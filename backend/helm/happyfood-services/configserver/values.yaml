@@ -1,0 +1,27 @@
+deploymentName: configserver-deployment
+serviceName: configserver
+appLabel: configserver
+appName: configserver
+
+replicaCount: 1
+
+image:
+  repository: sontruong02003/configserver
+  tag: s1
+
+containerPort: 8071
+
+service:
+  type: ClusterIP
+  port: 8071
+  targetPort: 8071
+
+appname_enabled: true
+profile_enabled: false
+datasource_enabled: false
+config_enabled: false
+discovery_enabled: false
+resouceserver_enabled: false
+otel_enabled: false
+kafka_enabled: false
+database_enabled: false

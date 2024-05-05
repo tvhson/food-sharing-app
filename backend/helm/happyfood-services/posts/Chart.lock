@@ -1,0 +1,6 @@
+dependencies:
+- name: happyfood-common
+  repository: file://../../happyfood-common
+  version: 0.1.0
+digest: sha256:b6a4b1c8093810cb5d99204e07769b679842b83381ad9b36832bdf041e376239
+generated: "2024-05-04T21:43:49.2426192+07:00"

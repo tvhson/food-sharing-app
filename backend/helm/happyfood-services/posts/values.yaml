@@ -1,0 +1,32 @@
+deploymentName: posts-deployment
+serviceName: posts
+appLabel: posts
+appName: posts
+
+dataSource:
+  url: jdbc:mysql://postsdb:3308/postsdb
+  username: root
+  password: root
+
+replicaCount: 1
+
+image:
+  repository: sontruong02003/posts
+  tag: s1
+
+containerPort: 8090
+
+service:
+  type: ClusterIP
+  port: 8090
+  targetPort: 8090
+
+appname_enabled: true
+profile_enabled: true
+datasource_enabled: true
+config_enabled: true
+discovery_enabled: true
+resouceserver_enabled: false
+otel_enabled: false
+kafka_enabled: false
+database_enabled: false
