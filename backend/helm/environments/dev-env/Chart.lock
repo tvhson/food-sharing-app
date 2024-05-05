@@ -1,0 +1,27 @@
+dependencies:
+- name: happyfood-common
+  repository: file://../../happyfood-common
+  version: 0.1.0
+- name: configserver
+  repository: file://../../happyfood-services/configserver
+  version: 0.1.0
+- name: accountsdb
+  repository: file://../../happyfood-services/accountsdb
+  version: 0.1.0
+- name: accounts
+  repository: file://../../happyfood-services/accounts
+  version: 0.1.0
+- name: postsdb
+  repository: file://../../happyfood-services/postsdb
+  version: 0.1.0
+- name: posts
+  repository: file://../../happyfood-services/posts
+  version: 0.1.0
+- name: auth
+  repository: file://../../happyfood-services/auth
+  version: 0.1.0
+- name: gatewayserver
+  repository: file://../../happyfood-services/gatewayserver
+  version: 0.1.0
+digest: sha256:a59095401764ba74340e29a81fa798e12bc02851e16f8fc48d843b7afbfbf792
+generated: "2024-05-05T09:58:49.8983397+07:00"

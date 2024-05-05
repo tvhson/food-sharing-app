@@ -1,0 +1,27 @@
+deploymentName: auth-deployment
+serviceName: auth
+appLabel: auth
+appName: auth
+
+replicaCount: 1
+
+image:
+  repository: sontruong02003/auth
+  tag: s1
+
+containerPort: 7080
+
+service:
+  type: ClusterIP
+  port: 7080
+  targetPort: 7080
+
+appname_enabled: true
+profile_enabled: true
+datasource_enabled: false
+config_enabled: true
+discovery_enabled: true
+resouceserver_enabled: false
+otel_enabled: false
+kafka_enabled: false
+database_enabled: false

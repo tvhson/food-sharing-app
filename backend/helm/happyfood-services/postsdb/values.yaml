@@ -1,0 +1,31 @@
+deploymentName: postsdb-deployment
+serviceName: postsdb
+appLabel: postsdb
+appName: postsdb
+
+replicaCount: 1
+
+image:
+  repository: mysql
+  tag: latest
+
+containerPort: 3306
+
+service:
+  type: ClusterIP
+  port: 3308
+  targetPort: 3306
+
+mysql:
+  database: postsdb
+  rootPassword: root
+
+appname_enabled: false
+profile_enabled: false
+datasource_enabled: false
+config_enabled: false
+discovery_enabled: false
+resouceserver_enabled: false
+otel_enabled: false
+kafka_enabled: false
+database_enabled: true

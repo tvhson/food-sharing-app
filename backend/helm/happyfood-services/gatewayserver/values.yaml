@@ -1,0 +1,27 @@
+deploymentName: gatewayserver-deployment
+serviceName: gatewayserver
+appLabel: gatewayserver
+appName: gatewayserver
+
+replicaCount: 1
+
+image:
+  repository: sontruong02003/gatewayserver
+  tag: s1
+
+containerPort: 8072
+
+service:
+  type: LoadBalancer
+  port: 8072
+  targetPort: 8072
+
+appname_enabled: true
+profile_enabled: true
+datasource_enabled: false
+config_enabled: true
+discovery_enabled: true
+resouceserver_enabled: false
+otel_enabled: false
+kafka_enabled: false
+database_enabled: false
