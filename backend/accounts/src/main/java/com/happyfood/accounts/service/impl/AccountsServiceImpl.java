@@ -68,7 +68,6 @@ public class AccountsServiceImpl implements IAccountsService {
         accounts.setStatus(accountsDto.getStatus());
         accounts.setBirthDate(accountsDto.getBirthDate());
         accounts.setImageUrl(accountsDto.getImageUrl());
-        accounts.setRole(accountsDto.getRole());
         accounts.setBannedDate(accountsDto.getBannedDate());
 
         accounts = accountsRepository.save(accounts);

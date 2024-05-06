@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "accounts", url = "http://accounts:8080", fallback = AccountsFallback.class)
 public interface AccountsFeignClient {
-    @GetMapping(value = "/accounts/info/{accountId}", consumes = "application/json")
-    public ResponseEntity<AccountsDto> getAccount(@PathVariable Long accountId);
+    @GetMapping(value = "/accounts/info/{userId}", consumes = "application/json")
+    public ResponseEntity<AccountsDto> getAccount(@PathVariable Long userId);
 }
