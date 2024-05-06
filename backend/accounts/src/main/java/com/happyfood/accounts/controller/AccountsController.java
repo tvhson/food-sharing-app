@@ -25,7 +25,7 @@ public class AccountsController {
     @Retry(name = "test", fallbackMethod = "testFallback")
     @GetMapping
     public ResponseEntity<?> test() {
-        return ResponseEntity.ok().body(buildVersion);
+        return ResponseEntity.ok().body(buildVersion + " - test");
     }
 
     public ResponseEntity<?> testFallback(Throwable e) {
@@ -50,9 +50,9 @@ public class AccountsController {
         return ResponseEntity.ok(iAccountsService.authentication(accountsDto.getEmail(), accountsDto.getPassword()));
     }
 
-    @GetMapping("/info/{accountId}")
-    public ResponseEntity<AccountsDto> getAccount(@PathVariable Long accountId) {
-        return ResponseEntity.ok(iAccountsService.getAccount(accountId));
+    @GetMapping("/info/{userId}")
+    public ResponseEntity<AccountsDto> getAccount(@PathVariable Long userId) {
+        return ResponseEntity.ok(iAccountsService.getAccount(userId));
     }
 
     @PostMapping("/info")
@@ -61,7 +61,7 @@ public class AccountsController {
     }
 
     @PutMapping("/info")
-    public ResponseEntity<AccountsDto> updateAccount(@RequestHeader Long accountId, @Valid @RequestBody AccountsDto accountsDto) {
-        return ResponseEntity.ok(iAccountsService.updateAccount(accountId, accountsDto));
+    public ResponseEntity<AccountsDto> updateAccount(@RequestHeader Long userId, @Valid @RequestBody AccountsDto accountsDto) {
+        return ResponseEntity.ok(iAccountsService.updateAccount(userId, accountsDto));
     }
 }

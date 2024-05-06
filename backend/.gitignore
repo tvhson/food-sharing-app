@@ -1,0 +1,7 @@
+
+
+# auth application.yaml
+/auth/src/main/resources/application.yaml
+
+# gateway application.yaml
+/gateway/src/main/resources/application.yaml
