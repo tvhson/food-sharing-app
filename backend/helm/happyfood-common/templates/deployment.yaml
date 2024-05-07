@@ -18,7 +18,9 @@ spec:
       containers:
       - name: {{ .Values.appLabel }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+{{- if .Values.global.docker_online_enabled }}
         imagePullPolicy: Always
+{{- end }}
         ports:
         - containerPort: {{ .Values.containerPort }}
           protocol: TCP
