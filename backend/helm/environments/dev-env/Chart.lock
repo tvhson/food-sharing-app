@@ -23,5 +23,8 @@ dependencies:
 - name: gatewayserver
   repository: file://../../happyfood-services/gatewayserver
   version: 0.1.0
-digest: sha256:a59095401764ba74340e29a81fa798e12bc02851e16f8fc48d843b7afbfbf792
-generated: "2024-05-05T09:58:49.8983397+07:00"
+- name: media
+  repository: file://../../happyfood-services/media
+  version: 0.1.0
+digest: sha256:690398e3ceb8560a97146cbca75c570f055913aecd523fc6045ef3f612e0b60a
+generated: "2024-05-07T11:16:54.3280017+07:00"

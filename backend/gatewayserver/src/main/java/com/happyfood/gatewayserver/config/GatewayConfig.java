@@ -25,6 +25,9 @@ public class GatewayConfig {
                 .route("POSTS", r -> r.path("/posts/**", "/posts-details/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://posts:8090"))
+                .route("MEDIA", r -> r.path("/media/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://media:9000"))
                 .build();
     }
 }

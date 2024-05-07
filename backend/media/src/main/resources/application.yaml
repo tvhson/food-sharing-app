@@ -1,0 +1,63 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: media
+  profiles:
+    active: "default"
+  config:
+    import: "optional:configserver:http://localhost:8071"
+  cloud:
+    kubernetes:
+      discovery:
+        all-namespaces: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+endpoints:
+  shutdown:
+    enabled: true
+
+
+info:
+  app:
+    name: "media"
+    description: "media Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      sontruong02003:
+        posts: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
+aws:
+  accessKey: AKIAYS2NVACDMBYG6GNN
+  secretKey: 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
+  region: ap-southeast-1
+  s3:
+    bucket: tvhson

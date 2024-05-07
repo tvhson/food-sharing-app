@@ -5,3 +5,6 @@
 
 # gateway application.yaml
 /gateway/src/main/resources/application.yaml
+
+# media application.yaml
+/media/src/main/resources/application.yaml
