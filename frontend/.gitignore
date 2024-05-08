@@ -68,3 +68,5 @@ yarn-error.log
 # add local properties file
 /android/local.properties
 /android/secrets.properties
+# add secrets file
+/components/data/SecretData.tsx
