@@ -17,6 +17,12 @@ dependencies:
 - name: posts
   repository: file://../../happyfood-services/posts
   version: 0.1.0
+- name: organizationpostsdb
+  repository: file://../../happyfood-services/organizationpostsdb
+  version: 0.1.0
+- name: organizationposts
+  repository: file://../../happyfood-services/organizationposts
+  version: 0.1.0
 - name: auth
   repository: file://../../happyfood-services/auth
   version: 0.1.0
@@ -26,5 +32,5 @@ dependencies:
 - name: media
   repository: file://../../happyfood-services/media
   version: 0.1.0
-digest: sha256:690398e3ceb8560a97146cbca75c570f055913aecd523fc6045ef3f612e0b60a
-generated: "2024-05-07T11:16:54.3280017+07:00"
+digest: sha256:161bc78e1001f0929339492b3b1122a581c8a4ef5592dc3f37dc706c551328f5
+generated: "2024-05-08T13:53:46.1741363+07:00"

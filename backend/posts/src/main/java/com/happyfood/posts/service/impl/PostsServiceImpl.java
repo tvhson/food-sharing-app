@@ -68,12 +68,16 @@ public class PostsServiceImpl implements IPostsService {
     @Override
     public List<PostsDto> getRecommendedPosts(Long userId) {
         List<Posts> posts = postsRepository.findAll();
-        return posts.stream().map(PostsMapper::mapToPostsDto).toList();
+        return posts.stream()
+                .filter(post -> !post.isDeleted())
+                .map(PostsMapper::mapToPostsDto).toList();
     }
 
     @Override
     public List<PostsDto> getPostsOfUser(Long userId) {
         List<Posts> posts = postsRepository.findAllByCreatedById(userId);
-        return posts.stream().map(PostsMapper::mapToPostsDto).toList();
+        return posts.stream()
+                .filter(post -> !post.isDeleted())
+                .map(PostsMapper::mapToPostsDto).toList();
     }
 }

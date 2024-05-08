@@ -13,6 +13,7 @@
         <module name="configserver" />
         <module name="media" />
         <module name="message" />
+        <module name="organizationposts" />
         <module name="posts" />
       </profile>
     </annotationProcessing>
@@ -30,6 +31,7 @@
       <module name="gatewayserver" options="-parameters" />
       <module name="media" options="-parameters" />
       <module name="message" options="-parameters" />
+      <module name="organizationposts" options="-parameters" />
       <module name="posts" options="-parameters" />
       <module name="sharingposts" options="-parameters" />
     </option>
