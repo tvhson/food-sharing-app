@@ -48,6 +48,14 @@ dependencies:
     version: 0.1.0
     repository: file://../../happyfood-services/posts
 
+  - name: organizationpostsdb
+    version: 0.1.0
+    repository: file://../../happyfood-services/organizationpostsdb
+
+  - name: organizationposts
+    version: 0.1.0
+    repository: file://../../happyfood-services/organizationposts
+
   - name: auth
     version: 0.1.0
     repository: file://../../happyfood-services/auth

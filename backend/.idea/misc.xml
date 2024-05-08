@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/auth/pom.xml" />
         <option value="$PROJECT_DIR$/posts/pom.xml" />
         <option value="$PROJECT_DIR$/media/pom.xml" />
+        <option value="$PROJECT_DIR$/organizationposts/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
