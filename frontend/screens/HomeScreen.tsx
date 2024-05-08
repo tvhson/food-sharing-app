@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useRef, useState} from 'react';
-import {View, Text, FlatList} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import Header from '../components/ui/Header';
 import Colors from '../global/Color';
 import {SearchBar} from '@rneui/themed';
@@ -75,6 +75,21 @@ const HomeScreen = ({navigation}: any) => {
           />
         )}
       />
+      <TouchableOpacity
+        onPress={() => navigation.navigate('CreatePost', {location})}
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+          width: 50,
+          height: 50,
+          borderRadius: 25,
+          backgroundColor: Colors.button,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text style={{fontSize: 30, color: 'white'}}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 };

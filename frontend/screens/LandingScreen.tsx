@@ -1,9 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Button} from '@rneui/themed';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Image, Text, TouchableOpacity} from 'react-native';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import Colors from '../global/Color';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoadingScreen from './LoadingScreen';
 
 const LandingScreen = ({navigation}: any) => {
   const handleRegister = () => {
@@ -12,6 +14,7 @@ const LandingScreen = ({navigation}: any) => {
   const handleLogin = () => {
     navigation.navigate('Login');
   };
+  
 
   return (
     <View style={styles.container}>
@@ -41,14 +44,14 @@ const LandingScreen = ({navigation}: any) => {
           entering={FadeInDown.delay(400).duration(1000).springify()}
           style={{width: 300, marginTop: 150, marginVertical: 10}}>
           <Button
-            title="Register"
+            title="Login"
             icon={{
               name: 'user',
               type: 'font-awesome',
               size: 20,
               color: 'white',
             }}
-            onPress={handleRegister}
+            onPress={handleLogin}
             iconPosition="left"
             iconContainerStyle={{marginRight: 10}}
             titleStyle={{fontWeight: '700'}}
@@ -63,11 +66,11 @@ const LandingScreen = ({navigation}: any) => {
         </Animated.View>
         <Animated.View
           entering={FadeInDown.delay(400).duration(1000).springify()}>
-          <TouchableOpacity onPress={handleLogin}>
+          <TouchableOpacity onPress={handleRegister}>
             <Text
               style={{fontSize: 16, color: Colors.button}} // Apply the color dynamically
             >
-              or Sign in
+              or Register
             </Text>
           </TouchableOpacity>
         </Animated.View>

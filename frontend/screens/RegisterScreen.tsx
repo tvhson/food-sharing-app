@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import {Icon, Button} from '@rneui/themed';
 import React, {useState} from 'react';
@@ -8,17 +9,103 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import Colors from '../global/Color';
+import {createNotifications} from 'react-native-notificated';
+import {register} from '../api/RegisterApi';
+
+const {useNotifications} = createNotifications();
 
 const RegisterScreen = ({navigation}: any) => {
+  const {notify} = useNotifications();
+  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const validateEmail = (email: string) => {
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+  const validatePassword = (password: string) => {
+    const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return re.test(String(password));
+  };
+  const validateConfirmPassword = (
+    password: string,
+    confirmPassword: string,
+  ) => {
+    return password === confirmPassword;
+  };
+  const handleRegister = async () => {
+    if (
+      name === '' ||
+      username === '' ||
+      password === '' ||
+      confirmPassword === ''
+    ) {
+      notify('error', {
+        params: {description: 'Please fill all fields.', title: 'Error'},
+      });
+      return;
+    }
+    if (!validateEmail(username)) {
+      notify('error', {
+        params: {description: 'Invalid email.', title: 'Error'},
+      });
+      return;
+    }
 
-  const handleRegister = () => {
-    console.log('Registering user:', username);
-    console.log('Password:', password);
+    if (!validatePassword(password)) {
+      notify('error', {
+        params: {
+          description:
+            'Password must contain at least 8 characters, including letters and numbers.',
+          title: 'Error',
+          style: {multiline: 100},
+        },
+      });
+      return;
+    }
+    if (!validateConfirmPassword(password, confirmPassword)) {
+      notify('error', {
+        params: {description: 'Password does not match.', title: 'Error'},
+      });
+      return;
+    }
+    const email: string = username;
+    register({name, email, password})
+      .then(response => {
+        if (response.status === 201) {
+          notify('success', {
+            params: {
+              description: 'Register success',
+              title: 'Success',
+            },
+          });
+          navigation.navigate('Login');
+        } else {
+          notify('error', {
+            params: {
+              description: response.data.message || 'Register failed.',
+              title: 'Error',
+            },
+          });
+        }
+      })
+      .catch(error => {
+        notify('error', {
+          params: {
+            description: error.message,
+            title: 'Error',
+            style: {multiline: 100},
+          },
+        });
+      });
   };
   const handleLogin = () => {
     navigation.navigate('Login');
@@ -82,6 +169,23 @@ const RegisterScreen = ({navigation}: any) => {
           entering={FadeInUp.delay(400).duration(1000).springify()}
           style={{marginTop: 130, alignItems: 'center'}}>
           <TextInput
+            placeholder="Name"
+            placeholderTextColor={'#706d6d'}
+            style={{
+              fontSize: 16,
+              padding: 10,
+              backgroundColor: '#eff2ff',
+              borderRadius: 8,
+              width: '90%',
+              color: 'black',
+            }}
+            onChangeText={setName}
+          />
+        </Animated.View>
+        <Animated.View
+          entering={FadeInUp.delay(400).duration(1000).springify()}
+          style={{marginTop: 20, alignItems: 'center'}}>
+          <TextInput
             placeholder="Email"
             placeholderTextColor={'#706d6d'}
             style={{
@@ -90,44 +194,92 @@ const RegisterScreen = ({navigation}: any) => {
               backgroundColor: '#eff2ff',
               borderRadius: 8,
               width: '90%',
+              color: 'black',
             }}
+            onChangeText={setUsername}
           />
         </Animated.View>
         <Animated.View
           entering={FadeInUp.delay(500).duration(1000).springify()}
           style={{marginTop: 20, alignItems: 'center'}}>
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor={'#706d6d'}
+          <View
             style={{
-              fontSize: 16,
               padding: 10,
+              paddingVertical: 0,
               backgroundColor: '#eff2ff',
               borderRadius: 8,
               width: '90%',
-            }}
-          />
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor={'#706d6d'}
+              style={{
+                fontSize: 16,
+                color: 'black',
+                width: '90%',
+              }}
+              secureTextEntry={!showPassword}
+              onChangeText={setPassword}
+            />
+            <TouchableWithoutFeedback>
+              <Icon
+                name={showPassword ? 'eye' : 'eye-with-line'}
+                type="entypo"
+                size={24}
+                color={'#706d6d'}
+                onPress={() => {
+                  setShowPassword(!showPassword);
+                }}
+              />
+            </TouchableWithoutFeedback>
+          </View>
         </Animated.View>
         <Animated.View
           entering={FadeInUp.delay(600).duration(1000).springify()}
           style={{marginTop: 20, alignItems: 'center'}}>
-          <TextInput
-            placeholder="Confirm password"
-            placeholderTextColor={'#706d6d'}
+          <View
             style={{
-              fontSize: 16,
               padding: 10,
+              paddingVertical: 0,
               backgroundColor: '#eff2ff',
               borderRadius: 8,
               width: '90%',
-            }}
-          />
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TextInput
+              placeholder="Confirm password"
+              placeholderTextColor={'#706d6d'}
+              style={{
+                fontSize: 16,
+                color: 'black',
+                width: '90%',
+              }}
+              secureTextEntry={!showConfirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+            <TouchableWithoutFeedback>
+              <Icon
+                name={showConfirmPassword ? 'eye' : 'eye-with-line'}
+                type="entypo"
+                size={24}
+                color={'#706d6d'}
+                onPress={() => {
+                  setShowConfirmPassword(!showConfirmPassword);
+                }}
+              />
+            </TouchableWithoutFeedback>
+          </View>
         </Animated.View>
 
         <Animated.View
           entering={FadeInDown.delay(400).duration(1000).springify()}
           style={{
-            marginTop: 150,
+            marginTop: 120,
             alignItems: 'center',
             width: '100%',
           }}>
