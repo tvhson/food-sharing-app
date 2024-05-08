@@ -1,11 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-  Text,
-  Touchable,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {Text, TouchableWithoutFeedback, View} from 'react-native';
 import React from 'react';
 import {Icon, Image} from '@rneui/themed';
 import Colors from '../../global/Color';

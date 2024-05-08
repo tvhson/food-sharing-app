@@ -8,18 +8,78 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from 'react-native';
+import {createNotifications} from 'react-native-notificated';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
+import {login} from '../api/LoginApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const {useNotifications} = createNotifications();
 
 const LoginScreen = ({navigation}: any) => {
+  const {notify} = useNotifications();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
+  const validateEmail = (email: string) => {
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
   const handleRegister = () => {
     navigation.navigate('Register');
   };
   const handleLogin = () => {
-    navigation.navigate('BottomTabNavigator');
+    console.log(email, password);
+    if (email === '' || password === '') {
+      notify('error', {
+        params: {description: 'Please fill all fields.', title: 'Error'},
+      });
+      return;
+    }
+    if (!validateEmail(email)) {
+      notify('error', {
+        params: {description: 'Invalid email.', title: 'Error'},
+      });
+      return;
+    }
+    login({email, password})
+      .then(response => {
+        if (response.status === 200) {
+          notify('success', {
+            params: {description: 'Login successful.', title: 'Success'},
+          });
+          if (response.data) {
+            AsyncStorage.setItem('user', JSON.stringify(response.data));
+            navigation.navigate('BottomTabNavigator');
+          } else {
+            notify('error', {
+              params: {
+                description: response.data.message || 'Login failed.',
+                title: 'Error',
+              },
+            });
+          }
+        } else {
+          notify('error', {
+            params: {
+              description: response.data.message || 'Login failed.',
+              title: 'Error',
+            },
+          });
+        }
+      })
+      .catch(error => {
+        notify('error', {
+          params: {
+            description: error.message || 'Login failed.',
+            title: 'Error',
+            style: {multiline: 100},
+          },
+        });
+      });
   };
 
   return (
@@ -88,23 +148,48 @@ const LoginScreen = ({navigation}: any) => {
               backgroundColor: '#eff2ff',
               borderRadius: 8,
               width: '90%',
+              color: 'black',
             }}
+            onChangeText={setEmail}
           />
         </Animated.View>
         <Animated.View
           entering={FadeInUp.delay(500).duration(1000).springify()}
           style={{marginTop: 20, alignItems: 'center'}}>
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor={'#706d6d'}
+          <View
             style={{
-              fontSize: 16,
               padding: 10,
+              paddingVertical: 0,
               backgroundColor: '#eff2ff',
               borderRadius: 8,
               width: '90%',
-            }}
-          />
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor={'#706d6d'}
+              style={{
+                fontSize: 16,
+                color: 'black',
+                width: '90%',
+              }}
+              secureTextEntry={!showPassword}
+              onChangeText={setPassword}
+            />
+            <TouchableWithoutFeedback>
+              <Icon
+                name={showPassword ? 'eye' : 'eye-with-line'}
+                type="entypo"
+                size={24}
+                color={'#706d6d'}
+                onPress={() => {
+                  setShowPassword(!showPassword);
+                }}
+              />
+            </TouchableWithoutFeedback>
+          </View>
         </Animated.View>
 
         <Animated.View
