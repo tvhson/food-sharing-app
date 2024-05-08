@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.button,
     padding: 10,
     borderBottomWidth: 1,
+    height: 60,
     borderBottomColor: '#ccc',
     justifyContent: 'space-between',
   },
