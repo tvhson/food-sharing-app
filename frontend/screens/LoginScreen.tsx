@@ -14,6 +14,7 @@ import {createNotifications} from 'react-native-notificated';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {login} from '../api/LoginApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getInfoUser} from '../api/AccountsApi';
 
 const {useNotifications} = createNotifications();
 
@@ -22,6 +23,7 @@ const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
   const validateEmail = (email: string) => {
     const re =
@@ -52,7 +54,7 @@ const LoginScreen = ({navigation}: any) => {
             params: {description: 'Login successful.', title: 'Success'},
           });
           if (response.data) {
-            AsyncStorage.setItem('user', JSON.stringify(response.data));
+            AsyncStorage.setItem('token', JSON.stringify(response.data));
             navigation.navigate('BottomTabNavigator');
           } else {
             notify('error', {

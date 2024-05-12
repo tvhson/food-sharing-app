@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'http://192.168.123.94:8080/';
+const baseUrl = 'http://34.69.53.221:8072/';
 
 const ApiManager = axios.create({
   baseURL: baseUrl,

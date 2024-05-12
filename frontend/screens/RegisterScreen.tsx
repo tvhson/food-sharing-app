@@ -80,7 +80,7 @@ const RegisterScreen = ({navigation}: any) => {
     const email: string = username;
     register({name, email, password})
       .then(response => {
-        if (response.status === 201) {
+        if (response.status === 200) {
           notify('success', {
             params: {
               description: 'Register success',
@@ -89,6 +89,7 @@ const RegisterScreen = ({navigation}: any) => {
           });
           navigation.navigate('Login');
         } else {
+          console.log(response.data.message || 'Register failed.');
           notify('error', {
             params: {
               description: response.data.message || 'Register failed.',

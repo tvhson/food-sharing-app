@@ -18,7 +18,7 @@ const Router = () => {
 
   useEffect(() => {
     const checkUser = async () => {
-      const storedUser = await AsyncStorage.getItem('user');
+      const storedUser = await AsyncStorage.getItem('token');
       setUser(storedUser);
       setIsLoading(false);
     };
