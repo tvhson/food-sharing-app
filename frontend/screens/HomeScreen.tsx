@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import Header from '../components/ui/Header';
 import Colors from '../global/Color';
@@ -12,6 +12,8 @@ import GetLocation, {
   LocationErrorCode,
   isLocationError,
 } from 'react-native-get-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getInfoUser} from '../api/AccountsApi';
 
 const HomeScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
@@ -41,6 +43,29 @@ const HomeScreen = ({navigation}: any) => {
       }
       setLocation(null);
     });
+
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getToken = async () => {
+      const storedToken = await AsyncStorage.getItem('token');
+      if (storedToken) {
+        const parsedToken = JSON.parse(storedToken);
+        setToken(parsedToken.accessToken);
+      }
+    };
+
+    const saveInfoUser = async () => {
+      getInfoUser(token).then((response: any) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          AsyncStorage.setItem('infoUser', JSON.stringify(response.data));
+        }
+      });
+    };
+    getToken();
+    saveInfoUser();
+  }, [token]);
 
   return (
     <View
