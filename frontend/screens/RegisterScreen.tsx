@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import {Icon, Button} from '@rneui/themed';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   TextInput,
@@ -111,6 +111,14 @@ const RegisterScreen = ({navigation}: any) => {
   const handleLogin = () => {
     navigation.navigate('Login');
   };
+  useEffect(() => {
+    setName('');
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  }, []);
 
   return (
     <View style={styles.container}>

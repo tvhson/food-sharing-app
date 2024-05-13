@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import {Accessory} from '@rneui/base';
-import {Avatar, Button} from '@rneui/themed';
+import {Accessory, Text} from '@rneui/base';
+import {Avatar, Button, Icon} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, ImageBackground} from 'react-native';
 import Colors from '../global/Color';
@@ -23,8 +23,11 @@ const ProfileScreen = ({navigation}: any) => {
   const [token, setToken] = useState<string | null>(null);
   const [infoUser, setInfoUser] = useState<any | null>(null);
   const [imageUrl, setImageUrl] = useState('');
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [editData, setEditData] = useState(null);
+
+  const handleEditData = (data: any) => {
+    setEditData(data);
+  };
 
   useEffect(() => {
     const getToken = async () => {
@@ -60,14 +63,9 @@ const ProfileScreen = ({navigation}: any) => {
       if (getInfo) {
         const parsedInfo = JSON.parse(getInfo);
         setInfoUser(parsedInfo);
+        console.log(parsedInfo);
         if (parsedInfo.imageUrl) {
           setImageUrl(parsedInfo.imageUrl);
-        }
-        if (parsedInfo.email) {
-          setEmail(parsedInfo.email);
-        }
-        if (parsedInfo.name) {
-          setName(parsedInfo.name);
         }
       }
     };
@@ -75,7 +73,7 @@ const ProfileScreen = ({navigation}: any) => {
     getToken();
     requestCameraPermission();
     getInfoUser();
-  }, []);
+  }, [isEditVisible]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
@@ -91,14 +89,27 @@ const ProfileScreen = ({navigation}: any) => {
     });
     uploadPhoto(dataForm, token).then((response: any) => {
       if (response.status === 200) {
-        console.log(response.data);
-        setImageUrl(response.data);
-        updateUser({imageUrl: imageUrl[0], email: email, name: name}, token)
+        const imageUrlString = response.data[0];
+        setImageUrl(imageUrlString);
+        updateUser(
+          {
+            imageUrl: response.data[0],
+            email: infoUser.email,
+            name: infoUser.name,
+            bannedDate: infoUser.bannedDate,
+            birthDate: infoUser.birthDate,
+            description: infoUser.description,
+            phone: infoUser.phone,
+            status: infoUser.status,
+            latitude: infoUser.latitude,
+            longitude: infoUser.longitude,
+            locationName: infoUser.locationName,
+          },
+          token,
+        )
           .then((response2: any) => {
-            console.log(imageUrl[0], email, name, token);
-            console.log(response2);
+            //console.log(response2);
             if (response2.status === 200) {
-              console.log(response2.data);
               AsyncStorage.setItem('infoUser', JSON.stringify(response2.data));
               notify('success', {
                 params: {
@@ -126,12 +137,16 @@ const ProfileScreen = ({navigation}: any) => {
           });
         return response.data;
       } else {
-        console.log(response.status);
-        throw new Error(response.data.errorMessage);
+        notify('error', {
+          params: {
+            description: 'Upload image failed.',
+            title: 'Error',
+          },
+        });
       }
     });
   };
-
+  console.log(editData);
   return (
     <View style={styles.container}>
       <EditProfileScreen
@@ -139,6 +154,7 @@ const ProfileScreen = ({navigation}: any) => {
         setVisible={setIsEditVisible}
         infoUser={infoUser}
         token={token}
+        onEditData={handleEditData}
       />
       <UploadPhoto
         isVisible={isUploadVisible}
@@ -164,10 +180,9 @@ const ProfileScreen = ({navigation}: any) => {
             size={128}
             rounded
             source={{
-              uri:
-                imageUrl && imageUrl.length > 0
-                  ? imageUrl[0]
-                  : 'https://randomuser.me/api/portraits/men/36.jpg',
+              uri: imageUrl
+                ? imageUrl
+                : 'https://randomuser.me/api/portraits/men/36.jpg',
             }}>
             <Accessory
               size={30}
@@ -182,7 +197,82 @@ const ProfileScreen = ({navigation}: any) => {
         </View>
         <View
           style={{
-            marginHorizontal: 40,
+            marginHorizontal: 35,
+            backgroundColor: 'white',
+            borderRadius: 8,
+            marginVertical: 20,
+            overflow: 'hidden',
+            padding: 10,
+          }}>
+          <Button
+            title={
+              (editData as unknown as {name?: string})?.name
+                ? (editData as unknown as {name?: string})?.name
+                : infoUser?.name
+            }
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black', marginLeft: 10}}
+            icon={{name: 'user', type: 'antdesign', color: 'black'}}
+          />
+          <Button
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
+            title={
+              (editData as unknown as {birthDate?: Date})?.birthDate
+                ? (editData as unknown as {birthDate?: Date})?.birthDate
+                : infoUser?.birthDate
+            }
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black', marginLeft: 10}}
+            icon={{name: 'birthday-cake', type: 'font-awesome', color: 'black'}}
+          />
+          <Button
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
+            title={
+              (editData as unknown as {phone?: string})?.phone
+                ? (editData as unknown as {phone?: string})?.phone
+                : infoUser?.phone
+            }
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black', marginLeft: 10}}
+            icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
+          />
+          <Button
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
+            title={
+              (editData as unknown as {locationName?: string})?.locationName
+                ? (editData as unknown as {locationName?: string})?.locationName
+                : infoUser?.locationName
+            }
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black'}}
+            icon={{name: 'location', type: 'entypo', color: 'black'}}
+          />
+        </View>
+
+        <View
+          style={{
+            marginHorizontal: 35,
             backgroundColor: 'white',
             borderRadius: 8,
             marginVertical: 20,

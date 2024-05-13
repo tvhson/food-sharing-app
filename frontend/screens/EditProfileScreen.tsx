@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Icon} from '@rneui/themed';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {LegacyRef, useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -21,25 +21,58 @@ const {useNotifications} = createNotifications();
 function EditProfileScreen(props: any) {
   const {notify} = useNotifications();
   const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
+  const [locationName, setLocationName] = useState('');
   const [description, setDescription] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [birthDate, setBirthDate] = useState(new Date());
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
 
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
   };
+
   const saveProfile = () => {
-    console.log(name, location, description, phone, birthDate);
-    console.log(props.token);
+    if (name === '') {
+      notify('error', {
+        params: {description: 'Name is required.', title: 'Error'},
+      });
+      return;
+    }
+    if (
+      (phone !== null && phone.length < 10) ||
+      (phone !== null && phone.length > 10)
+    ) {
+      notify('error', {
+        params: {
+          description: 'Phone number must be 10  digits.',
+          title: 'Error',
+        },
+      });
+      return;
+    }
+
     updateUser(
-      {name, location, description, phone, birthDate, email},
+      {
+        name,
+        locationName:
+          locationName === '' ? props.infoUser.locationName : locationName,
+        description,
+        phone,
+        birthDate,
+        email,
+        imageUrl: props.infoUser.imageUrl,
+        latitude: latitude === 0 ? props.infoUser.latitude : latitude,
+        longitude: longitude === 0 ? props.infoUser.longitude : longitude,
+        status: props.infoUser.status,
+      },
       props.token,
     )
       .then((response: any) => {
-        console.log(response.data);
+        console.log(response);
         if (response.status === 200) {
+          props.onEditData(response.data);
           props.setVisible(false);
           notify('success', {
             params: {
@@ -74,14 +107,14 @@ function EditProfileScreen(props: any) {
         setBirthDate(new Date(props.infoUser.birthDate));
       }
       if (props.infoUser.location !== null) {
-        setLocation(props.infoUser.location);
+        setLocationName(props.infoUser.locationName);
       }
     }
   }, [
     props.infoUser,
     props.infoUser?.birthDate,
     props.infoUser?.description,
-    props.infoUser?.location,
+    props.infoUser?.locationName,
     props.infoUser?.name,
     props.infoUser?.phoneNumber,
   ]);
@@ -94,7 +127,7 @@ function EditProfileScreen(props: any) {
       style={{margin: 0}}>
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
-        keyboardShouldPersistTaps="always">
+        keyboardShouldPersistTaps="handled">
         <View style={styles.modalContent}>
           <View style={{height: 70}} />
           <View style={{marginLeft: 10}}>
@@ -172,10 +205,16 @@ function EditProfileScreen(props: any) {
               Location
             </Text>
             <GooglePlacesAutocomplete
-              placeholder="Enter your country/region"
+              fetchDetails={true}
+              placeholder={
+                locationName === '' ? 'Enter your country/region' : locationName
+              }
               onPress={(data, details = null) => {
-                console.log(data, details);
+                setLocationName(data.description);
+                setLatitude(details?.geometry.location.lat || 0);
+                setLongitude(details?.geometry.location.lng || 0);
               }}
+              disableScroll={true}
               query={{
                 key: MAP_API_KEY,
                 language: 'vi',
