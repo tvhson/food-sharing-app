@@ -27,7 +27,7 @@ const Router = () => {
   if (isLoading) {
     return <LoadingScreen />;
   }
-  console.log(isLoading, user);
+  //console.log(isLoading, user);
   return (
     <>
       <Stack.Navigator screenOptions={{headerShown: false}}>

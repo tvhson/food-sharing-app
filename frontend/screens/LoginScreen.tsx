@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Icon, Button} from '@rneui/themed';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   TextInput,
@@ -23,7 +23,6 @@ const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
 
   const validateEmail = (email: string) => {
     const re =
@@ -34,7 +33,7 @@ const LoginScreen = ({navigation}: any) => {
     navigation.navigate('Register');
   };
   const handleLogin = () => {
-    console.log(email, password);
+    //console.log(email, password);
     if (email === '' || password === '') {
       notify('error', {
         params: {description: 'Please fill all fields.', title: 'Error'},
@@ -83,6 +82,10 @@ const LoginScreen = ({navigation}: any) => {
         });
       });
   };
+  useEffect(() => {
+    setEmail('');
+    setPassword('');
+  }, []);
 
   return (
     <View style={styles.container}>

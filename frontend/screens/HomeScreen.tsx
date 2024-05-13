@@ -17,6 +17,7 @@ import {getInfoUser} from '../api/AccountsApi';
 
 const HomeScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
+  const [imageUrl, setImageUrl] = useState();
   const [location, setLocation] = useState<Location | null>(null);
   const [error, setError] = useState<LocationErrorCode | null>(null);
 
@@ -58,8 +59,11 @@ const HomeScreen = ({navigation}: any) => {
     const saveInfoUser = async () => {
       getInfoUser(token).then((response: any) => {
         if (response.status === 200) {
-          console.log(response.data);
+          //console.log(response.data);
           AsyncStorage.setItem('infoUser', JSON.stringify(response.data));
+          if (response.data.imageUrl) {
+            setImageUrl(response.data.imageUrl);
+          }
         }
       });
     };
@@ -74,7 +78,7 @@ const HomeScreen = ({navigation}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <Header />
+      <Header imageUrl={imageUrl} />
       <SearchBar
         placeholder="Search food by name"
         containerStyle={{
