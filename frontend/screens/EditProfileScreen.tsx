@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Icon} from '@rneui/themed';
-import React, {LegacyRef, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,13 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Modal from 'react-native-modal';
 import MAP_API_KEY from '../components/data/SecretData';
 import {updateUser} from '../api/AccountsApi';
 import {createNotifications} from 'react-native-notificated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {DatePickerInput} from 'react-native-paper-dates';
 
 const {useNotifications} = createNotifications();
 function EditProfileScreen(props: any) {
@@ -28,6 +28,7 @@ function EditProfileScreen(props: any) {
   const [birthDate, setBirthDate] = useState(new Date());
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
+  const autocompleteRef = useRef<any | null>(null);
 
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
@@ -57,20 +58,19 @@ function EditProfileScreen(props: any) {
       {
         name,
         locationName:
-          locationName === '' ? props.infoUser.locationName : locationName,
+          locationName === '' ? props.userInfo.locationName : locationName,
         description,
         phone,
         birthDate,
         email,
-        imageUrl: props.infoUser.imageUrl,
-        latitude: latitude === 0 ? props.infoUser.latitude : latitude,
-        longitude: longitude === 0 ? props.infoUser.longitude : longitude,
-        status: props.infoUser.status,
+        imageUrl: props.userInfo.imageUrl,
+        latitude: latitude === 0 ? props.userInfo.latitude : latitude,
+        longitude: longitude === 0 ? props.userInfo.longitude : longitude,
+        status: props.userInfo.status,
       },
       props.token,
     )
       .then((response: any) => {
-        console.log(response);
         if (response.status === 200) {
           props.onEditData(response.data);
           props.setVisible(false);
@@ -98,25 +98,27 @@ function EditProfileScreen(props: any) {
       });
   };
   useEffect(() => {
-    if (props.infoUser) {
-      setName(props.infoUser.name);
-      setDescription(props.infoUser.description);
-      setPhone(props.infoUser.phone);
-      setEmail(props.infoUser.email);
-      if (props.infoUser.birthDate !== null) {
-        setBirthDate(new Date(props.infoUser.birthDate));
+    if (props.userInfo) {
+      setName(props.userInfo.name);
+      setDescription(props.userInfo.description);
+      setPhone(props.userInfo.phone);
+      setEmail(props.userInfo.email);
+      if (props.userInfo.birthDate !== null) {
+        setBirthDate(new Date(props.userInfo.birthDate));
       }
-      if (props.infoUser.location !== null) {
-        setLocationName(props.infoUser.locationName);
+      if (props.userInfo.locationName !== null) {
+        setLocationName(props.userInfo.locationName);
+        autocompleteRef.current?.setAddressText(props.userInfo.locationName);
       }
     }
   }, [
-    props.infoUser,
-    props.infoUser?.birthDate,
-    props.infoUser?.description,
-    props.infoUser?.locationName,
-    props.infoUser?.name,
-    props.infoUser?.phoneNumber,
+    props.userInfo,
+    props.userInfo?.birthDate,
+    props.userInfo?.description,
+    props.userInfo?.locationName,
+    props.userInfo?.name,
+    props.userInfo?.phoneNumber,
+    props.isVisible,
   ]);
 
   return (
@@ -183,20 +185,22 @@ function EditProfileScreen(props: any) {
               onChangeText={text => setPhone(text)}
             />
           </View>
-          <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Birthday
-            </Text>
+          <View style={{marginHorizontal: 10, marginTop: 30}}>
             <View
               style={{
                 width: '100%',
                 alignItems: 'center',
               }}>
-              <DatePicker
-                date={birthDate}
-                onDateChange={setBirthDate}
-                mode="date"
-                locale="eng"
+              <DatePickerInput
+                locale="en"
+                label="Birthday"
+                value={birthDate}
+                onChange={(date: Date | undefined) =>
+                  setBirthDate(date || new Date())
+                }
+                inputMode="start"
+                style={{width: 300}}
+                mode="outlined"
               />
             </View>
           </View>
@@ -205,10 +209,9 @@ function EditProfileScreen(props: any) {
               Location
             </Text>
             <GooglePlacesAutocomplete
+              ref={autocompleteRef}
               fetchDetails={true}
-              placeholder={
-                locationName === '' ? 'Enter your country/region' : locationName
-              }
+              placeholder={'Enter your country/region'}
               onPress={(data, details = null) => {
                 setLocationName(data.description);
                 setLatitude(details?.geometry.location.lat || 0);

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import {Accessory, Text} from '@rneui/base';
-import {Avatar, Button, Icon} from '@rneui/themed';
+import {Accessory} from '@rneui/base';
+import {Avatar, Button} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, ImageBackground} from 'react-native';
 import Colors from '../global/Color';
@@ -16,12 +16,12 @@ import {createNotifications} from 'react-native-notificated';
 
 const {useNotifications} = createNotifications();
 
-const ProfileScreen = ({navigation}: any) => {
+const ProfileScreen = ({navigation, route}: any) => {
+  const accessToken = route.params.accessToken;
+  const userInfo = route.params.userInfo;
   const {notify} = useNotifications();
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
-  const [infoUser, setInfoUser] = useState<any | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [editData, setEditData] = useState(null);
 
@@ -30,13 +30,6 @@ const ProfileScreen = ({navigation}: any) => {
   };
 
   useEffect(() => {
-    const getToken = async () => {
-      const storedToken = await AsyncStorage.getItem('token');
-      if (storedToken) {
-        const parsedToken = JSON.parse(storedToken);
-        setToken(parsedToken.accessToken);
-      }
-    };
     const requestCameraPermission = async () => {
       try {
         const granted = await PermissionsAndroid.request(
@@ -58,22 +51,15 @@ const ProfileScreen = ({navigation}: any) => {
         console.warn(err);
       }
     };
-    const getInfoUser = async () => {
-      const getInfo = await AsyncStorage.getItem('infoUser');
-      if (getInfo) {
-        const parsedInfo = JSON.parse(getInfo);
-        setInfoUser(parsedInfo);
-        console.log(parsedInfo);
-        if (parsedInfo.imageUrl) {
-          setImageUrl(parsedInfo.imageUrl);
-        }
+    const getImageUrl = async () => {
+      if (userInfo.imageUrl) {
+        setImageUrl(userInfo.imageUrl);
       }
     };
 
-    getToken();
     requestCameraPermission();
-    getInfoUser();
-  }, [isEditVisible]);
+    getImageUrl();
+  }, [isEditVisible, userInfo.imageUrl]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
@@ -87,30 +73,30 @@ const ProfileScreen = ({navigation}: any) => {
       name: image.filename || 'image.jpeg',
       type: image.mime || 'image/jpeg',
     });
-    uploadPhoto(dataForm, token).then((response: any) => {
+    uploadPhoto(dataForm, accessToken).then((response: any) => {
       if (response.status === 200) {
         const imageUrlString = response.data[0];
         setImageUrl(imageUrlString);
         updateUser(
           {
             imageUrl: response.data[0],
-            email: infoUser.email,
-            name: infoUser.name,
-            bannedDate: infoUser.bannedDate,
-            birthDate: infoUser.birthDate,
-            description: infoUser.description,
-            phone: infoUser.phone,
-            status: infoUser.status,
-            latitude: infoUser.latitude,
-            longitude: infoUser.longitude,
-            locationName: infoUser.locationName,
+            email: userInfo.email,
+            name: userInfo.name,
+            bannedDate: userInfo.bannedDate,
+            birthDate: userInfo.birthDate,
+            description: userInfo.description,
+            phone: userInfo.phone,
+            status: userInfo.status,
+            latitude: userInfo.latitude,
+            longitude: userInfo.longitude,
+            locationName: userInfo.locationName,
           },
-          token,
+          accessToken,
         )
           .then((response2: any) => {
             //console.log(response2);
             if (response2.status === 200) {
-              AsyncStorage.setItem('infoUser', JSON.stringify(response2.data));
+              AsyncStorage.setItem('userInfo', JSON.stringify(response2.data));
               notify('success', {
                 params: {
                   description: 'Update avatar successful.',
@@ -146,14 +132,13 @@ const ProfileScreen = ({navigation}: any) => {
       }
     });
   };
-  console.log(editData);
   return (
     <View style={styles.container}>
       <EditProfileScreen
         isVisible={isEditVisible}
         setVisible={setIsEditVisible}
-        infoUser={infoUser}
-        token={token}
+        userInfo={userInfo}
+        token={accessToken}
         onEditData={handleEditData}
       />
       <UploadPhoto
@@ -208,7 +193,7 @@ const ProfileScreen = ({navigation}: any) => {
             title={
               (editData as unknown as {name?: string})?.name
                 ? (editData as unknown as {name?: string})?.name
-                : infoUser?.name
+                : userInfo?.name
             }
             disabled
             disabledStyle={{backgroundColor: 'transparent'}}
@@ -227,7 +212,7 @@ const ProfileScreen = ({navigation}: any) => {
             title={
               (editData as unknown as {birthDate?: Date})?.birthDate
                 ? (editData as unknown as {birthDate?: Date})?.birthDate
-                : infoUser?.birthDate
+                : userInfo?.birthDate
             }
             buttonStyle={{
               backgroundColor: 'transparent',
@@ -243,7 +228,7 @@ const ProfileScreen = ({navigation}: any) => {
             title={
               (editData as unknown as {phone?: string})?.phone
                 ? (editData as unknown as {phone?: string})?.phone
-                : infoUser?.phone
+                : userInfo?.phone
             }
             buttonStyle={{
               backgroundColor: 'transparent',
@@ -259,7 +244,7 @@ const ProfileScreen = ({navigation}: any) => {
             title={
               (editData as unknown as {locationName?: string})?.locationName
                 ? (editData as unknown as {locationName?: string})?.locationName
-                : infoUser?.locationName
+                : userInfo?.locationName
             }
             buttonStyle={{
               backgroundColor: 'transparent',
