@@ -89,7 +89,6 @@ const RegisterScreen = ({navigation}: any) => {
           });
           navigation.navigate('Login');
         } else {
-          console.log(response.data.message || 'Register failed.');
           notify('error', {
             params: {
               description: response.data.message || 'Register failed.',

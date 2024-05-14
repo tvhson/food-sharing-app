@@ -14,8 +14,15 @@ import GetLocation, {
 } from 'react-native-get-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getInfoUser} from '../api/AccountsApi';
+import {createNotifications} from 'react-native-notificated';
+import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
-const HomeScreen = ({navigation}: any) => {
+const {useNotifications} = createNotifications();
+
+const HomeScreen = ({navigation, route}: any) => {
+  const accessToken = route.params.accessToken;
+  const userInfo = route.params.userInfo;
+  const {notify} = useNotifications();
   const [search, setSearch] = useState('');
   const [imageUrl, setImageUrl] = useState();
   const [location, setLocation] = useState<Location | null>(null);
@@ -25,51 +32,37 @@ const HomeScreen = ({navigation}: any) => {
     setSearch(search);
   };
 
-  GetLocation.getCurrentPosition({
-    enableHighAccuracy: true,
-    timeout: 30000,
-    rationale: {
-      title: 'Location permission',
-      message: 'The app needs the permission to request your location.',
-      buttonPositive: 'Ok',
-    },
-  })
-    .then(newLocation => {
-      setLocation(newLocation);
-    })
-    .catch(ex => {
-      if (isLocationError(ex)) {
-        const {code, message} = ex;
-        setError(code);
-      }
-      setLocation(null);
-    });
-
-  const [token, setToken] = useState<string | null>(null);
-
   useEffect(() => {
-    const getToken = async () => {
-      const storedToken = await AsyncStorage.getItem('token');
-      if (storedToken) {
-        const parsedToken = JSON.parse(storedToken);
-        setToken(parsedToken.accessToken);
+    const getImageUrl = async () => {
+      if (userInfo.imageUrl) {
+        setImageUrl(userInfo.imageUrl);
       }
     };
 
-    const saveInfoUser = async () => {
-      getInfoUser(token).then((response: any) => {
-        if (response.status === 200) {
-          //console.log(response.data);
-          AsyncStorage.setItem('infoUser', JSON.stringify(response.data));
-          if (response.data.imageUrl) {
-            setImageUrl(response.data.imageUrl);
+    const getLocation = async () => {
+      GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 30000,
+        rationale: {
+          title: 'Location permission',
+          message: 'The app needs the permission to request your location.',
+          buttonPositive: 'Ok',
+        },
+      })
+        .then(newLocation => {
+          setLocation(newLocation);
+        })
+        .catch(ex => {
+          if (isLocationError(ex)) {
+            const {code, message} = ex;
+            setError(code);
           }
-        }
-      });
+          setLocation(null);
+        });
     };
-    getToken();
-    saveInfoUser();
-  }, [token]);
+    getLocation();
+    getImageUrl();
+  }, [userInfo.imageUrl]);
 
   return (
     <View
@@ -105,7 +98,9 @@ const HomeScreen = ({navigation}: any) => {
         )}
       />
       <TouchableOpacity
-        onPress={() => navigation.navigate('CreatePost', {location})}
+        onPress={() =>
+          navigation.navigate('CreatePost', {location, accessToken})
+        }
         style={{
           position: 'absolute',
           bottom: 20,
