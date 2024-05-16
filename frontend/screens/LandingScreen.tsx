@@ -4,8 +4,6 @@ import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Image, Text, TouchableOpacity} from 'react-native';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import Colors from '../global/Color';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoadingScreen from './LoadingScreen';
 
 const LandingScreen = ({navigation}: any) => {
   const handleRegister = () => {
@@ -14,7 +12,6 @@ const LandingScreen = ({navigation}: any) => {
   const handleLogin = () => {
     navigation.navigate('Login');
   };
-  
 
   return (
     <View style={styles.container}>
