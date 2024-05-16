@@ -14,8 +14,10 @@ public class PostsMapper {
                 .description(postsDto.getDescription())
                 .note(postsDto.getNote())
                 .expiredDate(postsDto.getExpiredDate())
+                .pickUpStartDate(postsDto.getPickUpStartDate())
                 .pickUpEndDate(postsDto.getPickUpEndDate())
                 .status(postsDto.getStatus())
+                .locationName(postsDto.getLocationName())
                 .latitude(postsDto.getLatitude())
                 .longitude(postsDto.getLongitude())
                 .createdById(postsDto.getCreatedById())
@@ -32,12 +34,15 @@ public class PostsMapper {
                 .description(posts.getDescription())
                 .note(posts.getNote())
                 .expiredDate(posts.getExpiredDate())
+                .pickUpStartDate(posts.getPickUpStartDate())
                 .pickUpEndDate(posts.getPickUpEndDate())
                 .status(posts.getStatus())
+                .locationName(posts.getLocationName())
                 .latitude(posts.getLatitude())
                 .longitude(posts.getLongitude())
                 .createdById(posts.getCreatedById())
                 .receiverId(posts.getReceiverId())
+                .createdDate(posts.getCreatedDate())
                 .build();
     }
 }

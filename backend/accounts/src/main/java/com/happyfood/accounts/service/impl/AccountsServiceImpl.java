@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class AccountsServiceImpl implements IAccountsService {
@@ -27,6 +30,8 @@ public class AccountsServiceImpl implements IAccountsService {
 
         Accounts accounts = AccountsMapper.mapToAccounts(accountsDto);
         accounts.setPassword(passwordEncoder.encode(accounts.getPassword()));
+        accounts.setStatus("ACTIVE");
+        accounts.setCreatedDate(new Date());
         accounts = accountsRepository.save(accounts);
 //        sendCommunication(accounts);
         return AccountsMapper.mapToAccountsDto(accounts);
@@ -63,6 +68,7 @@ public class AccountsServiceImpl implements IAccountsService {
         accounts.setName(accountsDto.getName());
         accounts.setPhone(accountsDto.getPhone());
         accounts.setDescription(accountsDto.getDescription());
+        accounts.setLocationName(accountsDto.getLocationName());
         accounts.setLatitude(accountsDto.getLatitude());
         accounts.setLongitude(accountsDto.getLongitude());
         accounts.setStatus(accountsDto.getStatus());

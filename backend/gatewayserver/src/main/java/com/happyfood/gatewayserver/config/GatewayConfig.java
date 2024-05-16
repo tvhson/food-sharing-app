@@ -31,6 +31,9 @@ public class GatewayConfig {
                 .route("ORGANIZATIONPOSTS", r -> r.path("/organizationposts/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://organizationposts:9010"))
+                .route("CHATS", r -> r.path("/chats/**", "/ws/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://chats:9020"))
                 .build();
     }
 }

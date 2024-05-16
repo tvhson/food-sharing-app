@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -56,13 +57,14 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
             }
             organizationpostsList.add(organizationpostsDetail);
         }
+        Collections.reverse(organizationpostsList);
         return organizationpostsList;
     }
 
     @Override
     public List<OrganizationpostsDto> getOrganizationpostsByUserId(Long userId) {
         List<Organizationposts> organizationposts = organizationpostsRepository.findByUserId(userId);
-
+        Collections.reverse(organizationposts);
         return organizationposts.stream()
                 .filter(organizationpost -> !organizationpost.isDeleted())
                 .map(OrganizationpostsMapper::mapToOrganizationpostsDto)

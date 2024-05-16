@@ -32,6 +32,7 @@ public class AccountsDto {
     private String description;
     private String status;
     private Date bannedDate;
+    private String locationName;
     private String latitude;
     private String longitude;
 }
