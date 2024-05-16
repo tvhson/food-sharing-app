@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import Header from '../components/ui/Header';
 import Colors from '../global/Color';
@@ -12,9 +12,19 @@ import GetLocation, {
   LocationErrorCode,
   isLocationError,
 } from 'react-native-get-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getInfoUser} from '../api/AccountsApi';
+import {createNotifications} from 'react-native-notificated';
+import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
-const HomeScreen = ({navigation}: any) => {
+const {useNotifications} = createNotifications();
+
+const HomeScreen = ({navigation, route}: any) => {
+  const accessToken = route.params.accessToken;
+  const userInfo = route.params.userInfo;
+  const {notify} = useNotifications();
   const [search, setSearch] = useState('');
+  const [imageUrl, setImageUrl] = useState();
   const [location, setLocation] = useState<Location | null>(null);
   const [error, setError] = useState<LocationErrorCode | null>(null);
 
@@ -22,25 +32,37 @@ const HomeScreen = ({navigation}: any) => {
     setSearch(search);
   };
 
-  GetLocation.getCurrentPosition({
-    enableHighAccuracy: true,
-    timeout: 30000,
-    rationale: {
-      title: 'Location permission',
-      message: 'The app needs the permission to request your location.',
-      buttonPositive: 'Ok',
-    },
-  })
-    .then(newLocation => {
-      setLocation(newLocation);
-    })
-    .catch(ex => {
-      if (isLocationError(ex)) {
-        const {code, message} = ex;
-        setError(code);
+  useEffect(() => {
+    const getImageUrl = async () => {
+      if (userInfo.imageUrl) {
+        setImageUrl(userInfo.imageUrl);
       }
-      setLocation(null);
-    });
+    };
+
+    const getLocation = async () => {
+      GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 30000,
+        rationale: {
+          title: 'Location permission',
+          message: 'The app needs the permission to request your location.',
+          buttonPositive: 'Ok',
+        },
+      })
+        .then(newLocation => {
+          setLocation(newLocation);
+        })
+        .catch(ex => {
+          if (isLocationError(ex)) {
+            const {code, message} = ex;
+            setError(code);
+          }
+          setLocation(null);
+        });
+    };
+    getLocation();
+    getImageUrl();
+  }, [userInfo.imageUrl]);
 
   return (
     <View
@@ -49,7 +71,7 @@ const HomeScreen = ({navigation}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <Header />
+      <Header imageUrl={imageUrl} />
       <SearchBar
         placeholder="Search food by name"
         containerStyle={{
@@ -76,7 +98,9 @@ const HomeScreen = ({navigation}: any) => {
         )}
       />
       <TouchableOpacity
-        onPress={() => navigation.navigate('CreatePost', {location})}
+        onPress={() =>
+          navigation.navigate('CreatePost', {location, accessToken})
+        }
         style={{
           position: 'absolute',
           bottom: 20,

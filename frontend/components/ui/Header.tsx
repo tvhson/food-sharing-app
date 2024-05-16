@@ -3,13 +3,18 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Colors from '../../global/Color';
 
-const Header = () => {
+const Header = (props: any) => {
+  const imageUrl = props.imageUrl;
   return (
     <View style={styles.container}>
       <Avatar
         size={32}
         rounded
-        source={{uri: 'https://randomuser.me/api/portraits/men/36.jpg'}}
+        source={{
+          uri: imageUrl
+            ? imageUrl
+            : 'https://randomuser.me/api/portraits/men/36.jpg',
+        }}
       />
       <Text style={styles.title}>Happy Food</Text>
       <TouchableOpacity>

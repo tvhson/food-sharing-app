@@ -11,12 +11,15 @@ import NotificationScreen from '../screens/NotificationScreen';
 
 const Tab = createBottomTabNavigator();
 
-const BottomTabNavigator = () => {
+const BottomTabNavigator = ({route}: any) => {
+  const accessToken = route.params.accessToken;
+  const userInfo = route.params.userInfo;
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{headerShown: false, tabBarShowLabel: false}}>
       <Tab.Screen
+        initialParams={{accessToken: accessToken, userInfo: userInfo}}
         name="Home"
         component={HomeScreen}
         options={{
@@ -73,6 +76,7 @@ const BottomTabNavigator = () => {
         }}
       />
       <Tab.Screen
+        initialParams={{accessToken: accessToken, userInfo: userInfo}}
         name="Profile"
         component={ProfileScreen}
         options={{

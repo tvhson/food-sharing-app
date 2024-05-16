@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {Icon, Button} from '@rneui/themed';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   TextInput,
@@ -14,6 +14,7 @@ import {createNotifications} from 'react-native-notificated';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {login} from '../api/LoginApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getInfoUser} from '../api/AccountsApi';
 
 const {useNotifications} = createNotifications();
 
@@ -32,7 +33,7 @@ const LoginScreen = ({navigation}: any) => {
     navigation.navigate('Register');
   };
   const handleLogin = () => {
-    console.log(email, password);
+    //console.log(email, password);
     if (email === '' || password === '') {
       notify('error', {
         params: {description: 'Please fill all fields.', title: 'Error'},
@@ -52,7 +53,7 @@ const LoginScreen = ({navigation}: any) => {
             params: {description: 'Login successful.', title: 'Success'},
           });
           if (response.data) {
-            AsyncStorage.setItem('user', JSON.stringify(response.data));
+            AsyncStorage.setItem('token', JSON.stringify(response.data));
             navigation.navigate('BottomTabNavigator');
           } else {
             notify('error', {
@@ -81,6 +82,10 @@ const LoginScreen = ({navigation}: any) => {
         });
       });
   };
+  useEffect(() => {
+    setEmail('');
+    setPassword('');
+  }, []);
 
   return (
     <View style={styles.container}>
