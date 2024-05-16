@@ -11,7 +11,8 @@ public class RouterValidator {
 
     public static final List<String> openEndpoints = List.of(
             "/auth/register",
-            "/auth/login"
+            "/auth/login",
+            "/ws"
     );
 
     public Predicate<ServerHttpRequest> isSecured =

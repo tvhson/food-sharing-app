@@ -17,6 +17,7 @@ public class AccountsMapper {
                 .description(accountsDto.getDescription())
                 .status(accountsDto.getStatus())
                 .bannedDate(accountsDto.getBannedDate())
+                .locationName(accountsDto.getLocationName())
                 .latitude(accountsDto.getLatitude())
                 .longitude(accountsDto.getLongitude())
                 .build();
@@ -35,6 +36,7 @@ public class AccountsMapper {
                 .description(accounts.getDescription())
                 .status(accounts.getStatus())
                 .bannedDate(accounts.getBannedDate())
+                .locationName(accounts.getLocationName())
                 .latitude(accounts.getLatitude())
                 .longitude(accounts.getLongitude())
                 .build();

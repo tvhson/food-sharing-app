@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -44,6 +45,7 @@ public class PostsServiceImpl implements IPostsService {
         posts.setPickUpStartDate(postsDto.getPickUpStartDate());
         posts.setPickUpEndDate(postsDto.getPickUpEndDate());
         posts.setStatus(postsDto.getStatus());
+        posts.setLocationName(postsDto.getLocationName());
         posts.setLatitude(postsDto.getLatitude());
         posts.setLongitude(postsDto.getLongitude());
         posts.setReceiverId(postsDto.getReceiverId());
@@ -68,6 +70,7 @@ public class PostsServiceImpl implements IPostsService {
     @Override
     public List<PostsDto> getRecommendedPosts(Long userId) {
         List<Posts> posts = postsRepository.findAll();
+        Collections.reverse(posts);
         return posts.stream()
                 .filter(post -> !post.isDeleted())
                 .map(PostsMapper::mapToPostsDto).toList();
@@ -76,6 +79,7 @@ public class PostsServiceImpl implements IPostsService {
     @Override
     public List<PostsDto> getPostsOfUser(Long userId) {
         List<Posts> posts = postsRepository.findAllByCreatedById(userId);
+        Collections.reverse(posts);
         return posts.stream()
                 .filter(post -> !post.isDeleted())
                 .map(PostsMapper::mapToPostsDto).toList();
