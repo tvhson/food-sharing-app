@@ -33,7 +33,7 @@ public class ChatsService implements IChatsService {
                         .senderId(chatMessage.getSenderId())
                         .recipientId(chatMessage.getRecipientId())
                         .build()));
-        if (Objects.equals(chatRooms.getRecipientId(), chatMessage.getSenderId())) {
+        if (!Objects.equals(chatRooms.getRecipientId(), chatMessage.getSenderId())) {
             chatRooms.setSenderStatus("READ");
             chatRooms.setRecipientStatus("UNREAD");
         } else {
