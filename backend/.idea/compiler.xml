@@ -16,6 +16,7 @@
         <module name="message" />
         <module name="organizationposts" />
         <module name="posts" />
+        <module name="notifications" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -33,6 +34,7 @@
       <module name="gatewayserver" options="-parameters" />
       <module name="media" options="-parameters" />
       <module name="message" options="-parameters" />
+      <module name="notifications" options="-parameters" />
       <module name="organizationposts" options="-parameters" />
       <module name="posts" options="-parameters" />
       <module name="sharingposts" options="-parameters" />
