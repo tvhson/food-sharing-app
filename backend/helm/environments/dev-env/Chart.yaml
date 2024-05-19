@@ -72,6 +72,14 @@ dependencies:
     version: 0.1.0
     repository: file://../../happyfood-services/notifications
 
+  - name: reportsdb
+    version: 0.1.0
+    repository: file://../../happyfood-services/reportsdb
+
+  - name: reports
+    version: 0.1.0
+    repository: file://../../happyfood-services/reports
+
   - name: auth
     version: 0.1.0
     repository: file://../../happyfood-services/auth

@@ -30,6 +30,7 @@ public class AccountsServiceImpl implements IAccountsService {
 
         Accounts accounts = AccountsMapper.mapToAccounts(accountsDto);
         accounts.setPassword(passwordEncoder.encode(accounts.getPassword()));
+        accounts.setRole("USER");
         accounts.setStatus("ACTIVE");
         accounts.setCreatedDate(new Date());
         accounts = accountsRepository.save(accounts);
@@ -55,11 +56,28 @@ public class AccountsServiceImpl implements IAccountsService {
         Accounts accounts = accountsRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
 
+        if (accounts.getBannedDate() != null && accounts.getBannedDate().before(new Date())) {
+            accounts.setStatus("ACTIVE");
+            accounts.setBannedDate(null);
+            accounts = accountsRepository.save(accounts);
+        }
+
         if (passwordEncoder.matches(password, accounts.getPassword())) {
             return AccountsMapper.mapToAccountsDto(accounts);
         }
         return null;
     }
+
+    @Override
+    public AccountsDto banAccount(Long accountId, Long days) {
+        Accounts accounts = accountsRepository.findById(accountId)
+                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+        accounts.setStatus("BANNED");
+        accounts.setBannedDate(new Date(System.currentTimeMillis() + days * 24 * 60 * 60 * 1000));
+
+        return AccountsMapper.mapToAccountsDto(accountsRepository.save(accounts));
+    }
+
 
     @Override
     public AccountsDto updateAccount(Long accountId, AccountsDto accountsDto) {

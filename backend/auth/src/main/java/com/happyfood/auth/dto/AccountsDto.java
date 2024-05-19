@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,4 +25,6 @@ public class AccountsDto {
     @NotEmpty(message = "Name cannot be empty")
     private String name;
     private String role;
+    private String status;
+    private Date bannedDate;
 }

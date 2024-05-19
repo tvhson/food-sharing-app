@@ -7,5 +7,6 @@ public interface IAccountsService {
     AccountsDto getAccount(Long accountId);
     AccountsDto authentication(String email, String password);
     AccountsDto updateAccount(Long accountId, AccountsDto accountsDto);
+    AccountsDto banAccount(Long accountId, Long days);
     void changePassword(Long accountId,String oldPassword, String newPassword);
 }
