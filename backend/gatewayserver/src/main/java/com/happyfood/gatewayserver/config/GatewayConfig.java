@@ -37,6 +37,9 @@ public class GatewayConfig {
                 .route("NOTIFICATIONS", r -> r.path("/notifications/**", "/ws-notifications/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://notifications:9030"))
+                .route("REPORTS", r -> r.path("/reports/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://reports:9040"))
                 .build();
     }
 }

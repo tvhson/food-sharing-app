@@ -72,6 +72,10 @@ public class AuthService {
                 throw new CustomException("Invalid credentials", HttpStatus.UNPROCESSABLE_ENTITY);
             }
 
+            if (accountsDto.getStatus().equals("BANNED")) {
+                throw new CustomException("Your account has been banned", HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+
             String accessToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "ACCESS");
             String refreshToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "REFRESH");
 

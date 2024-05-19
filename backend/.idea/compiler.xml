@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="gatewayserver" />
+        <module name="reports" />
         <module name="auth" />
         <module name="chats" />
         <module name="accounts" />
@@ -37,6 +38,7 @@
       <module name="notifications" options="-parameters" />
       <module name="organizationposts" options="-parameters" />
       <module name="posts" options="-parameters" />
+      <module name="reports" options="-parameters" />
       <module name="sharingposts" options="-parameters" />
     </option>
   </component>
