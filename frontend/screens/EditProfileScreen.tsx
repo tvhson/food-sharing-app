@@ -16,9 +16,12 @@ import {updateUser} from '../api/AccountsApi';
 import {createNotifications} from 'react-native-notificated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DatePickerInput} from 'react-native-paper-dates';
+import {UserInfo, saveUser} from '../redux/UserReducer';
+import {useDispatch} from 'react-redux';
 
-const {useNotifications} = createNotifications();
+const {useNotifications, ModalNotificationsProvider} = createNotifications();
 function EditProfileScreen(props: any) {
+  const dispatch = useDispatch();
   const {notify} = useNotifications();
   const [name, setName] = useState('');
   const [locationName, setLocationName] = useState('');
@@ -34,26 +37,54 @@ function EditProfileScreen(props: any) {
     props.setVisible(!props.isVisible);
   };
 
-  const saveProfile = () => {
+  const saveProfile = async () => {
+    let current = new Date();
+    current.setHours(0, 0, 0, 0);
+    console.log('hehe');
+    console.log(phone.length);
+    console.log(phone);
     if (name === '') {
       notify('error', {
         params: {description: 'Name is required.', title: 'Error'},
       });
       return;
     }
-    if (
-      (phone !== null && phone.length < 10) ||
-      (phone !== null && phone.length > 10)
-    ) {
+    if (phone && phone.length < 10) {
+      console.log('hehe2');
       notify('error', {
         params: {
           description: 'Phone number must be 10  digits.',
           title: 'Error',
+          isModalNotification: true,
+          style: {multiline: 100},
         },
       });
       return;
     }
-
+    //check if phone is digit
+    const isOnlyDigits = /^\d+$/.test(phone);
+    if (!isOnlyDigits) {
+      notify('error', {
+        params: {
+          description: 'Phone number must contain only digits.',
+          title: 'Error',
+          isModalNotification: true,
+          style: {multiline: 100},
+        },
+      });
+      return;
+    }
+    if (birthDate > current) {
+      notify('error', {
+        params: {
+          description: 'Birthday must be less than current date.',
+          title: 'Error',
+          isModalNotification: true,
+          style: {multiline: 100},
+        },
+      });
+      return;
+    }
     updateUser(
       {
         name,
@@ -72,7 +103,8 @@ function EditProfileScreen(props: any) {
     )
       .then((response: any) => {
         if (response.status === 200) {
-          props.onEditData(response.data);
+          const userInfo: UserInfo = response.data;
+          dispatch(saveUser(userInfo));
           props.setVisible(false);
           notify('success', {
             params: {
@@ -80,7 +112,7 @@ function EditProfileScreen(props: any) {
               title: 'Success',
             },
           });
-          AsyncStorage.setItem('infoUser', JSON.stringify(response.data));
+          AsyncStorage.setItem('userInfo', JSON.stringify(response.data));
         } else {
           notify('error', {
             params: {description: 'Update profile failed.', title: 'Error'},
@@ -127,6 +159,7 @@ function EditProfileScreen(props: any) {
       onBackButtonPress={() => props.setVisible(false)}
       isVisible={props.isVisible}
       style={{margin: 0}}>
+      <ModalNotificationsProvider notificationTopPosition={0} />
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
         keyboardShouldPersistTaps="handled">
@@ -183,6 +216,8 @@ function EditProfileScreen(props: any) {
               placeholder="Enter your phone number"
               value={phone}
               onChangeText={text => setPhone(text)}
+              maxLength={10}
+              keyboardType="numeric"
             />
           </View>
           <View style={{marginHorizontal: 10, marginTop: 30}}>

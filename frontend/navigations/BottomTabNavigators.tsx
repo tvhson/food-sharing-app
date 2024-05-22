@@ -1,34 +1,30 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ChatScreen from '../screens/ChatScreen';
 import FundingScreen from '../screens/FundingScreen';
-import {Icon} from '@rneui/themed';
+import {Icon, MD3Colors} from 'react-native-paper';
 import NotificationScreen from '../screens/NotificationScreen';
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = ({route}: any) => {
-  const accessToken = route.params.accessToken;
-  const userInfo = route.params.userInfo;
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{headerShown: false, tabBarShowLabel: false}}>
       <Tab.Screen
-        initialParams={{accessToken: accessToken, userInfo: userInfo}}
         name="Home"
         component={HomeScreen}
         options={{
           tabBarIcon: ({focused}) => (
             <Icon
-              name={focused ? 'home' : 'home-outline'}
+              source={focused ? 'home' : 'home-outline'}
               color="#F6836B"
-              type="material-community"
-              size={40}
+              size={36}
             />
           ),
         }}
@@ -39,9 +35,8 @@ const BottomTabNavigator = ({route}: any) => {
         options={{
           tabBarIcon: ({focused}) => (
             <Icon
-              name={focused ? 'accessibility' : 'accessibility-outline'}
+              source={focused ? 'account-heart' : 'account-heart-outline'}
               color="#F6836B"
-              type="ionicon"
               size={36}
             />
           ),
@@ -53,9 +48,8 @@ const BottomTabNavigator = ({route}: any) => {
         options={{
           tabBarIcon: ({focused}) => (
             <Icon
-              name={focused ? 'chat' : 'chat-bubble-outline'}
+              source={focused ? 'chat' : 'chat-outline'}
               color="#F6836B"
-              type="material"
               size={36}
             />
           ),
@@ -67,25 +61,22 @@ const BottomTabNavigator = ({route}: any) => {
         options={{
           tabBarIcon: ({focused}) => (
             <Icon
-              name={focused ? 'bell-alt' : 'bell'}
+              source={focused ? 'bell' : 'bell-outline'}
               color="#F6836B"
-              type="fontisto"
               size={36}
             />
           ),
         }}
       />
       <Tab.Screen
-        initialParams={{accessToken: accessToken, userInfo: userInfo}}
         name="Profile"
         component={ProfileScreen}
         options={{
           tabBarIcon: ({focused}) => (
             <Icon
-              name={focused ? 'user' : 'user-o'}
+              source={focused ? 'account' : 'account-outline'}
               color="#F6836B"
-              type="font-awesome"
-              size={40}
+              size={36}
             />
           ),
         }}
