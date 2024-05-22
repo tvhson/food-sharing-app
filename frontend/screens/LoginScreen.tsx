@@ -14,15 +14,23 @@ import {createNotifications} from 'react-native-notificated';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {login} from '../api/LoginApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getInfoUser} from '../api/AccountsApi';
+import {useDispatch, useSelector} from 'react-redux';
+import {setStatus} from '../redux/LoadingReducer';
+import {setToken} from '../redux/TokenReducer';
+import {enableScreens} from 'react-native-screens';
+import {RootState} from '../redux/Store';
+import AppLoader from '../components/ui/AppLoader';
+enableScreens();
 
 const {useNotifications} = createNotifications();
 
 const LoginScreen = ({navigation}: any) => {
+  const dispatch = useDispatch();
   const {notify} = useNotifications();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const isLoading = useSelector((state: RootState) => state.loading.status);
 
   const validateEmail = (email: string) => {
     const re =
@@ -32,7 +40,8 @@ const LoginScreen = ({navigation}: any) => {
   const handleRegister = () => {
     navigation.navigate('Register');
   };
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    dispatch(setStatus(true));
     //console.log(email, password);
     if (email === '' || password === '') {
       notify('error', {
@@ -46,15 +55,29 @@ const LoginScreen = ({navigation}: any) => {
       });
       return;
     }
-    login({email, password})
-      .then(response => {
-        if (response.status === 200) {
-          notify('success', {
-            params: {description: 'Login successful.', title: 'Success'},
-          });
-          if (response.data) {
-            AsyncStorage.setItem('token', JSON.stringify(response.data));
-            navigation.navigate('BottomTabNavigator');
+    try {
+      await login({email, password})
+        .then(response => {
+          if (response.status === 200) {
+            // notify('success', {
+            //   params: {description: 'Login successful.', title: 'Success'},
+            // });
+            if (response.data) {
+              const token: any = response.data;
+              AsyncStorage.setItem('token', token.accessToken);
+              AsyncStorage.setItem('isLogin', 'true');
+              dispatch(setToken(token.accessToken));
+              navigation.navigate('Loading', {
+                token: token.accessToken,
+              });
+            } else {
+              notify('error', {
+                params: {
+                  description: response.data.message || 'Login failed.',
+                  title: 'Error',
+                },
+              });
+            }
           } else {
             notify('error', {
               params: {
@@ -63,29 +86,37 @@ const LoginScreen = ({navigation}: any) => {
               },
             });
           }
-        } else {
+        })
+        .catch(error => {
           notify('error', {
             params: {
-              description: response.data.message || 'Login failed.',
+              description: error.message || 'Login failed.',
               title: 'Error',
+              style: {multiline: 100},
             },
           });
-        }
-      })
-      .catch(error => {
-        notify('error', {
-          params: {
-            description: error.message || 'Login failed.',
-            title: 'Error',
-            style: {multiline: 100},
-          },
+        })
+        .finally(() => {
+          dispatch(setStatus(false));
         });
+    } catch (error: any) {
+      notify('error', {
+        params: {
+          description: error.message || 'Login failed.',
+          title: 'Error',
+          style: {multiline: 100},
+        },
       });
+    }
   };
+
   useEffect(() => {
     setEmail('');
     setPassword('');
   }, []);
+  if (isLoading) {
+    return <AppLoader />;
+  }
 
   return (
     <View style={styles.container}>

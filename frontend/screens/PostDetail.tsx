@@ -1,15 +1,28 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
 import Colors from '../global/Color';
 import {Avatar, Button, Icon} from '@rneui/themed';
 import MapView, {Marker} from 'react-native-maps';
 import {Linking} from 'react-native';
+import {getInfoUserById} from '../api/AccountsApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
 
 const PostDetail = ({route, navigation}: any) => {
   const item = route.params.item;
-  const locationStart = route.params.location;
-  const locationEnd = route.params.item.location;
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const [createPostUser, setCreatePostUser] = useState<any>(null);
+  const locationStart = {
+    latitude: route.params.location.latitude,
+    longitude: route.params.location.longitude,
+  };
+  const locationEnd = {
+    latitude: route.params.item.latitude,
+    longitude: route.params.item.longitude,
+  };
+  // const locationEnd = route.params.item.location;
   const openGoogleMaps = (
     startLocation: {latitude: number; longitude: number},
     endLocation: {latitude: number; longitude: number},
@@ -17,6 +30,24 @@ const PostDetail = ({route, navigation}: any) => {
     const url = `https://www.google.com/maps/dir/?api=1&origin=${startLocation.latitude},${startLocation.longitude}&destination=${endLocation.latitude},${endLocation.longitude}`;
     Linking.openURL(url);
   };
+
+  useEffect(() => {
+    const getInfoUserCreatePost = async () => {
+      if (accessToken) {
+        getInfoUserById(item.createdById, accessToken)
+          .then((response: any) => {
+            if (response.status === 200) {
+              setCreatePostUser(response.data);
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    };
+    getInfoUserCreatePost();
+  }, [accessToken, item.createdById]);
+
   return (
     <ScrollView
       style={{
@@ -43,7 +74,7 @@ const PostDetail = ({route, navigation}: any) => {
         <Icon name="arrow-back" type="ionicon" size={24} color={'black'} />
       </TouchableOpacity>
       <Image
-        source={{uri: item.image}}
+        source={{uri: item.imageUrl}}
         style={{
           width: '100%',
           height: 200,
@@ -68,22 +99,68 @@ const PostDetail = ({route, navigation}: any) => {
           {item.title}
         </Text>
         <Text style={{fontSize: 16, color: Colors.grayText, marginTop: 4}}>
-          {item.createAt}
+          {new Date(item.createdDate).toLocaleDateString()}
         </Text>
       </View>
       <View style={{flexDirection: 'row', marginHorizontal: 20, marginTop: 10}}>
         <Avatar
           size={40}
           rounded
-          source={{uri: 'https://randomuser.me/api/portraits/men/36.jpg'}}
+          source={{
+            uri:
+              createPostUser && createPostUser.imageUrl
+                ? createPostUser.imageUrl
+                : 'https://randomuser.me/api/portraits/men/36.jpg',
+          }}
         />
         <Text style={{fontSize: 20, color: Colors.text, marginLeft: 20}}>
-          Khoi
+          {createPostUser && createPostUser.name
+            ? createPostUser.name
+            : 'Unknown'}
         </Text>
       </View>
-      <View style={{marginHorizontal: 20, marginTop: 20}}>
+      <View style={{marginTop: 20, marginHorizontal: 20}}>
         <Text style={{fontSize: 16, color: Colors.grayText}}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>
+            {'\u2022'} Description:{' '}
+          </Text>
           {item.description}
+        </Text>
+        <Text style={{fontSize: 16, color: Colors.grayText}}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>
+            {'\u2022'} Weight:{' '}
+          </Text>
+          {item.weight}
+        </Text>
+        <Text style={{fontSize: 16, color: Colors.grayText}}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>
+            {'\u2022'} Note:{' '}
+          </Text>
+          {item.note}
+        </Text>
+        <Text style={{fontSize: 16, color: Colors.grayText}}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>
+            {'\u2022'} Expired date:{' '}
+          </Text>
+          {new Date(item.expiredDate).toLocaleDateString()}
+        </Text>
+        <Text style={{fontSize: 16, color: Colors.grayText}}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>
+            {'\u2022'} Pickup start:{' '}
+          </Text>
+          {new Date(item.pickUpStartDate).toLocaleDateString()}
+        </Text>
+        <Text style={{fontSize: 16, color: Colors.grayText}}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>
+            {'\u2022'} Pickup end:{' '}
+          </Text>
+          {new Date(item.pickUpEndDate).toLocaleDateString()}
+        </Text>
+        <Text style={{fontSize: 16, color: Colors.grayText}}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>
+            {'\u2022'} Location:{' '}
+          </Text>
+          {item.locationName}
         </Text>
       </View>
 
@@ -100,8 +177,8 @@ const PostDetail = ({route, navigation}: any) => {
         }}>
         <MapView
           initialRegion={{
-            latitude: 10.875830080525523,
-            longitude: 106.78383111914486,
+            latitude: parseFloat(item.latitude),
+            longitude: parseFloat(item.longitude),
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
@@ -109,8 +186,8 @@ const PostDetail = ({route, navigation}: any) => {
           style={{flex: 1, borderRadius: 20}}>
           <Marker
             coordinate={{
-              latitude: 10.875830080525523,
-              longitude: 106.78383111914486,
+              latitude: parseFloat(item.latitude),
+              longitude: parseFloat(item.longitude),
             }}
           />
         </MapView>

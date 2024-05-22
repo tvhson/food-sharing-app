@@ -15,6 +15,9 @@ const Header = (props: any) => {
             ? imageUrl
             : 'https://randomuser.me/api/portraits/men/36.jpg',
         }}
+        onPress={() => {
+          props.navigation.navigate('Profile');
+        }}
       />
       <Text style={styles.title}>Happy Food</Text>
       <TouchableOpacity>
