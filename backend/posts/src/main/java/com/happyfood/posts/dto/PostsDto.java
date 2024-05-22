@@ -23,6 +23,7 @@ public class PostsDto {
     private Date pickUpStartDate;
     private Date pickUpEndDate;
     private String status;
+    private String locationName;
     private String latitude;
     private String longitude;
     private Long createdById;

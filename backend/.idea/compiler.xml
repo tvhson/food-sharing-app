@@ -8,13 +8,16 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="gatewayserver" />
+        <module name="reports" />
         <module name="auth" />
+        <module name="chats" />
         <module name="accounts" />
         <module name="configserver" />
         <module name="media" />
         <module name="message" />
         <module name="organizationposts" />
         <module name="posts" />
+        <module name="notifications" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -26,13 +29,16 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="accounts" options="-parameters" />
       <module name="auth" options="-parameters" />
+      <module name="chats" options="-parameters" />
       <module name="configserver" options="-parameters" />
       <module name="eurekaserver" options="-parameters" />
       <module name="gatewayserver" options="-parameters" />
       <module name="media" options="-parameters" />
       <module name="message" options="-parameters" />
+      <module name="notifications" options="-parameters" />
       <module name="organizationposts" options="-parameters" />
       <module name="posts" options="-parameters" />
+      <module name="reports" options="-parameters" />
       <module name="sharingposts" options="-parameters" />
     </option>
   </component>

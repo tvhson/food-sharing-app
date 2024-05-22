@@ -30,11 +30,10 @@ public class Posts {
     private Date pickUpEndDate;
     private String status;
     private boolean isDeleted;
+    private String locationName;
     private String latitude;
     private String longitude;
     private Long createdById;
     private Long receiverId;
-    @CreatedDate
-    @Column(updatable = false)
     private Date createdDate;
 }

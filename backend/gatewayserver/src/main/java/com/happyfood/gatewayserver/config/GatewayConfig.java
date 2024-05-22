@@ -31,6 +31,15 @@ public class GatewayConfig {
                 .route("ORGANIZATIONPOSTS", r -> r.path("/organizationposts/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://organizationposts:9010"))
+                .route("CHATS", r -> r.path("/chats/**", "/ws-chats/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://chats:9020"))
+                .route("NOTIFICATIONS", r -> r.path("/notifications/**", "/ws-notifications/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://notifications:9030"))
+                .route("REPORTS", r -> r.path("/reports/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://reports:9040"))
                 .build();
     }
 }

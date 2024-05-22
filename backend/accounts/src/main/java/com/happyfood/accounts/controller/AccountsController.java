@@ -1,11 +1,13 @@
 package com.happyfood.accounts.controller;
 
 import com.happyfood.accounts.dto.AccountsDto;
+import com.happyfood.accounts.exception.CustomException;
 import com.happyfood.accounts.service.IAccountsService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +65,13 @@ public class AccountsController {
     @PutMapping("/info")
     public ResponseEntity<AccountsDto> updateAccount(@RequestHeader Long userId, @Valid @RequestBody AccountsDto accountsDto) {
         return ResponseEntity.ok(iAccountsService.updateAccount(userId, accountsDto));
+    }
+
+    @PostMapping("ban")
+    public ResponseEntity<?> banAccount(@RequestHeader String role, @RequestParam Long userId, @RequestParam Long days) {
+        if (!role.equals("ADMIN")) {
+            throw new CustomException("You are not authorized to perform this action", HttpStatus.UNAUTHORIZED);
+        }
+        return ResponseEntity.ok(iAccountsService.banAccount(userId, days));
     }
 }
