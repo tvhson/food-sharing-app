@@ -3,13 +3,16 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/accounts/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chats/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/configserver/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/eurekaserver/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gatewayserver/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/media/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/message/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notifications/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/organizationposts/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/posts/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/reports/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sharingposts/src/main/java" charset="UTF-8" />
   </component>
 </project>

@@ -1,0 +1,32 @@
+deploymentName: reports-deployment
+serviceName: reports
+appLabel: reports
+appName: reports
+
+dataSource:
+  url: jdbc:mysql://reportsdb:3312/reportsdb
+  username: root
+  password: root
+
+replicaCount: 1
+
+image:
+  repository: sontruong02003/reports
+  tag: s1
+
+containerPort: 9040
+
+service:
+  type: ClusterIP
+  port: 9040
+  targetPort: 9040
+
+appname_enabled: true
+profile_enabled: true
+datasource_enabled: true
+config_enabled: true
+discovery_enabled: true
+resouceserver_enabled: false
+otel_enabled: false
+kafka_enabled: false
+database_enabled: false

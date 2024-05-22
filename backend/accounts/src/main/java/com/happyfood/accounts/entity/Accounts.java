@@ -30,9 +30,8 @@ public class Accounts{
     private String description;
     private String status;
     private Date bannedDate;
+    private String locationName;
     private String latitude;
     private String longitude;
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdDate;
+    private Date createdDate;
 }

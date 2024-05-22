@@ -8,6 +8,10 @@ spring:
       httpclient:
         connect-timeout: 5000
         response-timeout: 10s
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginsPatterns: "*"
     kubernetes:
       discovery:
         enabled: true

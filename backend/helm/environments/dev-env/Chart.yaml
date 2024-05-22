@@ -56,6 +56,30 @@ dependencies:
     version: 0.1.0
     repository: file://../../happyfood-services/organizationposts
 
+  - name: chatsdb
+    version: 0.1.0
+    repository: file://../../happyfood-services/chatsdb
+
+  - name: chats
+    version: 0.1.0
+    repository: file://../../happyfood-services/chats
+
+  - name: notificationsdb
+    version: 0.1.0
+    repository: file://../../happyfood-services/notificationsdb
+
+  - name: notifications
+    version: 0.1.0
+    repository: file://../../happyfood-services/notifications
+
+  - name: reportsdb
+    version: 0.1.0
+    repository: file://../../happyfood-services/reportsdb
+
+  - name: reports
+    version: 0.1.0
+    repository: file://../../happyfood-services/reports
+
   - name: auth
     version: 0.1.0
     repository: file://../../happyfood-services/auth
