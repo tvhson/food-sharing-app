@@ -18,4 +18,7 @@ public class OrganizationpostsDto {
     private Date createdDate;
     private String linkWebsites;
     private Long userId;
+    private String locationName;
+    private String latitude;
+    private String longitude;
 }

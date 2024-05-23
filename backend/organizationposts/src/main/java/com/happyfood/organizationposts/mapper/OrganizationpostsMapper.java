@@ -13,6 +13,9 @@ public class OrganizationpostsMapper {
                 .createdDate(organizationpostsDto.getCreatedDate())
                 .linkWebsites(organizationpostsDto.getLinkWebsites())
                 .userId(organizationpostsDto.getUserId())
+                .locationName(organizationpostsDto.getLocationName())
+                .longitude(organizationpostsDto.getLongitude())
+                .latitude(organizationpostsDto.getLatitude())
                 .build();
     }
 
@@ -26,6 +29,9 @@ public class OrganizationpostsMapper {
                 .createdDate(organizationposts.getCreatedDate())
                 .linkWebsites(organizationposts.getLinkWebsites())
                 .userId(organizationposts.getUserId())
+                .locationName(organizationposts.getLocationName())
+                .longitude(organizationposts.getLongitude())
+                .latitude(organizationposts.getLatitude())
                 .build();
     }
 }

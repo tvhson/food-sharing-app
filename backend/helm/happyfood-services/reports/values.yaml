@@ -30,3 +30,4 @@ resouceserver_enabled: false
 otel_enabled: false
 kafka_enabled: false
 database_enabled: false
+allwayspull_enabled: true
