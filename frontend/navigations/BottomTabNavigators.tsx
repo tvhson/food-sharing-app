@@ -5,9 +5,9 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ChatScreen from '../screens/ChatScreen';
-import FundingScreen from '../screens/FundingScreen';
 import {Icon, MD3Colors} from 'react-native-paper';
 import NotificationScreen from '../screens/NotificationScreen';
+import {FundingScreen} from '../screens/FundingScreen';
 
 const Tab = createBottomTabNavigator();
 

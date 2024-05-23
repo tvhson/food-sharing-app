@@ -10,7 +10,24 @@ import {UserInfo, saveUser} from '../redux/UserReducer';
 import {setToken} from '../redux/TokenReducer';
 import {getPostOfUser, getPosts} from '../api/PostApi';
 import {enableScreens} from 'react-native-screens';
-import {pushMyPost, pushSharingPost} from '../redux/SharingPostReducer';
+import {
+  clearMyPosts,
+  clearSharingPosts,
+  pushMyPost,
+  pushSharingPost,
+} from '../redux/SharingPostReducer';
+import {
+  getOrganizationPost,
+  getOrganizationPostOfUser,
+} from '../api/OrganizationPostApi';
+import {
+  clearFundingPosts,
+  clearMyFundingPosts,
+  pushFundingPost,
+  pushMyFundingPost,
+} from '../redux/OrganizationPostReducer';
+import GetLocation from 'react-native-get-location';
+import {setLocation} from '../redux/LocationReducer';
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
@@ -19,6 +36,24 @@ const LoadingScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     dispatch(setToken(token));
+    const getLocation = async () => {
+      GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 30000,
+        rationale: {
+          title: 'Location permission',
+          message: 'The app needs the permission to request your location.',
+          buttonPositive: 'Ok',
+        },
+      })
+        .then(newLocation => {
+          dispatch(setLocation(newLocation));
+          console.log(newLocation);
+        })
+        .catch(ex => {
+          console.log(ex);
+        });
+    };
     const saveInfo = async () => {
       try {
         const response: any = await getInfoUser(token);
@@ -39,6 +74,7 @@ const LoadingScreen = ({navigation, route}: any) => {
         const response: any = await getPosts(token.toString());
         if (response.status === 200) {
           const data = response.data;
+          dispatch(clearSharingPosts());
           for (const sharingPost of data) {
             dispatch(pushSharingPost(sharingPost));
           }
@@ -55,6 +91,7 @@ const LoadingScreen = ({navigation, route}: any) => {
         const response: any = await getPostOfUser(token.toString());
         if (response.status === 200) {
           const data = response.data;
+          dispatch(clearMyPosts());
           for (const sharingPost of data) {
             dispatch(pushMyPost(sharingPost));
           }
@@ -66,9 +103,50 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
+    const saveOrganizationPost = async () => {
+      try {
+        const response: any = await getOrganizationPost(token.toString());
+        if (response.status === 200) {
+          const data = response.data;
+          dispatch(clearFundingPosts());
+          for (const fundingPost of data) {
+            dispatch(pushFundingPost(fundingPost));
+          }
+        } else {
+          console.log(response);
+          throw new Error(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const saveMyOrganizationPost = async () => {
+      try {
+        const response: any = await getOrganizationPostOfUser(token.toString());
+        if (response.status === 200) {
+          const data = response.data;
+          dispatch(clearMyFundingPosts());
+          for (const fundingPost of data) {
+            dispatch(pushMyFundingPost(fundingPost));
+          }
+        } else {
+          console.log(response);
+          throw new Error(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
     const loadData = async () => {
       try {
-        await Promise.all([saveInfo(), saveRecommendPost(), saveMyPost()]);
+        await Promise.all([
+          getLocation(),
+          saveInfo(),
+          saveRecommendPost(),
+          saveMyPost(),
+          saveOrganizationPost(),
+          saveMyOrganizationPost(),
+        ]);
         console.log('done');
         setTimeout(
           () =>
