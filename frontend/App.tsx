@@ -5,6 +5,9 @@ import Router from './navigations/Routers';
 import {createNotifications} from 'react-native-notificated';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {en, enGB, registerTranslation} from 'react-native-paper-dates';
+import {Provider} from 'react-redux';
+import {Store} from './redux/Store';
+import {PaperProvider} from 'react-native-paper';
 registerTranslation('pl', {
   save: 'Save',
   selectSingle: 'Select date',
@@ -31,11 +34,15 @@ const {NotificationsProvider} = createNotifications();
 function App() {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <NotificationsProvider>
-        <NavigationContainer>
-          <Router />
-        </NavigationContainer>
-      </NotificationsProvider>
+      <Provider store={Store}>
+        <PaperProvider>
+          <NotificationsProvider>
+            <NavigationContainer>
+              <Router />
+            </NavigationContainer>
+          </NotificationsProvider>
+        </PaperProvider>
+      </Provider>
     </GestureHandlerRootView>
   );
 }

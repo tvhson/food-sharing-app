@@ -11,23 +11,22 @@ import {uploadPhoto} from '../api/UploadPhotoApi';
 
 import {PermissionsAndroid} from 'react-native';
 import EditProfileScreen from './EditProfileScreen';
-import {updateUser} from '../api/AccountsApi';
+import {getInfoUser, updateUser} from '../api/AccountsApi';
 import {createNotifications} from 'react-native-notificated';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
+import {saveUser} from '../redux/UserReducer';
 
 const {useNotifications} = createNotifications();
 
 const ProfileScreen = ({navigation, route}: any) => {
-  const accessToken = route.params.accessToken;
-  const userInfo = route.params.userInfo;
+  const dispatch = useDispatch();
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const {notify} = useNotifications();
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [editData, setEditData] = useState(null);
-
-  const handleEditData = (data: any) => {
-    setEditData(data);
-  };
 
   useEffect(() => {
     const requestCameraPermission = async () => {
@@ -58,12 +57,20 @@ const ProfileScreen = ({navigation, route}: any) => {
     };
 
     requestCameraPermission();
-    getImageUrl();
-  }, [isEditVisible, userInfo.imageUrl]);
+    if (userInfo) {
+      getImageUrl();
+    }
+  }, [accessToken, isEditVisible, userInfo]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
-    navigation.replace('Landing');
+    await AsyncStorage.removeItem('isLogin');
+    await AsyncStorage.removeItem('userInfo');
+    await AsyncStorage.removeItem('recommendPost');
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Landing'}],
+    });
   };
 
   const postImage = (image: any) => {
@@ -97,6 +104,8 @@ const ProfileScreen = ({navigation, route}: any) => {
             //console.log(response2);
             if (response2.status === 200) {
               AsyncStorage.setItem('userInfo', JSON.stringify(response2.data));
+              const userInfo2: any = response2.data;
+              dispatch(saveUser(userInfo2));
               notify('success', {
                 params: {
                   description: 'Update avatar successful.',
@@ -139,7 +148,6 @@ const ProfileScreen = ({navigation, route}: any) => {
         setVisible={setIsEditVisible}
         userInfo={userInfo}
         token={accessToken}
-        onEditData={handleEditData}
       />
       <UploadPhoto
         isVisible={isUploadVisible}
@@ -190,11 +198,7 @@ const ProfileScreen = ({navigation, route}: any) => {
             padding: 10,
           }}>
           <Button
-            title={
-              (editData as unknown as {name?: string})?.name
-                ? (editData as unknown as {name?: string})?.name
-                : userInfo?.name
-            }
+            title={userInfo.name}
             disabled
             disabledStyle={{backgroundColor: 'transparent'}}
             disabledTitleStyle={{color: 'black'}}
@@ -209,11 +213,7 @@ const ProfileScreen = ({navigation, route}: any) => {
             disabled
             disabledStyle={{backgroundColor: 'transparent'}}
             disabledTitleStyle={{color: 'black'}}
-            title={
-              (editData as unknown as {birthDate?: Date})?.birthDate
-                ? (editData as unknown as {birthDate?: Date})?.birthDate
-                : userInfo?.birthDate
-            }
+            title={new Date(userInfo.birthDate).toLocaleDateString()}
             buttonStyle={{
               backgroundColor: 'transparent',
               justifyContent: 'flex-start',
@@ -225,11 +225,7 @@ const ProfileScreen = ({navigation, route}: any) => {
             disabled
             disabledStyle={{backgroundColor: 'transparent'}}
             disabledTitleStyle={{color: 'black'}}
-            title={
-              (editData as unknown as {phone?: string})?.phone
-                ? (editData as unknown as {phone?: string})?.phone
-                : userInfo?.phone
-            }
+            title={userInfo.phone}
             buttonStyle={{
               backgroundColor: 'transparent',
               justifyContent: 'flex-start',
@@ -241,11 +237,7 @@ const ProfileScreen = ({navigation, route}: any) => {
             disabled
             disabledStyle={{backgroundColor: 'transparent'}}
             disabledTitleStyle={{color: 'black'}}
-            title={
-              (editData as unknown as {locationName?: string})?.locationName
-                ? (editData as unknown as {locationName?: string})?.locationName
-                : userInfo?.locationName
-            }
+            title={userInfo.locationName}
             buttonStyle={{
               backgroundColor: 'transparent',
               justifyContent: 'flex-start',

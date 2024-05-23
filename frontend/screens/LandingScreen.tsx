@@ -4,6 +4,9 @@ import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Image, Text, TouchableOpacity} from 'react-native';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import Colors from '../global/Color';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
+import {setStatus} from '../redux/LoadingReducer';
 
 const LandingScreen = ({navigation}: any) => {
   const handleRegister = () => {
@@ -12,6 +15,32 @@ const LandingScreen = ({navigation}: any) => {
   const handleLogin = () => {
     navigation.navigate('Login');
   };
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      dispatch(setStatus(true));
+      try {
+        await AsyncStorage.getItem('isLogin')
+          .then((isLogin: any) => {
+            if (isLogin === 'true') {
+              AsyncStorage.getItem('token').then((token: any) => {
+                navigation.navigate('Loading', {token: token});
+              });
+            }
+          })
+          .catch((error: any) => {
+            console.log(error);
+          })
+          .finally(() => {
+            dispatch(setStatus(false));
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    checkLogin();
+  }, [dispatch, navigation]);
 
   return (
     <View style={styles.container}>

@@ -10,100 +10,66 @@ import Colors from '../global/Color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingScreen from '../screens/LoadingScreen';
 import {getInfoUser} from '../api/AccountsApi';
+import {getPosts} from '../api/PostApi';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
+import AppLoader from '../components/ui/AppLoader';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import EditPostScreen from '../screens/EditPostScreen';
 
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<any | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const isLoading = useSelector((state: RootState) => state.loading.status);
+  const token = useSelector((state: RootState) => state.token.key);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const storedToken = await AsyncStorage.getItem('token');
-      if (storedToken) {
-        const parsedToken = JSON.parse(storedToken);
-        setAccessToken(parsedToken.accessToken);
-      }
-      setToken(storedToken);
-      setIsLoading(false);
-    };
-    const getUserInfo = async () => {
-      getInfoUser(accessToken).then((response: any) => {
-        if (response.status === 200) {
-          AsyncStorage.setItem('infoUser', JSON.stringify(response.data));
-          setUserInfo(response.data);
-          setDataLoaded(true);
-        }
-      });
-    };
-    checkUser();
-    getUserInfo();
-  }, [accessToken, isLoading, token]);
-  if (isLoading || !dataLoaded) {
-    return <LoadingScreen />;
-  }
-  //console.log(isLoading, user);
   return (
     <>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        {token !== null ? (
-          <>
-            <Stack.Screen
-              name="BottomTabNavigator"
-              component={BottomTabNavigator}
-              initialParams={{accessToken: accessToken, userInfo: userInfo}}
-            />
-            <Stack.Screen name="Landing" component={LandingScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="PostDetail" component={PostDetail} />
-            <Stack.Screen
-              name="CreatePost"
-              component={CreatePostScreen}
-              options={{
-                headerShown: true,
-                headerTitle: 'Create Post',
-                headerStyle: {
-                  backgroundColor: Colors.button,
-                },
-                headerTitleStyle: {
-                  color: 'white',
-                },
-                headerTintColor: 'white',
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="Landing" component={LandingScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen
-              name="BottomTabNavigator"
-              component={BottomTabNavigator}
-            />
-            <Stack.Screen name="PostDetail" component={PostDetail} />
-            <Stack.Screen
-              name="CreatePost"
-              component={CreatePostScreen}
-              options={{
-                headerShown: true,
-                headerTitle: 'Create Post',
-                headerStyle: {
-                  backgroundColor: Colors.button,
-                },
-                headerTitleStyle: {
-                  color: 'white',
-                },
-                headerTintColor: 'white',
-              }}
-            />
-          </>
-        )}
+        <>
+          <Stack.Screen name="Landing" component={LandingScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen
+            name="BottomTabNavigator"
+            component={BottomTabNavigator}
+          />
+          <Stack.Screen name="PostDetail" component={PostDetail} />
+          <Stack.Screen name="Loading" component={LoadingScreen} />
+          <Stack.Screen
+            name="CreatePost"
+            component={CreatePostScreen}
+            options={{
+              headerShown: true,
+              headerTitle: 'Create Post',
+              headerStyle: {
+                backgroundColor: Colors.button,
+              },
+              headerTitleStyle: {
+                color: 'white',
+              },
+              headerTintColor: 'white',
+            }}
+          />
+          <Stack.Screen
+            name="EditPost"
+            component={EditPostScreen}
+            options={{
+              headerShown: true,
+              headerTitle: 'Edit Post',
+              headerStyle: {
+                backgroundColor: Colors.button,
+              },
+              headerTitleStyle: {
+                color: 'white',
+              },
+              headerTintColor: 'white',
+            }}
+          />
+        </>
       </Stack.Navigator>
+      <EditProfileScreen />
     </>
   );
 };
