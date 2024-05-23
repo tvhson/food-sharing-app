@@ -28,3 +28,17 @@ export const updateUser = async (data: any, token: any) => {
     return error;
   }
 };
+
+export const getInfoUserById = async (id: any, token: any) => {
+  try {
+    const response = await ApiManager(`accounts/info/${id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

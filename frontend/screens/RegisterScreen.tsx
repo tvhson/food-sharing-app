@@ -87,6 +87,12 @@ const RegisterScreen = ({navigation}: any) => {
               title: 'Success',
             },
           });
+          setName('');
+          setUsername('');
+          setPassword('');
+          setConfirmPassword('');
+          setShowPassword(false);
+          setShowConfirmPassword(false);
           navigation.navigate('Login');
         } else {
           notify('error', {
@@ -108,6 +114,12 @@ const RegisterScreen = ({navigation}: any) => {
       });
   };
   const handleLogin = () => {
+    setName('');
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     navigation.navigate('Login');
   };
   useEffect(() => {

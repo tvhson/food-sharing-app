@@ -18,14 +18,15 @@ import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 import GetLocation from 'react-native-get-location';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {createNotifications} from 'react-native-notificated';
-import {createPost, updatePost} from '../api/PostApi';
+import {updatePost} from '../api/PostApi';
 import {useDispatch} from 'react-redux';
-import {pushMyPost, updateMyPost} from '../redux/SharingPostReducer';
+import {updateMyPost} from '../redux/SharingPostReducer';
 
 const {useNotifications} = createNotifications();
 
-const CreatePostScreen = ({route, navigation}: any) => {
+const EditPostScreen = ({route, navigation}: any) => {
   const dispatch = useDispatch();
+  const item = route.params.item;
   const {notify} = useNotifications();
   const location = route.params.location;
   const accessToken = route.params.accessToken;
@@ -49,6 +50,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
   const [imagePath, setImagePath] = useState('');
+  const [isImageAlreadyUpload, setIsImageAlreadyUpload] = useState(false);
 
   const mapRef = useRef<MapView | null>(null);
   const autocompleteRef = useRef<any | null>(null);
@@ -94,7 +96,35 @@ const CreatePostScreen = ({route, navigation}: any) => {
           setLocationCurrent(null);
         });
     }
-  }, [location]);
+    if (item) {
+      console.log(item);
+      setTitle(item.title);
+      setDescription(item.description);
+      setWeight(item.weight);
+      setNote(item.note);
+      setStatus(item.status);
+      setLocationName(item.locationName);
+      setLatitude(Number(item.latitude));
+      setLongitude(Number(item.longitude));
+      autocompleteRef.current?.setAddressText(
+        item.locationName ? item.locationName : '',
+      );
+      if (mapRef.current) {
+        mapRef.current.animateToRegion({
+          latitude: Number(item.latitude),
+          longitude: Number(item.longitude),
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+      }
+      setExpiredDate(new Date(item.expiredDate));
+      setPickUpStartDate(new Date(item.pickUpStartDate));
+      setPickUpEndDate(new Date(item.pickUpEndDate));
+      setImagePath(item.imageUrl);
+      setImageUpload(item.imageUrl);
+      setIsImageAlreadyUpload(true);
+    }
+  }, [item, location]);
 
   const postImage = async (image: any) => {
     setImageUpload(image);
@@ -102,7 +132,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
       setImagePath(image.path);
     }
   };
-  const handleCreatePost = () => {
+  const handleEditPost = () => {
     let currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     expiredDate.setHours(0, 0, 0, 0);
@@ -117,12 +147,6 @@ const CreatePostScreen = ({route, navigation}: any) => {
     if (locationName === '') {
       notify('error', {
         params: {description: 'Location is required.', title: 'Error'},
-      });
-      return;
-    }
-    if (imageUpload === null) {
-      notify('error', {
-        params: {description: 'Image is required.', title: 'Error'},
       });
       return;
     }
@@ -155,61 +179,110 @@ const CreatePostScreen = ({route, navigation}: any) => {
       });
       return;
     }
-
-    const dataForm = new FormData();
-    if (imageUpload) {
-      dataForm.append('file', {
-        uri: imageUpload.path,
-        name: imageUpload.filename || 'image.jpeg',
-        type: imageUpload.mime || 'image/jpeg',
+    if (imageUpload === null && !isImageAlreadyUpload) {
+      notify('error', {
+        params: {description: 'Image is required.', title: 'Error'},
       });
-      uploadPhoto(dataForm, accessToken).then((response: any) => {
-        if (response.status === 200) {
-          createPost(
-            {
-              title,
-              imageUrl: response.data[0],
-              content,
-              weight,
-              description,
-              note,
-              status,
-              locationName,
-              latitude,
-              longitude,
-              expiredDate,
-              pickUpStartDate,
-              pickUpEndDate,
+      return;
+    }
+    if (isImageAlreadyUpload) {
+      updatePost(
+        item.id,
+        {
+          title,
+          imageUrl: imagePath,
+          content,
+          weight,
+          description,
+          note,
+          status,
+          locationName,
+          latitude,
+          longitude,
+          expiredDate,
+          pickUpStartDate,
+          pickUpEndDate,
+        },
+        accessToken,
+      )
+        .then((response: any) => {
+          if (response.status === 200) {
+            notify('success', {
+              params: {
+                description: 'Edit post successful.',
+                title: 'Success',
+              },
+            });
+            dispatch(updateMyPost(response.data));
+            navigation.navigate('Home');
+          }
+        })
+        .catch((error: any) => {
+          notify('error', {
+            params: {
+              description: error.message,
+              title: 'Error',
+              style: {multiline: 100},
             },
-            accessToken,
-          )
-            .then((response2: any) => {
-              if (response2.status === 200) {
-                notify('success', {
+          });
+        });
+    } else {
+      const dataForm = new FormData();
+      if (imageUpload) {
+        dataForm.append('file', {
+          uri: imageUpload.path,
+          name: imageUpload.filename || 'image.jpeg',
+          type: imageUpload.mime || 'image/jpeg',
+        });
+        uploadPhoto(dataForm, accessToken).then((response: any) => {
+          if (response.status === 200) {
+            updatePost(
+              item.id,
+              {
+                title,
+                imageUrl: response.data[0],
+                content,
+                weight,
+                description,
+                note,
+                status,
+                locationName,
+                latitude,
+                longitude,
+                expiredDate,
+                pickUpStartDate,
+                pickUpEndDate,
+              },
+              accessToken,
+            )
+              .then((response2: any) => {
+                if (response2.status === 200) {
+                  notify('success', {
+                    params: {
+                      description: 'Edit post successful.',
+                      title: 'Success',
+                    },
+                  });
+                  dispatch(updateMyPost(response.data));
+                  navigation.navigate('Home');
+                }
+              })
+              .catch((error: any) => {
+                notify('error', {
                   params: {
-                    description: 'Create post successful.',
-                    title: 'Success',
+                    description: error.message,
+                    title: 'Error',
+                    style: {multiline: 100},
                   },
                 });
-                dispatch(pushMyPost(response2.data));
-                navigation.navigate('Home');
-              }
-            })
-            .catch((error: any) => {
-              notify('error', {
-                params: {
-                  description: error.message,
-                  title: 'Error',
-                  style: {multiline: 100},
-                },
               });
+          } else {
+            notify('error', {
+              params: {description: response.data, title: 'Error'},
             });
-        } else {
-          notify('error', {
-            params: {description: response.data, title: 'Error'},
-          });
-        }
-      });
+          }
+        });
+      }
     }
   };
 
@@ -504,6 +577,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
                   }}
                   onPress={() => {
                     setImagePath('');
+                    setIsImageAlreadyUpload(false);
                   }}>
                   <Icon name="close" type="ionicon" size={20} color="white" />
                 </TouchableOpacity>
@@ -529,8 +603,8 @@ const CreatePostScreen = ({route, navigation}: any) => {
         </View>
 
         <Button
-          title="Create Post"
-          onPress={handleCreatePost}
+          title="Edit Post"
+          onPress={handleEditPost}
           buttonStyle={{
             backgroundColor: Colors.postTitle,
             width: 200,
@@ -546,4 +620,4 @@ const CreatePostScreen = ({route, navigation}: any) => {
   );
 };
 
-export default CreatePostScreen;
+export default EditPostScreen;
