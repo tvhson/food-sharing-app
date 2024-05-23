@@ -16,12 +16,12 @@ public class OrganizationpostsController {
     private final IOrganizationpostsService organizationpostsService;
 
     @PostMapping
-    ResponseEntity<OrganizationpostsDto> createOrganizationposts(@RequestHeader Long userId, @RequestBody OrganizationpostsDto organizationpostsDto) {
+    ResponseEntity<OrganizationpostsDetail> createOrganizationposts(@RequestHeader Long userId, @RequestBody OrganizationpostsDto organizationpostsDto) {
         return ResponseEntity.ok(organizationpostsService.createOrganizationposts(userId, organizationpostsDto));
     }
 
     @PutMapping("/{organizationpostId}")
-    ResponseEntity<OrganizationpostsDto> updateOrganizationpostsById(@PathVariable Long organizationpostId, @RequestHeader Long userId, @RequestBody OrganizationpostsDto organizationpostsDto) {
+    ResponseEntity<OrganizationpostsDetail> updateOrganizationpostsById(@PathVariable Long organizationpostId, @RequestHeader Long userId, @RequestBody OrganizationpostsDto organizationpostsDto) {
         return ResponseEntity.ok(organizationpostsService.updateOrganizationposts(organizationpostId, userId, organizationpostsDto));
     }
 
@@ -37,7 +37,7 @@ public class OrganizationpostsController {
     }
 
     @GetMapping("/get")
-    ResponseEntity<List<OrganizationpostsDto>> getOrganizationpostsByUserId(@RequestHeader Long userId) {
+    ResponseEntity<List<OrganizationpostsDetail>> getOrganizationpostsByUserId(@RequestHeader Long userId) {
         return ResponseEntity.ok(organizationpostsService.getOrganizationpostsByUserId(userId));
     }
 

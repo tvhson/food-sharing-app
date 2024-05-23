@@ -26,6 +26,9 @@ public class Organizationposts {
     private boolean isDeleted;
     private String linkWebsites;
     private Long userId;
+    private String locationName;
+    private String latitude;
+    private String longitude;
 
     @OneToMany(mappedBy = "organizationPost")
     private List<AttendeeId> attendees;
