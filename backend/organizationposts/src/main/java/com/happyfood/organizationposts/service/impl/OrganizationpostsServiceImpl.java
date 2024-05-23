@@ -62,26 +62,41 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
     }
 
     @Override
-    public List<OrganizationpostsDto> getOrganizationpostsByUserId(Long userId) {
+    public List<OrganizationpostsDetail> getOrganizationpostsByUserId(Long userId) {
         List<Organizationposts> organizationposts = organizationpostsRepository.findByUserId(userId);
         Collections.reverse(organizationposts);
         return organizationposts.stream()
                 .filter(organizationpost -> !organizationpost.isDeleted())
-                .map(OrganizationpostsMapper::mapToOrganizationpostsDto)
+                .map(organizationpost -> {
+                    OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
+                    organizationpostsDetail.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost));
+                    ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationpost.getUserId());
+                    if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
+                        organizationpostsDetail.setAccounts(accountsDtoResponseEntity.getBody());
+                    }
+                    return organizationpostsDetail;
+                })
                 .toList();
     }
 
     @Override
-    public OrganizationpostsDto createOrganizationposts(Long userId, OrganizationpostsDto organizationpostsDto) {
+    public OrganizationpostsDetail createOrganizationposts(Long userId, OrganizationpostsDto organizationpostsDto) {
         Organizationposts organizationPosts = OrganizationpostsMapper.mapToOrganizationposts(organizationpostsDto);
         organizationPosts.setUserId(userId);
         organizationPosts.setCreatedDate(new Date());
 
-        return OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationPosts));
+        OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
+        organizationpostsDetail.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationPosts)));
+        ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationPosts.getUserId());
+        if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
+            organizationpostsDetail.setAccounts(accountsDtoResponseEntity.getBody());
+        }
+
+        return organizationpostsDetail;
     }
 
     @Override
-    public OrganizationpostsDto updateOrganizationposts(Long id, Long userId, OrganizationpostsDto organizationpostsDto) {
+    public OrganizationpostsDetail updateOrganizationposts(Long id, Long userId, OrganizationpostsDto organizationpostsDto) {
         Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Organizationposts not found", HttpStatus.NOT_FOUND));
 
         if (!organizationposts.getUserId().equals(userId)) {
@@ -93,8 +108,18 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
         organizationposts.setPeopleAttended(organizationpostsDto.getPeopleAttended());
         organizationposts.setImageUrl(organizationpostsDto.getImageUrl());
         organizationposts.setLinkWebsites(organizationpostsDto.getLinkWebsites());
+        organizationposts.setLocationName(organizationpostsDto.getLocationName());
+        organizationposts.setLatitude(organizationpostsDto.getLatitude());
+        organizationposts.setLongitude(organizationpostsDto.getLongitude());
 
-        return OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationposts));
+        OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
+        organizationpostsDetail.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationposts)));
+        ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationposts.getUserId());
+        if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
+            organizationpostsDetail.setAccounts(accountsDtoResponseEntity.getBody());
+        }
+
+        return organizationpostsDetail;
     }
 
     @Override
