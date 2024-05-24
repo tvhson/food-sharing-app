@@ -28,6 +28,12 @@ import {
 } from '../redux/OrganizationPostReducer';
 import GetLocation from 'react-native-get-location';
 import {setLocation} from '../redux/LocationReducer';
+import {connectNotification, getNotifications} from '../api/NotificationApi';
+import {
+  addNotification,
+  countNumberOfUnread,
+  setNotifications,
+} from '../redux/NotificationReducer';
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
@@ -55,12 +61,16 @@ const LoadingScreen = ({navigation, route}: any) => {
         });
     };
     const saveInfo = async () => {
+      const saveNotification = (body: any) => {
+        console.log(body);
+        dispatch(addNotification(body));
+      };
       try {
         const response: any = await getInfoUser(token);
-
         if (response.status === 200) {
           const userInfo: UserInfo = response.data;
           dispatch(saveUser(userInfo));
+          connectNotification(userInfo.id, saveNotification);
         } else {
           console.log(response);
           throw new Error(response);
@@ -137,6 +147,22 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
+    const saveNotification = async () => {
+      try {
+        const response: any = await getNotifications(token.toString());
+        if (response.status === 200) {
+          const data = response.data;
+          dispatch(setNotifications(data));
+          dispatch(countNumberOfUnread());
+        } else {
+          console.log(response);
+          throw new Error(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     const loadData = async () => {
       try {
         await Promise.all([
@@ -146,7 +172,9 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveMyPost(),
           saveOrganizationPost(),
           saveMyOrganizationPost(),
+          saveNotification(),
         ]);
+
         console.log('done');
         setTimeout(
           () =>

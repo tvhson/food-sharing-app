@@ -16,6 +16,7 @@ import {createNotifications} from 'react-native-notificated';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {saveUser} from '../redux/UserReducer';
+import {disconnectSocket} from '../api/NotificationApi';
 
 const {useNotifications} = createNotifications();
 
@@ -67,6 +68,7 @@ const ProfileScreen = ({navigation, route}: any) => {
     await AsyncStorage.removeItem('isLogin');
     await AsyncStorage.removeItem('userInfo');
     await AsyncStorage.removeItem('recommendPost');
+    disconnectSocket();
     navigation.reset({
       index: 0,
       routes: [{name: 'Landing'}],

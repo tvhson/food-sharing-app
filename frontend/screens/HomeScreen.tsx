@@ -104,7 +104,7 @@ const HomeScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     const getRecommendPost = async () => {
-      if (!recommendedPost) {
+      if (recommendedPost) {
         setRecommendPost(recommendedPost);
       } else if (accessToken) {
         getPosts(accessToken.toString()).then((response: any) => {

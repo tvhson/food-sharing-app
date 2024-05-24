@@ -23,7 +23,7 @@ const NotificationItem = ({item, navigation}: any) => {
           elevation: 2,
         }}>
         <Image
-          source={{uri: item.image}}
+          source={{uri: item.imageUrl}}
           style={{width: 100, height: 100, borderRadius: 8}}
         />
         <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>
@@ -48,7 +48,7 @@ const NotificationItem = ({item, navigation}: any) => {
             </Text>
             <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
               <Text style={{fontSize: 12, color: Colors.grayText}}>
-                {item.createdAt}
+                {new Date(item.createdDate).toLocaleDateString()}
               </Text>
             </View>
           </View>
