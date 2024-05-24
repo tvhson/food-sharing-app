@@ -108,7 +108,6 @@ const PostRenderItem = ({item, navigation, location}: any) => {
               <Menu.Item
                 onPress={() => {
                   setVisible(false);
-                  dispatch(deleteMyPost(item.id));
                   setVisibleDialog(true);
                 }}
                 title="Delete"

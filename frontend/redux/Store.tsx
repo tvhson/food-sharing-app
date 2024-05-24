@@ -5,6 +5,7 @@ import TokenReducer from './TokenReducer';
 import SharingPostReducer from './SharingPostReducer';
 import OrganizationPostReducer from './OrganizationPostReducer';
 import LocationReducer from './LocationReducer';
+import NotificationReducer from './NotificationReducer';
 export const Store = configureStore({
   reducer: {
     userInfo: UserReducer,
@@ -13,6 +14,7 @@ export const Store = configureStore({
     sharingPost: SharingPostReducer,
     fundingPost: OrganizationPostReducer,
     location: LocationReducer,
+    notification: NotificationReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
