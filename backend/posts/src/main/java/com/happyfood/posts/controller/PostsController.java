@@ -1,5 +1,6 @@
 package com.happyfood.posts.controller;
 
+import com.happyfood.posts.dto.Coordinates;
 import com.happyfood.posts.dto.PostsDto;
 import com.happyfood.posts.service.IPostsService;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,8 @@ public class PostsController {
         return ResponseEntity.ok(postsService.getPostById(postId));
     }
     @GetMapping("/recommended")
-    ResponseEntity<List<PostsDto>> getRecommendedPosts(@RequestHeader Long userId) {
-        return ResponseEntity.ok(postsService.getRecommendedPosts(userId));
+    ResponseEntity<List<PostsDto>> getRecommendedPosts(@RequestHeader Long userId, @RequestBody Coordinates location) {
+        return ResponseEntity.ok(postsService.getRecommendedPosts(userId, location));
     }
     @GetMapping("/user")
     ResponseEntity<List<PostsDto>> getPostsOfUser(@RequestHeader Long userId) {

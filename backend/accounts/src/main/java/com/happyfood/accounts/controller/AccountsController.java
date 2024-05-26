@@ -39,6 +39,11 @@ public class AccountsController {
         return ResponseEntity.ok(iAccountsService.getAccount(userId));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllAccounts() {
+        return ResponseEntity.ok(iAccountsService.getAllAccounts());
+    }
+
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestHeader Long userId,
                                             @RequestParam String oldPassword,
@@ -67,11 +72,20 @@ public class AccountsController {
         return ResponseEntity.ok(iAccountsService.updateAccount(userId, accountsDto));
     }
 
-    @PostMapping("ban")
+    @PostMapping("/ban")
     public ResponseEntity<?> banAccount(@RequestHeader String role, @RequestParam Long userId, @RequestParam Long days) {
         if (!role.equals("ADMIN")) {
             throw new CustomException("You are not authorized to perform this action", HttpStatus.UNAUTHORIZED);
         }
         return ResponseEntity.ok(iAccountsService.banAccount(userId, days));
+    }
+
+    @PutMapping("/role/{userId}")
+    public ResponseEntity<?> changeRole(@RequestHeader String role, @PathVariable Long userId, @RequestParam String newRole) {
+//        if (!role.equals("ADMIN")) {
+//            throw new CustomException("You are not authorized to perform this action", HttpStatus.UNAUTHORIZED);
+//        }
+        iAccountsService.changeRole(userId, newRole);
+        return ResponseEntity.ok().build();
     }
 }

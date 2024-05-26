@@ -1,5 +1,6 @@
 package com.happyfood.posts.service.impl;
 
+import com.happyfood.posts.dto.Coordinates;
 import com.happyfood.posts.dto.PostsDto;
 import com.happyfood.posts.entity.Posts;
 import com.happyfood.posts.exception.CustomException;
@@ -68,12 +69,28 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public List<PostsDto> getRecommendedPosts(Long userId) {
+    public List<PostsDto> getRecommendedPosts(Long userId, Coordinates location) {
         List<Posts> posts = postsRepository.findAll();
-        Collections.reverse(posts);
-        return posts.stream()
+
+        double latitude = Double.parseDouble(location.getLatitude());
+        double longitude = Double.parseDouble(location.getLongitude());
+
+        List<PostsDto> recommendedPosts = posts.stream()
                 .filter(post -> !post.isDeleted())
-                .map(PostsMapper::mapToPostsDto).toList();
+                .map(PostsMapper::mapToPostsDto)
+                .filter(post -> post.getReceiverId() == null)
+                .filter(post -> post.getLatitude() != null)
+                .filter(post -> post.getLongitude() != null)
+                .filter(post -> {
+                    double postLatitude = Double.parseDouble(post.getLatitude());
+                    double postLongitude = Double.parseDouble(post.getLongitude());
+                    double distance = Math.sqrt(Math.pow(latitude - postLatitude, 2) + Math.pow(longitude - postLongitude, 2)) * 1.60934;
+                    post.setDistance(distance);
+                    return distance < 25;
+                })
+                .toList();
+
+        return recommendedPosts;
     }
 
     @Override
