@@ -10,4 +10,5 @@ public interface IChatsService {
     List<ChatMessages> getChatMessages(Long userId, Long chatId);
     List<ChatRooms> getChatRooms(Long userId);
     void updateStatuses(Long userId, Long chatId);
+    ChatRooms updateChatRoom(Long userId, Long chatId, String status);
 }

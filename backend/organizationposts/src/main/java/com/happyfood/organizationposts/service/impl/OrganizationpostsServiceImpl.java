@@ -1,6 +1,7 @@
 package com.happyfood.organizationposts.service.impl;
 
 import com.happyfood.organizationposts.dto.AccountsDto;
+import com.happyfood.organizationposts.dto.Coordinates;
 import com.happyfood.organizationposts.dto.OrganizationpostsDetail;
 import com.happyfood.organizationposts.dto.OrganizationpostsDto;
 import com.happyfood.organizationposts.entity.Organizationposts;
@@ -41,16 +42,28 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
     }
 
     @Override
-    public List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId) {
+    public List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId, Coordinates location) {
         List<OrganizationpostsDetail> organizationpostsList = new ArrayList<>();
         List<Organizationposts> organizationposts = organizationpostsRepository.findAll();
+
+        double latitude = Double.parseDouble(location.getLatitude());
+        double longitude = Double.parseDouble(location.getLongitude());
+
 
         for (Organizationposts organizationpost : organizationposts) {
 
             if (organizationpost.isDeleted()) continue;
+            if (organizationpost.getLatitude() == null || organizationpost.getLongitude() == null) continue;
+            OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost);
+
+            double postLatitude = Double.parseDouble(organizationpostsDto.getLatitude());
+            double postLongitude = Double.parseDouble(organizationpostsDto.getLongitude());
+            double distance = Math.sqrt(Math.pow(latitude - postLatitude, 2) + Math.pow(longitude - postLongitude, 2)) * 1.60934;
+            if (distance > 50) continue;
+            organizationpostsDto.setDistance(distance);
 
             OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
-            organizationpostsDetail.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost));
+            organizationpostsDetail.setOrganizationposts(organizationpostsDto);
             ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationpost.getUserId());
             if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
                 organizationpostsDetail.setAccounts(accountsDtoResponseEntity.getBody());

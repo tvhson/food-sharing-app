@@ -18,7 +18,7 @@ public class Notifications {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private String urlImage;
+    private String imageUrl;
     private String description;
     private String type;
     private boolean isRead;

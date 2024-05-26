@@ -1,5 +1,6 @@
 package com.happyfood.organizationposts.controller;
 
+import com.happyfood.organizationposts.dto.Coordinates;
 import com.happyfood.organizationposts.dto.OrganizationpostsDetail;
 import com.happyfood.organizationposts.dto.OrganizationpostsDto;
 import com.happyfood.organizationposts.service.IOrganizationpostsService;
@@ -42,7 +43,7 @@ public class OrganizationpostsController {
     }
 
     @GetMapping("/recommended")
-    ResponseEntity<List<OrganizationpostsDetail>> getRecommendationOrganizationposts(@RequestHeader Long userId) {
-        return ResponseEntity.ok(organizationpostsService.getRecommendationOrganizationposts(userId));
+    ResponseEntity<List<OrganizationpostsDetail>> getRecommendationOrganizationposts(@RequestHeader Long userId, @RequestBody Coordinates location) {
+        return ResponseEntity.ok(organizationpostsService.getRecommendationOrganizationposts(userId, location));
     }
 }

@@ -29,10 +29,30 @@ public class ChatsService implements IChatsService {
     @Override
     public void sendMessage(Long userId, ChatMessages chatMessage) {
         ChatRooms chatRooms = chatRoomsRepository.findBySenderIdAndRecipientId(chatMessage.getSenderId(), chatMessage.getRecipientId())
-                .orElseGet(() -> chatRoomsRepository.save(ChatRooms.builder()
-                        .senderId(chatMessage.getSenderId())
-                        .recipientId(chatMessage.getRecipientId())
-                        .build()));
+                .orElseGet(() -> {
+                    ChatRooms chatRoom = ChatRooms.builder()
+                            .senderId(chatMessage.getSenderId())
+                            .recipientId(chatMessage.getRecipientId())
+                            .status("ACTIVE")
+                            .build();
+
+                    ResponseEntity<AccountsDto> senderDtoResponseEntity = accountsFeignClient.getAccount(chatRoom.getSenderId());
+                    if (senderDtoResponseEntity != null && senderDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
+                        AccountsDto senderDto = senderDtoResponseEntity.getBody();
+                        assert senderDto != null;
+                        chatRoom.setSenderName(senderDto.getName());
+                        chatRoom.setSenderProfilePic(senderDto.getImageUrl());
+                    }
+
+                    ResponseEntity<AccountsDto> recipientDtoResponseEntity = accountsFeignClient.getAccount(chatRoom.getRecipientId());
+                    if (recipientDtoResponseEntity != null && recipientDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
+                        AccountsDto recipientDto = recipientDtoResponseEntity.getBody();
+                        assert recipientDto != null;
+                        chatRoom.setRecipientName(recipientDto.getName());
+                        chatRoom.setRecipientProfilePic(recipientDto.getImageUrl());
+                    }
+                    return chatRoomsRepository.save(chatRoom);
+                });
         if (!Objects.equals(chatRooms.getRecipientId(), chatMessage.getSenderId())) {
             chatRooms.setSenderStatus("READ");
             chatRooms.setRecipientStatus("UNREAD");
@@ -40,6 +60,9 @@ public class ChatsService implements IChatsService {
             chatRooms.setSenderStatus("UNREAD");
             chatRooms.setRecipientStatus("READ");
         }
+        chatRooms.setLastMessage(chatMessage.getContent());
+        chatRooms.setLastMessageCreatedDate(new Date());
+        chatRooms.setLastMessageSenderId(chatMessage.getSenderId());
         chatRoomsRepository.save(chatRooms);
 
         chatMessage.setChatRoomId(chatRooms.getId());
@@ -51,11 +74,8 @@ public class ChatsService implements IChatsService {
                 chatMessage.getRecipientId().toString(), "/queue/rooms",
                 chatRooms); // send room to sender
         simpMessagingTemplate.convertAndSendToUser(
-                chatMessage.getRecipientId().toString(), "/queue/messages",
+                chatMessage.getChatRoomId().toString(), "/queue/messages",
                 chatMessage); // send message to recipient
-        simpMessagingTemplate.convertAndSendToUser(
-                chatMessage.getSenderId().toString(), "/queue/messages",
-                chatMessage); // send room to recipient
     }
 
     @Override
@@ -98,5 +118,13 @@ public class ChatsService implements IChatsService {
             chatRooms.setSenderStatus("READ");
         }
         chatRoomsRepository.save(chatRooms);
+    }
+
+    @Override
+    public ChatRooms updateChatRoom(Long userId, Long chatId, String status) {
+        ChatRooms chatRooms = chatRoomsRepository.findById(chatId).orElseThrow(() -> new CustomException("Chat not found", HttpStatus.NOT_FOUND));
+        chatRooms.setSenderStatus(status);
+        chatRoomsRepository.save(chatRooms);
+        return chatRooms;
     }
 }
