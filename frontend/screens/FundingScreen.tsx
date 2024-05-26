@@ -10,8 +10,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {getOrganizationPost} from '../api/OrganizationPostApi';
 import {
+  addToTheEndOfFundingPost,
   clearFundingPosts,
   pushFundingPost,
+  setHomePageFundingPost,
 } from '../redux/OrganizationPostReducer';
 import {OrganizationPost} from '../components/ui/OrganizationPost';
 import Colors from '../global/Color';
@@ -21,8 +23,6 @@ export const FundingScreen = ({navigation}: any) => {
   const FundingPostData = useSelector(
     (state: RootState) => state.fundingPost.HomePage,
   );
-  const location = useSelector((state: RootState) => state.location);
-  console.log(location);
   const token = useSelector((state: RootState) => state.token.key);
   const dispatch = useDispatch();
   const shuffleBack = useSharedValue(false);
@@ -38,16 +38,12 @@ export const FundingScreen = ({navigation}: any) => {
 
   const getFundingPost = async () => {
     try {
-      console.log('get funding post');
       const response: any = await getOrganizationPost(token.toString());
       if (response.status === 200) {
         const data = response.data;
         dispatch(clearFundingPosts());
-        for (const fundingPost of data) {
-          dispatch(pushFundingPost(fundingPost));
-        }
+        dispatch(setHomePageFundingPost(data));
         setCurrentCards(response.data);
-        console.log(response.data);
       } else {
         console.log(response);
         throw new Error(response);

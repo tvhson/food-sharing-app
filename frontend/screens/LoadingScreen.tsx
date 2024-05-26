@@ -34,6 +34,8 @@ import {
   countNumberOfUnread,
   setNotifications,
 } from '../redux/NotificationReducer';
+import {connectChat, getRoomChats} from '../api/ChatApi';
+import {pushChatRoom, setChatRooms} from '../redux/ChatRoomReducer';
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
@@ -65,12 +67,17 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(body);
         dispatch(addNotification(body));
       };
+      const saveChatRoom = (body: any) => {
+        console.log(body, 'Toi o loading');
+        dispatch(pushChatRoom(body));
+      };
       try {
         const response: any = await getInfoUser(token);
         if (response.status === 200) {
           const userInfo: UserInfo = response.data;
           dispatch(saveUser(userInfo));
           connectNotification(userInfo.id, saveNotification);
+          connectChat(userInfo.id, saveChatRoom);
         } else {
           console.log(response);
           throw new Error(response);
@@ -162,9 +169,24 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
+    const saveChatRoom = async () => {
+      try {
+        const response: any = await getRoomChats(token.toString());
+        if (response.status === 200) {
+          const data = response.data;
+          dispatch(setChatRooms(data));
+        } else {
+          console.log(response);
+          throw new Error(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
     const loadData = async () => {
       try {
+        console.log('loading');
         await Promise.all([
           getLocation(),
           saveInfo(),
@@ -173,6 +195,7 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveOrganizationPost(),
           saveMyOrganizationPost(),
           saveNotification(),
+          saveChatRoom(),
         ]);
 
         console.log('done');

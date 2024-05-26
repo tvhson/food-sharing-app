@@ -134,7 +134,7 @@ const PostRenderItem = ({item, navigation, location}: any) => {
             <Text
               style={{
                 fontSize: 22,
-                fontWeight: 'bold',
+                fontWeight: '500',
                 color: Colors.postTitle,
               }}>
               {item.title}
@@ -161,25 +161,25 @@ const PostRenderItem = ({item, navigation, location}: any) => {
             }}>
             <View>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: 'bold', color: 'black'}}>
+                <Text style={{fontWeight: '500', color: 'black'}}>
                   {'\u2022'} Description:{' '}
                 </Text>
                 {item.description}
               </Text>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: 'bold', color: 'black'}}>
+                <Text style={{fontWeight: '500', color: 'black'}}>
                   {'\u2022'} Expired date:{' '}
                 </Text>
                 {new Date(item.expiredDate).toLocaleDateString()}
               </Text>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: 'bold', color: 'black'}}>
+                <Text style={{fontWeight: '500', color: 'black'}}>
                   {'\u2022'} Pickup start:{' '}
                 </Text>
                 {new Date(item.pickUpStartDate).toLocaleDateString()}
               </Text>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: 'bold', color: 'black'}}>
+                <Text style={{fontWeight: '500', color: 'black'}}>
                   {'\u2022'} Pickup end:{' '}
                 </Text>
                 {new Date(item.pickUpEndDate).toLocaleDateString()}

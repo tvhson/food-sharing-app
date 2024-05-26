@@ -14,8 +14,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {
   clearNotifications,
-  clearNumberOfUnread,
-  countNumberOfUnread,
   setNotifications,
   setReadAllNotifications,
 } from '../redux/NotificationReducer';
@@ -23,49 +21,6 @@ import {getNotifications, readAllNotifications} from '../api/NotificationApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, Image} from '@rneui/themed';
 import {useFocusEffect} from '@react-navigation/native';
-
-const newData = [
-  {
-    id: '5',
-    title: 'New Message',
-    image: 'https://randomuser.me/api/portraits/men/37.jpg',
-    description: 'You have a new message from Mike Doe.',
-    type: 'message',
-    createdAt: '2022-01-01',
-  },
-  {
-    id: '6',
-    title: 'New Message',
-    image: 'https://randomuser.me/api/portraits/men/38.jpg',
-    description: 'You have a new message from Steve Doe.',
-    type: 'message',
-    createdAt: '2022-01-02',
-  },
-  {
-    id: '7',
-    title: 'New Message',
-    image: 'https://randomuser.me/api/portraits/men/39.jpg',
-    description: 'You have a new message from Bob Doe.',
-    type: 'message',
-    createdAt: '2022-01-03',
-  },
-  {
-    id: '8',
-    title: 'New Message',
-    image: 'https://randomuser.me/api/portraits/men/40.jpg',
-    description: 'You have a new message from Tom Doe.',
-    type: 'message',
-    createdAt: '2022-01-04',
-  },
-  {
-    id: '9',
-    title: 'New Message',
-    image: 'https://randomuser.me/api/portraits/men/41.jpg',
-    description: 'You have a new message from Jerry Doe.',
-    type: 'message',
-    createdAt: '2022-01-05',
-  },
-];
 
 const NotificationScreen = ({navigation}: any) => {
   const notificationDatas = useSelector(
@@ -143,12 +98,9 @@ const NotificationScreen = ({navigation}: any) => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('useFocusEffect callback is running'); // Add this line
       const readAll = async () => {
-        console.log('readAll function is running'); // Add this line
         dispatch(setReadAllNotifications());
         if (accessToken) {
-          console.log('accessToken is defined'); // Add this line
           readAllNotifications(accessToken.toString()).catch((error: any) => {
             console.log('Error when calling readAllNotifications:', error);
           });
