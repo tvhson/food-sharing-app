@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/no-unstable-nested-components */
 import React, {useEffect, useState} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -5,13 +6,18 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ChatScreen from '../screens/ChatScreen';
-import FundingScreen from '../screens/FundingScreen';
-import {Icon, MD3Colors} from 'react-native-paper';
+import {Badge, Icon, MD3Colors} from 'react-native-paper';
 import NotificationScreen from '../screens/NotificationScreen';
+import {FundingScreen} from '../screens/FundingScreen';
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = ({route}: any) => {
+  const numberOfUnread = useSelector(
+    (state: RootState) => state.notification.numberOfUnread,
+  );
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -60,11 +66,24 @@ const BottomTabNavigator = ({route}: any) => {
         component={NotificationScreen}
         options={{
           tabBarIcon: ({focused}) => (
-            <Icon
-              source={focused ? 'bell' : 'bell-outline'}
-              color="#F6836B"
-              size={36}
-            />
+            <>
+              <Icon
+                source={focused ? 'bell' : 'bell-outline'}
+                color="#F6836B"
+                size={36}
+              />
+              <Badge
+                visible={!focused && numberOfUnread !== 0}
+                size={20}
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 15,
+                  backgroundColor: 'red',
+                }}>
+                {numberOfUnread}
+              </Badge>
+            </>
           ),
         }}
       />

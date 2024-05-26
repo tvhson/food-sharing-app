@@ -43,12 +43,13 @@ const HomeScreen = ({navigation, route}: any) => {
   const [recommendPost, setRecommendPost] = useState<any>(null);
   const {notify} = useNotifications();
   const [search, setSearch] = useState('');
-  const [location, setLocation] = useState<Location | null>(null);
   const [error, setError] = useState<LocationErrorCode | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<any>(null);
+
+  const location = useSelector((state: RootState) => state.location);
 
   const updateSearch = (search: any) => {
     setSearch(search);
@@ -103,7 +104,7 @@ const HomeScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     const getRecommendPost = async () => {
-      if (!recommendedPost) {
+      if (recommendedPost) {
         setRecommendPost(recommendedPost);
       } else if (accessToken) {
         getPosts(accessToken.toString()).then((response: any) => {
@@ -119,31 +120,8 @@ const HomeScreen = ({navigation, route}: any) => {
         });
       }
     };
-    const getLocation = async () => {
-      GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 30000,
-        rationale: {
-          title: 'Location permission',
-          message: 'The app needs the permission to request your location.',
-          buttonPositive: 'Ok',
-        },
-      })
-        .then(newLocation => {
-          setLocation(newLocation);
-        })
-        .catch(ex => {
-          if (isLocationError(ex)) {
-            const {code, message} = ex;
-            setError(code);
-          }
-          setLocation(null);
-        });
-    };
-
     const fetchData = async () => {
       setIsLoading(true);
-      await getLocation();
       await getRecommendPost();
       setIsLoading(false);
     };
