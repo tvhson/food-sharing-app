@@ -19,6 +19,7 @@ import EditPostScreen from '../screens/EditPostScreen';
 import CreateFundingScreen from '../screens/CreateFundingScreen';
 import OrganizationPostDetail from '../screens/OrganizationPostDetail';
 import EditFundingScreen from '../screens/EditFundingScreen';
+import ChatRoomScreen from '../screens/ChatRoomSceen';
 
 const Stack = createNativeStackNavigator();
 
@@ -104,6 +105,7 @@ const Router = () => {
               headerTintColor: 'white',
             }}
           />
+          <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
         </>
       </Stack.Navigator>
       <EditProfileScreen />

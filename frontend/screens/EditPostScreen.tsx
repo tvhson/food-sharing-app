@@ -97,7 +97,6 @@ const EditPostScreen = ({route, navigation}: any) => {
         });
     }
     if (item) {
-      console.log(item);
       setTitle(item.title);
       setDescription(item.description);
       setWeight(item.weight);

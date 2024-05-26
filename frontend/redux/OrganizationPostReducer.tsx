@@ -41,19 +41,25 @@ const FundingPostSlice = createSlice({
       state: FundingPosts,
       action: PayloadAction<FundingPost>,
     ) => {
-      state.HomePage.push(action.payload);
+      state.HomePage.unshift(action.payload);
     },
     pushMyFundingPost: (
       state: FundingPosts,
       action: PayloadAction<FundingPost>,
     ) => {
-      state.MyPosts.push(action.payload);
+      state.MyPosts.unshift(action.payload);
+    },
+    addToTheEndOfFundingPost: (
+      state: FundingPosts,
+      action: PayloadAction<FundingPost>,
+    ) => {
+      state.HomePage.push(action.payload);
     },
     setHomePageFundingPost: (
       state: FundingPosts,
       action: PayloadAction<FundingPost[]>,
     ) => {
-      state.HomePage = action.payload;
+      state.HomePage = action.payload.slice().reverse();
     },
     setMyFundingPosts: (
       state: FundingPosts,
@@ -104,5 +110,6 @@ export const {
   deleteMyFundingPost,
   clearFundingPosts,
   clearMyFundingPosts,
+  addToTheEndOfFundingPost,
 } = FundingPostSlice.actions;
 export default FundingPostSlice.reducer;

@@ -18,6 +18,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {createOrganizationPost} from '../api/OrganizationPostApi';
 import {
+  addToTheEndOfFundingPost,
   pushFundingPost,
   pushMyFundingPost,
 } from '../redux/OrganizationPostReducer';
@@ -94,7 +95,7 @@ const CreateFundingScreen = ({navigation}: any) => {
                     title: 'Success',
                   },
                 });
-                dispatch(pushFundingPost(response2.data));
+                dispatch(addToTheEndOfFundingPost(response2.data));
                 dispatch(pushMyFundingPost(response2.data));
                 navigation.navigate('Funding');
               }
