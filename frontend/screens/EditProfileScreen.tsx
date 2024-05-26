@@ -40,9 +40,6 @@ function EditProfileScreen(props: any) {
   const saveProfile = async () => {
     let current = new Date();
     current.setHours(0, 0, 0, 0);
-    console.log('hehe');
-    console.log(phone.length);
-    console.log(phone);
     if (name === '') {
       notify('error', {
         params: {description: 'Name is required.', title: 'Error'},
@@ -50,7 +47,6 @@ function EditProfileScreen(props: any) {
       return;
     }
     if (phone && phone.length < 10) {
-      console.log('hehe2');
       notify('error', {
         params: {
           description: 'Phone number must be 10  digits.',
@@ -61,7 +57,6 @@ function EditProfileScreen(props: any) {
       });
       return;
     }
-    //check if phone is digit
     const isOnlyDigits = /^\d+$/.test(phone);
     if (!isOnlyDigits) {
       notify('error', {

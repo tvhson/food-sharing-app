@@ -1,9 +1,27 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Image, Text, TouchableWithoutFeedback} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import Colors from '../../global/Color';
+import {Icon} from '@rneui/themed';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/Store';
 
-const NotificationItem = ({item, navigation}: any) => {
+const ChatRoomItem = ({item, navigation}: any) => {
+  const userInfo = useSelector((state: RootState) => state.userInfo);
+  const recipientProfilePic =
+    item.recipientProfilePic === null
+      ? 'https://randomuser.me/api/portraits/men/36.jpg'
+      : item.recipientProfilePic;
+  const senderProfilePic =
+    item.senderProfilePic === null
+      ? 'https://randomuser.me/api/portraits/men/36.jpg'
+      : item.senderProfilePic;
   function timeAgo(dateInput: Date | string | number) {
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) {
@@ -44,9 +62,11 @@ const NotificationItem = ({item, navigation}: any) => {
     const diffInYears = Math.floor(diffInDays / 365);
     return `${diffInYears} years ago`;
   }
-
   return (
-    <TouchableWithoutFeedback>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        navigation.navigate('ChatRoom', {item});
+      }}>
       <View
         style={{
           padding: 10,
@@ -57,7 +77,12 @@ const NotificationItem = ({item, navigation}: any) => {
           elevation: 2,
         }}>
         <Image
-          source={{uri: item.imageUrl}}
+          source={{
+            uri:
+              item.senderId === userInfo.id
+                ? recipientProfilePic
+                : senderProfilePic,
+          }}
           style={{width: 100, height: 100, borderRadius: 8}}
         />
         <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>
@@ -68,7 +93,9 @@ const NotificationItem = ({item, navigation}: any) => {
                 fontWeight: 'bold',
                 color: Colors.postTitle,
               }}>
-              {item.title}
+              {item.senderId === userInfo.id
+                ? item.recipientName
+                : item.senderName}
             </Text>
           </View>
           <View
@@ -78,18 +105,19 @@ const NotificationItem = ({item, navigation}: any) => {
               justifyContent: 'space-between',
             }}>
             <Text style={{fontSize: 16, color: Colors.grayText}}>
-              {item.description}
+              {item.lastMessageSenderId === userInfo.id ? 'You: ' : ''}
+              {item.lastMessage}
             </Text>
-            <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-              <Text style={{fontSize: 12, color: Colors.grayText}}>
-                {timeAgo(item.createdDate)}
-              </Text>
-            </View>
           </View>
+        </View>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+          <Text style={{fontSize: 12, color: Colors.grayText}}>
+            {timeAgo(item.lastMessageCreatedDate)}
+          </Text>
         </View>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-export default NotificationItem;
+export default ChatRoomItem;

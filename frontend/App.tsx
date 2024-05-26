@@ -8,6 +8,8 @@ import {en, enGB, registerTranslation} from 'react-native-paper-dates';
 import {Provider} from 'react-redux';
 import {Store} from './redux/Store';
 import {PaperProvider} from 'react-native-paper';
+import * as encoding from 'text-encoding';
+import {encode as btoa} from 'base-64';
 registerTranslation('pl', {
   save: 'Save',
   selectSingle: 'Select date',
@@ -29,6 +31,7 @@ registerTranslation('pl', {
 });
 registerTranslation('en-GB', enGB);
 registerTranslation('en', en);
+var encoder = new encoding.TextEncoder();
 
 const {NotificationsProvider} = createNotifications();
 function App() {

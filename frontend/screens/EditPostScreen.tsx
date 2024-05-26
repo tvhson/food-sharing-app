@@ -97,7 +97,6 @@ const EditPostScreen = ({route, navigation}: any) => {
         });
     }
     if (item) {
-      console.log(item);
       setTitle(item.title);
       setDescription(item.description);
       setWeight(item.weight);
@@ -324,7 +323,10 @@ const EditPostScreen = ({route, navigation}: any) => {
         <TextInput
           placeholder="Description"
           placeholderTextColor={'#706d6d'}
+          multiline
+          numberOfLines={4}
           style={{
+            height: 100,
             fontSize: 16,
             padding: 10,
             backgroundColor: '#eff2ff',

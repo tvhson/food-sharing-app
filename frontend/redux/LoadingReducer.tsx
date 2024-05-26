@@ -2,9 +2,11 @@ import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 interface Loading {
   status: boolean;
+  loadFunding: boolean;
 }
 const initialState: Loading = {
   status: false,
+  loadFunding: false,
 };
 
 const LoadingSlice = createSlice({
@@ -14,8 +16,11 @@ const LoadingSlice = createSlice({
     setStatus: (state: Loading, action: PayloadAction<boolean>) => {
       state.status = action.payload;
     },
+    setLoadFunding: (state: Loading, action: PayloadAction<boolean>) => {
+      state.loadFunding = action.payload;
+    },
   },
 });
 
-export const {setStatus} = LoadingSlice.actions;
+export const {setStatus, setLoadFunding} = LoadingSlice.actions;
 export default LoadingSlice.reducer;

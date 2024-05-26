@@ -16,6 +16,8 @@ import {createNotifications} from 'react-native-notificated';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {saveUser} from '../redux/UserReducer';
+import {disconnectSocket} from '../api/NotificationApi';
+import {disconnectChat} from '../api/ChatApi';
 
 const {useNotifications} = createNotifications();
 
@@ -27,7 +29,7 @@ const ProfileScreen = ({navigation, route}: any) => {
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-
+  console.log(userInfo);
   useEffect(() => {
     const requestCameraPermission = async () => {
       try {
@@ -67,6 +69,8 @@ const ProfileScreen = ({navigation, route}: any) => {
     await AsyncStorage.removeItem('isLogin');
     await AsyncStorage.removeItem('userInfo');
     await AsyncStorage.removeItem('recommendPost');
+    disconnectSocket();
+    disconnectChat();
     navigation.reset({
       index: 0,
       routes: [{name: 'Landing'}],
@@ -181,7 +185,7 @@ const ProfileScreen = ({navigation, route}: any) => {
               size={30}
               name="edit"
               color={'white'}
-              style={{backgroundColor: Colors.button}}
+              style={{backgroundColor: Colors.button, overflow: 'hidden'}}
               onPress={() => {
                 setIsUploadVisible(!isUploadVisible);
               }}

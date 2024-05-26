@@ -16,6 +16,10 @@ import {RootState} from '../redux/Store';
 import AppLoader from '../components/ui/AppLoader';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import EditPostScreen from '../screens/EditPostScreen';
+import CreateFundingScreen from '../screens/CreateFundingScreen';
+import OrganizationPostDetail from '../screens/OrganizationPostDetail';
+import EditFundingScreen from '../screens/EditFundingScreen';
+import ChatRoomScreen from '../screens/ChatRoomSceen';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +40,10 @@ const Router = () => {
             component={BottomTabNavigator}
           />
           <Stack.Screen name="PostDetail" component={PostDetail} />
+          <Stack.Screen
+            name="OrganizationPostDetail"
+            component={OrganizationPostDetail}
+          />
           <Stack.Screen name="Loading" component={LoadingScreen} />
           <Stack.Screen
             name="CreatePost"
@@ -67,6 +75,37 @@ const Router = () => {
               headerTintColor: 'white',
             }}
           />
+          <Stack.Screen
+            name="EditFundingPost"
+            component={EditFundingScreen}
+            options={{
+              headerShown: true,
+              headerTitle: 'Edit Funding Post',
+              headerStyle: {
+                backgroundColor: Colors.button,
+              },
+              headerTitleStyle: {
+                color: 'white',
+              },
+              headerTintColor: 'white',
+            }}
+          />
+          <Stack.Screen
+            name="CreateFundingPost"
+            component={CreateFundingScreen}
+            options={{
+              headerShown: true,
+              headerTitle: 'Create Funding Post',
+              headerStyle: {
+                backgroundColor: Colors.button,
+              },
+              headerTitleStyle: {
+                color: 'white',
+              },
+              headerTintColor: 'white',
+            }}
+          />
+          <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
         </>
       </Stack.Navigator>
       <EditProfileScreen />
