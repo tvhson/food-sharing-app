@@ -3,6 +3,8 @@ package com.happyfood.chats.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,4 +26,7 @@ public class ChatRooms {
     private String senderStatus;
     private String recipientStatus;
     private String status;
+    private String lastMessage;
+    private Date lastMessageCreatedDate;
+    private Long lastMessageSenderId;
 }
