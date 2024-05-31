@@ -73,7 +73,7 @@ public class AuthService {
             }
 
             if (accountsDto.getStatus().equals("BANNED")) {
-                throw new CustomException("Your account has been banned", HttpStatus.UNPROCESSABLE_ENTITY);
+                throw new CustomException("Your account has been banned" + accountsDto.getBannedDate().toString(), HttpStatus.UNAUTHORIZED);
             }
 
             String accessToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "ACCESS");

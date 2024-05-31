@@ -21,4 +21,5 @@ public class OrganizationpostsDto {
     private String locationName;
     private String latitude;
     private String longitude;
+    private double distance;
 }

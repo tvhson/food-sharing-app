@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,12 @@ public class AccountsServiceImpl implements IAccountsService {
         accounts = accountsRepository.save(accounts);
 //        sendCommunication(accounts);
         return AccountsMapper.mapToAccountsDto(accounts);
+    }
+
+    @Override
+    public List<AccountsDto> getAllAccounts() {
+        List<Accounts> accounts = accountsRepository.findAll();
+        return accounts.stream().map(AccountsMapper::mapToAccountsDto).toList();
     }
 
 //    private void sendCommunication(Accounts account) {
@@ -113,5 +120,13 @@ public class AccountsServiceImpl implements IAccountsService {
 
         accounts.setPassword(passwordEncoder.encode(newPassword));
         accounts = accountsRepository.save(accounts);
+    }
+
+    @Override
+    public void changeRole(Long accountId, String role) {
+        Accounts accounts = accountsRepository.findById(accountId)
+                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+        accounts.setRole(role);
+        accountsRepository.save(accounts);
     }
 }

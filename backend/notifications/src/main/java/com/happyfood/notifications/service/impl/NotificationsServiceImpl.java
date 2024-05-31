@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +21,9 @@ public class NotificationsServiceImpl implements INotificationsService {
 
     @Override
     public List<Notifications> getNotifications(Long userId) {
-        return notificationsRepository.findByUserId(userId);
+        List<Notifications> notifications = notificationsRepository.findByUserId(userId);
+        Collections.reverse(notifications);
+        return notifications;
     }
 
     @Override
@@ -49,5 +52,10 @@ public class NotificationsServiceImpl implements INotificationsService {
             notification.setRead(true);
             notificationsRepository.save(notification);
         });
+    }
+
+    @Override
+    public void deleteNotification(Long notificationId) {
+        notificationsRepository.deleteById(notificationId);
     }
 }

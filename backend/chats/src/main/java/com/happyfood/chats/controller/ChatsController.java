@@ -37,4 +37,8 @@ public class ChatsController {
         chatsService.updateStatuses(userId, chatId);
         return ResponseEntity.ok().build();
     }
+    @PostMapping("/rooms/{chatId}")
+    public ResponseEntity<ChatRooms> updateChatRoom(@RequestHeader Long userId, @PathVariable Long chatId, @RequestParam String status) {
+        return ResponseEntity.ok(chatsService.updateChatRoom(userId, chatId, status));
+    }
 }
