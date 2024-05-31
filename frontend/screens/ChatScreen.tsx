@@ -145,7 +145,7 @@ const ChatScreen = ({navigation}: any) => {
               height: 500,
             }}>
             <Image
-              source={require('../assets/images/BgNoPost..png')}
+              source={require('../assets/images/BgNoMessage.png')}
               style={{width: 300, height: 400}}
             />
           </View>

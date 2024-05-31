@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import LottieView from 'lottie-react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 
 import {View, Text, StyleSheet} from 'react-native';
 import Colors from '../global/Color';
-import {useDispatch, useSelector} from 'react-redux';
-import {getInfoUser} from '../api/AccountsApi';
+import {useDispatch} from 'react-redux';
+import {getAllAccounts, getInfoUser} from '../api/AccountsApi';
 import {UserInfo, saveUser} from '../redux/UserReducer';
 import {setToken} from '../redux/TokenReducer';
 import {getPostOfUser, getPosts} from '../api/PostApi';
@@ -36,6 +36,9 @@ import {
 } from '../redux/NotificationReducer';
 import {connectChat, getRoomChats} from '../api/ChatApi';
 import {pushChatRoom, setChatRooms} from '../redux/ChatRoomReducer';
+import {getReport} from '../api/ReportApi';
+import {setReports} from '../redux/ReportReducer';
+import {setAccounts} from '../redux/AccountsReducer';
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
@@ -71,6 +74,34 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(body, 'Toi o loading');
         dispatch(pushChatRoom(body));
       };
+      const saveReport = async () => {
+        try {
+          const response: any = await getReport(token.toString());
+          if (response.status === 200) {
+            const data = response.data;
+            dispatch(setReports(data));
+          } else {
+            console.log(response);
+            throw new Error(response);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      const saveAllAccounts = async () => {
+        try {
+          const response: any = await getAllAccounts(token);
+          if (response.status === 200) {
+            const data = response.data;
+            dispatch(setAccounts(data));
+          } else {
+            console.log(response);
+            throw new Error(response);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
       try {
         const response: any = await getInfoUser(token);
         if (response.status === 200) {
@@ -78,6 +109,10 @@ const LoadingScreen = ({navigation, route}: any) => {
           dispatch(saveUser(userInfo));
           connectNotification(userInfo.id, saveNotification);
           connectChat(userInfo.id, saveChatRoom);
+          if (response.data.role === 'ADMIN') {
+            saveReport();
+            saveAllAccounts();
+          }
         } else {
           console.log(response);
           throw new Error(response);

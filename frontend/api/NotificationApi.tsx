@@ -53,3 +53,17 @@ export const readAllNotifications = async (token: any) => {
     return error;
   }
 };
+export const createNotification = async (data: any, token: any) => {
+  try {
+    const result = await ApiManager('notifications', {
+      method: 'POST',
+      headers: {
+        Authorization: token,
+      },
+      data: data,
+    });
+    return result;
+  } catch (error) {
+    return error;
+  }
+};

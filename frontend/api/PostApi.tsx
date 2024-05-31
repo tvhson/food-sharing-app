@@ -66,3 +66,31 @@ export const updatePost = async (postId: any, data: any, token: any) => {
     return error;
   }
 };
+export const reportPost = async (token: any, data: any) => {
+  try {
+    const response = await ApiManager('reports', {
+      method: 'POST',
+      headers: {
+        Authorization: token,
+      },
+      data: data,
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getPostById = async (postId: any, token: any) => {
+  try {
+    const response = await ApiManager(`posts/get/${postId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
