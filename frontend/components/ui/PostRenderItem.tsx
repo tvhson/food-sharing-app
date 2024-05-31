@@ -1,13 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Text, TouchableWithoutFeedback, View} from 'react-native';
+import {Text, TextInput, TouchableWithoutFeedback, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {Icon, Image} from '@rneui/themed';
 import Colors from '../../global/Color';
 import getDistance from 'geolib/es/getDistance';
-import {Button, Dialog, Menu, Portal} from 'react-native-paper';
+import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/Store';
-import {deletePost} from '../../api/PostApi';
+import {deletePost, reportPost} from '../../api/PostApi';
 import {deleteMyPost} from '../../redux/SharingPostReducer';
 
 const PostRenderItem = ({item, navigation, location}: any) => {
@@ -18,9 +18,16 @@ const PostRenderItem = ({item, navigation, location}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const accessToken = useSelector((state: RootState) => state.token.key);
   const [visible, setVisible] = useState<boolean>(false);
-  const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+  const [visibleDialogDelete, setVisibleDialogDelete] =
+    useState<boolean>(false);
+  const [visibleDialogReport, setVisibleDialogReport] =
+    useState<boolean>(false);
   const [distance, setDistance] = useState<number>(0);
   const [anchor, setAnchor] = useState({x: 0, y: 0});
+  const [reason, setReason] = useState<string>(
+    'Spam or Misleading Information',
+  );
+  const [descriptionReason, setDescriptionReason] = useState<string>('');
 
   const openMenu = () => {
     setVisible(true);
@@ -57,6 +64,27 @@ const PostRenderItem = ({item, navigation, location}: any) => {
         dispatch(deleteMyPost(item.id));
       }
     }
+    setVisibleDialogDelete(false);
+  };
+  const handleReportPost = async () => {
+    if (accessToken) {
+      const response: any = await reportPost(accessToken, {
+        title: reason,
+        description: descriptionReason,
+        imageUrl: item.imageUrl,
+        status: 'PENDING',
+        linkId: item.id,
+        note: '',
+        type: 'POST',
+        senderId: userInfo.id,
+        accusedId: item.createdById,
+        senderName: userInfo.name,
+      });
+      if (response.status === 200) {
+        console.log('Report post success');
+      }
+      setVisibleDialogReport(false);
+    }
   };
   return (
     <TouchableWithoutFeedback
@@ -73,8 +101,8 @@ const PostRenderItem = ({item, navigation, location}: any) => {
         }}>
         <Portal>
           <Dialog
-            visible={visibleDialog}
-            onDismiss={() => setVisibleDialog(false)}>
+            visible={visibleDialogDelete}
+            onDismiss={() => setVisibleDialogDelete(false)}>
             <Dialog.Icon icon="alert" />
             <Dialog.Title style={{textAlign: 'center'}}>
               Confirm Delete Post
@@ -83,10 +111,97 @@ const PostRenderItem = ({item, navigation, location}: any) => {
               <Text>Do you want to delete this post?</Text>
             </Dialog.Content>
             <Dialog.Actions>
-              <Button onPress={() => setVisibleDialog(false)} textColor="red">
+              <Button
+                onPress={() => setVisibleDialogDelete(false)}
+                textColor="red">
                 Cancel
               </Button>
               <Button onPress={() => handleDeletePost()}>Delete</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+        <Portal>
+          <Dialog
+            visible={visibleDialogReport}
+            onDismiss={() => setVisibleDialogReport(false)}>
+            <Dialog.Icon icon="alert" />
+            <Dialog.Title style={{textAlign: 'center'}}>
+              Report this post
+            </Dialog.Title>
+            <Dialog.Content>
+              <RadioButton.Group
+                onValueChange={newValue => setReason(newValue)}
+                value={reason}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: 20,
+                  }}>
+                  <RadioButton value="Spam or Misleading Information" />
+                  <Text>Spam or Misleading Information</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: 20,
+                  }}>
+                  <RadioButton value="Offensive Content" />
+                  <Text>Offensive Content</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: 20,
+                  }}>
+                  <RadioButton value="Scam or Fraudulent Activity" />
+                  <Text>Scam or Fraudulent Activity</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: 20,
+                  }}>
+                  <RadioButton value="Health and Safety Concerns" />
+                  <Text>Health and Safety Concerns</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginLeft: 20,
+                  }}>
+                  <RadioButton value="Other" />
+                  <Text>Other</Text>
+                </View>
+              </RadioButton.Group>
+              {reason === 'Other' && (
+                <View style={{marginHorizontal: 10}}>
+                  <TextInput
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: 'black',
+                      color: 'black',
+                      fontSize: 16,
+                    }}
+                    placeholder="Enter your reason"
+                    value={descriptionReason}
+                    multiline
+                    onChangeText={text => setDescriptionReason(text)}
+                  />
+                </View>
+              )}
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button
+                onPress={() => setVisibleDialogReport(false)}
+                textColor="red">
+                Cancel
+              </Button>
+              <Button onPress={() => handleReportPost()}>Report</Button>
             </Dialog.Actions>
           </Dialog>
         </Portal>
@@ -108,7 +223,7 @@ const PostRenderItem = ({item, navigation, location}: any) => {
               <Menu.Item
                 onPress={() => {
                   setVisible(false);
-                  setVisibleDialog(true);
+                  setVisibleDialogDelete(true);
                 }}
                 title="Delete"
                 leadingIcon="delete"
@@ -116,7 +231,10 @@ const PostRenderItem = ({item, navigation, location}: any) => {
             </>
           )}
           <Menu.Item
-            onPress={() => {}}
+            onPress={() => {
+              setVisible(false);
+              setVisibleDialogReport(true);
+            }}
             title="Report"
             leadingIcon="alert-octagon"
           />

@@ -7,6 +7,8 @@ import OrganizationPostReducer from './OrganizationPostReducer';
 import LocationReducer from './LocationReducer';
 import NotificationReducer from './NotificationReducer';
 import ChatRoomReducer from './ChatRoomReducer';
+import ReportReducer from './ReportReducer';
+import AccountsReducer from './AccountsReducer';
 export const Store = configureStore({
   reducer: {
     userInfo: UserReducer,
@@ -17,6 +19,8 @@ export const Store = configureStore({
     location: LocationReducer,
     notification: NotificationReducer,
     chatRoom: ChatRoomReducer,
+    report: ReportReducer,
+    account: AccountsReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

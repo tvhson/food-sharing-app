@@ -54,7 +54,7 @@ export const disconnectMessage = () => {
 };
 
 export const sendMessage = (message: any) => {
-  stompClientMessage.send('/app/message', {}, JSON.stringify(message));
+  stompClient.send('/app/message', {}, JSON.stringify(message));
 };
 
 export const getRoomChats = async (token: any) => {

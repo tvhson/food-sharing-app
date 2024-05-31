@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
 import Colors from '../global/Color';
 import {Avatar, Button, Icon} from '@rneui/themed';
@@ -9,10 +9,9 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 
 const OrganizationPostDetail = ({route, navigation}: any) => {
-  console.log('item', route.params.item);
   const item = route.params.item;
-  const accessToken = useSelector((state: RootState) => state.token.key);
   const createPostUser = route.params.item.accounts;
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const locationStart = useSelector((state: RootState) => state.location);
   const locationEnd = {
     latitude: route.params.item.latitude,
@@ -184,36 +183,38 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
         </MapView>
       </View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginHorizontal: 20,
-          marginTop: 20,
-        }}>
-        <Button
-          title={'Attend'}
-          buttonStyle={{
-            backgroundColor: Colors.postTitle,
-            borderColor: 'transparent',
-            borderWidth: 0,
-            borderRadius: 10,
-            paddingHorizontal: 45,
-          }}
-          titleStyle={{fontWeight: '700', fontSize: 18}}
-        />
-        <Button
-          title={'Message'}
-          buttonStyle={{
-            backgroundColor: Colors.postTitle,
-            borderColor: 'transparent',
-            borderWidth: 0,
-            borderRadius: 10,
-            paddingHorizontal: 45,
-          }}
-          titleStyle={{fontWeight: '700', fontSize: 18}}
-        />
-      </View>
+      {createPostUser.id !== userInfo.id ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: 20,
+            marginTop: 20,
+          }}>
+          <Button
+            title={'Attend'}
+            buttonStyle={{
+              backgroundColor: Colors.postTitle,
+              borderColor: 'transparent',
+              borderWidth: 0,
+              borderRadius: 10,
+              paddingHorizontal: 45,
+            }}
+            titleStyle={{fontWeight: '700', fontSize: 18}}
+          />
+          <Button
+            title={'Message'}
+            buttonStyle={{
+              backgroundColor: Colors.postTitle,
+              borderColor: 'transparent',
+              borderWidth: 0,
+              borderRadius: 10,
+              paddingHorizontal: 45,
+            }}
+            titleStyle={{fontWeight: '700', fontSize: 18}}
+          />
+        </View>
+      ) : null}
       <View style={{height: 20}} />
     </ScrollView>
   );

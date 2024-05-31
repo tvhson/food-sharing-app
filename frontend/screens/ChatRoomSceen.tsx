@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View, Text} from 'react-native';
 import {GiftedChat, Send} from 'react-native-gifted-chat';
 import {
   connectMessage,
   disconnectMessage,
   getMessages,
+  getRoomChats,
   sendMessage,
 } from '../api/ChatApi';
 import Colors from '../global/Color';
@@ -13,11 +14,13 @@ import {Avatar, Icon, IconButton} from 'react-native-paper';
 import {BackHandler} from 'react-native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
+import {createNotification} from '../api/NotificationApi';
 
 const ChatRoomScreen = ({navigation, route}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
   const item = route.params.item;
   const userInfo = useSelector((state: RootState) => state.userInfo);
+  const [roomId, setRoomId] = useState(item.id ? item.id : null);
 
   const recipientProfilePic =
     item.recipientProfilePic === null
@@ -43,7 +46,9 @@ const ChatRoomScreen = ({navigation, route}: any) => {
             avatar:
               message.senderId === userInfo.id
                 ? userInfo.imageUrl
-                : recipientProfilePic,
+                : senderProfilePic === userInfo.imageUrl
+                ? recipientProfilePic
+                : senderProfilePic,
           },
         };
       };
@@ -55,12 +60,16 @@ const ChatRoomScreen = ({navigation, route}: any) => {
 
         setMessages((prevMessages: any) => [convertedMessage, ...prevMessages]);
       };
-      connectMessage(item.id, saveMessage);
+      connectMessage(roomId, saveMessage);
     };
-    connectToMessage();
+    if (roomId) {
+      connectToMessage();
+    }
   }, [
-    item.id,
+    item,
     recipientProfilePic,
+    roomId,
+    senderProfilePic,
     userInfo.id,
     userInfo.imageUrl,
     userInfo.name,
@@ -98,7 +107,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       };
     };
     const loadMessages = async () => {
-      getMessages(item.id, accessToken).then((response: any) => {
+      getMessages(roomId, accessToken).then((response: any) => {
         if (response.status === 200) {
           const convertedMessages = response.data
             .map((message: any) => convertMessage(message))
@@ -109,15 +118,81 @@ const ChatRoomScreen = ({navigation, route}: any) => {
         }
       });
     };
-    loadMessages();
+    if (roomId) {
+      loadMessages();
+    }
   }, [
     accessToken,
-    item.id,
     recipientProfilePic,
+    roomId,
     senderProfilePic,
     userInfo.id,
     userInfo.imageUrl,
   ]);
+
+  const onSend = useCallback(
+    async (newMessage: any) => {
+      console.log(newMessage);
+      const message = {
+        senderId: userInfo.id,
+        recipientId:
+          userInfo.id === item.senderId ? item.recipientId : item.senderId,
+        senderName: userInfo.name,
+        recipientName:
+          userInfo.id === item.senderId ? item.recipientName : item.senderName,
+        content: newMessage[0].text,
+      };
+      await sendMessage(message);
+      setMessages((previousMessages: any) =>
+        GiftedChat.append(previousMessages, newMessage),
+      );
+      if (roomId === null) {
+        await getRoomChats(accessToken)
+          .then((response: any) => {
+            if (response.status === 200) {
+              const roomChats = response.data;
+              const roomChat = roomChats.find(
+                (room: any) =>
+                  room.senderId === item.senderId &&
+                  room.recipientId === item.recipientId,
+              );
+              if (roomChat) {
+                setRoomId(roomChat.id);
+                createNotification(
+                  {
+                    title: 'You have a new message',
+                    imageUrl:
+                      userInfo.imageUrl ||
+                      'https://randomuser.me/api/portraits/men/36.jpg',
+                    description: userInfo.name + ' has sent you a message',
+                    type: 'MESSAGE',
+                    linkId: roomChat.id,
+                    userId: item.recipientId,
+                  },
+                  accessToken,
+                ).then((response2: any) => {
+                  console.log(response2);
+                });
+              }
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    },
+    [
+      accessToken,
+      item.recipientId,
+      item.recipientName,
+      item.senderId,
+      item.senderName,
+      roomId,
+      userInfo.id,
+      userInfo.imageUrl,
+      userInfo.name,
+    ],
+  );
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.background}}>
@@ -164,23 +239,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       </View>
       <GiftedChat
         messages={messages}
-        onSend={(newMessage: any) => {
-          const message = {
-            senderId: userInfo.id,
-            recipientId:
-              userInfo.id === item.senderId ? item.recipientId : item.senderId,
-            senderName: userInfo.name,
-            recipientName:
-              userInfo.id === item.senderId
-                ? item.recipientName
-                : item.senderName,
-            content: newMessage[0].text,
-          };
-          sendMessage(message);
-          setMessages((previousMessages: any) =>
-            GiftedChat.append(previousMessages, newMessage),
-          );
-        }}
+        onSend={(newMessage: any) => onSend(newMessage)}
         user={{
           _id: userInfo.id,
           name: userInfo.name,
@@ -198,7 +257,6 @@ const ChatRoomScreen = ({navigation, route}: any) => {
           );
         }}
         alwaysShowSend
-        key={item.id}
         keyboardShouldPersistTaps={'handled'}
       />
     </View>
