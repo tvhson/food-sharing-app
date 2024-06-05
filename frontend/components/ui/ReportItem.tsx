@@ -48,7 +48,9 @@ const ReportItem = ({item, navigation}: any) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        navigation.navigate('ReportDetail', {item: item});
+        navigation.navigate('ReportDetail', {
+          item: item,
+        });
       }}>
       <View
         style={{

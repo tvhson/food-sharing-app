@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,8 @@ import ChatRoomItem from '../components/ui/ChatRoomItem';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {getRoomChats} from '../api/ChatApi';
-import {setChatRooms} from '../redux/ChatRoomReducer';
+import {clearChatRooms, setChatRooms} from '../redux/ChatRoomReducer';
+import {useFocusEffect} from '@react-navigation/native';
 
 const ChatScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
@@ -25,6 +26,7 @@ const ChatScreen = ({navigation}: any) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const accessToken = useSelector((state: RootState) => state.token.key);
+  const myId = useSelector((state: RootState) => state.userInfo.id);
   const chatRooms = useSelector((state: RootState) => state.chatRoom.chatRooms);
   const [chatRoom, setChatRoom] = useState(chatRooms);
 
@@ -38,14 +40,14 @@ const ChatScreen = ({navigation}: any) => {
   const loadMoreItem = () => {
     setCurrentPage(currentPage + 1);
   };
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     const saveChatRoom = async () => {
       if (accessToken) {
         getRoomChats(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
             console.log(response.data);
             setChatRoom(response.data);
-            dispatch(setChatRooms(response.data));
+            dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
           } else {
             console.log(response);
           }
@@ -53,11 +55,11 @@ const ChatScreen = ({navigation}: any) => {
       }
     };
     setRefreshing(true);
-    dispatch(setChatRooms([]));
+    dispatch(clearChatRooms());
     saveChatRoom();
     setCurrentPage(0);
     setRefreshing(false);
-  };
+  }, [accessToken, dispatch, myId]);
   const updateSearch = (message: any) => {
     setSearch(message);
   };
@@ -70,7 +72,7 @@ const ChatScreen = ({navigation}: any) => {
           if (response.status === 200) {
             console.log(response.data);
             setChatRoom(response.data);
-            dispatch(setChatRooms(response.data));
+            dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
           } else {
             console.log(response);
           }
@@ -83,7 +85,30 @@ const ChatScreen = ({navigation}: any) => {
       setIsLoading(false);
     };
     fetchData();
-  }, [dispatch, accessToken, chatRooms]);
+  }, [dispatch, accessToken, chatRooms, myId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      onRefresh();
+    }, [onRefresh]),
+  );
+  useEffect(() => {
+    if (search === '') {
+      setChatRoom(chatRooms);
+    } else {
+      const filteredData = chatRooms.filter(item => {
+        if (item.senderId === myId) {
+          return item.recipientName
+            .toLowerCase()
+            .includes(search.toLowerCase());
+        } else if (item.recipientId === myId) {
+          return item.senderName.toLowerCase().includes(search.toLowerCase());
+        }
+        return false;
+      });
+      setChatRoom(filteredData);
+    }
+  }, [search, chatRooms, myId]);
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.background}}>

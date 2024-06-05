@@ -57,7 +57,11 @@ const NotificationItem = ({item, navigation}: any) => {
           elevation: 2,
         }}>
         <Image
-          source={{uri: item.imageUrl}}
+          source={{
+            uri: item.imageUrl
+              ? item.imageUrl
+              : 'https://www.w3schools.com/w3images/avatar2.png',
+          }}
           style={{width: 100, height: 100, borderRadius: 8}}
         />
         <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>

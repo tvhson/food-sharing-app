@@ -7,16 +7,20 @@ import {
   disconnectMessage,
   getMessages,
   getRoomChats,
+  readAllMessagesOfRoom,
   sendMessage,
 } from '../api/ChatApi';
 import Colors from '../global/Color';
 import {Avatar, Icon, IconButton} from 'react-native-paper';
 import {BackHandler} from 'react-native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {createNotification} from '../api/NotificationApi';
+import {useFocusEffect} from '@react-navigation/native';
+import {readAllMessageOfRoomChatId} from '../redux/ChatRoomReducer';
 
 const ChatRoomScreen = ({navigation, route}: any) => {
+  const dispatch = useDispatch();
   const accessToken = useSelector((state: RootState) => state.token.key);
   const item = route.params.item;
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -192,6 +196,28 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       userInfo.imageUrl,
       userInfo.name,
     ],
+  );
+  useFocusEffect(
+    useCallback(() => {
+      const readAllMessages = async () => {
+        if (accessToken) {
+          readAllMessagesOfRoom(roomId, accessToken)
+            .then((response: any) => {
+              if (response.status === 200) {
+                console.log(response.data);
+                dispatch(readAllMessageOfRoomChatId(roomId));
+              } else {
+                console.log(response);
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        }
+      };
+      readAllMessages();
+      return readAllMessages;
+    }, [accessToken, dispatch, roomId]),
   );
 
   return (
