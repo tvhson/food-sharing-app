@@ -202,11 +202,15 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
           Accuser
         </Text>
-        {senderInfo ? <ReportAccountItem item={senderInfo} /> : null}
+        {senderInfo ? (
+          <ReportAccountItem item={senderInfo} isReport={true} />
+        ) : null}
         <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
           Accused
         </Text>
-        {accusedInfo ? <ReportAccountItem item={accusedInfo} /> : null}
+        {accusedInfo ? (
+          <ReportAccountItem item={accusedInfo} isReport={true} />
+        ) : null}
         <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
           Report reason
         </Text>
@@ -221,118 +225,124 @@ const ReportDetailScreen = ({navigation, route}: any) => {
             {item.title === 'Other' ? item.description : item.title}
           </Text>
         </View>
-        <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
-          Report reason
-        </Text>
-        <View
-          style={{
-            backgroundColor: 'white',
-            padding: 10,
-            borderRadius: 8,
-            marginTop: 5,
-          }}>
-          <RadioButton.Group
-            onValueChange={newValue => setBanDay(newValue)}
-            value={banDay}>
+        {item.status === 'PENDING' && (
+          <>
+            {' '}
+            <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
+              Ban account
+            </Text>
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
+                backgroundColor: 'white',
+                padding: 10,
+                borderRadius: 8,
+                marginTop: 5,
               }}>
-              <RadioButton value="1" />
-              <Text>1 day</Text>
+              <RadioButton.Group
+                onValueChange={newValue => setBanDay(newValue)}
+                value={banDay}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="1" />
+                  <Text>1 day</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="7" />
+                  <Text>1 week</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="14" />
+                  <Text>2 weeks</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="30" />
+                  <Text>1 month</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="90" />
+                  <Text>3 months</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="180" />
+                  <Text>6 months</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="365" />
+                  <Text>1 year</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="0" />
+                  <Text>Not ban</Text>
+                </View>
+              </RadioButton.Group>
             </View>
             <View
               style={{
                 flexDirection: 'row',
-                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 20,
               }}>
-              <RadioButton value="7" />
-              <Text>1 week</Text>
+              <Button
+                title={'Cancel'}
+                buttonStyle={{
+                  backgroundColor: Colors.grayText,
+                  borderColor: 'transparent',
+                  borderWidth: 0,
+                  borderRadius: 10,
+                  paddingHorizontal: 45,
+                  width: 150,
+                }}
+                onPress={() => navigation.goBack()}
+                titleStyle={{fontWeight: '700', fontSize: 18}}
+              />
+              <Button
+                title={'Done'}
+                buttonStyle={{
+                  backgroundColor: Colors.postTitle,
+                  borderColor: 'transparent',
+                  borderWidth: 0,
+                  width: 150,
+                  borderRadius: 10,
+                  paddingHorizontal: 45,
+                }}
+                onPress={handleDone}
+                titleStyle={{fontWeight: '700', fontSize: 18}}
+              />
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <RadioButton value="14" />
-              <Text>2 weeks</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <RadioButton value="30" />
-              <Text>1 month</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <RadioButton value="90" />
-              <Text>3 months</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <RadioButton value="180" />
-              <Text>6 months</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <RadioButton value="365" />
-              <Text>1 year</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <RadioButton value="0" />
-              <Text>Not ban</Text>
-            </View>
-          </RadioButton.Group>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 20,
-          }}>
-          <Button
-            title={'Cancel'}
-            buttonStyle={{
-              backgroundColor: Colors.grayText,
-              borderColor: 'transparent',
-              borderWidth: 0,
-              borderRadius: 10,
-              paddingHorizontal: 45,
-              width: 150,
-            }}
-            onPress={() => navigation.goBack()}
-            titleStyle={{fontWeight: '700', fontSize: 18}}
-          />
-          <Button
-            title={'Done'}
-            buttonStyle={{
-              backgroundColor: Colors.postTitle,
-              borderColor: 'transparent',
-              borderWidth: 0,
-              width: 150,
-              borderRadius: 10,
-              paddingHorizontal: 45,
-            }}
-            onPress={handleDone}
-            titleStyle={{fontWeight: '700', fontSize: 18}}
-          />
-        </View>
+          </>
+        )}
+
         <View style={{height: 40}} />
       </ScrollView>
     </View>

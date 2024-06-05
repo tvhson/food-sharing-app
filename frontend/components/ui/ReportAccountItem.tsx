@@ -8,11 +8,18 @@ import {changeRoleById} from '../../api/AccountsApi';
 import {useDispatch, useSelector} from 'react-redux';
 import {changeRole} from '../../redux/AccountsReducer';
 import {RootState} from '../../redux/Store';
+import {banAccount} from '../../api/ReportApi';
+import {createNotifications} from 'react-native-notificated';
 
-const ReportAccountItem = ({item}: any) => {
+const {useNotifications} = createNotifications();
+
+const ReportAccountItem = ({item, isReport}: any) => {
+  const {notify} = useNotifications();
   const accessToken = useSelector((state: RootState) => state.token.key);
   const [visibleDialogRole, setVisibleDialogRole] = useState(false);
+  const [visibleDialogBan, setVisibleDialogBan] = useState(false);
   const [role, setRole] = useState(item.role);
+  const [banDays, setBanDays] = useState('1');
   const [visible, setVisible] = useState<boolean>(false);
   const [anchor, setAnchor] = useState({x: 0, y: 0});
   const dispatch = useDispatch();
@@ -51,8 +58,32 @@ const ReportAccountItem = ({item}: any) => {
           longitude: item.longitude,
         }),
       );
+      notify('success', {
+        params: {
+          description: 'Role has been changed successfully',
+          title: 'Change role',
+          style: {multiline: 100},
+        },
+      });
     } else {
       console.log(response);
+    }
+  };
+  const handleBanAccount = async () => {
+    const response: any = await banAccount(
+      item.id,
+      Number(banDays),
+      accessToken,
+    );
+    if (response.status === 200) {
+      setVisibleDialogBan(false);
+      notify('success', {
+        params: {
+          description: 'Account has been banned successfully',
+          title: 'Ban account',
+          style: {multiline: 100},
+        },
+      });
     }
   };
 
@@ -67,65 +98,157 @@ const ReportAccountItem = ({item}: any) => {
           flexDirection: 'row',
           elevation: 2,
         }}>
-        <Portal>
-          <Dialog
-            visible={visibleDialogRole}
-            onDismiss={() => setVisibleDialogRole(false)}>
-            <Dialog.Icon icon="alert" />
-            <Dialog.Title style={{textAlign: 'center'}}>
-              Change role of {item.name}
-            </Dialog.Title>
-            <Dialog.Content>
-              <RadioButton.Group
-                onValueChange={newValue => setRole(newValue)}
-                value={role}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginLeft: 20,
-                  }}>
-                  <RadioButton value="USER" />
-                  <Text>User</Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginLeft: 20,
-                  }}>
-                  <RadioButton value="ORGANIZATION" />
-                  <Text>Organization</Text>
-                </View>
-              </RadioButton.Group>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button
-                onPress={() => setVisibleDialogRole(false)}
-                textColor="red">
-                Cancel
-              </Button>
-              <Button onPress={() => handleChangeRole()}>Save</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
-        <Menu visible={visible} onDismiss={closeMenu} anchor={anchor}>
-          <Menu.Item
-            onPress={() => {
-              setVisible(false);
-              setVisibleDialogRole(true);
-            }}
-            title="Change role"
-            leadingIcon="account-wrench"
-          />
-          <Menu.Item
-            onPress={() => {
-              setVisible(false);
-            }}
-            title="Ban account"
-            leadingIcon="account-lock"
-          />
-        </Menu>
+        {!isReport ? (
+          <>
+            <Portal>
+              <Dialog
+                visible={visibleDialogRole}
+                onDismiss={() => setVisibleDialogRole(false)}>
+                <Dialog.Icon icon="alert" />
+                <Dialog.Title style={{textAlign: 'center'}}>
+                  Change role of {item.name}
+                </Dialog.Title>
+                <Dialog.Content>
+                  <RadioButton.Group
+                    onValueChange={newValue => setRole(newValue)}
+                    value={role}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="USER" />
+                      <Text>User</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="ORGANIZATION" />
+                      <Text>Organization</Text>
+                    </View>
+                  </RadioButton.Group>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button
+                    onPress={() => setVisibleDialogRole(false)}
+                    textColor="red">
+                    Cancel
+                  </Button>
+                  <Button onPress={() => handleChangeRole()}>Save</Button>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
+            <Portal>
+              <Dialog
+                visible={visibleDialogBan}
+                onDismiss={() => setVisibleDialogBan(false)}>
+                <Dialog.Icon icon="alert" />
+                <Dialog.Title style={{textAlign: 'center'}}>
+                  Ban account {item.name}
+                </Dialog.Title>
+                <Dialog.Content>
+                  <RadioButton.Group
+                    onValueChange={newValue => setBanDays(newValue)}
+                    value={role}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="1" />
+                      <Text>1 day</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="7" />
+                      <Text>1 week</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="14" />
+                      <Text>2 weeks</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="30" />
+                      <Text>1 month</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="90" />
+                      <Text>3 months</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="180" />
+                      <Text>6 months</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: 20,
+                      }}>
+                      <RadioButton value="365" />
+                      <Text>1 year</Text>
+                    </View>
+                  </RadioButton.Group>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button
+                    onPress={() => setVisibleDialogBan(false)}
+                    textColor="red">
+                    Cancel
+                  </Button>
+                  <Button onPress={() => handleBanAccount()}>Ban</Button>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
+            <Menu visible={visible} onDismiss={closeMenu} anchor={anchor}>
+              <Menu.Item
+                onPress={() => {
+                  setVisible(false);
+                  setVisibleDialogRole(true);
+                }}
+                title="Change role"
+                leadingIcon="account-wrench"
+              />
+              <Menu.Item
+                onPress={() => {
+                  setVisible(false);
+                  setVisibleDialogBan(true);
+                }}
+                title="Ban account"
+                leadingIcon="account-lock"
+              />
+            </Menu>
+          </>
+        ) : null}
         <Image
           source={{
             uri: item.imageUrl

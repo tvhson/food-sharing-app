@@ -23,7 +23,7 @@ const AccountsSlice = createSlice({
       const accountFound = state.user.find(
         account => account.id === action.payload.id,
       );
-      if (accountFound) {
+      if (accountFound && action.payload.role === 'ORGANIZATION') {
         accountFound.role = 'ORGANIZATION';
         state.organization.push(accountFound);
         state.user = state.user.filter(
@@ -33,7 +33,7 @@ const AccountsSlice = createSlice({
         const account = state.organization.find(
           account2 => account2.id === action.payload.id,
         );
-        if (account) {
+        if (account && action.payload.role === 'USER') {
           account.role = 'USER';
           state.user.push(account);
           state.organization = state.organization.filter(
