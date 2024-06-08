@@ -33,8 +33,8 @@ public class PostsController {
         return ResponseEntity.ok(postsService.getPostById(postId));
     }
     @GetMapping("/recommended")
-    ResponseEntity<List<PostsDto>> getRecommendedPosts(@RequestHeader Long userId, @RequestBody Coordinates location) {
-        return ResponseEntity.ok(postsService.getRecommendedPosts(userId, location));
+    ResponseEntity<List<PostsDto>> getRecommendedPosts(@RequestHeader Long userId) {
+        return ResponseEntity.ok(postsService.getRecommendedPosts(userId));
     }
     @GetMapping("/user")
     ResponseEntity<List<PostsDto>> getPostsOfUser(@RequestHeader Long userId) {

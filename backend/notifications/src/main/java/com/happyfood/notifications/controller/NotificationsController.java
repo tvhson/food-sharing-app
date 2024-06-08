@@ -36,6 +36,12 @@ public class NotificationsController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/update-type/{notificationId}")
+    public ResponseEntity<?> updateType(@PathVariable Long notificationId, @RequestParam String type) {
+        notificationsService.updateType(notificationId, type);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long notificationId) {
         notificationsService.deleteNotification(notificationId);

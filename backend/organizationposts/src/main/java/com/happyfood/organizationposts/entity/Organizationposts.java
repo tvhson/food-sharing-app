@@ -20,7 +20,6 @@ public class Organizationposts {
     private Long id;
     private String title;
     private String description;
-    private int peopleAttended;
     private String imageUrl;
     private Date createdDate;
     private boolean isDeleted;
@@ -30,6 +29,6 @@ public class Organizationposts {
     private String latitude;
     private String longitude;
 
-    @OneToMany(mappedBy = "organizationPost")
+    @OneToMany(mappedBy = "organizationPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<AttendeeId> attendees;
 }
