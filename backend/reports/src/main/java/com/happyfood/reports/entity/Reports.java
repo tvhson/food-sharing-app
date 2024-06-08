@@ -28,5 +28,6 @@ public class Reports {
     private String note;
     private String type;
     private Long senderId;
+    private String senderName;
     private Long accusedId;
 }

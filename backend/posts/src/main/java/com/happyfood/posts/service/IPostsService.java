@@ -10,6 +10,6 @@ public interface IPostsService {
     PostsDto updatePostById(Long userId, PostsDto postsDto, Long postId);
     void deletePostById(Long userId, Long postId);
     PostsDto getPostById(Long postId);
-    List<PostsDto> getRecommendedPosts(Long userId, Coordinates location);
+    List<PostsDto> getRecommendedPosts(Long userId);
     List<PostsDto> getPostsOfUser(Long userId);
 }

@@ -43,7 +43,12 @@ public class OrganizationpostsController {
     }
 
     @GetMapping("/recommended")
-    ResponseEntity<List<OrganizationpostsDetail>> getRecommendationOrganizationposts(@RequestHeader Long userId, @RequestBody Coordinates location) {
-        return ResponseEntity.ok(organizationpostsService.getRecommendationOrganizationposts(userId, location));
+    ResponseEntity<List<OrganizationpostsDetail>> getRecommendationOrganizationposts(@RequestHeader Long userId) {
+        return ResponseEntity.ok(organizationpostsService.getRecommendationOrganizationposts(userId));
+    }
+
+    @PostMapping("/attend/{organizationpostId}")
+    ResponseEntity<OrganizationpostsDetail> toggleAttendOrganizationposts(@PathVariable Long organizationpostId, @RequestHeader Long userId) {
+        return ResponseEntity.ok(organizationpostsService.toggleAttendOrganizationposts(organizationpostId, userId));
     }
 }

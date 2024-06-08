@@ -25,4 +25,5 @@ public class Notifications {
     private Date createdDate;
     private Long linkId;
     private Long userId;
+    private Long senderId;
 }

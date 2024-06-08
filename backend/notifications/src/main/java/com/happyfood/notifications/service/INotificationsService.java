@@ -9,5 +9,6 @@ public interface INotificationsService {
     Notifications createNotification(Notifications message);
     void readNotification(Long userId, Long notificationId);
     void readAllNotifications(Long userId);
+    void updateType(Long notificationId, String type);
     void deleteNotification(Long notificationId);
 }

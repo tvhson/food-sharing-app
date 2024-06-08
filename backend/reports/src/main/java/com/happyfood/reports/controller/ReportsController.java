@@ -25,7 +25,7 @@ public class ReportsController {
     }
 
     @PutMapping("/{reportId}")
-    public ResponseEntity<Reports> updateReport(@RequestHeader String role, @PathVariable Long reportId, @RequestBody Reports report) {
+    public ResponseEntity<Reports> updateReport(@RequestHeader String role , @PathVariable Long reportId, @RequestBody Reports report) {
         if (!role.equals("ADMIN")) {
             return ResponseEntity.status(403).build();
         }

@@ -22,4 +22,5 @@ public class OrganizationpostsDto {
     private String latitude;
     private String longitude;
     private double distance;
+    private boolean isAttended;
 }

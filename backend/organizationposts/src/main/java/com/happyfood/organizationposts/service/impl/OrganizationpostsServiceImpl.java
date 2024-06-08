@@ -4,6 +4,7 @@ import com.happyfood.organizationposts.dto.AccountsDto;
 import com.happyfood.organizationposts.dto.Coordinates;
 import com.happyfood.organizationposts.dto.OrganizationpostsDetail;
 import com.happyfood.organizationposts.dto.OrganizationpostsDto;
+import com.happyfood.organizationposts.entity.AttendeeId;
 import com.happyfood.organizationposts.entity.Organizationposts;
 import com.happyfood.organizationposts.exception.CustomException;
 import com.happyfood.organizationposts.mapper.OrganizationpostsMapper;
@@ -30,7 +31,12 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
         OrganizationpostsDetail postsDetailDto = new OrganizationpostsDetail();
 
         Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Organizationposts not found", HttpStatus.NOT_FOUND));
-        postsDetailDto.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationposts));
+        OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationposts);
+
+        organizationpostsDto.setAttended(organizationposts.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(organizationposts.getUserId())));
+        organizationpostsDto.setPeopleAttended(organizationposts.getAttendees().size());
+
+        postsDetailDto.setOrganizationposts(organizationpostsDto);
 
         ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationposts.getUserId());
 
@@ -42,25 +48,26 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
     }
 
     @Override
-    public List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId, Coordinates location) {
+    public List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId) {
         List<OrganizationpostsDetail> organizationpostsList = new ArrayList<>();
         List<Organizationposts> organizationposts = organizationpostsRepository.findAll();
 
-        double latitude = Double.parseDouble(location.getLatitude());
-        double longitude = Double.parseDouble(location.getLongitude());
+//        double latitude = Double.parseDouble(location.getLatitude());
+//        double longitude = Double.parseDouble(location.getLongitude());
 
 
         for (Organizationposts organizationpost : organizationposts) {
 
             if (organizationpost.isDeleted()) continue;
-            if (organizationpost.getLatitude() == null || organizationpost.getLongitude() == null) continue;
+//            if (organizationpost.getLatitude() == null || organizationpost.getLongitude() == null) continue;
             OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost);
-
-            double postLatitude = Double.parseDouble(organizationpostsDto.getLatitude());
-            double postLongitude = Double.parseDouble(organizationpostsDto.getLongitude());
-            double distance = Math.sqrt(Math.pow(latitude - postLatitude, 2) + Math.pow(longitude - postLongitude, 2)) * 1.60934;
-            if (distance > 50) continue;
-            organizationpostsDto.setDistance(distance);
+            organizationpostsDto.setAttended(organizationpost.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+            organizationpostsDto.setPeopleAttended(organizationpost.getAttendees().size());
+//            double postLatitude = Double.parseDouble(organizationpostsDto.getLatitude());
+//            double postLongitude = Double.parseDouble(organizationpostsDto.getLongitude());
+//            double distance = Math.sqrt(Math.pow(latitude - postLatitude, 2) + Math.pow(longitude - postLongitude, 2)) * 1.60934;
+//            if (distance > 50) continue;
+//            organizationpostsDto.setDistance(distance);
 
             OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
             organizationpostsDetail.setOrganizationposts(organizationpostsDto);
@@ -81,8 +88,11 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
         return organizationposts.stream()
                 .filter(organizationpost -> !organizationpost.isDeleted())
                 .map(organizationpost -> {
+                    OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost);
+                    organizationpostsDto.setAttended(organizationpost.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+                    organizationpostsDto.setPeopleAttended(organizationpost.getAttendees().size());
                     OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
-                    organizationpostsDetail.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost));
+                    organizationpostsDetail.setOrganizationposts(organizationpostsDto);
                     ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationpost.getUserId());
                     if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
                         organizationpostsDetail.setAccounts(accountsDtoResponseEntity.getBody());
@@ -97,6 +107,7 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
         Organizationposts organizationPosts = OrganizationpostsMapper.mapToOrganizationposts(organizationpostsDto);
         organizationPosts.setUserId(userId);
         organizationPosts.setCreatedDate(new Date());
+        organizationPosts.setAttendees(new ArrayList<>());
 
         OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
         organizationpostsDetail.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationPosts)));
@@ -118,15 +129,44 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
 
         organizationposts.setTitle(organizationpostsDto.getTitle());
         organizationposts.setDescription(organizationpostsDto.getDescription());
-        organizationposts.setPeopleAttended(organizationpostsDto.getPeopleAttended());
         organizationposts.setImageUrl(organizationpostsDto.getImageUrl());
         organizationposts.setLinkWebsites(organizationpostsDto.getLinkWebsites());
         organizationposts.setLocationName(organizationpostsDto.getLocationName());
         organizationposts.setLatitude(organizationpostsDto.getLatitude());
         organizationposts.setLongitude(organizationpostsDto.getLongitude());
 
+        OrganizationpostsDto organizationpostsDto1 = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationposts));
+        organizationpostsDto1.setAttended(organizationposts.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+        organizationpostsDto1.setPeopleAttended(organizationposts.getAttendees().size());
+
         OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
-        organizationpostsDetail.setOrganizationposts(OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationposts)));
+        organizationpostsDetail.setOrganizationposts(organizationpostsDto1);
+        ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationposts.getUserId());
+        if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
+            organizationpostsDetail.setAccounts(accountsDtoResponseEntity.getBody());
+        }
+
+        return organizationpostsDetail;
+    }
+
+    @Override
+    public OrganizationpostsDetail toggleAttendOrganizationposts(Long id, Long userId) {
+        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Organizationposts not found", HttpStatus.NOT_FOUND));
+
+        if (organizationposts.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId))) {
+            organizationposts.getAttendees().removeIf(attendee -> attendee.getUserId().equals(userId));
+        } else {
+            organizationposts.getAttendees().add(AttendeeId.builder().userId(userId).organizationPost(organizationposts).build());
+        }
+
+        organizationpostsRepository.save(organizationposts);
+
+        OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpostsRepository.save(organizationposts));
+        organizationpostsDto.setAttended(organizationposts.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+        organizationpostsDto.setPeopleAttended(organizationposts.getAttendees().size());
+
+        OrganizationpostsDetail organizationpostsDetail = new OrganizationpostsDetail();
+        organizationpostsDetail.setOrganizationposts(organizationpostsDto);
         ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(organizationposts.getUserId());
         if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {
             organizationpostsDetail.setAccounts(accountsDtoResponseEntity.getBody());

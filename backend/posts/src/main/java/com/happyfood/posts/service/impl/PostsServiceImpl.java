@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -69,27 +66,28 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public List<PostsDto> getRecommendedPosts(Long userId, Coordinates location) {
+    public List<PostsDto> getRecommendedPosts(Long userI ) {
         List<Posts> posts = postsRepository.findAll();
 
-        double latitude = Double.parseDouble(location.getLatitude());
-        double longitude = Double.parseDouble(location.getLongitude());
+//        double latitude = Double.parseDouble(location.getLatitude());
+//        double longitude = Double.parseDouble(location.getLongitude());
 
-        List<PostsDto> recommendedPosts = posts.stream()
+        List<PostsDto> recommendedPosts = new ArrayList<>(posts.stream()
                 .filter(post -> !post.isDeleted())
+                .filter(post -> !post.getStatus().equals("RECEIVED"))
                 .map(PostsMapper::mapToPostsDto)
-                .filter(post -> post.getReceiverId() == null)
-                .filter(post -> post.getLatitude() != null)
-                .filter(post -> post.getLongitude() != null)
-                .filter(post -> {
-                    double postLatitude = Double.parseDouble(post.getLatitude());
-                    double postLongitude = Double.parseDouble(post.getLongitude());
-                    double distance = Math.sqrt(Math.pow(latitude - postLatitude, 2) + Math.pow(longitude - postLongitude, 2)) * 1.60934;
-                    post.setDistance(distance);
-                    return distance < 25;
-                })
-                .toList();
-
+//                .filter(post -> post.getReceiverId() == null)
+//                .filter(post -> post.getLatitude() != null)
+//                .filter(post -> post.getLongitude() != null)
+//                .filter(post -> {
+//                    double postLatitude = Double.parseDouble(post.getLatitude());
+//                    double postLongitude = Double.parseDouble(post.getLongitude());
+//                    double distance = Math.sqrt(Math.pow(latitude - postLatitude, 2) + Math.pow(longitude - postLongitude, 2)) * 1.60934;
+//                    post.setDistance(distance);
+//                    return distance < 25;
+//                })
+                .toList());
+        Collections.reverse(recommendedPosts);
         return recommendedPosts;
     }
 
