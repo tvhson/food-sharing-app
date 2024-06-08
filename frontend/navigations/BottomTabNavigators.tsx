@@ -18,6 +18,13 @@ const BottomTabNavigator = ({route}: any) => {
   const numberOfUnread = useSelector(
     (state: RootState) => state.notification.numberOfUnread,
   );
+  const numberOfUnreadChat = useSelector(
+    (state: RootState) => state.chatRoom.numberOfUnreadMessages,
+  );
+  useEffect(() => {
+    console.log('Number of unread chats:', numberOfUnreadChat);
+  }, [numberOfUnreadChat]);
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -53,11 +60,24 @@ const BottomTabNavigator = ({route}: any) => {
         component={ChatScreen}
         options={{
           tabBarIcon: ({focused}) => (
-            <Icon
-              source={focused ? 'chat' : 'chat-outline'}
-              color="#F6836B"
-              size={36}
-            />
+            <>
+              <Icon
+                source={focused ? 'chat' : 'chat-outline'}
+                color="#F6836B"
+                size={36}
+              />
+              <Badge
+                visible={!focused && numberOfUnreadChat !== 0}
+                size={20}
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 15,
+                  backgroundColor: 'red',
+                }}>
+                {numberOfUnreadChat}
+              </Badge>
+            </>
           ),
         }}
       />

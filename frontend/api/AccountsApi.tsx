@@ -42,3 +42,33 @@ export const getInfoUserById = async (id: any, token: any) => {
     return error;
   }
 };
+export const getAllAccounts = async (token: any) => {
+  try {
+    const response = await ApiManager('accounts/all', {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const changeRoleById = async (id: any, role: any, token: any) => {
+  try {
+    const response = await ApiManager(`accounts/role/${id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: token,
+      },
+      params: {
+        newRole: role,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

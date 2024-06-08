@@ -4,8 +4,8 @@ import React, {useEffect, useState} from 'react';
 
 import {View, Text, StyleSheet} from 'react-native';
 import Colors from '../global/Color';
-import {useDispatch, useSelector} from 'react-redux';
-import {getInfoUser} from '../api/AccountsApi';
+import {useDispatch} from 'react-redux';
+import {getAllAccounts, getInfoUser} from '../api/AccountsApi';
 import {UserInfo, saveUser} from '../redux/UserReducer';
 import {setToken} from '../redux/TokenReducer';
 import {getPostOfUser, getPosts} from '../api/PostApi';
@@ -35,12 +35,20 @@ import {
   setNotifications,
 } from '../redux/NotificationReducer';
 import {connectChat, getRoomChats} from '../api/ChatApi';
-import {pushChatRoom, setChatRooms} from '../redux/ChatRoomReducer';
+import {
+  calculateUnreadMessages,
+  pushChatRoom,
+  setChatRooms,
+} from '../redux/ChatRoomReducer';
+import {getReport} from '../api/ReportApi';
+import {setReports} from '../redux/ReportReducer';
+import {setAccounts} from '../redux/AccountsReducer';
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
   const token = route.params.token;
   const dispatch = useDispatch();
+  const [myId, setMyId] = useState(0);
 
   useEffect(() => {
     dispatch(setToken(token));
@@ -70,14 +78,63 @@ const LoadingScreen = ({navigation, route}: any) => {
       const saveChatRoom = (body: any) => {
         console.log(body, 'Toi o loading');
         dispatch(pushChatRoom(body));
+        dispatch(calculateUnreadMessages(myId));
+      };
+      const saveReport = async () => {
+        try {
+          const response: any = await getReport(token.toString());
+          if (response.status === 200) {
+            const data = response.data;
+            dispatch(setReports(data));
+          } else {
+            console.log(response);
+            throw new Error(response);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      const saveAllAccounts = async () => {
+        try {
+          const response: any = await getAllAccounts(token);
+          if (response.status === 200) {
+            const data = response.data;
+            dispatch(setAccounts(data));
+          } else {
+            console.log(response);
+            throw new Error(response);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      const saveAllChatRoom = async () => {
+        try {
+          const response: any = await getRoomChats(token.toString());
+          if (response.status === 200) {
+            const data = response.data;
+            dispatch(setChatRooms({chatRooms: data, myId}));
+          } else {
+            console.log(response);
+            throw new Error(response);
+          }
+        } catch (error) {
+          console.log(error);
+        }
       };
       try {
         const response: any = await getInfoUser(token);
         if (response.status === 200) {
           const userInfo: UserInfo = response.data;
+          setMyId(userInfo.id);
           dispatch(saveUser(userInfo));
           connectNotification(userInfo.id, saveNotification);
           connectChat(userInfo.id, saveChatRoom);
+          saveAllChatRoom();
+          if (response.data.role === 'ADMIN') {
+            saveReport();
+            saveAllAccounts();
+          }
         } else {
           console.log(response);
           throw new Error(response);
@@ -169,20 +226,6 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
-    const saveChatRoom = async () => {
-      try {
-        const response: any = await getRoomChats(token.toString());
-        if (response.status === 200) {
-          const data = response.data;
-          dispatch(setChatRooms(data));
-        } else {
-          console.log(response);
-          throw new Error(response);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
 
     const loadData = async () => {
       try {
@@ -195,7 +238,6 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveOrganizationPost(),
           saveMyOrganizationPost(),
           saveNotification(),
-          saveChatRoom(),
         ]);
 
         console.log('done');
@@ -212,7 +254,7 @@ const LoadingScreen = ({navigation, route}: any) => {
       }
     };
     loadData();
-  }, [dispatch, navigation, token]);
+  }, [dispatch, myId, navigation, token]);
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.background}}>

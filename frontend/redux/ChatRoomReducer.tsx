@@ -42,11 +42,70 @@ const ChatRoomSlice = createSlice({
         state.chatRooms.unshift(action.payload);
       }
     },
-    setChatRooms: (state: ChatRooms, action: PayloadAction<ChatRoom[]>) => {
-      state.chatRooms = action.payload;
+    setChatRooms: (
+      state: ChatRooms,
+      action: PayloadAction<{chatRooms: ChatRoom[]; myId: number}>,
+    ) => {
+      var numberOfUnreadMessages = 0;
+      state.chatRooms = action.payload.chatRooms;
+      state.chatRooms.forEach(chatRoom => {
+        if (chatRoom.senderId === action.payload.myId) {
+          if (chatRoom.senderStatus === 'UNREAD') {
+            chatRoom.numberOfUnreadMessages++;
+            numberOfUnreadMessages++;
+          }
+        } else if (chatRoom.recipientId === action.payload.myId) {
+          if (chatRoom.recipientStatus === 'UNREAD') {
+            chatRoom.numberOfUnreadMessages++;
+            numberOfUnreadMessages++;
+          }
+        }
+      });
+      state.numberOfUnreadMessages = numberOfUnreadMessages;
+    },
+    readAllMessageOfRoomChatId: (
+      state: ChatRooms,
+      action: PayloadAction<number>,
+    ) => {
+      const index = state.chatRooms.findIndex(
+        chatRoom => chatRoom.id === action.payload,
+      );
+      if (index !== -1) {
+        state.chatRooms[index].numberOfUnreadMessages = 0;
+      }
+    },
+    calculateUnreadMessages: (
+      state: ChatRooms,
+      action: PayloadAction<number>,
+    ) => {
+      var numberOfUnreadMessages = 0;
+      state.chatRooms.forEach(chatRoom => {
+        if (chatRoom.senderId === action.payload) {
+          if (chatRoom.senderStatus === 'UNREAD') {
+            chatRoom.numberOfUnreadMessages++;
+            numberOfUnreadMessages++;
+          }
+        } else if (chatRoom.recipientId === action.payload) {
+          if (chatRoom.recipientStatus === 'UNREAD') {
+            chatRoom.numberOfUnreadMessages++;
+            numberOfUnreadMessages++;
+          }
+        }
+      });
+      state.numberOfUnreadMessages = numberOfUnreadMessages;
+    },
+    clearChatRooms: (state: ChatRooms) => {
+      state.chatRooms = [];
+      state.numberOfUnreadMessages = 0;
     },
   },
 });
 
-export const {pushChatRoom, setChatRooms} = ChatRoomSlice.actions;
+export const {
+  pushChatRoom,
+  setChatRooms,
+  readAllMessageOfRoomChatId,
+  clearChatRooms,
+  calculateUnreadMessages,
+} = ChatRoomSlice.actions;
 export default ChatRoomSlice.reducer;
