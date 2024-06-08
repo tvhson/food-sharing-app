@@ -3,21 +3,20 @@
 import {Accessory} from '@rneui/base';
 import {Avatar, Button} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, ImageBackground} from 'react-native';
+import {View, StyleSheet, ImageBackground, ScrollView} from 'react-native';
 import Colors from '../global/Color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 
-import {PermissionsAndroid} from 'react-native';
 import EditProfileScreen from './EditProfileScreen';
-import {getInfoUser, updateUser} from '../api/AccountsApi';
 import {createNotifications} from 'react-native-notificated';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {saveUser} from '../redux/UserReducer';
 import {disconnectSocket} from '../api/NotificationApi';
 import {disconnectChat} from '../api/ChatApi';
+import {updateUser} from '../api/AccountsApi';
 
 const {useNotifications} = createNotifications();
 
@@ -31,34 +30,12 @@ const ProfileScreen = ({navigation, route}: any) => {
   const [imageUrl, setImageUrl] = useState('');
   console.log(userInfo);
   useEffect(() => {
-    const requestCameraPermission = async () => {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: 'Camera Permission',
-            message: 'This app needs access to your camera',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Camera permission granted');
-        } else {
-          console.log('Camera permission denied');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    };
     const getImageUrl = async () => {
       if (userInfo.imageUrl) {
         setImageUrl(userInfo.imageUrl);
       }
     };
 
-    requestCameraPermission();
     if (userInfo) {
       getImageUrl();
     }
@@ -192,64 +169,70 @@ const ProfileScreen = ({navigation, route}: any) => {
             />
           </Avatar>
         </View>
-        <View
-          style={{
-            marginHorizontal: 35,
-            backgroundColor: 'white',
-            borderRadius: 8,
-            marginVertical: 20,
-            overflow: 'hidden',
-            padding: 10,
-          }}>
-          <Button
-            title={userInfo.name}
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black', marginLeft: 10}}
-            icon={{name: 'user', type: 'antdesign', color: 'black'}}
-          />
-          <Button
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            title={new Date(userInfo.birthDate).toLocaleDateString()}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black', marginLeft: 10}}
-            icon={{name: 'birthday-cake', type: 'font-awesome', color: 'black'}}
-          />
-          <Button
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            title={userInfo.phone}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black', marginLeft: 10}}
-            icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
-          />
-          <Button
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            title={userInfo.locationName}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black'}}
-            icon={{name: 'location', type: 'entypo', color: 'black'}}
-          />
-        </View>
+        {userInfo.role !== 'ADMIN' ? (
+          <View
+            style={{
+              marginHorizontal: 35,
+              backgroundColor: 'white',
+              borderRadius: 8,
+              marginVertical: 20,
+              overflow: 'hidden',
+              padding: 10,
+            }}>
+            <Button
+              title={userInfo.name}
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black', marginLeft: 10}}
+              icon={{name: 'user', type: 'antdesign', color: 'black'}}
+            />
+            <Button
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              title={new Date(userInfo.birthDate).toLocaleDateString()}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black', marginLeft: 10}}
+              icon={{
+                name: 'birthday-cake',
+                type: 'font-awesome',
+                color: 'black',
+              }}
+            />
+            <Button
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              title={userInfo.phone}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black', marginLeft: 10}}
+              icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
+            />
+            <Button
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              title={userInfo.locationName}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black'}}
+              icon={{name: 'location', type: 'entypo', color: 'black'}}
+            />
+          </View>
+        ) : null}
 
         <View
           style={{
@@ -260,37 +243,88 @@ const ProfileScreen = ({navigation, route}: any) => {
             overflow: 'hidden',
             padding: 10,
           }}>
+          {userInfo.role !== 'ADMIN' ? (
+            <Button
+              title="Edit profile"
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black'}}
+              icon={{name: 'profile', type: 'antdesign', color: 'black'}}
+              onPress={() => setIsEditVisible(!isEditVisible)}
+            />
+          ) : null}
+          {userInfo.role !== 'ADMIN' ? (
+            <Button
+              title="My posts"
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black'}}
+              icon={{
+                name: 'post-outline',
+                type: 'material-community',
+                color: 'black',
+              }}
+              onPress={() => navigation.navigate('MyPost')}
+            />
+          ) : null}
+          {userInfo.role === 'ORGANIZATION' ? (
+            <Button
+              title="My organization posts"
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black'}}
+              onPress={() => navigation.navigate('MyFundingPost')}
+              icon={{name: 'organization', type: 'octicon', color: 'black'}}
+            />
+          ) : null}
+          {userInfo.role === 'ADMIN' ? (
+            <>
+              <Button
+                onPress={() => navigation.navigate('Report')}
+                title="Reports"
+                buttonStyle={{
+                  backgroundColor: 'transparent',
+                  justifyContent: 'flex-start',
+                }}
+                titleStyle={{color: 'black'}}
+                icon={{name: 'report', type: 'material-icon', color: 'black'}}
+              />
+              <Button
+                title="Manage Accounts"
+                buttonStyle={{
+                  backgroundColor: 'transparent',
+                  justifyContent: 'flex-start',
+                }}
+                onPress={() => navigation.navigate('Verify')}
+                titleStyle={{color: 'black'}}
+                icon={{
+                  name: 'verified-user',
+                  type: 'material-icon',
+                  color: 'black',
+                }}
+              />
+            </>
+          ) : null}
+        </View>
+        <View style={{flex: 1, justifyContent: 'flex-end'}}>
           <Button
-            title="Edit profile"
+            title="Logout"
+            onPress={() => handleLogout()}
             buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
+              backgroundColor: Colors.button,
+              width: 200,
+              alignSelf: 'center',
+              borderRadius: 10,
+              marginBottom: 50,
             }}
-            titleStyle={{color: 'black'}}
-            icon={{name: 'profile', type: 'antdesign', color: 'black'}}
-            onPress={() => setIsEditVisible(!isEditVisible)}
-          />
-          <Button
-            title="Notification"
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black'}}
-            icon={{name: 'bell', type: 'entypo', color: 'black'}}
           />
         </View>
-        <Button
-          title="Logout"
-          onPress={() => handleLogout()}
-          buttonStyle={{
-            backgroundColor: Colors.button,
-            width: 200,
-            alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 10,
-          }}
-        />
       </ImageBackground>
     </View>
   );
@@ -299,6 +333,7 @@ const ProfileScreen = ({navigation, route}: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
   title: {
     fontSize: 24,

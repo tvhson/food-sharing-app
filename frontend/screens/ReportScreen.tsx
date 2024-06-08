@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,30 +9,31 @@ import {
   RefreshControl,
 } from 'react-native';
 import Colors from '../global/Color';
-import NotificationItem from '../components/ui/NotificationItem';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
-import {
-  clearNotifications,
-  setNotifications,
-  setReadAllNotifications,
-} from '../redux/NotificationReducer';
-import {getNotifications, readAllNotifications} from '../api/NotificationApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Button, Image} from '@rneui/themed';
-import {useFocusEffect} from '@react-navigation/native';
+import {Image} from '@rneui/themed';
+import {IconButton, SegmentedButtons} from 'react-native-paper';
+import {getReport} from '../api/ReportApi';
+import {clearReports, setReports} from '../redux/ReportReducer';
+import ReportItem from '../components/ui/ReportItem';
 
-const NotificationScreen = ({navigation}: any) => {
-  const notificationDatas = useSelector(
-    (state: RootState) => state.notification.notifications,
+const ReportScreen = ({navigation}: any) => {
+  const ReportPendingDatas = useSelector(
+    (state: RootState) => state.report.reportsPending,
+  );
+  const ReportFinishedDatas = useSelector(
+    (state: RootState) => state.report.reportsFinished,
   );
   const accessToken = useSelector((state: RootState) => state.token.key);
   const dispatch = useDispatch();
-  const [notifications, setNotificationsList] = useState<any>(null);
+  const [reportPending, setReportPending] = useState<any>(ReportPendingDatas);
+  const [reportFinished, setReportFinished] =
+    useState<any>(ReportFinishedDatas);
 
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [valueOfSegmentButton, setValueOfSegmentButton] = useState('Pending');
 
   const renderLoader = () => {
     return isLoading ? (
@@ -45,17 +46,12 @@ const NotificationScreen = ({navigation}: any) => {
     setCurrentPage(currentPage + 1);
   };
   const onRefresh = () => {
-    const saveNotifications = async () => {
+    const saveReport = async () => {
       if (accessToken) {
-        getNotifications(accessToken.toString()).then((response: any) => {
+        getReport(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
             console.log(response.data);
-            AsyncStorage.setItem(
-              'notifications',
-              JSON.stringify(response.data),
-            );
-            setNotificationsList(response.data);
-            dispatch(setNotifications(response.data));
+            dispatch(setReports(response.data));
           } else {
             console.log(response);
           }
@@ -63,25 +59,21 @@ const NotificationScreen = ({navigation}: any) => {
       }
     };
     setRefreshing(true);
-    dispatch(clearNotifications());
-    saveNotifications();
+    dispatch(clearReports());
+    saveReport();
     setCurrentPage(0);
     setRefreshing(false);
   };
 
   useEffect(() => {
-    const saveNotifications = async () => {
-      if (notificationDatas) {
-        setNotificationsList(notificationDatas);
+    const saveReport = async () => {
+      if (ReportPendingDatas || ReportFinishedDatas) {
+        setReportFinished(ReportFinishedDatas);
+        setReportPending(ReportPendingDatas);
       } else if (accessToken) {
-        getNotifications(accessToken.toString()).then((response: any) => {
+        getReport(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
-            AsyncStorage.setItem(
-              'notifications',
-              JSON.stringify(response.data),
-            );
-            setNotifications(response.data);
-            dispatch(setNotifications(response.data));
+            dispatch(setReports(response.data));
           } else {
             console.log(response);
           }
@@ -90,26 +82,11 @@ const NotificationScreen = ({navigation}: any) => {
     };
     const fetchData = async () => {
       setIsLoading(true);
-      await saveNotifications();
+      await saveReport();
       setIsLoading(false);
     };
     fetchData();
-  }, [dispatch, accessToken, notificationDatas]);
-
-  useFocusEffect(
-    useCallback(() => {
-      const readAll = async () => {
-        dispatch(setReadAllNotifications());
-        if (accessToken) {
-          readAllNotifications(accessToken.toString()).catch((error: any) => {
-            console.log('Error when calling readAllNotifications:', error);
-          });
-        }
-      };
-      readAll();
-      return readAll;
-    }, [accessToken, dispatch]),
-  );
+  }, [dispatch, accessToken, ReportPendingDatas, ReportFinishedDatas]);
 
   return (
     <View
@@ -129,21 +106,62 @@ const NotificationScreen = ({navigation}: any) => {
 
           alignItems: 'center',
         }}>
+        <View style={{position: 'absolute', top: -1, left: 10}}>
+          <IconButton
+            icon="chevron-left"
+            size={40}
+            iconColor="white"
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
+        </View>
         <Text
           style={{
             fontSize: 24,
             fontWeight: 'bold',
             color: 'white',
           }}>
-          Notifications
+          Reports
         </Text>
       </View>
+      <SegmentedButtons
+        style={{margin: 20}}
+        value={valueOfSegmentButton}
+        onValueChange={setValueOfSegmentButton}
+        buttons={[
+          {
+            value: 'Pending',
+            label: 'Pending',
+            checkedColor: 'white',
+            style: {
+              backgroundColor:
+                valueOfSegmentButton === 'Pending'
+                  ? Colors.button
+                  : 'transparent',
+            },
+          },
+          {
+            value: 'Finished',
+            label: 'Finished',
+            checkedColor: 'white',
+            style: {
+              backgroundColor:
+                valueOfSegmentButton === 'Finished'
+                  ? Colors.button
+                  : 'transparent',
+            },
+          },
+        ]}
+      />
       <FlatList
         style={{marginHorizontal: 8}}
-        data={notifications}
+        data={
+          valueOfSegmentButton === 'Pending' ? reportPending : reportFinished
+        }
         keyExtractor={item => item.id}
         renderItem={({item}) => (
-          <NotificationItem item={item} navigation={navigation} />
+          <ReportItem item={item} navigation={navigation} />
         )}
         onEndReached={() => {
           if (!isLoading) {
@@ -164,7 +182,7 @@ const NotificationScreen = ({navigation}: any) => {
               height: 500,
             }}>
             <Image
-              source={require('../assets/images/BgNoNotification.png')}
+              source={require('../assets/images/BgNoData.png')}
               style={{width: 300, height: 400}}
             />
           </View>
@@ -174,7 +192,7 @@ const NotificationScreen = ({navigation}: any) => {
   );
 };
 
-export default NotificationScreen;
+export default ReportScreen;
 const styles = StyleSheet.create({
   loaderStyle: {
     marginVertical: 16,

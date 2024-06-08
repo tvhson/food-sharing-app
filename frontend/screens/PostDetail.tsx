@@ -6,14 +6,16 @@ import {Avatar, Button, Icon} from '@rneui/themed';
 import MapView, {Marker} from 'react-native-maps';
 import {Linking} from 'react-native';
 import {getInfoUserById} from '../api/AccountsApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
+import {getRoomChats} from '../api/ChatApi';
 
 const PostDetail = ({route, navigation}: any) => {
   const item = route.params.item;
   const accessToken = useSelector((state: RootState) => state.token.key);
   const [createPostUser, setCreatePostUser] = useState<any>(null);
+  const [roomChat, setRoomChat] = useState<any>(null);
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const locationStart = {
     latitude: route.params.location.latitude,
     longitude: route.params.location.longitude,
@@ -38,6 +40,25 @@ const PostDetail = ({route, navigation}: any) => {
           .then((response: any) => {
             if (response.status === 200) {
               setCreatePostUser(response.data);
+              getRoomChats(accessToken.toString())
+                .then((response2: any) => {
+                  if (response2.status === 200) {
+                    const roomChats = response2.data;
+                    const roomChatFind = roomChats.find(
+                      (room: any) =>
+                        (room.senderId === userInfo.id &&
+                          room.recipientId === response.data.id) ||
+                        (room.senderId === response.data.id &&
+                          room.recipientId === userInfo.id),
+                    );
+                    setRoomChat(roomChatFind);
+                  } else {
+                    console.log(response);
+                  }
+                })
+                .catch(error => {
+                  console.log(error);
+                });
             }
           })
           .catch(error => {
@@ -46,7 +67,7 @@ const PostDetail = ({route, navigation}: any) => {
       }
     };
     getInfoUserCreatePost();
-  }, [accessToken, item.createdById]);
+  }, [accessToken, item.createdById, userInfo.id]);
 
   return (
     <ScrollView
@@ -193,36 +214,56 @@ const PostDetail = ({route, navigation}: any) => {
         </MapView>
       </View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginHorizontal: 20,
-          marginTop: 20,
-        }}>
-        <Button
-          title={'Received'}
-          buttonStyle={{
-            backgroundColor: Colors.postTitle,
-            borderColor: 'transparent',
-            borderWidth: 0,
-            borderRadius: 10,
-            paddingHorizontal: 45,
-          }}
-          titleStyle={{fontWeight: '700', fontSize: 18}}
-        />
-        <Button
-          title={'Message'}
-          buttonStyle={{
-            backgroundColor: Colors.postTitle,
-            borderColor: 'transparent',
-            borderWidth: 0,
-            borderRadius: 10,
-            paddingHorizontal: 45,
-          }}
-          titleStyle={{fontWeight: '700', fontSize: 18}}
-        />
-      </View>
+      {createPostUser &&
+      createPostUser.id &&
+      userInfo.id !== createPostUser.id ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: 20,
+            marginTop: 20,
+          }}>
+          <Button
+            title={'Received'}
+            buttonStyle={{
+              backgroundColor: Colors.postTitle,
+              borderColor: 'transparent',
+              borderWidth: 0,
+              borderRadius: 10,
+              paddingHorizontal: 45,
+            }}
+            titleStyle={{fontWeight: '700', fontSize: 18}}
+          />
+          <Button
+            title={'Message'}
+            buttonStyle={{
+              backgroundColor: Colors.postTitle,
+              borderColor: 'transparent',
+              borderWidth: 0,
+              borderRadius: 10,
+              paddingHorizontal: 45,
+            }}
+            titleStyle={{fontWeight: '700', fontSize: 18}}
+            onPress={() => {
+              if (roomChat) {
+                navigation.navigate('ChatRoom', {item: roomChat});
+              } else {
+                navigation.navigate('ChatRoom', {
+                  item: {
+                    senderProfilePic: userInfo.imageUrl,
+                    recipientProfilePic: createPostUser.imageUrl,
+                    senderId: userInfo.id,
+                    recipientId: createPostUser.id,
+                    senderName: userInfo.name,
+                    recipientName: createPostUser.name,
+                  },
+                });
+              }
+            }}
+          />
+        </View>
+      ) : null}
       <View style={{height: 20}} />
     </ScrollView>
   );

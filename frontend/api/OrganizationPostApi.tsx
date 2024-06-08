@@ -70,3 +70,16 @@ export const updateOrganizationPost = async (
     return error;
   }
 };
+export const getOrganizationPostById = async (postId: any, token: any) => {
+  try {
+    const response = await ApiManager(`organizationposts/get/${postId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

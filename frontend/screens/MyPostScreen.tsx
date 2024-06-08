@@ -19,23 +19,18 @@ import {createNotifications} from 'react-native-notificated';
 import {getPostOfUser, getPosts} from '../api/PostApi';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
-import {
-  clearMyPosts,
-  clearSharingPosts,
-  pushMyPost,
-  pushSharingPost,
-} from '../redux/SharingPostReducer';
+import {clearMyPosts, pushMyPost} from '../redux/SharingPostReducer';
 
 const {useNotifications} = createNotifications();
 
-const HomeScreen = ({navigation, route}: any) => {
+const MyPostScreen = ({navigation, route}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
   const userInfo = useSelector((state: RootState) => state.userInfo);
-  const recommendedPost = useSelector(
-    (state: RootState) => state.sharingPost.HomePage,
+  const myPostReducer = useSelector(
+    (state: RootState) => state.sharingPost.MyPosts,
   );
   const dispatch = useDispatch();
-  const [recommendPost, setRecommendPost] = useState<any>(null);
+  const [myPost, setMyPost] = useState<any>(null);
   const {notify} = useNotifications();
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
@@ -63,15 +58,10 @@ const HomeScreen = ({navigation, route}: any) => {
   const onRefresh = () => {
     const getRecommendPost = async () => {
       if (accessToken) {
-        getPosts(accessToken.toString()).then((response: any) => {
+        getPostOfUser(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
-            AsyncStorage.setItem(
-              'recommendPost',
-              JSON.stringify(response.data),
-            );
-            setRecommendPost(response.data);
             for (const post of response.data) {
-              dispatch(pushSharingPost(post));
+              dispatch(pushMyPost(post));
             }
           } else {
             console.log(response);
@@ -80,7 +70,7 @@ const HomeScreen = ({navigation, route}: any) => {
       }
     };
     setRefreshing(true);
-    dispatch(clearSharingPosts());
+    dispatch(clearMyPosts());
     getRecommendPost();
     setCurrentPage(0);
     setRefreshing(false);
@@ -88,8 +78,8 @@ const HomeScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     const getRecommendPost = async () => {
-      if (recommendedPost) {
-        setRecommendPost(recommendedPost);
+      if (myPostReducer) {
+        setMyPost(myPostReducer);
       } else if (accessToken) {
         getPosts(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
@@ -97,7 +87,7 @@ const HomeScreen = ({navigation, route}: any) => {
               'recommendPost',
               JSON.stringify(response.data),
             );
-            setRecommendPost(response.data);
+            setMyPost(response.data);
           } else {
             console.log(response);
           }
@@ -110,20 +100,20 @@ const HomeScreen = ({navigation, route}: any) => {
       setIsLoading(false);
     };
     fetchData();
-  }, [accessToken, recommendedPost]);
+  }, [accessToken, myPostReducer]);
   useEffect(() => {
     const applyFilter = () => {
       if (search === '') {
-        setFilterPosts(recommendPost);
+        setFilterPosts(myPost);
       } else {
-        const filtered = recommendPost.filter((item: any) =>
+        const filtered = myPost.filter((item: any) =>
           item.title.toLowerCase().includes(search.toLowerCase()),
         );
         setFilterPosts(filtered);
       }
     };
     applyFilter();
-  }, [recommendPost, search]);
+  }, [myPost, search]);
 
   return (
     <View
@@ -132,7 +122,7 @@ const HomeScreen = ({navigation, route}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <Header imageUrl={userInfo.imageUrl} navigation={navigation} />
+      <Header isMyPost={true} navigation={navigation} />
       <SearchBar
         placeholder="Search food by name"
         containerStyle={{
@@ -213,7 +203,7 @@ const HomeScreen = ({navigation, route}: any) => {
   );
 };
 
-export default HomeScreen;
+export default MyPostScreen;
 const styles = StyleSheet.create({
   loaderStyle: {
     marginVertical: 16,

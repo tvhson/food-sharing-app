@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import Colors from '../../global/Color';
-import {Icon} from '@rneui/themed';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/Store';
 
@@ -31,6 +30,9 @@ const ChatRoomItem = ({item, navigation}: any) => {
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
     if (diffInSeconds < 60) {
+      if (diffInSeconds < 0) {
+        return 'Just now';
+      }
       return `${diffInSeconds}s ago`;
     }
 
@@ -90,7 +92,13 @@ const ChatRoomItem = ({item, navigation}: any) => {
             <Text
               style={{
                 fontSize: 22,
-                fontWeight: 'bold',
+                fontWeight:
+                  (item.senderId === userInfo.id &&
+                    item.senderStatus === 'UNREAD') ||
+                  (item.recipientId === userInfo.id &&
+                    item.recipientStatus === 'UNREAD')
+                    ? 'bold'
+                    : 'normal',
                 color: Colors.postTitle,
               }}>
               {item.senderId === userInfo.id
@@ -104,14 +112,48 @@ const ChatRoomItem = ({item, navigation}: any) => {
               flexDirection: 'column',
               justifyContent: 'space-between',
             }}>
-            <Text style={{fontSize: 16, color: Colors.grayText}}>
+            <Text
+              style={{
+                fontSize: 16,
+                color:
+                  (item.senderId === userInfo.id &&
+                    item.senderStatus === 'UNREAD') ||
+                  (item.recipientId === userInfo.id &&
+                    item.recipientStatus === 'UNREAD')
+                    ? 'black'
+                    : Colors.grayText,
+                fontWeight:
+                  (item.senderId === userInfo.id &&
+                    item.senderStatus === 'UNREAD') ||
+                  (item.recipientId === userInfo.id &&
+                    item.recipientStatus === 'UNREAD')
+                    ? 'bold'
+                    : 'normal',
+              }}>
               {item.lastMessageSenderId === userInfo.id ? 'You: ' : ''}
               {item.lastMessage}
             </Text>
           </View>
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-          <Text style={{fontSize: 12, color: Colors.grayText}}>
+          <Text
+            style={{
+              fontSize: 12,
+              color:
+                (item.senderId === userInfo.id &&
+                  item.senderStatus === 'UNREAD') ||
+                (item.recipientId === userInfo.id &&
+                  item.recipientStatus === 'UNREAD')
+                  ? 'black'
+                  : Colors.grayText,
+              fontWeight:
+                (item.senderId === userInfo.id &&
+                  item.senderStatus === 'UNREAD') ||
+                (item.recipientId === userInfo.id &&
+                  item.recipientStatus === 'UNREAD')
+                  ? 'bold'
+                  : 'normal',
+            }}>
             {timeAgo(item.lastMessageCreatedDate)}
           </Text>
         </View>

@@ -1,5 +1,4 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-import {readAllNotifications} from '../api/NotificationApi';
 
 interface Notification {
   id: number;

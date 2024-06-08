@@ -3,7 +3,7 @@ import React from 'react';
 import {View, Image, Text, TouchableWithoutFeedback} from 'react-native';
 import Colors from '../../global/Color';
 
-const NotificationItem = ({item, navigation}: any) => {
+const ReportItem = ({item, navigation}: any) => {
   function timeAgo(dateInput: Date | string | number) {
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) {
@@ -46,7 +46,12 @@ const NotificationItem = ({item, navigation}: any) => {
   }
 
   return (
-    <TouchableWithoutFeedback>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        navigation.navigate('ReportDetail', {
+          item: item,
+        });
+      }}>
       <View
         style={{
           padding: 10,
@@ -57,11 +62,7 @@ const NotificationItem = ({item, navigation}: any) => {
           elevation: 2,
         }}>
         <Image
-          source={{
-            uri: item.imageUrl
-              ? item.imageUrl
-              : 'https://www.w3schools.com/w3images/avatar2.png',
-          }}
+          source={{uri: item.imageUrl}}
           style={{width: 100, height: 100, borderRadius: 8}}
         />
         <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>
@@ -70,9 +71,9 @@ const NotificationItem = ({item, navigation}: any) => {
               style={{
                 fontSize: 22,
                 fontWeight: 'bold',
-                color: Colors.postTitle,
+                color: 'black',
               }}>
-              {item.title}
+              {item.senderName} reported the post
             </Text>
           </View>
           <View
@@ -82,7 +83,7 @@ const NotificationItem = ({item, navigation}: any) => {
               justifyContent: 'space-between',
             }}>
             <Text style={{fontSize: 16, color: Colors.grayText}}>
-              {item.description}
+              Reason: {item.title}
             </Text>
             <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
               <Text style={{fontSize: 12, color: Colors.grayText}}>
@@ -96,4 +97,4 @@ const NotificationItem = ({item, navigation}: any) => {
   );
 };
 
-export default NotificationItem;
+export default ReportItem;

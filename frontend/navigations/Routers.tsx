@@ -20,6 +20,11 @@ import CreateFundingScreen from '../screens/CreateFundingScreen';
 import OrganizationPostDetail from '../screens/OrganizationPostDetail';
 import EditFundingScreen from '../screens/EditFundingScreen';
 import ChatRoomScreen from '../screens/ChatRoomSceen';
+import MyPostScreen from '../screens/MyPostScreen';
+import {MyFundingPostScreen} from '../screens/MyFundingPostScreen';
+import ReportScreen from '../screens/ReportScreen';
+import ReportDetailScreen from '../screens/ReportDetailScreen';
+import VerifyScreen from '../screens/VerifyScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -106,6 +111,11 @@ const Router = () => {
             }}
           />
           <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
+          <Stack.Screen name="MyPost" component={MyPostScreen} />
+          <Stack.Screen name="MyFundingPost" component={MyFundingPostScreen} />
+          <Stack.Screen name="Report" component={ReportScreen} />
+          <Stack.Screen name="ReportDetail" component={ReportDetailScreen} />
+          <Stack.Screen name="Verify" component={VerifyScreen} />
         </>
       </Stack.Navigator>
       <EditProfileScreen />
