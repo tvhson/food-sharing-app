@@ -36,9 +36,9 @@ public class NotificationsController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update-type/{notificationId}")
-    public ResponseEntity<?> updateType(@PathVariable Long notificationId, @RequestParam String type) {
-        notificationsService.updateType(notificationId, type);
+    @PutMapping("/update/{notificationId}")
+    public ResponseEntity<?> updateNotification(@PathVariable Long notificationId, @RequestBody Notifications notifications) {
+        notificationsService.updateNotification(notificationId, notifications);
         return ResponseEntity.ok().build();
     }
 
