@@ -3,14 +3,13 @@ import {Text, TextInput, TouchableWithoutFeedback, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {Icon, Image} from '@rneui/themed';
 import Colors from '../../global/Color';
-import getDistance from 'geolib/es/getDistance';
 import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/Store';
 import {deletePost, reportPost} from '../../api/PostApi';
 import {deleteMyPost} from '../../redux/SharingPostReducer';
 
-const PostRenderItem = ({item, navigation, location}: any) => {
+const PostRenderItem = ({item, navigation, location, distance}: any) => {
   const handleOnPress = () => {
     navigation.navigate('PostDetail', {item, location});
   };
@@ -22,7 +21,6 @@ const PostRenderItem = ({item, navigation, location}: any) => {
     useState<boolean>(false);
   const [visibleDialogReport, setVisibleDialogReport] =
     useState<boolean>(false);
-  const [distance, setDistance] = useState<number>(0);
   const [anchor, setAnchor] = useState({x: 0, y: 0});
   const [reason, setReason] = useState<string>(
     'Spam or Misleading Information',
@@ -34,19 +32,6 @@ const PostRenderItem = ({item, navigation, location}: any) => {
   };
 
   const closeMenu = () => setVisible(false);
-  useEffect(() => {
-    const getDistanceFromLocation = async () => {
-      if (location && location.latitude && location.longitude) {
-        setDistance(
-          getDistance(
-            {latitude: item.latitude, longitude: item.longitude},
-            {latitude: location.latitude, longitude: location.longitude},
-          ) / 1000,
-        );
-      }
-    };
-    getDistanceFromLocation();
-  }, [item.latitude, item.longitude, location]);
 
   const handleOnLongPress = (event: any) => {
     const anchorEvent = {

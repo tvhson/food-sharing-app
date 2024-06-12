@@ -1,18 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
+import {View, Text, FlatList, StyleSheet, RefreshControl} from 'react-native';
 import Colors from '../global/Color';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {Image} from '@rneui/themed';
-import {IconButton, SegmentedButtons} from 'react-native-paper';
+import {
+  ActivityIndicator,
+  IconButton,
+  SegmentedButtons,
+} from 'react-native-paper';
 import {getReport} from '../api/ReportApi';
 import {clearReports, setReports} from '../redux/ReportReducer';
 import ReportItem from '../components/ui/ReportItem';
@@ -73,6 +70,7 @@ const ReportScreen = ({navigation}: any) => {
       } else if (accessToken) {
         getReport(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
+            dispatch(clearReports());
             dispatch(setReports(response.data));
           } else {
             console.log(response);

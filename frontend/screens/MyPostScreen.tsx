@@ -20,6 +20,7 @@ import {getPostOfUser, getPosts} from '../api/PostApi';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {clearMyPosts, pushMyPost} from '../redux/SharingPostReducer';
+import getDistance from 'geolib/es/getDistance';
 
 const {useNotifications} = createNotifications();
 
@@ -31,6 +32,7 @@ const MyPostScreen = ({navigation, route}: any) => {
   );
   const dispatch = useDispatch();
   const [myPost, setMyPost] = useState<any>(null);
+
   const {notify} = useNotifications();
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
@@ -115,6 +117,18 @@ const MyPostScreen = ({navigation, route}: any) => {
     applyFilter();
   }, [myPost, search]);
 
+  const calculateDistance = (item: any) => {
+    if (location && location.latitude && location.longitude) {
+      return (
+        getDistance(
+          {latitude: item.latitude, longitude: item.longitude},
+          {latitude: location.latitude, longitude: location.longitude},
+        ) / 1000
+      );
+    }
+    return 0;
+  };
+
   return (
     <View
       style={{
@@ -156,6 +170,7 @@ const MyPostScreen = ({navigation, route}: any) => {
             item={item}
             navigation={navigation}
             location={location}
+            distance={calculateDistance(item)}
           />
         )}
         ListEmptyComponent={

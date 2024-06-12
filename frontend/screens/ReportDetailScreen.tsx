@@ -225,9 +225,8 @@ const ReportDetailScreen = ({navigation, route}: any) => {
             {item.title === 'Other' ? item.description : item.title}
           </Text>
         </View>
-        {item.status === 'PENDING' && (
+        {item.status === 'PENDING' ? (
           <>
-            {' '}
             <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
               Ban account
             </Text>
@@ -341,8 +340,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
               />
             </View>
           </>
-        )}
-
+        ) : null}
         <View style={{height: 40}} />
       </ScrollView>
     </View>

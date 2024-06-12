@@ -344,7 +344,7 @@ export const OrganizationPost = ({
                   {item.organizationposts?.title}
                 </Text>
                 <Text
-                  numberOfLines={3}
+                  numberOfLines={1}
                   ellipsizeMode="tail"
                   style={{
                     fontSize: 20,

@@ -1,4 +1,5 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {updateNotification} from '../api/NotificationApi';
 
 interface Notification {
   id: number;
@@ -62,6 +63,14 @@ const NotificationSlice = createSlice({
     clearNumberOfUnread: (state: Notifications) => {
       state.numberOfUnread = 0;
     },
+    updateNotificationAfter: (
+      state: Notifications,
+      action: PayloadAction<Notification>,
+    ) => {
+      state.notifications = state.notifications.map(notification =>
+        notification.id === action.payload.id ? action.payload : notification,
+      );
+    },
   },
 });
 
@@ -73,5 +82,6 @@ export const {
   countNumberOfUnread,
   clearNumberOfUnread,
   setReadAllNotifications,
+  updateNotificationAfter,
 } = NotificationSlice.actions;
 export default NotificationSlice.reducer;

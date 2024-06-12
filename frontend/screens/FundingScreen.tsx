@@ -23,6 +23,7 @@ export const FundingScreen = ({navigation}: any) => {
   const FundingPostData = useSelector(
     (state: RootState) => state.fundingPost.HomePage,
   );
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const token = useSelector((state: RootState) => state.token.key);
   const dispatch = useDispatch();
   const shuffleBack = useSharedValue(false);
@@ -92,21 +93,23 @@ export const FundingScreen = ({navigation}: any) => {
         onPress={() => getFundingPost()}>
         Reload
       </Button>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('CreateFundingPost')}
-        style={{
-          position: 'absolute',
-          bottom: 20,
-          right: 20,
-          width: 50,
-          height: 50,
-          borderRadius: 25,
-          backgroundColor: Colors.button,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text style={{fontSize: 30, color: 'white'}}>+</Text>
-      </TouchableOpacity>
+      {userInfo.role === 'ORGANIZATION' ? (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CreateFundingPost')}
+          style={{
+            position: 'absolute',
+            bottom: 20,
+            right: 20,
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+            backgroundColor: Colors.button,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{fontSize: 30, color: 'white'}}>+</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };

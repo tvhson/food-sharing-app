@@ -1,15 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
 import Colors from '../global/Color';
 import {Avatar, Button, Icon} from '@rneui/themed';
 import MapView, {Marker} from 'react-native-maps';
 import {Linking} from 'react-native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
+import {attendOrganizationPost} from '../api/OrganizationPostApi';
+import {attendPost} from '../redux/OrganizationPostReducer';
+import {getRoomChats} from '../api/ChatApi';
 
 const OrganizationPostDetail = ({route, navigation}: any) => {
   const item = route.params.item;
+  const dispatch = useDispatch();
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const [attend, setAttend] = useState(item.organizationposts.attended);
   const createPostUser = route.params.item.accounts;
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const locationStart = useSelector((state: RootState) => state.location);
@@ -17,6 +23,11 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
     latitude: route.params.item.latitude,
     longitude: route.params.item.longitude,
   };
+  const [peopleAttended, setPeopleAttended] = useState(
+    item.organizationposts.peopleAttended,
+  );
+  const [roomChat, setRoomChat] = useState<any>(null);
+
   const openGoogleMaps = (
     startLocation: {latitude: number; longitude: number},
     endLocation: {latitude: number; longitude: number},
@@ -24,6 +35,46 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
     const url = `https://www.google.com/maps/dir/?api=1&origin=${startLocation.latitude},${startLocation.longitude}&destination=${endLocation.latitude},${endLocation.longitude}`;
     Linking.openURL(url);
   };
+
+  const handleAttend = async () => {
+    // Call API to update the post
+    const response: any = await attendOrganizationPost(
+      item.organizationposts.id,
+      accessToken,
+    );
+    if (response.status === 200) {
+      setAttend(!attend);
+      dispatch(attendPost(item.organizationposts.id));
+      setPeopleAttended(attend ? peopleAttended - 1 : peopleAttended + 1);
+    }
+  };
+
+  useEffect(() => {
+    const getInfoUserCreatePost = async () => {
+      if (accessToken) {
+        getRoomChats(accessToken.toString())
+          .then((response: any) => {
+            if (response.status === 200) {
+              const roomChats = response.data;
+              const roomChatFind = roomChats.find(
+                (room: any) =>
+                  (room.senderId === userInfo.id &&
+                    room.recipientId === createPostUser.id) ||
+                  (room.senderId === createPostUser.id &&
+                    room.recipientId === userInfo.id),
+              );
+              setRoomChat(roomChatFind);
+            } else {
+              console.log(response);
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    };
+    getInfoUserCreatePost();
+  }, [accessToken, createPostUser.id, userInfo.id]);
 
   return (
     <ScrollView
@@ -149,7 +200,7 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
             type="material-community"
           />
           <Text style={{fontSize: 14, color: 'black'}}>
-            {item.organizationposts?.peopleAttended} people attended
+            {peopleAttended} people attended
           </Text>
         </View>
       </View>
@@ -192,7 +243,7 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
             marginTop: 20,
           }}>
           <Button
-            title={'Attend'}
+            title={attend ? 'Unattended' : 'Attend'}
             buttonStyle={{
               backgroundColor: Colors.postTitle,
               borderColor: 'transparent',
@@ -201,6 +252,7 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
               paddingHorizontal: 45,
             }}
             titleStyle={{fontWeight: '700', fontSize: 18}}
+            onPress={() => handleAttend()}
           />
           <Button
             title={'Message'}
@@ -212,6 +264,22 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
               paddingHorizontal: 45,
             }}
             titleStyle={{fontWeight: '700', fontSize: 18}}
+            onPress={() => {
+              if (roomChat) {
+                navigation.navigate('ChatRoom', {item: roomChat});
+              } else {
+                navigation.navigate('ChatRoom', {
+                  item: {
+                    senderProfilePic: userInfo.imageUrl,
+                    recipientProfilePic: createPostUser.imageUrl,
+                    senderId: userInfo.id,
+                    recipientId: createPostUser.id,
+                    senderName: userInfo.name,
+                    recipientName: createPostUser.name,
+                  },
+                });
+              }
+            }}
           />
         </View>
       ) : null}

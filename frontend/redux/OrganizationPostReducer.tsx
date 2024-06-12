@@ -20,6 +20,7 @@ interface OrganizationPost {
   locationName: string;
   latitude: number;
   longitude: number;
+  attended: boolean;
 }
 interface FundingPost {
   accounts: Account;
@@ -99,6 +100,36 @@ const FundingPostSlice = createSlice({
     clearMyFundingPosts: (state: FundingPosts) => {
       state.MyPosts = [];
     },
+    attendPost: (state: FundingPosts, action: PayloadAction<number>) => {
+      state.MyPosts = state.MyPosts.map(post =>
+        post.organizationposts.id === action.payload
+          ? {
+              ...post,
+              organizationposts: {
+                ...post.organizationposts,
+                attended: !post.organizationposts.attended,
+                peopleAttended: post.organizationposts.attended
+                  ? post.organizationposts.peopleAttended - 1
+                  : post.organizationposts.peopleAttended + 1,
+              },
+            }
+          : post,
+      );
+      state.HomePage = state.HomePage.map(post =>
+        post.organizationposts.id === action.payload
+          ? {
+              ...post,
+              organizationposts: {
+                ...post.organizationposts,
+                attended: !post.organizationposts.attended,
+                peopleAttended: post.organizationposts.attended
+                  ? post.organizationposts.peopleAttended - 1
+                  : post.organizationposts.peopleAttended + 1,
+              },
+            }
+          : post,
+      );
+    },
   },
 });
 export const {
@@ -111,5 +142,6 @@ export const {
   clearFundingPosts,
   clearMyFundingPosts,
   addToTheEndOfFundingPost,
+  attendPost,
 } = FundingPostSlice.actions;
 export default FundingPostSlice.reducer;

@@ -76,7 +76,6 @@ const LoadingScreen = ({navigation, route}: any) => {
         dispatch(addNotification(body));
       };
       const saveChatRoom = (body: any) => {
-        console.log(body, 'Toi o loading');
         dispatch(pushChatRoom(body));
         dispatch(calculateUnreadMessages(myId));
       };
@@ -229,7 +228,6 @@ const LoadingScreen = ({navigation, route}: any) => {
 
     const loadData = async () => {
       try {
-        console.log('loading');
         await Promise.all([
           getLocation(),
           saveInfo(),
@@ -239,8 +237,6 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveMyOrganizationPost(),
           saveNotification(),
         ]);
-
-        console.log('done');
         setTimeout(
           () =>
             navigation.reset({

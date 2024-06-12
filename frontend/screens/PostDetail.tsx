@@ -9,6 +9,7 @@ import {getInfoUserById} from '../api/AccountsApi';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {getRoomChats} from '../api/ChatApi';
+import {createNotification} from '../api/NotificationApi';
 
 const PostDetail = ({route, navigation}: any) => {
   const item = route.params.item;
@@ -24,13 +25,33 @@ const PostDetail = ({route, navigation}: any) => {
     latitude: route.params.item.latitude,
     longitude: route.params.item.longitude,
   };
-  // const locationEnd = route.params.item.location;
   const openGoogleMaps = (
     startLocation: {latitude: number; longitude: number},
     endLocation: {latitude: number; longitude: number},
   ) => {
     const url = `https://www.google.com/maps/dir/?api=1&origin=${startLocation.latitude},${startLocation.longitude}&destination=${endLocation.latitude},${endLocation.longitude}`;
     Linking.openURL(url);
+  };
+  const handleReceived = async () => {
+    if (accessToken) {
+      const response: any = await createNotification(
+        {
+          title: 'Someone want to receive your food',
+          imageUrl: item.imageUrl,
+          description: userInfo.name + ' want to received your food',
+          type: 'RECEIVED',
+          linkId: item.id,
+          userId: createPostUser.id,
+          senderId: userInfo.id,
+        },
+        accessToken,
+      );
+      if (response.status === 200) {
+        navigation.goBack();
+      } else {
+        console.log(response);
+      }
+    }
   };
 
   useEffect(() => {
@@ -234,6 +255,7 @@ const PostDetail = ({route, navigation}: any) => {
               paddingHorizontal: 45,
             }}
             titleStyle={{fontWeight: '700', fontSize: 18}}
+            onPress={() => handleReceived()}
           />
           <Button
             title={'Message'}

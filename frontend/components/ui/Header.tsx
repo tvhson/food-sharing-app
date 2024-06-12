@@ -1,13 +1,16 @@
-/* eslint-disable react-native/no-inline-styles */
 import {Avatar, Icon} from '@rneui/themed';
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Colors from '../../global/Color';
-import {IconButton} from 'react-native-paper';
+import {IconButton, Menu} from 'react-native-paper';
 
 const Header = (props: any) => {
   const imageUrl = props.imageUrl;
   const isMyPost = props.isMyPost || false;
+  const [visible, setVisible] = useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+
   return (
     <View style={styles.container}>
       {isMyPost === false ? (
@@ -36,9 +39,31 @@ const Header = (props: any) => {
         </View>
       )}
       <Text style={styles.title}>Happy Food</Text>
-      <TouchableOpacity>
-        <Icon name="filter" type="ionicon" size={24} color={'white'} />
-      </TouchableOpacity>
+      <Menu
+        visible={visible}
+        onDismiss={closeMenu}
+        anchor={
+          <TouchableOpacity onPress={openMenu}>
+            <Icon name="filter" type="ionicon" size={24} color={'white'} />
+          </TouchableOpacity>
+        }>
+        <Menu.Item
+          onPress={() => {
+            props.setSortingMethod('date');
+            setVisible(false);
+          }}
+          title="Sort by date"
+          leadingIcon={'sort-calendar-ascending'}
+        />
+        <Menu.Item
+          onPress={() => {
+            props.setSortingMethod('distance');
+            setVisible(false);
+          }}
+          title="Sort by distance"
+          leadingIcon={'map-marker-distance'}
+        />
+      </Menu>
     </View>
   );
 };
