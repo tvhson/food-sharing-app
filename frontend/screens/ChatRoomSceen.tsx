@@ -146,7 +146,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
           userInfo.id === item.senderId ? item.recipientName : item.senderName,
         content: newMessage[0].text,
       };
-      await sendMessage(message);
+      sendMessage(message);
       setMessages((previousMessages: any) =>
         GiftedChat.append(previousMessages, newMessage),
       );
@@ -172,6 +172,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
                     type: 'MESSAGE',
                     linkId: roomChat.id,
                     userId: item.recipientId,
+                    senderId: userInfo.id,
                   },
                   accessToken,
                 ).then((response2: any) => {

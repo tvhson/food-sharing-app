@@ -21,10 +21,6 @@ const BottomTabNavigator = ({route}: any) => {
   const numberOfUnreadChat = useSelector(
     (state: RootState) => state.chatRoom.numberOfUnreadMessages,
   );
-  useEffect(() => {
-    console.log('Number of unread chats:', numberOfUnreadChat);
-  }, [numberOfUnreadChat]);
-
   return (
     <Tab.Navigator
       initialRouteName="Home"

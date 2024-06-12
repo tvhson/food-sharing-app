@@ -1,4 +1,11 @@
 {
   "java.configuration.updateBuildConfiguration": "interactive",
-  "cSpell.words": ["antdesign", "entypo", "fontawesome", "reduxjs"]
+  "cSpell.words": [
+    "antdesign",
+    "entypo",
+    "fontawesome",
+    "reduxjs",
+    "sockjs",
+    "stompjs"
+  ]
 }

@@ -12,6 +12,7 @@ interface Report {
   type: string;
   senderId: number;
   accusedId: number;
+  senderName: string;
 }
 interface Reports {
   reportsPending: Report[];
@@ -26,13 +27,12 @@ const ReportSlice = createSlice({
   initialState,
   reducers: {
     setReports: (state: Reports, action: PayloadAction<Report[]>) => {
-      action.payload.forEach(report => {
-        if (report.status === 'PENDING') {
-          state.reportsPending.push(report);
-        } else {
-          state.reportsFinished.push(report);
-        }
-      });
+      state.reportsPending = action.payload.filter(
+        report => report.status === 'PENDING',
+      );
+      state.reportsFinished = action.payload.filter(
+        report => report.status === 'FINISHED',
+      );
     },
     updateTheReport: (state: Reports, action: PayloadAction<Report>) => {
       const reportToUpdate = state.reportsPending.find(

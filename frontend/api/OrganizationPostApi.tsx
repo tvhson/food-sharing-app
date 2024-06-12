@@ -83,3 +83,16 @@ export const getOrganizationPostById = async (postId: any, token: any) => {
     return error;
   }
 };
+export const attendOrganizationPost = async (postId: any, token: any) => {
+  try {
+    const response = await ApiManager(`organizationposts/attend/${postId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

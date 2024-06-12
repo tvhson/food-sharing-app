@@ -1,9 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Image, Text, TouchableWithoutFeedback} from 'react-native';
 import Colors from '../../global/Color';
+import {Button} from '@rneui/themed';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../redux/Store';
+import {updateNotification} from '../../api/NotificationApi';
+import {updateNotificationAfter} from '../../redux/NotificationReducer';
+import {updatePost} from '../../api/PostApi';
 
 const NotificationItem = ({item, navigation}: any) => {
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const location = useSelector((state: RootState) => state.location);
+  const dispatch = useDispatch();
   function timeAgo(dateInput: Date | string | number) {
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) {
@@ -11,6 +20,9 @@ const NotificationItem = ({item, navigation}: any) => {
     }
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diffInSeconds < 0) {
+      return 'Just now';
+    }
 
     if (diffInSeconds < 60) {
       return `${diffInSeconds}s ago`;
@@ -44,9 +56,99 @@ const NotificationItem = ({item, navigation}: any) => {
     const diffInYears = Math.floor(diffInDays / 365);
     return `${diffInYears} years ago`;
   }
+  const roomChat = useSelector((state: RootState) =>
+    state.chatRoom.chatRooms.find(chatRoom => chatRoom.id === item.linkId),
+  );
+  const postDetail: any = useSelector((state: RootState) =>
+    state.sharingPost.MyPosts.find(post => post.id === item.linkId),
+  );
+
+  const handleNavigate = () => {
+    if (item.type === 'MESSAGE') {
+      return () => {
+        console.log('roomChat', roomChat);
+        navigation.navigate('ChatRoom', {item: roomChat});
+      };
+    } else {
+      return () => {
+        navigation.navigate('PostDetail', {item: postDetail, location});
+      };
+    }
+  };
+  const handleDecline = async () => {
+    const notificationUpdate = {
+      id: item.id,
+      title: 'Decline',
+      imageUrl: item.imageUrl,
+      description: 'You have declined the request to give food',
+      type: 'DONE',
+      createdDate: item.createdDate,
+      linkId: item.linkId,
+      userId: item.userId,
+      senderId: item.senderId,
+      read: true,
+    };
+    const response: any = await updateNotification(
+      item.id,
+      accessToken,
+      notificationUpdate,
+    );
+    if (response.status === 200) {
+      dispatch(updateNotificationAfter(notificationUpdate));
+      console.log('Decline success');
+    }
+  };
+  const handleAccept = async () => {
+    console.log('Accept');
+    const notificationUpdate = {
+      id: item.id,
+      title: 'Accept',
+      imageUrl: item.imageUrl,
+      description: 'You have accept the request to give food',
+      type: 'DONE',
+      createdDate: item.createdDate,
+      linkId: item.linkId,
+      userId: item.userId,
+      senderId: item.senderId,
+      read: true,
+    };
+    const response: any = await updateNotification(
+      item.id,
+      accessToken,
+      notificationUpdate,
+    );
+    console.log(response);
+    if (response.status === 200) {
+      console.log('Accept success');
+      dispatch(updateNotificationAfter(notificationUpdate));
+      const response2: any = await updatePost(
+        item.linkId,
+        {
+          id: postDetail.id,
+          title: postDetail.title,
+          description: postDetail.description,
+          imageUrl: postDetail.imageUrl,
+          note: postDetail.note,
+          expiredDate: postDetail.expiredDate,
+          pickUpStartDate: postDetail.pickUpStartDate,
+          pickUpEndDate: postDetail.pickUpEndDate,
+          status: 'RECEIVED',
+          locationName: postDetail.locationName,
+          latitude: postDetail.latitude,
+          longitude: postDetail.longitude,
+          receiverId: item.senderId,
+        },
+        accessToken,
+      );
+      console.log(response2);
+      if (response2.status === 200) {
+        console.log('Accept success');
+      }
+    }
+  };
 
   return (
-    <TouchableWithoutFeedback>
+    <TouchableWithoutFeedback onPress={handleNavigate()}>
       <View
         style={{
           padding: 10,
@@ -84,10 +186,51 @@ const NotificationItem = ({item, navigation}: any) => {
             <Text style={{fontSize: 16, color: Colors.grayText}}>
               {item.description}
             </Text>
-            <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignContent: 'center',
+                alignItems: 'center',
+              }}>
               <Text style={{fontSize: 12, color: Colors.grayText}}>
                 {timeAgo(item.createdDate)}
               </Text>
+              {item.type === 'RECEIVED' ? (
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    marginVertical: 3,
+                  }}>
+                  <Button
+                    title={'Decline'}
+                    buttonStyle={{
+                      backgroundColor: Colors.postTitle,
+                      borderColor: 'transparent',
+                      borderWidth: 0,
+                      borderRadius: 10,
+                      paddingHorizontal: 20,
+                    }}
+                    titleStyle={{fontWeight: '700', fontSize: 12}}
+                    onPress={() => handleDecline()}
+                  />
+                  <Button
+                    title={'Accept'}
+                    buttonStyle={{
+                      backgroundColor: Colors.green2,
+                      borderColor: 'transparent',
+                      borderWidth: 0,
+                      borderRadius: 10,
+                      paddingHorizontal: 20,
+                    }}
+                    titleStyle={{fontWeight: '700', fontSize: 12}}
+                    onPress={() => handleAccept()}
+                  />
+                </View>
+              ) : null}
             </View>
           </View>
         </View>
