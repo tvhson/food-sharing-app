@@ -5,13 +5,17 @@ import Colors from '../../global/Color';
 import {Button} from '@rneui/themed';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/Store';
-import {updateNotification} from '../../api/NotificationApi';
+import {
+  createNotification,
+  updateNotification,
+} from '../../api/NotificationApi';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
 import {updatePost} from '../../api/PostApi';
 
 const NotificationItem = ({item, navigation}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
   const location = useSelector((state: RootState) => state.location);
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
   function timeAgo(dateInput: Date | string | number) {
     const date = new Date(dateInput);
@@ -80,7 +84,7 @@ const NotificationItem = ({item, navigation}: any) => {
       id: item.id,
       title: 'Decline',
       imageUrl: item.imageUrl,
-      description: 'You have declined the request to give food',
+      description: 'You have declined the confirmation of giving',
       type: 'DONE',
       createdDate: item.createdDate,
       linkId: item.linkId,
@@ -95,7 +99,24 @@ const NotificationItem = ({item, navigation}: any) => {
     );
     if (response.status === 200) {
       dispatch(updateNotificationAfter(notificationUpdate));
-      console.log('Decline success');
+      const response2: any = createNotification(
+        {
+          title: 'Confirmation declined',
+          imageUrl: item.imageUrl,
+          description:
+            userInfo.name + ' has declined your confirmation to receive food',
+          type: 'DONE',
+          linkId: item.linkId,
+          senderId: userInfo.id,
+          userId: item.senderId,
+        },
+        accessToken,
+      );
+      if (response2.status === 200) {
+        console.log('Decline success');
+      } else {
+        console.log(response2);
+      }
     }
   };
   const handleAccept = async () => {
@@ -104,7 +125,7 @@ const NotificationItem = ({item, navigation}: any) => {
       id: item.id,
       title: 'Accept',
       imageUrl: item.imageUrl,
-      description: 'You have accept the request to give food',
+      description: 'You have accept the confirmation of giving',
       type: 'DONE',
       createdDate: item.createdDate,
       linkId: item.linkId,
@@ -140,9 +161,24 @@ const NotificationItem = ({item, navigation}: any) => {
         },
         accessToken,
       );
-      console.log(response2);
-      if (response2.status === 200) {
+      const response3: any = createNotification(
+        {
+          title: 'Confirmation accepted',
+          imageUrl: item.imageUrl,
+          description:
+            userInfo.name + ' has accepted your confirmation to receive food',
+          type: 'DONE',
+          linkId: item.linkId,
+          senderId: userInfo.id,
+          userId: item.senderId,
+        },
+        accessToken,
+      );
+      if (response2.status === 200 && response3.status === 200) {
         console.log('Accept success');
+      } else {
+        console.log(response2);
+        console.log(response3);
       }
     }
   };

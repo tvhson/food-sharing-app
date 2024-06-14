@@ -36,9 +36,10 @@ const PostDetail = ({route, navigation}: any) => {
     if (accessToken) {
       const response: any = await createNotification(
         {
-          title: 'Someone want to receive your food',
+          title: 'Confirmation of received food',
           imageUrl: item.imageUrl,
-          description: userInfo.name + ' want to received your food',
+          description:
+            userInfo.name + ' want confirm that they have received food',
           type: 'RECEIVED',
           linkId: item.id,
           userId: createPostUser.id,
