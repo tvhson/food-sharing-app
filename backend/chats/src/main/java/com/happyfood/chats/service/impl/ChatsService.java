@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -104,6 +105,13 @@ public class ChatsService implements IChatsService {
                 chatRoom.setRecipientProfilePic(recipientDto.getImageUrl());
             }
         }
+
+        chatRooms.sort((o1, o2) -> {
+            if (o1.getLastMessageCreatedDate() == null || o2.getLastMessageCreatedDate() == null) {
+                return 0;
+            }
+            return o2.getLastMessageCreatedDate().compareTo(o1.getLastMessageCreatedDate());
+        });
 
         return chatRooms;
     }
