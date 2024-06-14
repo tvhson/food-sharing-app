@@ -86,9 +86,9 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={{
-          position: 'absolute', // Add this
-          top: 10, // Add this
-          left: 10, // Add this
+          position: 'absolute',
+          top: 10,
+          left: 10,
           width: 40,
           height: 40,
           borderRadius: 20,
@@ -245,7 +245,7 @@ const OrganizationPostDetail = ({route, navigation}: any) => {
           <Button
             title={attend ? 'Unattended' : 'Attend'}
             buttonStyle={{
-              backgroundColor: Colors.postTitle,
+              backgroundColor: attend ? '#ff0000' : Colors.postTitle,
               borderColor: 'transparent',
               borderWidth: 0,
               borderRadius: 10,
