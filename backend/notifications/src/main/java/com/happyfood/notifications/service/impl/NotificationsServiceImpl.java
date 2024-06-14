@@ -55,9 +55,16 @@ public class NotificationsServiceImpl implements INotificationsService {
     }
 
     @Override
-    public void updateType(Long notificationId, String type) {
+    public void updateNotification(Long notificationId, Notifications notificationNew) {
         Notifications notification = notificationsRepository.findById(notificationId).orElseThrow(() -> new CustomException("Notification not found", HttpStatus.NOT_FOUND));
-        notification.setType(type);
+        notification.setTitle(notificationNew.getTitle());
+        notification.setImageUrl(notificationNew.getImageUrl());
+        notification.setDescription(notificationNew.getDescription());
+        notification.setType(notificationNew.getType());
+        notification.setCreatedDate(notificationNew.getCreatedDate());
+        notification.setLinkId(notificationNew.getLinkId());
+        notification.setUserId(notificationNew.getUserId());
+        notification.setSenderId(notificationNew.getSenderId());
         notificationsRepository.save(notification);
     }
 
