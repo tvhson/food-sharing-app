@@ -28,13 +28,17 @@ import {
 } from '../redux/OrganizationPostReducer';
 import GetLocation from 'react-native-get-location';
 import {setLocation} from '../redux/LocationReducer';
-import {connectNotification, getNotifications} from '../api/NotificationApi';
+import {
+  connectNotification,
+  disconnectSocket,
+  getNotifications,
+} from '../api/NotificationApi';
 import {
   addNotification,
   countNumberOfUnread,
   setNotifications,
 } from '../redux/NotificationReducer';
-import {connectChat, getRoomChats} from '../api/ChatApi';
+import {connectChat, disconnectChat, getRoomChats} from '../api/ChatApi';
 import {
   calculateUnreadMessages,
   pushChatRoom,
@@ -43,6 +47,7 @@ import {
 import {getReport} from '../api/ReportApi';
 import {setReports} from '../redux/ReportReducer';
 import {setAccounts} from '../redux/AccountsReducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
@@ -124,6 +129,18 @@ const LoadingScreen = ({navigation, route}: any) => {
       try {
         const response: any = await getInfoUser(token);
         if (response.status === 200) {
+          if (response.data.bannedDate !== null) {
+            await AsyncStorage.removeItem('token');
+            await AsyncStorage.removeItem('isLogin');
+            await AsyncStorage.removeItem('userInfo');
+            await AsyncStorage.removeItem('recommendPost');
+            disconnectSocket();
+            disconnectChat();
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Landing'}],
+            });
+          }
           const userInfo: UserInfo = response.data;
           setMyId(userInfo.id);
           dispatch(saveUser(userInfo));
