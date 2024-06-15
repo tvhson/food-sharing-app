@@ -61,19 +61,6 @@ const ReportOrganizationItem = ({item, navigation, location}: any) => {
               }}>
               {item.organizationposts.title}
             </Text>
-            <View style={{flexDirection: 'row'}}>
-              <Icon
-                name="location-sharp"
-                type="ionicon"
-                size={14}
-                color="black"
-              />
-              <Text style={{fontSize: 12, color: Colors.grayText}}>
-                {distance < 0.1
-                  ? `${(distance * 1000).toFixed(0)} m`
-                  : `${distance.toFixed(2)} Km`}
-              </Text>
-            </View>
           </View>
           <View
             style={{
