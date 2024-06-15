@@ -153,7 +153,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                 <Dialog.Content>
                   <RadioButton.Group
                     onValueChange={newValue => setBanDays(newValue)}
-                    value={role}>
+                    value={banDays}>
                     <View
                       style={{
                         flexDirection: 'row',
