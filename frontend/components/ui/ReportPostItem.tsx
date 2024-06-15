@@ -7,7 +7,7 @@ import getDistance from 'geolib/es/getDistance';
 
 const ReportPostItem = ({item, navigation, location}: any) => {
   const handleOnPress = () => {
-    navigation.navigate('OrganizationPostDetail', {item});
+    navigation.navigate('PostDetail', {item, location});
   };
   const [distance, setDistance] = useState<number>(0);
 
