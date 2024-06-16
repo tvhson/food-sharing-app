@@ -65,23 +65,24 @@ public class AuthService {
         AccountsDto user = new AccountsDto();
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
+        AccountsDto accountsDto = null;
         try {
-            AccountsDto accountsDto = accountsFeignClient.login(user).getBody();
-
-            if (accountsDto == null) {
-                throw new CustomException("Invalid credentials", HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-
-            if (accountsDto.getStatus().equals("BANNED")) {
-                throw new CustomException("Your account has been banned" + accountsDto.getBannedDate().toString(), HttpStatus.UNAUTHORIZED);
-            }
-
-            String accessToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "ACCESS");
-            String refreshToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "REFRESH");
-
-            return new AuthResponse(accessToken, refreshToken);
+            accountsDto = accountsFeignClient.login(user).getBody();
         } catch (Exception e) {
-            throw new CustomException("Invalid credentials", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Email/Password is wrong", HttpStatus.UNPROCESSABLE_ENTITY);
         }
+
+        if (accountsDto == null) {
+            throw new CustomException("Email/Password is wrong", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        if (accountsDto.getStatus().equals("BANNED")) {
+            throw new CustomException("Your account has been banned" + accountsDto.getBannedDate().toString(), HttpStatus.UNAUTHORIZED);
+        }
+
+        String accessToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "ACCESS");
+        String refreshToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "REFRESH");
+
+        return new AuthResponse(accessToken, refreshToken);
     }
 }
