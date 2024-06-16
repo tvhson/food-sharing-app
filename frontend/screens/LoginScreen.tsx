@@ -58,10 +58,8 @@ const LoginScreen = ({navigation}: any) => {
     try {
       await login({email, password})
         .then(response => {
+          console.log(response);
           if (response.status === 200) {
-            // notify('success', {
-            //   params: {description: 'Login successful.', title: 'Success'},
-            // });
             if (response.data) {
               const token: any = response.data;
               AsyncStorage.setItem('token', token.accessToken);
@@ -75,6 +73,7 @@ const LoginScreen = ({navigation}: any) => {
                 params: {
                   description: response.data.message || 'Login failed.',
                   title: 'Error',
+                  style: {multiline: 100},
                 },
               });
             }
@@ -83,6 +82,7 @@ const LoginScreen = ({navigation}: any) => {
               params: {
                 description: response.data.message || 'Login failed.',
                 title: 'Error',
+                style: {multiline: 100},
               },
             });
           }
