@@ -39,6 +39,7 @@ const MyPostScreen = ({navigation, route}: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<any>(null);
+  const [sortingMethod, setSortingMethod] = useState('');
 
   const location = useSelector((state: RootState) => state.location);
 
@@ -105,17 +106,35 @@ const MyPostScreen = ({navigation, route}: any) => {
   }, [accessToken, myPostReducer]);
   useEffect(() => {
     const applyFilter = () => {
-      if (search === '') {
-        setFilterPosts(myPost);
-      } else {
-        const filtered = myPost.filter((item: any) =>
+      let filtered = myPost;
+      if (search !== '') {
+        filtered = filtered.filter((item: any) =>
           item.title.toLowerCase().includes(search.toLowerCase()),
         );
-        setFilterPosts(filtered);
       }
+      if (
+        sortingMethod === 'distance' &&
+        location &&
+        location.latitude &&
+        location.longitude
+      ) {
+        filtered = [...filtered].sort((a: any, b: any) => {
+          const distanceA = getDistance(
+            {latitude: a.latitude, longitude: a.longitude},
+            {latitude: location.latitude, longitude: location.longitude},
+          );
+          const distanceB = getDistance(
+            {latitude: b.latitude, longitude: b.longitude},
+            {latitude: location.latitude, longitude: location.longitude},
+          );
+          return distanceA - distanceB;
+        });
+      }
+
+      setFilterPosts(filtered);
     };
     applyFilter();
-  }, [myPost, search]);
+  }, [location, myPost, search, sortingMethod]);
 
   const calculateDistance = (item: any) => {
     if (location && location.latitude && location.longitude) {
@@ -136,7 +155,11 @@ const MyPostScreen = ({navigation, route}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <Header isMyPost={true} navigation={navigation} />
+      <Header
+        isMyPost={true}
+        navigation={navigation}
+        setSortingMethod={setSortingMethod}
+      />
       <SearchBar
         placeholder="Search food by name"
         containerStyle={{
