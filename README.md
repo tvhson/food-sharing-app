@@ -12,7 +12,7 @@ We are developing a Food Sharing Mobile Application aimed at promoting community
 
 ## About the Project
 
-![Screenshot](frontend/screenshot/Picture1.jpg)
+![Screenshot](frontend/screenshot/Picture1.png)
 
 ### Built With
 
