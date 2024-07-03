@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {Avatar, Icon} from '@rneui/themed';
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
