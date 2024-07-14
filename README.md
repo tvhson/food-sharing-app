@@ -14,6 +14,10 @@ We are developing a Food Sharing Mobile Application aimed at promoting community
 
 ![Screenshot](frontend/screenshot/Picture1.png)
 
+### Architecture Diagram
+
+![Screenshot](backend/architecture.png)
+
 ### Built With
 
 This project was built with the following technologies:
