@@ -14,7 +14,7 @@ export const connectChat = async (
   userId: number,
   showNotification: (body: any) => void,
 ) => {
-  stompClient = connectStompClient('http://34.172.57.110:8072/ws-chats');
+  stompClient = connectStompClient('http://34.136.66.11:8072/ws-chats');
 
   return new Promise((resolve, reject) => {
     stompClient.connect(
@@ -41,7 +41,7 @@ export const connectMessage = async (
   roomId: number,
   showNotification: (body: any) => void,
 ) => {
-  stompClientMessage = connectStompClient('http://34.172.57.110:8072/ws-chats');
+  stompClientMessage = connectStompClient('http://34.136.66.11:8072/ws-chats');
 
   return new Promise((resolve, reject) => {
     stompClientMessage.connect(

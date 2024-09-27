@@ -13,9 +13,7 @@ export const connectNotification = async (
   userId: number,
   showNotification: (body: any) => void,
 ) => {
-  stompClient = connectStompClient(
-    'http://34.172.57.110:8072/ws-notifications',
-  );
+  stompClient = connectStompClient('http://34.136.66.11:8072/ws-notifications');
 
   return new Promise((resolve, reject) => {
     stompClient.connect(
