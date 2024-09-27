@@ -25,6 +25,7 @@ import {MyFundingPostScreen} from '../screens/MyFundingPostScreen';
 import ReportScreen from '../screens/ReportScreen';
 import ReportDetailScreen from '../screens/ReportDetailScreen';
 import VerifyScreen from '../screens/VerifyScreen';
+import TestScreen from '../screens/TestScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ const Router = () => {
     <>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <>
+          <Stack.Screen name="Testing" component={TestScreen} />
           <Stack.Screen name="Landing" component={LandingScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
