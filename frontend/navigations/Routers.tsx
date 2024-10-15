@@ -31,6 +31,8 @@ import {
   ZegoUIKitPrebuiltCallWaitingScreen,
   ZegoUIKitPrebuiltCallInCallScreen,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import OrganizationPostDetail2 from '../screens/OrganizationPostDetail2';
+import WebViewScreen from '../screens/WebViewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -126,6 +128,22 @@ const Router = () => {
           <Stack.Screen name="Report" component={ReportScreen} />
           <Stack.Screen name="ReportDetail" component={ReportDetailScreen} />
           <Stack.Screen name="Verify" component={VerifyScreen} />
+          <Stack.Screen
+            name="OrganizationPostDetail2"
+            component={OrganizationPostDetail2}
+          />
+          <Stack.Screen
+            name="WebView"
+            component={WebViewScreen}
+            options={{
+              headerShown: true,
+              headerTitle: 'Xem trên trình duyệt',
+              headerStyle: {
+                backgroundColor: Colors.white,
+              },
+              headerTintColor: 'black',
+            }}
+          />
           <Stack.Screen
             name="ZegoUIKitPrebuiltCallWaitingScreen"
             component={ZegoUIKitPrebuiltCallWaitingScreen}

@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {
+  BackHandler,
   FlatList,
   Image,
   StyleSheet,
@@ -8,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useCallback, useEffect} from 'react';
 import Modal from 'react-native-modal';
 import Colors from '../../global/Color';
 import {getFontFamily} from '../../utils/fonts';
@@ -55,6 +56,7 @@ const Comment = (props: any) => {
     <Modal
       style={styles.modal}
       avoidKeyboard={true}
+      onBackButtonPress={() => setVisible(false)}
       onBackdropPress={() => setVisible(false)}
       isVisible={isVisible}
       onSwipeComplete={() => setVisible(false)}
