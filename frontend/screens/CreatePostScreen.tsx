@@ -53,48 +53,48 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const mapRef = useRef<MapView | null>(null);
   const autocompleteRef = useRef<any | null>(null);
 
-  const getLocationName = async (
-    latitudeCurrent: number,
-    longitudeCurrent: number,
-  ) => {
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
-      );
-      if (response.data.results.length > 0) {
-        setLocationName(response.data.results[0].formatted_address);
-        setLatitude(latitudeCurrent);
-        setLongitude(longitudeCurrent);
-        autocompleteRef.current?.setAddressText(
-          response.data.results[0].formatted_address,
-        );
-        return response.data.results[0].formatted_address;
-      }
-      return 'No location found';
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getLocationName = async (
+  //   latitudeCurrent: number,
+  //   longitudeCurrent: number,
+  // ) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
+  //     );
+  //     if (response.data.results.length > 0) {
+  //       setLocationName(response.data.results[0].formatted_address);
+  //       setLatitude(latitudeCurrent);
+  //       setLongitude(longitudeCurrent);
+  //       autocompleteRef.current?.setAddressText(
+  //         response.data.results[0].formatted_address,
+  //       );
+  //       return response.data.results[0].formatted_address;
+  //     }
+  //     return 'No location found';
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (location === null) {
-      GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 30000,
-        rationale: {
-          title: 'Location permission',
-          message: 'The app needs the permission to request your location.',
-          buttonPositive: 'Ok',
-        },
-      })
-        .then(newLocation => {
-          setLocationCurrent(newLocation);
-        })
-        .catch(() => {
-          setLocationCurrent(null);
-        });
-    }
-  }, [location]);
+  // useEffect(() => {
+  //   if (location === null) {
+  //     GetLocation.getCurrentPosition({
+  //       enableHighAccuracy: true,
+  //       timeout: 30000,
+  //       rationale: {
+  //         title: 'Location permission',
+  //         message: 'The app needs the permission to request your location.',
+  //         buttonPositive: 'Ok',
+  //       },
+  //     })
+  //       .then(newLocation => {
+  //         setLocationCurrent(newLocation);
+  //       })
+  //       .catch(() => {
+  //         setLocationCurrent(null);
+  //       });
+  //   }
+  // }, [location]);
 
   const postImage = async (image: any) => {
     setImageUpload(image);
@@ -243,7 +243,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
           }}
           value={title}
           onChangeText={setTitle}
@@ -263,7 +263,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
           }}
           value={description}
           onChangeText={setDescription}
@@ -280,7 +280,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
           }}
           value={weight}
           onChangeText={setWeight}
@@ -298,7 +298,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
           }}
           value={note}
           onChangeText={setNote}
@@ -324,7 +324,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
               }}
               mode="outlined"
               outlineStyle={{
-                borderColor: Colors.postTitle,
+                borderColor: Colors.greenPrimary,
                 borderRadius: 8,
                 borderWidth: 2,
               }}
@@ -352,7 +352,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
               }}
               mode="outlined"
               outlineStyle={{
-                borderColor: Colors.postTitle,
+                borderColor: Colors.greenPrimary,
                 borderRadius: 8,
                 borderWidth: 2,
               }}
@@ -380,7 +380,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
               }}
               mode="outlined"
               outlineStyle={{
-                borderColor: Colors.postTitle,
+                borderColor: Colors.greenPrimary,
                 borderRadius: 8,
                 borderWidth: 2,
               }}
@@ -392,21 +392,21 @@ const CreatePostScreen = ({route, navigation}: any) => {
           ref={autocompleteRef}
           fetchDetails={true}
           placeholder="Enter your place"
-          onPress={(data, details = null) => {
-            setLocationName(data.description);
-            setLatitude(details?.geometry.location.lat || 0);
-            setLongitude(details?.geometry.location.lng || 0);
-            if (details && mapRef.current) {
-              const lat = details.geometry.location.lat;
-              const lng = details.geometry.location.lng;
-              mapRef.current.animateToRegion({
-                latitude: lat,
-                longitude: lng,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              });
-            }
-          }}
+          // onPress={(data, details = null) => {
+          //   setLocationName(data.description);
+          //   setLatitude(details?.geometry.location.lat || 0);
+          //   setLongitude(details?.geometry.location.lng || 0);
+          //   if (details && mapRef.current) {
+          //     const lat = details.geometry.location.lat;
+          //     const lng = details.geometry.location.lng;
+          //     mapRef.current.animateToRegion({
+          //       latitude: lat,
+          //       longitude: lng,
+          //       latitudeDelta: 0.01,
+          //       longitudeDelta: 0.01,
+          //     });
+          //   }
+          // }}
           disableScroll={true}
           query={{
             key: MAP_API_KEY,
@@ -414,7 +414,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
           }}
           styles={{
             container: {
-              borderColor: Colors.postTitle,
+              borderColor: Colors.greenPrimary,
               borderRadius: 8,
               borderWidth: 2,
               width: '90%',
@@ -428,29 +428,29 @@ const CreatePostScreen = ({route, navigation}: any) => {
             },
           }}
         />
-        <Button
+        {/* <Button
           title="Get my current location"
           onPress={() => getLocationName(location.latitude, location.longitude)}
           buttonStyle={{
-            backgroundColor: Colors.postTitle,
+            backgroundColor: Colors.greenPrimary,
             width: 200,
             alignSelf: 'center',
             marginTop: 20,
             borderRadius: 10,
           }}
-        />
+        /> */}
         <View
           style={{
             width: '90%',
             height: 350,
             alignSelf: 'center',
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
             borderRadius: 20,
             borderWidth: 2,
             overflow: 'hidden',
             marginTop: 20,
           }}>
-          <MapView
+          {/* <MapView
             ref={mapRef}
             initialRegion={{
               latitude: latitude === '' ? locationCurrent.latitude : latitude,
@@ -468,14 +468,14 @@ const CreatePostScreen = ({route, navigation}: any) => {
                   longitude === '' ? locationCurrent.longitude : longitude,
               }}
             />
-          </MapView>
+          </MapView> */}
         </View>
         <View
           style={{
             width: '90%',
             height: 300,
             alignSelf: 'center',
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
             borderRadius: 20,
             borderWidth: 2,
             overflow: 'hidden',
@@ -518,13 +518,13 @@ const CreatePostScreen = ({route, navigation}: any) => {
                 name="camera"
                 type="ionicon"
                 size={60}
-                color={Colors.postTitle}
+                color={Colors.greenPrimary}
                 style={{marginTop: 20}}
                 onPress={() => {
                   setIsUploadVisible(!isUploadVisible);
                 }}
               />
-              <Text style={{color: Colors.postTitle, fontSize: 18}}>
+              <Text style={{color: Colors.greenPrimary, fontSize: 18}}>
                 Add image
               </Text>
             </>
@@ -535,7 +535,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
           title="Create Post"
           onPress={handleCreatePost}
           buttonStyle={{
-            backgroundColor: Colors.postTitle,
+            backgroundColor: Colors.greenPrimary,
             width: 200,
             alignSelf: 'center',
             marginTop: 20,

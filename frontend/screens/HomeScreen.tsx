@@ -9,9 +9,8 @@ import {
   StyleSheet,
   RefreshControl,
 } from 'react-native';
-import Header from '../components/ui/Header';
 import Colors from '../global/Color';
-import {Button, Image, SearchBar} from '@rneui/themed';
+import {Button, Icon, Image, SearchBar} from '@rneui/themed';
 import PostRenderItem from '../components/ui/PostRenderItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createNotifications} from 'react-native-notificated';
@@ -19,12 +18,15 @@ import {getPosts} from '../api/PostApi';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {clearSharingPosts, pushSharingPost} from '../redux/SharingPostReducer';
-import {ActivityIndicator} from 'react-native-paper';
+import {ActivityIndicator, Menu} from 'react-native-paper';
 import getDistance from 'geolib/es/getDistance';
+import {getFontFamily} from '../utils/fonts';
+import HeaderHome from '../components/ui/HeaderHome';
+import {PermissionsAndroid} from 'react-native';
 
 const {useNotifications} = createNotifications();
 
-const HomeScreen = ({navigation, route}: any) => {
+const HomeScreen = ({navigation, route, setIsHome}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
   const userInfo = useSelector((state: RootState) => state.userInfo);
 
@@ -40,6 +42,9 @@ const HomeScreen = ({navigation, route}: any) => {
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<any>(null);
   const [sortingMethod, setSortingMethod] = useState('');
+  const [visible, setVisible] = useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   const location = useSelector((state: RootState) => state.location);
 
@@ -159,6 +164,29 @@ const HomeScreen = ({navigation, route}: any) => {
     return 0;
   };
 
+  const checkPermissions = async () => {
+    try {
+      const cameraGranted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
+      const audioGranted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      );
+
+      if (!cameraGranted || !audioGranted) {
+        const permissions = [
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+        ];
+        await PermissionsAndroid.requestMultiple(permissions);
+      }
+    } catch (err: any) {
+      console.log(err.toString());
+    }
+  };
+
+  checkPermissions();
+
   return (
     <View
       style={{
@@ -166,24 +194,59 @@ const HomeScreen = ({navigation, route}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <Header
+      <HeaderHome navigation={navigation} />
+      {/* <Header
         imageUrl={userInfo.imageUrl}
         navigation={navigation}
         setSortingMethod={setSortingMethod}
-      />
-      <SearchBar
-        placeholder="Search food by name"
-        containerStyle={{
-          backgroundColor: 'transparent',
-          borderColor: 'transparent',
-        }}
-        inputContainerStyle={{
-          backgroundColor: 'white',
-        }}
-        round
-        onChangeText={updateSearch}
-        value={search}
-      />
+      /> */}
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{flex: 1}}>
+          <SearchBar
+            placeholder="Tìm thực phẩm bằng tên"
+            containerStyle={{
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+            }}
+            inputContainerStyle={{
+              backgroundColor: 'white',
+            }}
+            inputStyle={{
+              fontSize: 16,
+              fontFamily: getFontFamily('regular'),
+            }}
+            round
+            onChangeText={updateSearch}
+            value={search}
+          />
+        </View>
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          contentStyle={{backgroundColor: 'white'}}
+          anchor={
+            <TouchableOpacity style={{padding: 10}} onPress={openMenu}>
+              <Icon name="filter" type="ionicon" size={24} color={'black'} />
+            </TouchableOpacity>
+          }>
+          <Menu.Item
+            onPress={() => {
+              setSortingMethod('date');
+              setVisible(false);
+            }}
+            title="Xếp theo thời gian"
+            leadingIcon={'sort-calendar-ascending'}
+          />
+          <Menu.Item
+            onPress={() => {
+              setSortingMethod('distance');
+              setVisible(false);
+            }}
+            title="Xếp theo khoảng cách"
+            leadingIcon={'map-marker-distance'}
+          />
+        </Menu>
+      </View>
 
       {isLoading ? (
         renderLoader()
@@ -224,7 +287,7 @@ const HomeScreen = ({navigation, route}: any) => {
                   style={{width: 300, height: 400}}
                 />
                 <Button
-                  title="Create Post"
+                  title="Tạo bài viết"
                   containerStyle={{borderRadius: 8}}
                   buttonStyle={{backgroundColor: Colors.button}}
                   onPress={() =>
@@ -243,7 +306,7 @@ const HomeScreen = ({navigation, route}: any) => {
         }
         style={{
           position: 'absolute',
-          bottom: 20,
+          bottom: 30,
           right: 20,
           width: 50,
           height: 50,

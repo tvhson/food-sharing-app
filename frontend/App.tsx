@@ -10,6 +10,11 @@ import {Store} from './redux/Store';
 import {PaperProvider} from 'react-native-paper';
 import * as encoding from 'text-encoding';
 import {encode as btoa} from 'base-64';
+import {LogBox} from 'react-native';
+import {ZegoCallInvitationDialog} from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
+LogBox.ignoreAllLogs();
+
 registerTranslation('pl', {
   save: 'Save',
   selectSingle: 'Select date',
@@ -41,6 +46,7 @@ function App() {
         <PaperProvider>
           <NotificationsProvider>
             <NavigationContainer>
+              <ZegoCallInvitationDialog />
               <Router />
             </NavigationContainer>
           </NotificationsProvider>

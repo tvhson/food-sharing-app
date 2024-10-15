@@ -1,10 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Modal from 'react-native-modal';
 import ImagePicker from 'react-native-image-crop-picker';
 import Colors from '../../global/Color';
 import {createNotifications} from 'react-native-notificated';
+import {getFontFamily} from '../../utils/fonts';
 const {useNotifications} = createNotifications();
 
 function UploadPhoto(props: any) {
@@ -17,8 +25,6 @@ function UploadPhoto(props: any) {
   const takePhotoFromCamera = () => {
     toggleModal();
     ImagePicker.openCamera({
-      height: props.height,
-      width: props.width,
       cropping: true,
       cropperCircleOverlay: props.isCircle,
     })
@@ -40,10 +46,8 @@ function UploadPhoto(props: any) {
   const choosePhotoFromLibrary = () => {
     toggleModal();
     ImagePicker.openPicker({
-      height: props.height,
-      width: props.width,
       waitAnimationEnd: false,
-      compressImageQuality: 0.8,
+      compressImageQuality: 1,
       cropping: true,
       cropperCircleOverlay: props.isCircle,
     })
@@ -73,38 +77,57 @@ function UploadPhoto(props: any) {
       animationIn="slideInUp"
       animationOut="slideOutDown"
       backdropOpacity={0.4}
-      backdropTransitionInTiming={1000}
+      backdropTransitionInTiming={500}
       backdropTransitionOutTiming={500}
       style={styles.modal}>
       <View style={styles.modalContent}>
         <View style={styles.barIcon} />
         <View style={{alignItems: 'center'}}>
-          <Text style={styles.panelTitle}>Upload Photo</Text>
-          <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
+          <Text style={styles.panelTitle}>{props.title}</Text>
+          <Text style={styles.panelSubtitle}>{props.subtitle}</Text>
         </View>
+        <View style={{height: 1.5, backgroundColor: Colors.gray}} />
         <View style={styles.viewButton}>
-          <Pressable
-            android_ripple={{color: Colors.moodyBlue}}
+          <TouchableOpacity
             style={styles.panelButton}
             onPress={takePhotoFromCamera}>
-            <Text style={styles.panelButtonTitle}>Take Photo</Text>
-          </Pressable>
+            <View
+              style={{
+                backgroundColor: Colors.grayLight,
+                width: 40,
+                height: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 20,
+              }}>
+              <Image
+                source={require('../../assets/images/take_photo.png')}
+                style={{width: 24, height: 24}}
+              />
+            </View>
+            <Text style={styles.panelButtonTitle}>Chụp ảnh</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.viewButton}>
-          <Pressable
-            android_ripple={{color: Colors.moodyBlue}}
+          <TouchableOpacity
             style={styles.panelButton}
             onPress={choosePhotoFromLibrary}>
-            <Text style={styles.panelButtonTitle}>Choose From Library</Text>
-          </Pressable>
-        </View>
-        <View style={styles.viewButton}>
-          <Pressable
-            android_ripple={{color: Colors.moodyBlue}}
-            style={styles.panelButton}
-            onPress={toggleModal}>
-            <Text style={styles.panelButtonTitle}>Cancel</Text>
-          </Pressable>
+            <View
+              style={{
+                backgroundColor: Colors.grayLight,
+                width: 40,
+                height: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 20,
+              }}>
+              <Image
+                source={require('../../assets/images/library_photo.png')}
+                style={{width: 24, height: 24}}
+              />
+            </View>
+            <Text style={styles.panelButtonTitle}>Chọn ảnh từ thư viện</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -124,7 +147,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    minHeight: 300,
+    minHeight: 100,
     paddingBottom: 20,
     elevation: 5,
   },
@@ -136,33 +159,36 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     alignSelf: 'center',
   },
-
   panelTitle: {
     marginTop: 20,
-    fontSize: 24,
+    fontSize: 20,
     color: Colors.black,
-    fontWeight: '500',
+    fontFamily: getFontFamily('bold'),
   },
   panelSubtitle: {
     fontSize: 13,
     color: Colors.darkGray,
-    marginBottom: 40,
+    marginBottom: 10,
+    fontFamily: getFontFamily('regular'),
   },
   viewButton: {
     marginVertical: 7,
     borderRadius: 13,
     overflow: 'hidden',
-    backgroundColor: Colors.irisBlue,
     alignItems: 'center',
   },
   panelButton: {
+    flexDirection: 'row',
     backgroundColor: 'transparent',
     width: '100%',
     alignItems: 'center',
     height: 50,
-    justifyContent: 'center',
+    paddingHorizontal: 30,
   },
   panelButtonTitle: {
-    fontSize: 17,
+    marginLeft: 20,
+    fontSize: 16,
+    fontFamily: getFontFamily('bold'),
+    color: Colors.black,
   },
 });

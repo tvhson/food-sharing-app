@@ -13,7 +13,9 @@ import Colors from '../../global/Color';
 import {Icon} from 'react-native-paper';
 import Swiper from 'react-native-swiper';
 
-const PostRenderItem2 = () => {
+const PostRenderItem2 = (props: any) => {
+  const {item, setCommentPostId, setShowComment} = props;
+
   const images = [
     {
       uri: 'https://i.pinimg.com/736x/2b/8d/b3/2b8db3475614637b47fde73b0723fa34.jpg',
@@ -32,6 +34,17 @@ const PostRenderItem2 = () => {
     },
   ];
   const screenWidth = Dimensions.get('window').width;
+  const [liked, setLiked] = React.useState(false);
+
+  const handleLiked = () => {
+    setLiked(!liked);
+  };
+
+  const handleShowComment = () => {
+    setShowComment(true);
+    //setCommentPostId(item.id);
+  };
+
   return (
     <View
       style={{
@@ -259,28 +272,43 @@ const PostRenderItem2 = () => {
               </View>
             ))}
           </Swiper>
+          <View
+            style={{flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
+            <TouchableOpacity onPress={handleLiked}>
+              <Image
+                source={
+                  liked
+                    ? require('../../assets/images/liked.png')
+                    : require('../../assets/images/like.png')
+                }
+                style={{width: 50, height: 50}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{marginLeft: 10}}
+              onPress={handleShowComment}>
+              <Image
+                source={require('../../assets/images/comment.png')}
+                style={{width: 50, height: 50}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={{marginLeft: 10}}>
+              <Image
+                source={require('../../assets/images/share.png')}
+                style={{width: 50, height: 50}}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                marginLeft: 10,
+                fontFamily: getFontFamily('regular'),
+                color: Colors.black,
+                fontSize: 14,
+              }}>
+              {liked ? 'Bạn và 10 người khác' : '10 người'}
+            </Text>
+          </View>
         </View>
-
-        {/* <Text
-            style={{
-              fontSize: 16,
-              fontFamily: getFontFamily('regular'),
-              color: Colors.text,
-              marginTop: 10,
-            }}>
-            Hey pals, guess what? 🎉 I've just wrapped up crafting these
-            mind-blowing 3D wallpapers, drenched in the coolest of the cool
-            colors! 🌈💎
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontFamily: getFontFamily('regular'),
-              color: Colors.text,
-              marginTop: 10,
-            }}>
-            Tag: #Food #Vegeterian
-          </Text> */}
       </View>
     </View>
   );

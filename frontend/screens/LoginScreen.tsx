@@ -20,6 +20,11 @@ import {setToken} from '../redux/TokenReducer';
 import {enableScreens} from 'react-native-screens';
 import {RootState} from '../redux/Store';
 import AppLoader from '../components/ui/AppLoader';
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import * as ZIM from 'zego-zim-react-native';
+import * as ZPNs from 'zego-zpns-react-native';
+import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '../components/data/SecretData';
+
 enableScreens();
 
 const {useNotifications} = createNotifications();
@@ -40,6 +45,27 @@ const LoginScreen = ({navigation}: any) => {
   const handleRegister = () => {
     navigation.navigate('Register');
   };
+
+  const onUserLogin = async (userID, userName) => {
+    return ZegoUIKitPrebuiltCallService.init(
+      ZEGO_APP_ID, // You can get it from ZEGOCLOUD's console
+      ZEGO_APP_SIGN, // You can get it from ZEGOCLOUD's console
+      userID, // It can be any valid characters, but we recommend using a phone number.
+      userName,
+      [ZIM, ZPNs],
+      {
+        ringtoneConfig: {
+          incomingCallFileName: 'zego_incoming.mp3',
+          outgoingCallFileName: 'zego_outgoing.mp3',
+        },
+        androidNotificationConfig: {
+          channelID: 'ZegoUIKit',
+          channelName: 'ZegoUIKit',
+        },
+      },
+    );
+  };
+
   const handleLogin = async () => {
     dispatch(setStatus(true));
     //console.log(email, password);
@@ -62,6 +88,7 @@ const LoginScreen = ({navigation}: any) => {
           if (response.status === 200) {
             if (response.data) {
               const token: any = response.data;
+              onUserLogin(response.data.id, response.data.email);
               AsyncStorage.setItem('token', token.accessToken);
               AsyncStorage.setItem('isLogin', 'true');
               dispatch(setToken(token.accessToken));

@@ -5,9 +5,9 @@ const Colors = {
   secondary: '#00FF00',
   grayText: '#787878',
   background: '#F0F2F5',
-  button: '#F6836B',
+  button: '#00A862',
   text: '#000',
-  postTitle: '#F05C00',
+  postTitle: '#000',
   primaryDark: '#2759ff',
   primaryLite: '#637aff99',
   black: '#000',
@@ -16,7 +16,7 @@ const Colors = {
   light: '#EEEEEE',
   dark: '#333',
   gray: '#CCCCCC',
-  red: '#ff2f68',
+  red: '#ff0000',
   lightRed: '#ff4f7e',
   darkRed: '#d9365e',
   purple: '#8f06e4',
@@ -25,7 +25,7 @@ const Colors = {
   pink: '#ff4c98',
   gold: 'gold',
   line: '#282C35',
-  darkGray: '#999999',
+  darkGray: '#777777',
   grayPrimary: '#00000099',
   bluePrimary: '#0A66C2',
 
@@ -45,6 +45,7 @@ const Colors = {
   purpleAlpha: 'rgba(146, 6, 228, 0.15)',
   irisBlue: 'rgba(0, 181, 204, 1)',
   moodyBlue: 'rgba(132, 140, 2071 ,1)',
+  grayLight: '#0000001c',
 
   // bags background colors
   bag1Bg: '#ea7a72',

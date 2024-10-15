@@ -26,6 +26,11 @@ import ReportScreen from '../screens/ReportScreen';
 import ReportDetailScreen from '../screens/ReportDetailScreen';
 import VerifyScreen from '../screens/VerifyScreen';
 import TestScreen from '../screens/TestScreen';
+import ChatScreen from '../screens/ChatScreen';
+import {
+  ZegoUIKitPrebuiltCallWaitingScreen,
+  ZegoUIKitPrebuiltCallInCallScreen,
+} from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +41,9 @@ const Router = () => {
 
   return (
     <>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{headerShown: false}}
+        initialRouteName="BottomTabNavigator">
         <>
           <Stack.Screen name="Testing" component={TestScreen} />
           <Stack.Screen name="Landing" component={LandingScreen} />
@@ -112,12 +119,21 @@ const Router = () => {
               headerTintColor: 'white',
             }}
           />
+          <Stack.Screen name="Chat" component={ChatScreen} />
           <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
           <Stack.Screen name="MyPost" component={MyPostScreen} />
           <Stack.Screen name="MyFundingPost" component={MyFundingPostScreen} />
           <Stack.Screen name="Report" component={ReportScreen} />
           <Stack.Screen name="ReportDetail" component={ReportDetailScreen} />
           <Stack.Screen name="Verify" component={VerifyScreen} />
+          <Stack.Screen
+            name="ZegoUIKitPrebuiltCallWaitingScreen"
+            component={ZegoUIKitPrebuiltCallWaitingScreen}
+          />
+          <Stack.Screen
+            name="ZegoUIKitPrebuiltCallInCallScreen"
+            component={ZegoUIKitPrebuiltCallInCallScreen}
+          />
         </>
       </Stack.Navigator>
       <EditProfileScreen />
