@@ -260,10 +260,16 @@ const PostRenderItem2 = (props: any) => {
               backgroundColor: Colors.background,
             }}>
             {images.map((item, index) => (
-              <View key={index} style={{flex: 1}}>
+              <View
+                key={index}
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                }}>
                 <Image
                   source={{uri: item.uri}}
                   style={{
+                    flex: 1,
                     width: screenWidth * 0.85,
                     height: screenWidth,
                   }}

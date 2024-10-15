@@ -1,11 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {
-  runOnJS,
-  useAnimatedReaction,
-  useSharedValue,
-} from 'react-native-reanimated';
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  BackHandler,
+  Alert,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {getOrganizationPost} from '../api/OrganizationPostApi';
@@ -20,6 +23,8 @@ import Colors from '../global/Color';
 import {Button} from 'react-native-paper';
 import PostRenderItem2 from '../components/ui/PostRenderItem2';
 import Comment from '../components/ui/Comment';
+import OrganizationPost2 from '../components/ui/OrganizationPost2';
+import {useFocusEffect} from '@react-navigation/native';
 
 export const FundingScreen = ({navigation}: any) => {
   const FundingPostData = useSelector(
@@ -33,12 +38,14 @@ export const FundingScreen = ({navigation}: any) => {
 
   return (
     <View style={styles.container}>
-      <View>
+      <ScrollView>
         <PostRenderItem2
           setShowComment={setShowComment}
           setCommentPostId={setCommentPostId}
         />
-      </View>
+        <OrganizationPost2 navigation={navigation} />
+        <View style={{height: 30}} />
+      </ScrollView>
       <Comment
         isVisible={showComment}
         setVisible={setShowComment}
