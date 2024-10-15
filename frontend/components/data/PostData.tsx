@@ -105,3 +105,61 @@ const PostData = [
   },
 ];
 export default PostData;
+
+export const notificationItems = [
+  {
+    id: '1',
+    title: 'Food Donation Request',
+    imageUrl: 'https://www.example.com/sample-image1.png',
+    description: 'You have a new food donation request!',
+    type: 'RECEIVED',
+    createdDate: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    linkId: '12345',
+    userId: 'user1',
+    senderId: 'sender1',
+  },
+  {
+    id: '2',
+    title: 'Message from a Friend',
+    imageUrl: 'https://www.example.com/sample-image2.png',
+    description: 'Your friend has sent you a message.',
+    type: 'MESSAGE',
+    createdDate: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+    linkId: '54321',
+    userId: 'user2',
+    senderId: 'sender2',
+  },
+  {
+    id: '3',
+    title: 'Food Pickup Reminder',
+    imageUrl: 'https://www.example.com/sample-image3.png',
+    description: 'Reminder: You have a food pickup scheduled.',
+    type: 'RECEIVED',
+    createdDate: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    linkId: '67890',
+    userId: 'user3',
+    senderId: 'sender3',
+  },
+  {
+    id: '4',
+    title: 'Event Invitation',
+    imageUrl: 'https://www.example.com/sample-image4.png',
+    description: 'You are invited to a community event!',
+    type: 'MESSAGE',
+    createdDate: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    linkId: '98765',
+    userId: 'user4',
+    senderId: 'sender4',
+  },
+  {
+    id: '5',
+    title: 'Food Donation Accepted',
+    imageUrl: 'https://www.example.com/sample-image5.png',
+    description: 'Your food donation has been accepted!',
+    type: 'RECEIVED',
+    createdDate: new Date(Date.now() - 604800000).toISOString(), // 1 week ago
+    linkId: '24680',
+    userId: 'user5',
+    senderId: 'sender5',
+  },
+];

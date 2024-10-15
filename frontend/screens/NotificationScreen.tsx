@@ -21,11 +21,16 @@ import {getNotifications, readAllNotifications} from '../api/NotificationApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, Image} from '@rneui/themed';
 import {useFocusEffect} from '@react-navigation/native';
+import {notificationItems} from '../components/data/PostData';
+import {getFontFamily} from '../utils/fonts';
 
 const NotificationScreen = ({navigation}: any) => {
   const notificationDatas = useSelector(
     (state: RootState) => state.notification.notifications,
   );
+
+  const dummyData = notificationItems;
+
   const accessToken = useSelector((state: RootState) => state.token.key);
   const dispatch = useDispatch();
   const [notifications, setNotificationsList] = useState<any>(null);
@@ -118,29 +123,19 @@ const NotificationScreen = ({navigation}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <View
+      <Text
         style={{
-          height: 60,
-          width: '100%',
-          backgroundColor: Colors.button,
-          borderBottomWidth: 1,
-          borderBlockColor: '#ccc',
-          justifyContent: 'center',
-
-          alignItems: 'center',
+          fontSize: 24,
+          fontWeight: 'bold',
+          color: Colors.postTitle,
+          fontFamily: getFontFamily('bold'),
+          margin: 8,
         }}>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: 'bold',
-            color: 'white',
-          }}>
-          Notifications
-        </Text>
-      </View>
+        Thông báo
+      </Text>
       <FlatList
         style={{marginHorizontal: 8}}
-        data={notifications}
+        data={dummyData}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
           <NotificationItem item={item} navigation={navigation} />

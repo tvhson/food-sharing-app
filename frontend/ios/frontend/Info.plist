@@ -49,7 +49,6 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>SFProDisplayBlack.ttf</string>
 		<string>SFProDisplayBold.ttf</string>
 		<string>SFProDisplayHeavy.ttf</string>
 		<string>SFProDisplayLight.ttf</string>
@@ -58,6 +57,7 @@
 		<string>SFProDisplaySemiBold.ttf</string>
 		<string>SFProDisplayThin.ttf</string>
 		<string>SFProDisplayUltraLight.ttf</string>
+		<string>SFProDisplayBlack.ttf</string>
 	</array>
 </dict>
 </plist>

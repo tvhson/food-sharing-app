@@ -18,6 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DatePickerInput} from 'react-native-paper-dates';
 import {UserInfo, saveUser} from '../redux/UserReducer';
 import {useDispatch} from 'react-redux';
+import Colors from '../global/Color';
+import {getFontFamily} from '../utils/fonts';
 
 const {useNotifications, ModalNotificationsProvider} = createNotifications();
 function EditProfileScreen(props: any) {
@@ -161,11 +163,22 @@ function EditProfileScreen(props: any) {
         <View style={styles.modalContent}>
           <View style={{height: 70}} />
           <View style={{marginLeft: 10}}>
-            <Text>* Indicates required</Text>
+            <Text
+              style={{
+                fontFamily: getFontFamily('regular'),
+              }}>
+              * Bắt buộc phải điền
+            </Text>
           </View>
           <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Full name*
+            <Text
+              style={{
+                marginTop: 30,
+                color: 'black',
+                fontSize: 16,
+                fontFamily: getFontFamily('regular'),
+              }}>
+              Tên*
             </Text>
             <TextInput
               style={{
@@ -173,16 +186,23 @@ function EditProfileScreen(props: any) {
                 borderBottomColor: 'black',
                 color: 'black',
                 fontSize: 16,
+                fontFamily: getFontFamily('regular'),
               }}
-              placeholder="Enter your full name"
+              placeholder="Nhập tên đầy đủ của bạn"
               value={name}
               onChangeText={text => setName(text)}
             />
           </View>
 
           <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Description
+            <Text
+              style={{
+                marginTop: 30,
+                color: 'black',
+                fontSize: 16,
+                fontFamily: getFontFamily('regular'),
+              }}>
+              Mô tả
             </Text>
             <TextInput
               style={{
@@ -190,16 +210,23 @@ function EditProfileScreen(props: any) {
                 borderBottomColor: 'black',
                 color: 'black',
                 fontSize: 16,
+                fontFamily: getFontFamily('regular'),
               }}
-              placeholder="Enter your description"
+              placeholder="Nhập mô tả về bạn"
               value={description}
               onChangeText={text => setDescription(text)}
             />
           </View>
 
           <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Phone number*
+            <Text
+              style={{
+                marginTop: 30,
+                color: 'black',
+                fontSize: 16,
+                fontFamily: getFontFamily('regular'),
+              }}>
+              Số điện thoại*
             </Text>
             <TextInput
               style={{
@@ -207,8 +234,9 @@ function EditProfileScreen(props: any) {
                 borderBottomColor: 'black',
                 color: 'black',
                 fontSize: 16,
+                fontFamily: getFontFamily('regular'),
               }}
-              placeholder="Enter your phone number"
+              placeholder="Nhập số điện thoại của bạn"
               value={phone}
               onChangeText={text => setPhone(text)}
               maxLength={10}
@@ -223,25 +251,31 @@ function EditProfileScreen(props: any) {
               }}>
               <DatePickerInput
                 locale="en"
-                label="Birthday"
+                label="Ngày sinh"
                 value={birthDate}
                 onChange={(date: Date | undefined) =>
                   setBirthDate(date || new Date())
                 }
                 inputMode="start"
-                style={{width: 300}}
+                style={{width: 300, fontFamily: getFontFamily('regular')}}
                 mode="outlined"
               />
             </View>
           </View>
           <View style={{marginHorizontal: 10}}>
-            <Text style={{marginTop: 30, color: 'black', fontSize: 16}}>
-              Location
+            <Text
+              style={{
+                marginTop: 30,
+                color: 'black',
+                fontSize: 16,
+                fontFamily: getFontFamily('regular'),
+              }}>
+              Địa chỉ
             </Text>
             <GooglePlacesAutocomplete
               ref={autocompleteRef}
               fetchDetails={true}
-              placeholder={'Enter your country/region'}
+              placeholder={'Nhập địa chỉ của bạn'}
               onPress={(data, details = null) => {
                 setLocationName(data.description);
                 setLatitude(details?.geometry.location.lat || 0);
@@ -257,6 +291,7 @@ function EditProfileScreen(props: any) {
                 textInput: {
                   fontSize: 16,
                   color: 'black',
+                  fontFamily: getFontFamily('regular'),
                 },
               }}
             />
@@ -270,12 +305,12 @@ function EditProfileScreen(props: any) {
           <View
             style={{
               borderRadius: 30,
-              backgroundColor: '#1664b1',
+              backgroundColor: Colors.greenPrimary,
               paddingHorizontal: 150,
               paddingVertical: 6,
               elevation: 5,
             }}>
-            <Text style={styles.bottomText}>Save</Text>
+            <Text style={styles.bottomText}>Lưu</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -284,7 +319,7 @@ function EditProfileScreen(props: any) {
           <TouchableOpacity onPress={toggleModal} style={{marginTop: 3}}>
             <Icon type="antdesign" name="close" />
           </TouchableOpacity>
-          <Text style={styles.title}>Edit profile</Text>
+          <Text style={styles.title}>Sửa thông tin</Text>
         </View>
       </View>
     </Modal>
@@ -300,7 +335,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'black',
     marginLeft: 30,
-    fontWeight: 'bold',
+    fontFamily: getFontFamily('bold'),
   },
   bottomView: {
     position: 'absolute',
@@ -316,6 +351,7 @@ const styles = StyleSheet.create({
   },
   bottomText: {
     color: 'white',
+    fontFamily: getFontFamily('bold'),
     fontSize: 18,
   },
   topView: {

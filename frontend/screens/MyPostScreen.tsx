@@ -10,7 +10,7 @@ import {
   StyleSheet,
   RefreshControl,
 } from 'react-native';
-import Header from '../components/ui/Header';
+import Header from '../components/ui/HeaderHome';
 import Colors from '../global/Color';
 import {Button, Image, SearchBar} from '@rneui/themed';
 import PostRenderItem from '../components/ui/PostRenderItem';

@@ -17,6 +17,7 @@ import {saveUser} from '../redux/UserReducer';
 import {disconnectSocket} from '../api/NotificationApi';
 import {disconnectChat} from '../api/ChatApi';
 import {updateUser} from '../api/AccountsApi';
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 const {useNotifications} = createNotifications();
 
@@ -41,6 +42,10 @@ const ProfileScreen = ({navigation, route}: any) => {
     }
   }, [accessToken, isEditVisible, userInfo]);
 
+  const onUserLogout = async () => {
+    return ZegoUIKitPrebuiltCallService.uninit();
+  };
+
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('isLogin');
@@ -52,6 +57,7 @@ const ProfileScreen = ({navigation, route}: any) => {
       index: 0,
       routes: [{name: 'Landing'}],
     });
+    onUserLogout();
   };
 
   const postImage = (image: any) => {
@@ -61,6 +67,7 @@ const ProfileScreen = ({navigation, route}: any) => {
       name: image.filename || 'image.jpeg',
       type: image.mime || 'image/jpeg',
     });
+    console.log(image);
     uploadPhoto(dataForm, accessToken).then((response: any) => {
       if (response.status === 200) {
         const imageUrlString = response.data[0];
@@ -133,107 +140,43 @@ const ProfileScreen = ({navigation, route}: any) => {
       <UploadPhoto
         isVisible={isUploadVisible}
         setVisible={setIsUploadVisible}
-        height={140}
-        width={140}
         isCircle={true}
         postImage={postImage}
+        title="Thay đổi ảnh đại diện"
+        subtitle="Chọn ảnh từ thư viện hoặc chụp ảnh mới"
       />
-      <ImageBackground
-        source={require('../assets/images/ProfileBackground.png')}
-        resizeMode="cover"
-        style={{flex: 1}}>
-        <View
-          style={{
-            flexDirection: 'column',
-            justifyContent: 'center',
-            width: '100%',
-            alignItems: 'center',
-            marginTop: 70,
-          }}>
-          <Avatar
-            size={128}
-            rounded
-            source={{
-              uri: imageUrl
-                ? imageUrl
-                : 'https://randomuser.me/api/portraits/men/36.jpg',
-            }}>
-            <Accessory
-              size={30}
-              name="edit"
-              color={'white'}
-              style={{backgroundColor: Colors.button, overflow: 'hidden'}}
-              onPress={() => {
-                setIsUploadVisible(!isUploadVisible);
-              }}
-            />
-          </Avatar>
-        </View>
-        {userInfo.role !== 'ADMIN' ? (
-          <View
-            style={{
-              marginHorizontal: 35,
-              backgroundColor: 'white',
-              borderRadius: 8,
-              marginVertical: 20,
-              overflow: 'hidden',
-              padding: 10,
-            }}>
-            <Button
-              title={userInfo.name}
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black', marginLeft: 10}}
-              icon={{name: 'user', type: 'antdesign', color: 'black'}}
-            />
-            <Button
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              title={new Date(userInfo.birthDate).toLocaleDateString()}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black', marginLeft: 10}}
-              icon={{
-                name: 'birthday-cake',
-                type: 'font-awesome',
-                color: 'black',
-              }}
-            />
-            <Button
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              title={userInfo.phone}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black', marginLeft: 10}}
-              icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
-            />
-            <Button
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              title={userInfo.locationName}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black'}}
-              icon={{name: 'location', type: 'entypo', color: 'black'}}
-            />
-          </View>
-        ) : null}
 
+      <View
+        style={{
+          flexDirection: 'column',
+          justifyContent: 'center',
+          width: '100%',
+          alignItems: 'center',
+          marginTop: 70,
+        }}>
+        <Avatar
+          size={128}
+          rounded
+          source={{
+            uri: imageUrl
+              ? imageUrl
+              : 'https://randomuser.me/api/portraits/men/36.jpg',
+          }}>
+          <Accessory
+            pressableProps={{
+              style: {overflow: 'hidden'},
+            }}
+            size={30}
+            name="edit"
+            color={'white'}
+            style={{backgroundColor: Colors.button, overflow: 'hidden'}}
+            onPress={() => {
+              setIsUploadVisible(!isUploadVisible);
+            }}
+          />
+        </Avatar>
+      </View>
+      {userInfo.role !== 'ADMIN' ? (
         <View
           style={{
             marginHorizontal: 35,
@@ -243,89 +186,152 @@ const ProfileScreen = ({navigation, route}: any) => {
             overflow: 'hidden',
             padding: 10,
           }}>
-          {userInfo.role !== 'ADMIN' ? (
-            <Button
-              title="Edit profile"
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black'}}
-              icon={{name: 'profile', type: 'antdesign', color: 'black'}}
-              onPress={() => setIsEditVisible(!isEditVisible)}
-            />
-          ) : null}
-          {userInfo.role !== 'ADMIN' ? (
-            <Button
-              title="My posts"
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black'}}
-              icon={{
-                name: 'post-outline',
-                type: 'material-community',
-                color: 'black',
-              }}
-              onPress={() => navigation.navigate('MyPost')}
-            />
-          ) : null}
-          {userInfo.role === 'ORGANIZATION' ? (
-            <Button
-              title="My organization posts"
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black'}}
-              onPress={() => navigation.navigate('MyFundingPost')}
-              icon={{name: 'organization', type: 'octicon', color: 'black'}}
-            />
-          ) : null}
-          {userInfo.role === 'ADMIN' ? (
-            <>
-              <Button
-                onPress={() => navigation.navigate('Report')}
-                title="Reports"
-                buttonStyle={{
-                  backgroundColor: 'transparent',
-                  justifyContent: 'flex-start',
-                }}
-                titleStyle={{color: 'black'}}
-                icon={{name: 'report', type: 'material-icon', color: 'black'}}
-              />
-              <Button
-                title="Manage Accounts"
-                buttonStyle={{
-                  backgroundColor: 'transparent',
-                  justifyContent: 'flex-start',
-                }}
-                onPress={() => navigation.navigate('Verify')}
-                titleStyle={{color: 'black'}}
-                icon={{
-                  name: 'verified-user',
-                  type: 'material-icon',
-                  color: 'black',
-                }}
-              />
-            </>
-          ) : null}
-        </View>
-        <View style={{flex: 1, justifyContent: 'flex-end'}}>
           <Button
-            title="Logout"
-            onPress={() => handleLogout()}
+            title={userInfo.name}
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
             buttonStyle={{
-              backgroundColor: Colors.button,
-              width: 200,
-              alignSelf: 'center',
-              borderRadius: 10,
-              marginBottom: 50,
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black', marginLeft: 10}}
+            icon={{name: 'user', type: 'antdesign', color: 'black'}}
+          />
+          <Button
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
+            title={new Date(userInfo.birthDate).toLocaleDateString()}
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black', marginLeft: 10}}
+            icon={{
+              name: 'birthday-cake',
+              type: 'font-awesome',
+              color: 'black',
             }}
           />
+          <Button
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
+            title={userInfo.phone}
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black', marginLeft: 10}}
+            icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
+          />
+          <Button
+            disabled
+            disabledStyle={{backgroundColor: 'transparent'}}
+            disabledTitleStyle={{color: 'black'}}
+            title={userInfo.locationName}
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black'}}
+            icon={{name: 'location', type: 'entypo', color: 'black'}}
+          />
         </View>
-      </ImageBackground>
+      ) : null}
+
+      <View
+        style={{
+          marginHorizontal: 35,
+          backgroundColor: 'white',
+          borderRadius: 8,
+          marginVertical: 20,
+          overflow: 'hidden',
+          padding: 10,
+        }}>
+        {userInfo.role !== 'ADMIN' ? (
+          <Button
+            title="Edit profile"
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black'}}
+            icon={{name: 'profile', type: 'antdesign', color: 'black'}}
+            onPress={() => setIsEditVisible(!isEditVisible)}
+          />
+        ) : null}
+        {userInfo.role !== 'ADMIN' ? (
+          <Button
+            title="My posts"
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black'}}
+            icon={{
+              name: 'post-outline',
+              type: 'material-community',
+              color: 'black',
+            }}
+            onPress={() => navigation.navigate('MyPost')}
+          />
+        ) : null}
+        {userInfo.role === 'ORGANIZATION' ? (
+          <Button
+            title="My organization posts"
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black'}}
+            onPress={() => navigation.navigate('MyFundingPost')}
+            icon={{name: 'organization', type: 'octicon', color: 'black'}}
+          />
+        ) : null}
+        {userInfo.role === 'ADMIN' ? (
+          <>
+            <Button
+              onPress={() => navigation.navigate('Report')}
+              title="Reports"
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black'}}
+              icon={{name: 'report', type: 'material-icon', color: 'black'}}
+            />
+            <Button
+              title="Manage Accounts"
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              onPress={() => navigation.navigate('Verify')}
+              titleStyle={{color: 'black'}}
+              icon={{
+                name: 'verified-user',
+                type: 'material-icon',
+                color: 'black',
+              }}
+            />
+          </>
+        ) : null}
+      </View>
+      <View style={{flex: 1, justifyContent: 'flex-end'}}>
+        <Button
+          title="Logout"
+          onPress={() => handleLogout()}
+          buttonStyle={{
+            backgroundColor: Colors.button,
+            width: 200,
+            alignSelf: 'center',
+            borderRadius: 10,
+            marginBottom: 50,
+          }}
+        />
+      </View>
     </View>
   );
 };

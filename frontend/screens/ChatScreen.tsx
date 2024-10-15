@@ -112,25 +112,6 @@ const ChatScreen = ({navigation}: any) => {
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.background}}>
-      <View
-        style={{
-          height: 60,
-          width: '100%',
-          backgroundColor: Colors.button,
-          borderBottomWidth: 1,
-          borderBlockColor: '#ccc',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: 'bold',
-            color: 'white',
-          }}>
-          Messages
-        </Text>
-      </View>
       <SearchBar
         placeholder="Search user by name"
         containerStyle={{

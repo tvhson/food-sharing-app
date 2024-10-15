@@ -244,7 +244,7 @@ const NotificationItem = ({item, navigation}: any) => {
                   <Button
                     title={'Decline'}
                     buttonStyle={{
-                      backgroundColor: Colors.postTitle,
+                      backgroundColor: Colors.red,
                       borderColor: 'transparent',
                       borderWidth: 0,
                       borderRadius: 10,
@@ -256,7 +256,7 @@ const NotificationItem = ({item, navigation}: any) => {
                   <Button
                     title={'Accept'}
                     buttonStyle={{
-                      backgroundColor: Colors.green2,
+                      backgroundColor: Colors.greenPrimary,
                       borderColor: 'transparent',
                       borderWidth: 0,
                       borderRadius: 10,

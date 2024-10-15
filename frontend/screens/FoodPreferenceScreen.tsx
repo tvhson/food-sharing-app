@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React from 'react';
 import {getFontFamily} from '../utils/fonts';
 import Colors from '../global/Color';
@@ -7,22 +14,22 @@ import {Icon} from 'react-native-paper';
 
 const FoodPreferenceScreen = () => {
   const tags = [
-    'Animal Products',
-    'Vegetables',
-    'Fruits',
-    'Beverages',
-    'Grains',
-    'Dairy Products',
-    'Spices',
-    'Seafood',
-    'Bakery Products',
-    'Processed Foods',
-    'Nuts',
-    'Beans',
-    'Vegetarian Products',
-    'Fast Foods',
-    'Snacks',
-    'Frozen Foods',
+    'Sản phẩm động vật',
+    'Rau củ',
+    'Trái cây',
+    'Đồ uống',
+    'Ngũ cốc',
+    'Sản phẩm từ sữa',
+    'Gia vị',
+    'Hải sản',
+    'Sản phẩm từ lò nướng',
+    'Thực phẩm chế biến',
+    'Các loại hạt',
+    'Đậu',
+    'Sản phẩm chay',
+    'Thức ăn nhanh',
+    'Đồ ăn vặt',
+    'Thực phẩm đông lạnh',
   ];
 
   const vegetarianTags = [
@@ -51,8 +58,12 @@ const FoodPreferenceScreen = () => {
     }
   };
 
+  const handleSave = () => {
+    console.log(selectedTags);
+  };
+
   return (
-    <View style={{flex: 1, backgroundColor: Colors.background}}>
+    <View style={{flex: 1, backgroundColor: Colors.white}}>
       <View style={{flex: 1}}>
         <TouchableOpacity style={{marginTop: 20, marginLeft: 20}}>
           <Icon source={'arrow-left'} size={30} color={Colors.text} />
@@ -65,7 +76,7 @@ const FoodPreferenceScreen = () => {
             margin: 16,
             alignSelf: 'center',
           }}>
-          Your Diet Preferences{' '}
+          Sở thích ăn uống{' '}
           <Image
             source={require('../assets/images/yummy.png')}
             style={{width: 30, height: 30}}
@@ -77,18 +88,17 @@ const FoodPreferenceScreen = () => {
             fontFamily: getFontFamily('regular'),
             color: Colors.grayText,
             marginHorizontal: 16,
+            textAlign: 'center',
           }}>
-          Select the tags that you want to include in your diet.
+          Chọn các loại thực phẩm bạn thích ăn
         </Text>
         <View
           style={{
-            justifyContent: 'center',
-            alignItems: 'center',
+            marginTop: 20,
             flex: 1,
           }}>
           <View
             style={{
-              marginTop: 30,
               flexWrap: 'wrap',
               flexDirection: 'row',
               justifyContent: 'center',
@@ -129,37 +139,31 @@ const FoodPreferenceScreen = () => {
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        <TouchableOpacity onPress={handleSave}>
           <View
             style={{
-              alignSelf: 'flex-end',
-              justifyContent: 'flex-end',
-              alignContent: 'flex-end',
-              flex: 1,
+              backgroundColor: Colors.greenPrimary,
+              padding: 16,
+              borderRadius: 20,
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              bottom: 20,
+              right: 20,
+              paddingVertical: 10,
             }}>
-            <TouchableOpacity>
-              <View
-                style={{
-                  backgroundColor: Colors.greenPrimary,
-                  padding: 16,
-                  borderRadius: 20,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginBottom: 20,
-                  marginRight: 20,
-                  paddingVertical: 10,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontFamily: getFontFamily('black'),
-                    color: Colors.white,
-                  }}>
-                  Submit
-                </Text>
-              </View>
-            </TouchableOpacity>
+            <Text
+              style={{
+                fontSize: 20,
+                fontFamily: getFontFamily('black'),
+                color: Colors.white,
+              }}>
+              Lưu
+            </Text>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );

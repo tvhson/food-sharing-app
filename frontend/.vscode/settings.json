@@ -8,5 +8,6 @@
     "SFPRODISPLAY",
     "sockjs",
     "stompjs"
-  ]
+  ],
+  "files.eol": "\n"
 }
