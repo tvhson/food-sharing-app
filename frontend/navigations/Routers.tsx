@@ -43,11 +43,9 @@ const Router = () => {
 
   return (
     <>
-      <Stack.Navigator
-        screenOptions={{headerShown: false}}
-        initialRouteName="BottomTabNavigator">
+      <Stack.Navigator screenOptions={{headerShown: false}}>
         <>
-          <Stack.Screen name="Testing" component={TestScreen} />
+          {/* <Stack.Screen name="Testing" component={TestScreen} /> */}
           <Stack.Screen name="Landing" component={LandingScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />

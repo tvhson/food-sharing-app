@@ -24,6 +24,7 @@ import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn
 import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '../components/data/SecretData';
+import Colors from '../global/Color';
 
 enableScreens();
 
@@ -267,7 +268,7 @@ const LoginScreen = ({navigation}: any) => {
             onPress={handleLogin}
             titleStyle={{fontWeight: '700', fontSize: 20}}
             buttonStyle={{
-              backgroundColor: '#F6836B',
+              backgroundColor: Colors.greenPrimary,
               borderColor: 'transparent',
               borderWidth: 0,
               borderRadius: 30,
