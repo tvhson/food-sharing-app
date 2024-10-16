@@ -68,7 +68,6 @@ const LoginScreen = ({navigation}: any) => {
   };
 
   const handleLogin = async () => {
-    dispatch(setStatus(true));
     //console.log(email, password);
     if (email === '' || password === '') {
       notify('error', {
@@ -83,8 +82,9 @@ const LoginScreen = ({navigation}: any) => {
       return;
     }
     try {
+      dispatch(setStatus(true));
       await login({email, password})
-        .then(response => {
+        .then((response: any) => {
           console.log(response);
           if (response.status === 200) {
             if (response.data) {
@@ -242,17 +242,17 @@ const LoginScreen = ({navigation}: any) => {
               secureTextEntry={!showPassword}
               onChangeText={setPassword}
             />
-            <TouchableWithoutFeedback>
+            <TouchableOpacity
+              onPress={() => {
+                setShowPassword(!showPassword);
+              }}>
               <Icon
                 name={showPassword ? 'eye' : 'eye-with-line'}
                 type="entypo"
                 size={24}
                 color={'#706d6d'}
-                onPress={() => {
-                  setShowPassword(!showPassword);
-                }}
               />
-            </TouchableWithoutFeedback>
+            </TouchableOpacity>
           </View>
         </Animated.View>
 
