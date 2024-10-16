@@ -244,17 +244,17 @@ const RegisterScreen = ({navigation}: any) => {
               secureTextEntry={!showPassword}
               onChangeText={setPassword}
             />
-            <TouchableWithoutFeedback>
+            <TouchableOpacity
+              onPress={() => {
+                setShowPassword(!showPassword);
+              }}>
               <Icon
                 name={showPassword ? 'eye' : 'eye-with-line'}
                 type="entypo"
                 size={24}
                 color={'#706d6d'}
-                onPress={() => {
-                  setShowPassword(!showPassword);
-                }}
               />
-            </TouchableWithoutFeedback>
+            </TouchableOpacity>
           </View>
         </Animated.View>
         <Animated.View
@@ -282,17 +282,17 @@ const RegisterScreen = ({navigation}: any) => {
               secureTextEntry={!showConfirmPassword}
               onChangeText={setConfirmPassword}
             />
-            <TouchableWithoutFeedback>
+            <TouchableOpacity
+              onPress={() => {
+                setShowConfirmPassword(!showConfirmPassword);
+              }}>
               <Icon
                 name={showConfirmPassword ? 'eye' : 'eye-with-line'}
                 type="entypo"
                 size={24}
                 color={'#706d6d'}
-                onPress={() => {
-                  setShowConfirmPassword(!showConfirmPassword);
-                }}
               />
-            </TouchableWithoutFeedback>
+            </TouchableOpacity>
           </View>
         </Animated.View>
 
