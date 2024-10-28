@@ -1,6 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {
+  NavigationContainer,
+  NavigationContainerRef,
+} from '@react-navigation/native';
 import Router from './navigations/Routers';
 import {createNotifications} from 'react-native-notificated';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -12,6 +15,7 @@ import * as encoding from 'text-encoding';
 import {encode as btoa} from 'base-64';
 import {LogBox} from 'react-native';
 import {ZegoCallInvitationDialog} from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import analytics from '@react-native-firebase/analytics';
 
 LogBox.ignoreAllLogs();
 
@@ -40,12 +44,32 @@ var encoder = new encoding.TextEncoder();
 
 const {NotificationsProvider} = createNotifications();
 function App() {
+  const routeNameRef = React.useRef();
+  const navigationRef = React.useRef<NavigationContainerRef<any>>();
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <Provider store={Store}>
         <PaperProvider>
           <NotificationsProvider>
-            <NavigationContainer>
+            <NavigationContainer
+              ref={navigationRef}
+              onReady={() => {
+                routeNameRef.current =
+                  navigationRef.current.getCurrentRoute().name;
+              }}
+              onStateChange={async () => {
+                const previousRouteName = routeNameRef.current;
+                const currentRouteName =
+                  navigationRef.current.getCurrentRoute().name;
+
+                if (previousRouteName !== currentRouteName) {
+                  await analytics().logScreenView({
+                    screen_name: currentRouteName,
+                    screen_class: currentRouteName,
+                  });
+                }
+                routeNameRef.current = currentRouteName;
+              }}>
               <ZegoCallInvitationDialog />
               <Router />
             </NavigationContainer>

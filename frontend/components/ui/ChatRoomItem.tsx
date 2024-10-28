@@ -10,6 +10,7 @@ import {
 import Colors from '../../global/Color';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
 
 const ChatRoomItem = ({item, navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -31,38 +32,38 @@ const ChatRoomItem = ({item, navigation}: any) => {
 
     if (diffInSeconds < 60) {
       if (diffInSeconds < 0) {
-        return 'Just now';
+        return 'Vừa xong';
       }
-      return `${diffInSeconds}s ago`;
+      return `${diffInSeconds} giây trước`;
     }
 
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
+      return `${diffInMinutes} phút trước`;
     }
 
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
+      return `${diffInHours} giờ trước`;
     }
 
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) {
-      return `${diffInDays} days ago`;
+      return `${diffInDays} ngày trước`;
     }
 
     if (diffInDays < 30) {
       const diffInWeeks = Math.floor(diffInDays / 7);
-      return `${diffInWeeks} weeks ago`;
+      return `${diffInWeeks} tuần trước`;
     }
 
     if (diffInDays < 365) {
       const diffInMonths = Math.floor(diffInDays / 30);
-      return `${diffInMonths} months ago`;
+      return `${diffInMonths} tháng trước`;
     }
 
     const diffInYears = Math.floor(diffInDays / 365);
-    return `${diffInYears} years ago`;
+    return `${diffInYears} năm trước`;
   }
   return (
     <TouchableWithoutFeedback
@@ -91,6 +92,7 @@ const ChatRoomItem = ({item, navigation}: any) => {
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text
               style={{
+                fontFamily: getFontFamily('regular'),
                 fontSize: 22,
                 fontWeight:
                   (item.senderId === userInfo.id &&
@@ -114,6 +116,7 @@ const ChatRoomItem = ({item, navigation}: any) => {
             }}>
             <Text
               style={{
+                fontFamily: getFontFamily('regular'),
                 fontSize: 16,
                 color:
                   (item.senderId === userInfo.id &&
@@ -130,7 +133,7 @@ const ChatRoomItem = ({item, navigation}: any) => {
                     ? 'bold'
                     : 'normal',
               }}>
-              {item.lastMessageSenderId === userInfo.id ? 'You: ' : ''}
+              {item.lastMessageSenderId === userInfo.id ? 'Bạn: ' : ''}
               {item.lastMessage}
             </Text>
           </View>
@@ -138,6 +141,7 @@ const ChatRoomItem = ({item, navigation}: any) => {
         <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
           <Text
             style={{
+              fontFamily: getFontFamily('regular'),
               fontSize: 12,
               color:
                 (item.senderId === userInfo.id &&

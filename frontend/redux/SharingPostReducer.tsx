@@ -4,7 +4,7 @@ interface SharingPost {
   id: number;
   title: string;
   description: string;
-  imageUrl: string;
+  images: Array<string>;
   note: string;
   expiredDate: Date;
   pickUpStartDate: Date;

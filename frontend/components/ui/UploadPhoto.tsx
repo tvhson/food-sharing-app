@@ -45,26 +45,52 @@ function UploadPhoto(props: any) {
   };
   const choosePhotoFromLibrary = () => {
     toggleModal();
-    ImagePicker.openPicker({
-      waitAnimationEnd: false,
-      compressImageQuality: 1,
-      cropping: true,
-      cropperCircleOverlay: props.isCircle,
-    })
-      .then(image => {
-        props.postImage(image);
-        // console.log(image);
-        // props.setPhoto(image.path);
+    console.log(props.isMultiple);
+    if (props.isMultiple && props.isMultiple) {
+      ImagePicker.openPicker({
+        waitAnimationEnd: false,
+        compressImageQuality: 1,
+        multiple: true,
+        maxFiles: 10,
+        cropping: true,
+        cropperCircleOverlay: props.isCircle,
       })
-      .catch(error => {
-        notify('error', {
-          params: {
-            description: error.message,
-            title: 'Error',
-            style: {multiline: 100},
-          },
+        .then(images => {
+          props.postImage(images);
+          // console.log(images);
+          // props.setPhoto(image.path);
+        })
+        .catch(error => {
+          notify('error', {
+            params: {
+              description: error.message,
+              title: 'Error',
+              style: {multiline: 100},
+            },
+          });
         });
-      });
+    } else {
+      ImagePicker.openPicker({
+        waitAnimationEnd: false,
+        compressImageQuality: 1,
+        cropping: true,
+        cropperCircleOverlay: props.isCircle,
+      })
+        .then(image => {
+          props.postImage(image);
+          // console.log(image);
+          // props.setPhoto(image.path);
+        })
+        .catch(error => {
+          notify('error', {
+            params: {
+              description: error.message,
+              title: 'Error',
+              style: {multiline: 100},
+            },
+          });
+        });
+    }
   };
 
   return (

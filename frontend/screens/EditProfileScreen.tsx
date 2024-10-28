@@ -155,6 +155,10 @@ function EditProfileScreen(props: any) {
       onBackdropPress={() => props.setVisible(false)}
       onBackButtonPress={() => props.setVisible(false)}
       isVisible={props.isVisible}
+      animationIn={'fadeInUpBig'}
+      animationOut={'fadeOutDownBig'}
+      backdropTransitionInTiming={500}
+      backdropTransitionOutTiming={500}
       style={{margin: 0}}>
       <ModalNotificationsProvider notificationTopPosition={0} />
       <ScrollView

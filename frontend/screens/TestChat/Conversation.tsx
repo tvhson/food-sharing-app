@@ -19,50 +19,14 @@ import PeerChatDialog from '../../components/ui/ChatUI/PeerChatDialog';
 import GroupChatDialog from '../../components/ui/ChatUI/GroupChatDialog';
 import JoinGroupChatDialog from '../../components/ui/ChatUI/JoinGroupChatDialog';
 import {ZegoSendCallInvitationButton} from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import {getFontFamily} from '../../utils/fonts';
 
 const Conversation = ({navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
 
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [peerDialogVisible, setPeerDialogVisible] = useState(false);
-  const [groupDialogVisible, setGroupDialogVisible] = useState(false);
-  const [joinGroupDialogVisible, setJoinGroupDialogVisible] = useState(false);
   const [isFilter, setIsFilter] = useState(false);
   const [filterValue, setFilterValue] = useState('');
 
-  const openMenu = () => {
-    setMenuVisible(!menuVisible);
-  };
-  const onModalMaskPress = () => {
-    setMenuVisible(!menuVisible);
-  };
-  const onNewPeerChatPress = () => {
-    setMenuVisible(!menuVisible);
-    setPeerDialogVisible(true);
-  };
-  const onNewGroupChatPress = () => {
-    setMenuVisible(!menuVisible);
-    setGroupDialogVisible(true);
-  };
-  const onJoinGroupChatPress = () => {
-    setMenuVisible(!menuVisible);
-    setJoinGroupDialogVisible(true);
-  };
-  const onPeerDialogVisibleChanged = (
-    visible: boolean | ((prevState: boolean) => boolean),
-  ) => {
-    setPeerDialogVisible(visible);
-  };
-  const onGroupDialogVisibleChanged = (
-    visible: boolean | ((prevState: boolean) => boolean),
-  ) => {
-    setGroupDialogVisible(visible);
-  };
-  const onJoinGroupDialogVisibleChanged = (
-    visible: boolean | ((prevState: boolean) => boolean),
-  ) => {
-    setJoinGroupDialogVisible(visible);
-  };
   const lastMessageTimeBuilder = () => {
     return <Text>lastMessageTimeBuilder</Text>;
   };
@@ -95,6 +59,7 @@ const Conversation = ({navigation}: any) => {
     const preMessageSending = (message: any) => {
       return message;
     };
+
     console.log('#######props', props);
     navigation.navigate('MessageListPage', {
       ...props,
@@ -197,18 +162,12 @@ const Conversation = ({navigation}: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.appBar}>
-        <Text style={styles.title}>In-app Chat({`${userInfo.id}`})</Text>
+        <Text style={styles.title}>Tin nhắn</Text>
         <View style={styles.utils}>
           <TouchableWithoutFeedback onPress={filterConversation}>
             <Image
               style={[styles.icon, {marginRight: 8}]}
-              source={require('../../assets/images/icon-more.png')}
-            />
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={openMenu}>
-            <Image
-              style={styles.icon}
-              source={require('../../assets/images/icon-create.png')}
+              source={require('../../assets/images/search.png')}
             />
           </TouchableWithoutFeedback>
         </View>
@@ -221,31 +180,12 @@ const Conversation = ({navigation}: any) => {
               setFilterValue(text);
             }}
             value={filterValue}
-            placeholder="Search"
+            placeholder="Tìm kiếm"
             // onFocus={onFocus}
             // onBlur={onBlur}
           />
         </View>
       ) : null}
-      <ConversationPopUp
-        visible={menuVisible}
-        onModalMaskPress={onModalMaskPress}
-        onNewPeerChatPress={onNewPeerChatPress}
-        onNewGroupChatPress={onNewGroupChatPress}
-        onJoinGroupChatPress={onJoinGroupChatPress}
-      />
-      <PeerChatDialog
-        dialogVisible={peerDialogVisible}
-        onDialogVisibleChanged={onPeerDialogVisibleChanged}
-      />
-      <GroupChatDialog
-        dialogVisible={groupDialogVisible}
-        onDialogVisibleChanged={onGroupDialogVisibleChanged}
-      />
-      <JoinGroupChatDialog
-        dialogVisible={joinGroupDialogVisible}
-        onDialogVisibleChanged={onJoinGroupDialogVisibleChanged}
-      />
       <View style={styles.conversation}>
         <ConversationList
           filter={filter}
@@ -278,34 +218,35 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     height: 50,
     backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f8f8f8',
   },
   title: {
     marginLeft: 18,
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: getFontFamily('regular'),
+    color: 'black',
   },
   utils: {
     flexDirection: 'row',
   },
   icon: {
-    width: 36,
-    height: 36,
+    width: 30,
+    height: 30,
   },
   inputBox: {
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 10,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: 'white',
   },
   input: {
     paddingHorizontal: 20,
     width: '90%',
     height: 45,
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: 'white',
+    borderRadius: 20,
+    backgroundColor: '#f3f2f2ff',
+    fontFamily: getFontFamily('regular'),
+    fontSize: 16,
   },
   conversation: {
     flex: 1,

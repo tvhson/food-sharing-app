@@ -166,9 +166,6 @@ const ProfileScreen = ({navigation, route}: any) => {
               : 'https://randomuser.me/api/portraits/men/36.jpg',
           }}>
           <Accessory
-            pressableProps={{
-              style: {overflow: 'hidden'},
-            }}
             size={30}
             name="edit"
             color={'white'}

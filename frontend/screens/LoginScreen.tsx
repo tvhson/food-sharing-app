@@ -69,16 +69,15 @@ const LoginScreen = ({navigation}: any) => {
         .then((response: any) => {
           console.log(response);
 
-          //test crashlytics
-          // crashlytics().log('Login success.');
-          // crashlytics().setUserId(email);
-          // crashlytics().setAttributes({
-          //   email: email,
-          //   password: password,
-          // });
-          // crashlytics().crash();
-
           if (response.status === 200) {
+            //test crashlytics
+            // crashlytics().log('Login success.');
+            // crashlytics().setUserId(email);
+            // crashlytics().setAttributes({
+            //   email: email,
+            //   password: password,
+            // });
+            // crashlytics().crash();
             if (response.data) {
               const token: any = response.data;
               console.log(response);
