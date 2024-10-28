@@ -20,11 +20,8 @@ import {setToken} from '../redux/TokenReducer';
 import {enableScreens} from 'react-native-screens';
 import {RootState} from '../redux/Store';
 import AppLoader from '../components/ui/AppLoader';
-import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import * as ZIM from 'zego-zim-react-native';
-import * as ZPNs from 'zego-zpns-react-native';
-import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '../components/data/SecretData';
 import Colors from '../global/Color';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 enableScreens();
 
@@ -38,6 +35,11 @@ const LoginScreen = ({navigation}: any) => {
   const [showPassword, setShowPassword] = useState(false);
   const isLoading = useSelector((state: RootState) => state.loading.status);
 
+  //test crashlytics
+  // useEffect(() => {
+  //   crashlytics().log('Login mounted.');
+  // }, []);
+
   const validateEmail = (email: string) => {
     const re =
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -45,26 +47,6 @@ const LoginScreen = ({navigation}: any) => {
   };
   const handleRegister = () => {
     navigation.navigate('Register');
-  };
-
-  const onUserLogin = async (userID, userName) => {
-    return ZegoUIKitPrebuiltCallService.init(
-      ZEGO_APP_ID, // You can get it from ZEGOCLOUD's console
-      ZEGO_APP_SIGN, // You can get it from ZEGOCLOUD's console
-      userID, // It can be any valid characters, but we recommend using a phone number.
-      userName,
-      [ZIM, ZPNs],
-      {
-        ringtoneConfig: {
-          incomingCallFileName: 'zego_incoming.mp3',
-          outgoingCallFileName: 'zego_outgoing.mp3',
-        },
-        androidNotificationConfig: {
-          channelID: 'ZegoUIKit',
-          channelName: 'ZegoUIKit',
-        },
-      },
-    );
   };
 
   const handleLogin = async () => {
@@ -86,10 +68,20 @@ const LoginScreen = ({navigation}: any) => {
       await login({email, password})
         .then((response: any) => {
           console.log(response);
+
+          //test crashlytics
+          // crashlytics().log('Login success.');
+          // crashlytics().setUserId(email);
+          // crashlytics().setAttributes({
+          //   email: email,
+          //   password: password,
+          // });
+          // crashlytics().crash();
+
           if (response.status === 200) {
             if (response.data) {
               const token: any = response.data;
-              onUserLogin(response.data.id, response.data.email);
+              console.log(response);
               AsyncStorage.setItem('token', token.accessToken);
               AsyncStorage.setItem('isLogin', 'true');
               dispatch(setToken(token.accessToken));

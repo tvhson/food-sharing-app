@@ -11,10 +11,10 @@ import React from 'react';
 import {getFontFamily} from '../../utils/fonts';
 import Colors from '../../global/Color';
 import {Icon} from 'react-native-paper';
-import Swiper from 'react-native-swiper';
+import ImageSwiper from './ImageSwiper';
 
 const PostRenderItem2 = (props: any) => {
-  const {item, setCommentPostId, setShowComment} = props;
+  const {item, setCommentPostId, setShowComment, navigation} = props;
 
   const images = [
     {
@@ -44,6 +44,9 @@ const PostRenderItem2 = (props: any) => {
     setShowComment(true);
     //setCommentPostId(item.id);
   };
+  const handleGoToDetail = () => {
+    navigation.navigate('PostDetail2');
+  };
 
   return (
     <View
@@ -55,7 +58,9 @@ const PostRenderItem2 = (props: any) => {
         padding: 16,
         borderRadius: 30,
       }}>
-      <View style={{flexDirection: 'row'}}>
+      <TouchableOpacity
+        style={{flexDirection: 'row'}}
+        onPress={handleGoToDetail}>
         <TouchableOpacity>
           <Image
             source={require('../../assets/images/MealLogo.png')}
@@ -105,7 +110,7 @@ const PostRenderItem2 = (props: any) => {
             color={Colors.grayPrimary}
           />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
       <View>
         <View
           style={{
@@ -247,73 +252,45 @@ const PostRenderItem2 = (props: any) => {
             marginTop: 10,
             overflow: 'hidden',
             alignSelf: 'center',
+            pointerEvents: 'box-none',
           }}>
-          <Swiper
-            width={screenWidth * 0.85}
-            height={screenWidth}
-            containerStyle={{
-              borderRadius: 20,
-              overflow: 'hidden',
-              justifyContent: 'center',
-              alignItems: 'center',
-              alignSelf: 'center',
-              backgroundColor: Colors.background,
+          <ImageSwiper images={images} />
+        </View>
+        <View
+          style={{flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
+          <TouchableOpacity onPress={handleLiked}>
+            <Image
+              source={
+                liked
+                  ? require('../../assets/images/liked.png')
+                  : require('../../assets/images/like.png')
+              }
+              style={{width: 50, height: 50}}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{marginLeft: 10}}
+            onPress={handleShowComment}>
+            <Image
+              source={require('../../assets/images/comment.png')}
+              style={{width: 50, height: 50}}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={{marginLeft: 10}}>
+            <Image
+              source={require('../../assets/images/share.png')}
+              style={{width: 50, height: 50}}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              marginLeft: 10,
+              fontFamily: getFontFamily('regular'),
+              color: Colors.black,
+              fontSize: 14,
             }}>
-            {images.map((item, index) => (
-              <View
-                key={index}
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                }}>
-                <Image
-                  source={{uri: item.uri}}
-                  style={{
-                    flex: 1,
-                    width: screenWidth * 0.85,
-                    height: screenWidth,
-                  }}
-                  resizeMode="contain"
-                />
-              </View>
-            ))}
-          </Swiper>
-          <View
-            style={{flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
-            <TouchableOpacity onPress={handleLiked}>
-              <Image
-                source={
-                  liked
-                    ? require('../../assets/images/liked.png')
-                    : require('../../assets/images/like.png')
-                }
-                style={{width: 50, height: 50}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{marginLeft: 10}}
-              onPress={handleShowComment}>
-              <Image
-                source={require('../../assets/images/comment.png')}
-                style={{width: 50, height: 50}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={{marginLeft: 10}}>
-              <Image
-                source={require('../../assets/images/share.png')}
-                style={{width: 50, height: 50}}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                marginLeft: 10,
-                fontFamily: getFontFamily('regular'),
-                color: Colors.black,
-                fontSize: 14,
-              }}>
-              {liked ? 'Bạn và 10 người khác' : '10 người'}
-            </Text>
-          </View>
+            {liked ? 'Bạn và 10 người khác' : '10 người'}
+          </Text>
         </View>
       </View>
     </View>

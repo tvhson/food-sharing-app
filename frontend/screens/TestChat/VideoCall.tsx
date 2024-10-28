@@ -12,7 +12,7 @@ const VideoCall = (props: any) => {
       <ZegoUIKitPrebuiltCall
         appID={ZEGO_APP_ID}
         appSign={ZEGO_APP_SIGN}
-        userID={1234} // userID can be something like a phone number or the user id on your own user system.
+        userID={'1234'} // userID can be something like a phone number or the user id on your own user system.
         userName={'abc'}
         callID={'123'} // callID can be any unique string.
         config={{

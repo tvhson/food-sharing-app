@@ -18,6 +18,7 @@ import {disconnectSocket} from '../api/NotificationApi';
 import {disconnectChat} from '../api/ChatApi';
 import {updateUser} from '../api/AccountsApi';
 import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import {ZIMKit} from '@zegocloud/zimkit-rn';
 
 const {useNotifications} = createNotifications();
 
@@ -43,7 +44,9 @@ const ProfileScreen = ({navigation, route}: any) => {
   }, [accessToken, isEditVisible, userInfo]);
 
   const onUserLogout = async () => {
-    return ZegoUIKitPrebuiltCallService.uninit();
+    await ZIMKit.disconnectUser();
+    await ZegoUIKitPrebuiltCallService.uninit();
+    return;
   };
 
   const handleLogout = async () => {

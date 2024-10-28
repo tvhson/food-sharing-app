@@ -1,4 +1,11 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import React, {useState} from 'react';
 import {getFontFamily} from '../../utils/fonts';
 import Colors from '../../global/Color';
@@ -12,32 +19,36 @@ const CommentItem = (props: any) => {
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
   };
   return (
-    <View style={styles.container}>
-      <TouchableOpacity>
-        <Image source={comment.user.avatar} style={styles.avatar} />
-      </TouchableOpacity>
-      <View style={styles.contentContainer}>
-        <View style={styles.row}>
-          <Text style={styles.textName}>{comment.user.name}</Text>
-          <Text style={styles.textTime}>{comment.time}</Text>
-        </View>
-
-        <Text>{comment.content}</Text>
-      </View>
-      <View style={styles.iconContainer}>
-        <TouchableOpacity onPress={handleLikeComment}>
-          <Image
-            source={
-              isLiked
-                ? require('../../assets/images/heart-fill.png')
-                : require('../../assets/images/heart.png')
-            }
-            style={styles.icon}
-          />
+    <TouchableWithoutFeedback>
+      <View style={styles.container}>
+        <TouchableOpacity>
+          <Image source={comment.user.avatar} style={styles.avatar} />
         </TouchableOpacity>
-        <Text style={styles.textLike}>{likeCount > 0 ? likeCount : null}</Text>
+        <View style={styles.contentContainer}>
+          <View style={styles.row}>
+            <Text style={styles.textName}>{comment.user.name}</Text>
+            <Text style={styles.textTime}>{comment.time}</Text>
+          </View>
+
+          <Text>{comment.content}</Text>
+        </View>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={handleLikeComment}>
+            <Image
+              source={
+                isLiked
+                  ? require('../../assets/images/heart-fill.png')
+                  : require('../../assets/images/heart.png')
+              }
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+          <Text style={styles.textLike}>
+            {likeCount > 0 ? likeCount : null}
+          </Text>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
