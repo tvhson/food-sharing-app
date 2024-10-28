@@ -11,6 +11,7 @@ import React from 'react';
 import {getFontFamily} from '../utils/fonts';
 import Colors from '../global/Color';
 import {Icon} from 'react-native-paper';
+import {screenHeight} from '../global/Constant';
 
 const FoodPreferenceScreen = () => {
   const tags = [
@@ -18,15 +19,12 @@ const FoodPreferenceScreen = () => {
     'Rau củ',
     'Trái cây',
     'Đồ uống',
-    'Ngũ cốc',
-    'Sản phẩm từ sữa',
-    'Gia vị',
+    'Thực phẩm đóng gói',
     'Hải sản',
-    'Sản phẩm từ lò nướng',
-    'Thực phẩm chế biến',
+    'Sản phẩm từ tinh bột',
+    'Thực phẩm đã chế biến',
     'Các loại hạt',
-    'Đậu',
-    'Sản phẩm chay',
+    'Đồ ăn chay',
     'Thức ăn nhanh',
     'Đồ ăn vặt',
     'Thực phẩm đông lạnh',

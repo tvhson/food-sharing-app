@@ -42,6 +42,7 @@ export const FundingScreen = ({navigation}: any) => {
         <PostRenderItem2
           setShowComment={setShowComment}
           setCommentPostId={setCommentPostId}
+          navigation={navigation}
         />
         <OrganizationPost2 navigation={navigation} />
         <View style={{height: 30}} />

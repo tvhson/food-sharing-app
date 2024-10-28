@@ -15,6 +15,8 @@ import Colors from '../global/Color';
 import Header from '../components/ui/HeaderHome';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import FoodPreferenceScreen from '../screens/FoodPreferenceScreen';
+import PersonalPage from '../screens/PersonalPage';
+import Conversation from '../screens/TestChat/Conversation';
 
 const Tab = createBottomTabNavigator();
 
@@ -69,8 +71,8 @@ const BottomTabNavigator = ({route, navigation}: any) => {
           }}
         />
         <Tab.Screen
-          name="Chat"
-          component={ChatScreen}
+          name="Conversation"
+          component={Conversation}
           options={{
             tabBarIcon: ({focused}) => (
               <>
@@ -87,8 +89,8 @@ const BottomTabNavigator = ({route, navigation}: any) => {
           }}
         />
         <Tab.Screen
-          name="Test"
-          component={FoodPreferenceScreen}
+          name="Personal"
+          component={PersonalPage}
           options={{
             tabBarIcon: ({focused}) => (
               <>

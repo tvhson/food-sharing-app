@@ -46,6 +46,226 @@ const CommentData = [
     content: 'Bình luận 3',
     time: '3 giờ trước',
   },
+  {
+    id: 4,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 5,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 6,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 7,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 8,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 9,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 10,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 11,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 12,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 13,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 14,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 15,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 16,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 17,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 18,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 19,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 20,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 21,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 22,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 23,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 24,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+  {
+    id: 25,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
 ];
 
 const Comment = (props: any) => {
@@ -55,17 +275,18 @@ const Comment = (props: any) => {
   return (
     <Modal
       style={styles.modal}
+      hideModalContentWhileAnimating={true}
       avoidKeyboard={true}
       onBackButtonPress={() => setVisible(false)}
       onBackdropPress={() => setVisible(false)}
       isVisible={isVisible}
-      onSwipeComplete={() => setVisible(false)}
       animationIn={'slideInUp'}
       animationOut={'slideOutDown'}
       backdropOpacity={0.4}
       backdropTransitionInTiming={500}
       backdropTransitionOutTiming={500}
       swipeDirection={['down', 'left', 'right']}
+      onSwipeComplete={() => setVisible(false)}
       propagateSwipe={true}>
       <View style={styles.modalContent}>
         <View style={styles.barIcon} />
@@ -76,6 +297,9 @@ const Comment = (props: any) => {
           data={CommentData}
           renderItem={({item}) => <CommentItem comment={item} />}
           keyExtractor={item => item.id.toString()}
+          ListFooterComponent={<View style={{height: 70}} />}
+          keyboardShouldPersistTaps="handled"
+          initialNumToRender={20}
         />
         <View
           style={{
@@ -88,6 +312,7 @@ const Comment = (props: any) => {
             flexDirection: 'row',
             borderTopWidth: 1,
             borderTopColor: Colors.gray,
+            backgroundColor: Colors.white,
           }}>
           <TextInput
             multiline

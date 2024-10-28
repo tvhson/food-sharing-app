@@ -31,8 +31,10 @@ import {
   ZegoUIKitPrebuiltCallWaitingScreen,
   ZegoUIKitPrebuiltCallInCallScreen,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import {MessageListPage} from '@zegocloud/zimkit-rn';
 import OrganizationPostDetail2 from '../screens/OrganizationPostDetail2';
 import WebViewScreen from '../screens/WebViewScreen';
+import PostDetail2 from '../screens/PostDetail2';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,7 +47,6 @@ const Router = () => {
     <>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <>
-          {/* <Stack.Screen name="Testing" component={TestScreen} /> */}
           <Stack.Screen name="Landing" component={LandingScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
@@ -130,6 +131,7 @@ const Router = () => {
             name="OrganizationPostDetail2"
             component={OrganizationPostDetail2}
           />
+          <Stack.Screen name="PostDetail2" component={PostDetail2} />
           <Stack.Screen
             name="WebView"
             component={WebViewScreen}
@@ -142,11 +144,14 @@ const Router = () => {
               headerTintColor: 'black',
             }}
           />
+          <Stack.Screen name="MessageListPage" component={MessageListPage} />
           <Stack.Screen
+            options={{headerShown: false}}
             name="ZegoUIKitPrebuiltCallWaitingScreen"
             component={ZegoUIKitPrebuiltCallWaitingScreen}
           />
           <Stack.Screen
+            options={{headerShown: false}}
             name="ZegoUIKitPrebuiltCallInCallScreen"
             component={ZegoUIKitPrebuiltCallInCallScreen}
           />

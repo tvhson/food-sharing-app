@@ -9,3 +9,4 @@
 
 # Add any project specific keep options here:
 -keep class **.zego.**  { *; }
+-keep class **.**.zego_zpns.** { *; }

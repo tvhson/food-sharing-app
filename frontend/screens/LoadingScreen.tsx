@@ -1,8 +1,10 @@
+/* eslint-disable no-labels */
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import LottieView from 'lottie-react-native';
 import React, {useEffect, useState} from 'react';
 
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import Colors from '../global/Color';
 import {useDispatch} from 'react-redux';
 import {getAllAccounts, getInfoUser} from '../api/AccountsApi';
@@ -48,6 +50,12 @@ import {getReport} from '../api/ReportApi';
 import {setReports} from '../redux/ReportReducer';
 import {setAccounts} from '../redux/AccountsReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '../components/data/SecretData';
+import {ZIMKit} from '@zegocloud/zimkit-rn';
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import * as ZIM from 'zego-zim-react-native';
+import * as ZPNs from 'zego-zpns-react-native';
+
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
@@ -55,8 +63,73 @@ const LoadingScreen = ({navigation, route}: any) => {
   const dispatch = useDispatch();
   const [myId, setMyId] = useState(0);
 
+  const onUserLogin = async (userInfo: UserInfo) => {
+    ZIMKit.connectUser(
+      {
+        userID: String(userInfo.id),
+        userName: userInfo.name,
+      },
+      '',
+    )
+      .then((data: any) => {
+        console.log(data);
+        ZegoUIKitPrebuiltCallService.init(
+          ZEGO_APP_ID,
+          ZEGO_APP_SIGN,
+          String(userInfo.id),
+          userInfo.name,
+          [ZIM, ZPNs],
+          {
+            ringtoneConfig: {
+              incomingCallFileName: 'zego_incoming.mp3',
+              outgoingCallFileName: 'zego_outgoing.mp3',
+            },
+            innerText: {
+              incomingVideoCallDialogMessage: 'Có cuộc gọi video đến',
+              incomingVoiceCallDialogMessage: 'Có cuộc gọi thoại đến',
+              incomingCallPageDeclineButton: 'Từ chối',
+              incomingCallPageAcceptButton: 'Chấp nhận',
+            },
+            notifyWhenAppRunningInBackgroundOrQuit: true,
+            androidNotificationConfig: {
+              channelID: 'ZegoUIKit',
+              channelName: 'ZegoUIKit',
+            },
+            avatarBuilder: ({userInfo}) => {
+              return (
+                <View style={{width: '100%', height: '100%'}}>
+                  <Image
+                    style={{width: '100%', height: '100%'}}
+                    resizeMode="cover"
+                    source={{
+                      uri: userInfo.imageUrl
+                        ? userInfo.imageUrl
+                        : 'https://i.imgur.com/2nCt3Sbl.jpg',
+                    }}
+                  />
+                </View>
+              );
+            },
+          },
+        ).then(() => {
+          ZegoUIKitPrebuiltCallService.requestSystemAlertWindow({
+            message:
+              'Chúng tôi cần quyền hiển thị cửa sổ trên các ứng dụng khác để hiển thị cuộc gọi đến.',
+            allow: 'Đồng ý',
+            deny: 'Từ chối',
+          });
+        });
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+    console.log('ZIMKit.connectUser');
+  };
+
   useEffect(() => {
     dispatch(setToken(token));
+    ZIMKit.init(ZEGO_APP_ID, ZEGO_APP_SIGN);
+
     const getLocation = async () => {
       GetLocation.getCurrentPosition({
         enableHighAccuracy: true,
@@ -142,6 +215,7 @@ const LoadingScreen = ({navigation, route}: any) => {
             });
           }
           const userInfo: UserInfo = response.data;
+          onUserLogin(userInfo);
           setMyId(userInfo.id);
           dispatch(saveUser(userInfo));
           connectNotification(userInfo.id, saveNotification);

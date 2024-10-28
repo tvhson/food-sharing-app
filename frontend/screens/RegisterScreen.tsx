@@ -187,7 +187,7 @@ const RegisterScreen = ({navigation}: any) => {
         </Animated.View>
         <Animated.View
           entering={FadeInUp.delay(400).duration(1000).springify()}
-          style={{marginTop: 130, alignItems: 'center'}}>
+          style={{marginTop: 55, alignItems: 'center'}}>
           <TextInput
             placeholder="Name"
             placeholderTextColor={'#706d6d'}
@@ -299,7 +299,7 @@ const RegisterScreen = ({navigation}: any) => {
         <Animated.View
           entering={FadeInDown.delay(400).duration(1000).springify()}
           style={{
-            marginTop: 120,
+            marginTop: 155,
             alignItems: 'center',
             width: '100%',
           }}>
