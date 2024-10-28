@@ -2,6 +2,7 @@
 import {
   FlatList,
   Image,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,9 +19,72 @@ import ImageSwiper from '../components/ui/ImageSwiper';
 import screenWidth from '../global/Constant';
 import CommentItem from '../components/ui/CommentItem';
 
-const PostDetail2 = ({navigation}: any) => {
+const images = [
+  {
+    uri: 'https://i.pinimg.com/736x/2b/8d/b3/2b8db3475614637b47fde73b0723fa34.jpg',
+    title: 'Hello Swiper',
+    caption: 'Hello Swiper',
+  },
+  {
+    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaEj3BtwAHp34BuEm6r7OKJJQc6OuQuDAGXg&s',
+    title: 'Beautiful',
+    caption: 'Beautiful',
+  },
+  {
+    uri: 'https://5.imimg.com/data5/WM/OX/MY-33847593/doremon-cartoon-wallpaper-500x500.jpg',
+    title: 'And simple',
+    caption: 'And simple',
+  },
+];
+
+const CommentData = [
+  {
+    id: 1,
+    user: {
+      id: 1,
+      name: 'Nguyễn Văn A',
+      avatar: require('../assets/images/user.png'),
+    },
+    content: 'Bình luận 1',
+    time: '1 giờ trước',
+  },
+  {
+    id: 2,
+    user: {
+      id: 2,
+      name: 'Nguyễn Văn B',
+      avatar: require('../assets/images/user.png'),
+    },
+    content: 'Bình luận 2',
+    time: '2 giờ trước',
+  },
+  {
+    id: 3,
+    user: {
+      id: 3,
+      name: 'Nguyễn Văn C',
+      avatar: require('../assets/images/user.png'),
+    },
+    content: 'Bình luận 3',
+    time: '3 giờ trước',
+  },
+];
+
+const PostDetail2 = ({route, navigation}: any) => {
   const [liked, setLiked] = React.useState(false);
   const commentInputRef = useRef<TextInput>(null);
+  const item = route.params.item;
+  const locationStart = {
+    latitude: route.params.location.latitude,
+    longitude: route.params.location.longitude,
+  };
+  const locationEnd = {
+    latitude: route.params.item.latitude,
+    longitude: route.params.item.longitude,
+  };
+  const createdDate = route.params.createdDate;
+  const distance = route.params.distance;
+  const expiredString = route.params.expiredString;
 
   const handleLiked = () => {
     setLiked(!liked);
@@ -35,57 +99,12 @@ const PostDetail2 = ({navigation}: any) => {
     console.log(`Tag ${tag} clicked`);
   };
 
-  const handleCreateComment = () => {};
-  const images = [
-    {
-      uri: 'https://i.pinimg.com/736x/2b/8d/b3/2b8db3475614637b47fde73b0723fa34.jpg',
-      title: 'Hello Swiper',
-      caption: 'Hello Swiper',
-    },
-    {
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaEj3BtwAHp34BuEm6r7OKJJQc6OuQuDAGXg&s',
-      title: 'Beautiful',
-      caption: 'Beautiful',
-    },
-    {
-      uri: 'https://5.imimg.com/data5/WM/OX/MY-33847593/doremon-cartoon-wallpaper-500x500.jpg',
-      title: 'And simple',
-      caption: 'And simple',
-    },
-  ];
+  const handleDirection = () => {
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${locationStart.latitude},${locationStart.longitude}&destination=${locationEnd.latitude},${locationEnd.longitude}`;
+    Linking.openURL(url);
+  };
 
-  const CommentData = [
-    {
-      id: 1,
-      user: {
-        id: 1,
-        name: 'Nguyễn Văn A',
-        avatar: require('../assets/images/user.png'),
-      },
-      content: 'Bình luận 1',
-      time: '1 giờ trước',
-    },
-    {
-      id: 2,
-      user: {
-        id: 2,
-        name: 'Nguyễn Văn B',
-        avatar: require('../assets/images/user.png'),
-      },
-      content: 'Bình luận 2',
-      time: '2 giờ trước',
-    },
-    {
-      id: 3,
-      user: {
-        id: 3,
-        name: 'Nguyễn Văn C',
-        avatar: require('../assets/images/user.png'),
-      },
-      content: 'Bình luận 3',
-      time: '3 giờ trước',
-    },
-  ];
+  const handleCreateComment = () => {};
 
   const tags = [
     'Sản phẩm động vật',
@@ -148,27 +167,31 @@ const PostDetail2 = ({navigation}: any) => {
                   color: Colors.grayText,
                   marginLeft: 4,
                 }}>
-                2 hours ago
+                {createdDate}
               </Text>
             </View>
           </View>
-          <TouchableOpacity
+          <View
             style={{
               justifyContent: 'center',
               alignItems: 'center',
               borderRadius: 20,
-              width: 40,
+
               height: 40,
               alignSelf: 'center',
               position: 'absolute',
               right: 0,
+              flexDirection: 'row',
             }}>
-            <Icon
-              source={'dots-horizontal'}
-              size={30}
-              color={Colors.grayPrimary}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={handleDirection}>
+              <Icon source={'chat-processing'} size={30} color={Colors.black} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleDirection}
+              style={{marginLeft: 10}}>
+              <Icon source={'directions'} size={30} color={Colors.black} />
+            </TouchableOpacity>
+          </View>
         </View>
         <View>
           <View
@@ -189,7 +212,7 @@ const PostDetail2 = ({navigation}: any) => {
                   color: Colors.text,
                   marginLeft: 16,
                 }}>
-                Banana
+                {item.title}
               </Text>
             </View>
           </View>
@@ -211,7 +234,8 @@ const PostDetail2 = ({navigation}: any) => {
                   color: Colors.text,
                   marginLeft: 16,
                 }}>
-                2 kms away
+                Cách bạn{' '}
+                {distance < 0.1 ? `${distance * 1000}m` : `${distance}km`}
               </Text>
             </View>
           </View>
@@ -233,7 +257,9 @@ const PostDetail2 = ({navigation}: any) => {
                   color: Colors.text,
                   marginLeft: 16,
                 }}>
-                Expired in 2 days
+                {expiredString === 'Hết hạn'
+                  ? 'Hết hạn'
+                  : `Hết hạn sau ${expiredString}`}
               </Text>
             </View>
           </View>
@@ -277,7 +303,7 @@ const PostDetail2 = ({navigation}: any) => {
                   color: Colors.text,
                   marginLeft: 16,
                 }}>
-                5 kg
+                {item.weight} kg
               </Text>
             </View>
           </View>
@@ -299,7 +325,9 @@ const PostDetail2 = ({navigation}: any) => {
                   color: Colors.text,
                   marginLeft: 16,
                 }}>
-                Pick up at 5:00 PM
+                Lấy từ ngày{' '}
+                {new Date(item.pickUpStartDate).toLocaleDateString()} đến ngày{' '}
+                {new Date(item.pickUpEndDate).toLocaleDateString()}
               </Text>
             </View>
           </View>

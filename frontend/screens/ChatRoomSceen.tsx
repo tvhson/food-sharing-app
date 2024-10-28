@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, Image} from 'react-native';
 import {GiftedChat, Send} from 'react-native-gifted-chat';
 import {
   connectMessage,
@@ -18,6 +18,13 @@ import {RootState} from '../redux/Store';
 import {createNotification} from '../api/NotificationApi';
 import {useFocusEffect} from '@react-navigation/native';
 import {readAllMessageOfRoomChatId} from '../redux/ChatRoomReducer';
+import {ZegoSendCallInvitationButton} from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import {getFontFamily} from '../utils/fonts';
+import dayjs from 'dayjs';
+import dayvi from 'dayjs/locale/vi';
+import analytics from '@react-native-firebase/analytics';
+
+dayjs.locale('vi');
 
 const ChatRoomScreen = ({navigation, route}: any) => {
   const dispatch = useDispatch();
@@ -25,6 +32,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   const item = route.params.item;
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const [roomId, setRoomId] = useState(item.id ? item.id : null);
+  const [infoOther, setInfoOther] = useState<any>(null);
 
   const recipientProfilePic =
     item.recipientProfilePic === null
@@ -160,6 +168,11 @@ const ChatRoomScreen = ({navigation, route}: any) => {
                   room.senderId === item.senderId &&
                   room.recipientId === item.recipientId,
               );
+              analytics().logEvent('chat', {
+                roomChatId: roomChat.id,
+                senderId: item.senderId,
+                recipientId: item.recipientId,
+              });
               if (roomChat) {
                 setRoomId(roomChat.id);
                 createNotification(
@@ -222,50 +235,93 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   );
 
   return (
-    <View style={{flex: 1, backgroundColor: Colors.background}}>
+    <View style={{flex: 1, backgroundColor: Colors.white}}>
       <View
         style={{
           height: 60,
           width: '100%',
-          backgroundColor: Colors.button,
-          borderBottomWidth: 1,
-          borderBlockColor: '#ccc',
+          backgroundColor: Colors.white,
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
           flexDirection: 'row',
+          elevation: 5,
         }}>
-        <View style={{position: 'absolute', top: -1, left: 10}}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <IconButton
             icon="chevron-left"
-            size={40}
-            iconColor="white"
+            size={30}
+            iconColor="black"
             onPress={() => {
               disconnectMessage();
               navigation.goBack();
             }}
           />
+          <Avatar.Image
+            size={40}
+            source={{
+              uri:
+                userInfo.id === item.senderId
+                  ? recipientProfilePic
+                  : senderProfilePic,
+            }}
+            style={{marginRight: 10}}
+          />
+          <Text
+            style={{
+              fontSize: 20,
+              fontFamily: getFontFamily('semibold'),
+              color: 'black',
+            }}>
+            {userInfo.id === item.senderId
+              ? item.recipientName
+              : item.senderName}
+          </Text>
         </View>
-        <Avatar.Image
-          size={40}
-          source={{
-            uri:
-              userInfo.id === item.senderId
-                ? recipientProfilePic
-                : senderProfilePic,
-          }}
-          style={{marginRight: 10}}
-        />
-        <Text
+        <View
           style={{
-            fontSize: 24,
-            fontWeight: 'bold',
-            color: 'white',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingRight: 10,
           }}>
-          {userInfo.id === item.senderId ? item.recipientName : item.senderName}
-        </Text>
+          <View style={{marginRight: 10}}>
+            <ZegoSendCallInvitationButton
+              invitees={[
+                {
+                  userID:
+                    userInfo.id === item.senderId
+                      ? item.recipientId.toString()
+                      : item.senderId.toString(),
+                  userName:
+                    userInfo.id === item.senderId
+                      ? item.recipientName.toString()
+                      : item.senderName.toString(),
+                },
+              ]}
+              resourceID={'happyfood_call'}
+            />
+          </View>
+
+          <ZegoSendCallInvitationButton
+            invitees={[
+              {
+                userID:
+                  userInfo.id === item.senderId
+                    ? item.recipientId.toString()
+                    : item.senderId.toString(),
+                userName:
+                  userInfo.id === item.senderId
+                    ? item.recipientName.toString()
+                    : item.senderName.toString(),
+              },
+            ]}
+            isVideoCall={true}
+            resourceID={'happyfood_call'}
+          />
+        </View>
       </View>
       <GiftedChat
         messages={messages}
+        locale={dayvi}
         onSend={(newMessage: any) => onSend(newMessage)}
         user={{
           _id: userInfo.id,
@@ -278,13 +334,17 @@ const ChatRoomScreen = ({navigation, route}: any) => {
           return (
             <Send {...props}>
               <View style={{marginRight: 10, marginBottom: 10}}>
-                <Icon source="send" size={24} color={Colors.button} />
+                <Image
+                  source={require('../assets/images/send-message.png')}
+                  style={{width: 30, height: 30}}
+                />
               </View>
             </Send>
           );
         }}
         alwaysShowSend
         keyboardShouldPersistTaps={'handled'}
+        placeholder="Nhập tin nhắn..."
       />
     </View>
   );

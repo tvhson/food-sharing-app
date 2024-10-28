@@ -35,6 +35,7 @@ import {MessageListPage} from '@zegocloud/zimkit-rn';
 import OrganizationPostDetail2 from '../screens/OrganizationPostDetail2';
 import WebViewScreen from '../screens/WebViewScreen';
 import PostDetail2 from '../screens/PostDetail2';
+import {getFontFamily} from '../utils/fonts';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,12 +66,14 @@ const Router = () => {
             component={CreatePostScreen}
             options={{
               headerShown: true,
-              headerTitle: 'Create Post',
+              headerTitle: 'Tạo bài viết',
               headerStyle: {
                 backgroundColor: Colors.button,
               },
               headerTitleStyle: {
                 color: 'white',
+
+                fontFamily: getFontFamily('semibold'),
               },
               headerTintColor: 'white',
             }}
@@ -80,12 +83,13 @@ const Router = () => {
             component={EditPostScreen}
             options={{
               headerShown: true,
-              headerTitle: 'Edit Post',
+              headerTitle: 'Chỉnh sửa bài viết',
               headerStyle: {
                 backgroundColor: Colors.button,
               },
               headerTitleStyle: {
                 color: 'white',
+                fontFamily: getFontFamily('semibold'),
               },
               headerTintColor: 'white',
             }}
@@ -101,6 +105,7 @@ const Router = () => {
               },
               headerTitleStyle: {
                 color: 'white',
+                fontFamily: getFontFamily('semibold'),
               },
               headerTintColor: 'white',
             }}
@@ -116,6 +121,7 @@ const Router = () => {
               },
               headerTitleStyle: {
                 color: 'white',
+                fontFamily: getFontFamily('semibold'),
               },
               headerTintColor: 'white',
             }}
@@ -140,6 +146,10 @@ const Router = () => {
               headerTitle: 'Xem trên trình duyệt',
               headerStyle: {
                 backgroundColor: Colors.white,
+              },
+              headerTitleStyle: {
+                color: 'black',
+                fontFamily: getFontFamily('semibold'),
               },
               headerTintColor: 'black',
             }}

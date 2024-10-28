@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import Colors from '../global/Color';
 import {Button, Icon, Image, SearchBar} from '@rneui/themed';
-import PostRenderItem from '../components/ui/PostRenderItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createNotifications} from 'react-native-notificated';
 import {getPosts} from '../api/PostApi';
@@ -22,7 +21,8 @@ import {ActivityIndicator, Menu} from 'react-native-paper';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
 import HeaderHome from '../components/ui/HeaderHome';
-import {PermissionsAndroid} from 'react-native';
+import PostRenderItem2 from '../components/ui/PostRenderItem2';
+import Comment from '../components/ui/Comment';
 
 const {useNotifications} = createNotifications();
 
@@ -43,6 +43,9 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
   const [filterPosts, setFilterPosts] = useState<any>(null);
   const [sortingMethod, setSortingMethod] = useState('');
   const [visible, setVisible] = useState(false);
+  const [showComment, setShowComment] = useState(false);
+  const [commentPostId, setCommentPostId] = useState('');
+
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
@@ -52,41 +55,35 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
     setSearch(search);
   };
 
-  const renderLoader = () => {
-    return (
-      <View style={styles.loaderStyle}>
-        <ActivityIndicator size="large" color="#aaa" />
-      </View>
-    );
-  };
+  const renderLoader = () => (
+    <View style={styles.loaderStyle}>
+      <ActivityIndicator size="large" color="#aaa" />
+    </View>
+  );
 
   const loadMoreItem = () => {
     setCurrentPage(currentPage + 1);
   };
 
-  const onRefresh = () => {
-    const getRecommendPost = async () => {
-      if (accessToken) {
-        getPosts(accessToken.toString()).then((response: any) => {
-          if (response.status === 200) {
-            AsyncStorage.setItem(
-              'recommendPost',
-              JSON.stringify(response.data),
-            );
-            setRecommendPost(response.data);
-            for (const post of response.data) {
-              dispatch(pushSharingPost(post));
-            }
-          } else {
-            console.log(response);
-          }
-        });
-      }
-    };
+  const onRefresh = async () => {
     setRefreshing(true);
     setIsLoading(true);
     dispatch(clearSharingPosts());
-    getRecommendPost();
+
+    const getRecommendPost = async () => {
+      if (accessToken) {
+        const response: any = await getPosts(accessToken.toString());
+        if (response.status === 200) {
+          AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
+          setRecommendPost(response.data);
+          response.data.forEach((post: any) => dispatch(pushSharingPost(post)));
+        } else {
+          console.log(response);
+        }
+      }
+    };
+
+    await getRecommendPost();
     setCurrentPage(0);
     setIsLoading(false);
     setRefreshing(false);
@@ -97,17 +94,13 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
       if (recommendedPost) {
         setRecommendPost(recommendedPost);
       } else if (accessToken) {
-        getPosts(accessToken.toString()).then((response: any) => {
-          if (response.status === 200) {
-            AsyncStorage.setItem(
-              'recommendPost',
-              JSON.stringify(response.data),
-            );
-            setRecommendPost(response.data);
-          } else {
-            console.log(response);
-          }
-        });
+        const response: any = await getPosts(accessToken.toString());
+        if (response.status === 200) {
+          AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
+          setRecommendPost(response.data);
+        } else {
+          console.log(response);
+        }
       }
     };
     const fetchData = async () => {
@@ -148,8 +141,9 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
 
       setFilterPosts(filtered);
     };
-
-    applyFilter();
+    if (recommendPost) {
+      applyFilter();
+    }
   }, [location, recommendPost, search, sortingMethod]);
 
   const calculateDistance = (item: any) => {
@@ -164,29 +158,6 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
     return 0;
   };
 
-  const checkPermissions = async () => {
-    try {
-      const cameraGranted = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-      );
-      const audioGranted = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      );
-
-      if (!cameraGranted || !audioGranted) {
-        const permissions = [
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-        ];
-        await PermissionsAndroid.requestMultiple(permissions);
-      }
-    } catch (err: any) {
-      console.log(err.toString());
-    }
-  };
-
-  checkPermissions();
-
   return (
     <View
       style={{
@@ -195,11 +166,6 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
         flexDirection: 'column',
       }}>
       <HeaderHome navigation={navigation} />
-      {/* <Header
-        imageUrl={userInfo.imageUrl}
-        navigation={navigation}
-        setSortingMethod={setSortingMethod}
-      /> */}
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View style={{flex: 1}}>
           <SearchBar
@@ -248,74 +214,69 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
         </Menu>
       </View>
 
-      {isLoading ? (
-        renderLoader()
-      ) : (
-        <FlatList
-          style={{marginHorizontal: 8}}
-          data={filterPosts}
-          keyExtractor={item => item.id}
-          onEndReached={() => {
-            if (!isLoading) {
-              loadMoreItem();
-            }
-          }}
-          onEndReachedThreshold={0}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListFooterComponent={() => renderLoader()}
-          renderItem={({item}: any) => (
-            <PostRenderItem
-              item={item}
-              navigation={navigation}
-              location={location}
-              distance={calculateDistance(item)}
-            />
-          )}
-          ListEmptyComponent={
-            !isLoading ? (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                  height: 500,
-                }}>
-                <Image
-                  source={require('../assets/images/BgNoPost..png')}
-                  style={{width: 300, height: 400}}
-                />
-                <Button
-                  title="Tạo bài viết"
-                  containerStyle={{borderRadius: 8}}
-                  buttonStyle={{backgroundColor: Colors.button}}
-                  onPress={() =>
-                    navigation.navigate('CreatePost', {location, accessToken})
-                  }
-                />
-              </View>
-            ) : null
-          }
-        />
-      )}
+      <FlatList
+        style={{marginHorizontal: 8}}
+        data={filterPosts ?? recommendPost} // Fallback if `filterPosts` is empty
+        keyExtractor={item => item.id}
+        onEndReached={loadMoreItem}
+        onEndReachedThreshold={0.1}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListFooterComponent={renderLoader}
+        renderItem={({item}: any) => (
+          <PostRenderItem2
+            item={item}
+            navigation={navigation}
+            location={location}
+            distance={calculateDistance(item)}
+            setShowComment={setShowComment}
+          />
+        )}
+        ListEmptyComponent={
+          isLoading ? (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: 500,
+              }}>
+              <Image
+                source={require('../assets/images/BgNoPost.png')}
+                style={{width: 300, height: 400}}
+              />
+              <Button
+                title="Tạo bài viết"
+                containerStyle={{borderRadius: 8}}
+                buttonStyle={{backgroundColor: Colors.button}}
+                onPress={() =>
+                  navigation.navigate('CreatePost', {location, accessToken})
+                }
+              />
+            </View>
+          ) : null
+        }
+      />
 
+      <Comment
+        isVisible={showComment}
+        setVisible={setShowComment}
+        commentPostId={commentPostId}
+      />
       <TouchableOpacity
         onPress={() =>
           navigation.navigate('CreatePost', {location, accessToken})
         }
         style={{
           position: 'absolute',
-          bottom: 30,
-          right: 20,
-          width: 50,
-          height: 50,
-          borderRadius: 25,
+          bottom: 16,
+          right: 16,
           backgroundColor: Colors.button,
-          justifyContent: 'center',
-          alignItems: 'center',
+          borderRadius: 100,
+          padding: 16,
         }}>
-        <Text style={{fontSize: 30, color: 'white'}}>+</Text>
+        <Icon name="add" color="white" size={24} />
       </TouchableOpacity>
     </View>
   );
@@ -327,5 +288,6 @@ const styles = StyleSheet.create({
   loaderStyle: {
     marginVertical: 16,
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });

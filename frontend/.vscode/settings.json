@@ -9,5 +9,6 @@
     "sockjs",
     "stompjs"
   ],
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "cSpell.language": "en,vi"
 }

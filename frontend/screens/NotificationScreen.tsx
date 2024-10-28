@@ -135,7 +135,7 @@ const NotificationScreen = ({navigation}: any) => {
       </Text>
       <FlatList
         style={{marginHorizontal: 8}}
-        data={dummyData}
+        data={notifications}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
           <NotificationItem item={item} navigation={navigation} />
@@ -151,18 +151,20 @@ const NotificationScreen = ({navigation}: any) => {
         }
         ListFooterComponent={() => renderLoader()}
         ListEmptyComponent={
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: 500,
-            }}>
-            <Image
-              source={require('../assets/images/BgNoNotification.png')}
-              style={{width: 300, height: 400}}
-            />
-          </View>
+          !isLoading ? (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: 500,
+              }}>
+              <Image
+                source={require('../assets/images/BgNoNotification.png')}
+                style={{width: 300, height: 400}}
+              />
+            </View>
+          ) : null
         }
       />
     </View>

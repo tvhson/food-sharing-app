@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "npx react-native run-android",
+    "build:android": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
@@ -28,6 +29,7 @@
     "@zegocloud/zimkit-rn": "^2.1.5",
     "axios": "^1.6.8",
     "base-64": "^1.0.0",
+    "dayjs": "^1.11.13",
     "geolib": "^3.3.4",
     "lottie-react-native": "^6.7.2",
     "react": "18.2.0",

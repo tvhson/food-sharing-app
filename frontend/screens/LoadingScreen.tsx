@@ -4,7 +4,7 @@
 import LottieView from 'lottie-react-native';
 import React, {useEffect, useState} from 'react';
 
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, PermissionsAndroid} from 'react-native';
 import Colors from '../global/Color';
 import {useDispatch} from 'react-redux';
 import {getAllAccounts, getInfoUser} from '../api/AccountsApi';
@@ -55,6 +55,7 @@ import {ZIMKit} from '@zegocloud/zimkit-rn';
 import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
+import analytics from '@react-native-firebase/analytics';
 
 enableScreens();
 
@@ -129,6 +130,26 @@ const LoadingScreen = ({navigation, route}: any) => {
   useEffect(() => {
     dispatch(setToken(token));
     ZIMKit.init(ZEGO_APP_ID, ZEGO_APP_SIGN);
+    const checkPermissions = async () => {
+      try {
+        const cameraGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+        );
+        const audioGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        );
+
+        if (!cameraGranted || !audioGranted) {
+          const permissions = [
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+          ];
+          await PermissionsAndroid.requestMultiple(permissions);
+        }
+      } catch (err: any) {
+        console.log(err.toString());
+      }
+    };
 
     const getLocation = async () => {
       GetLocation.getCurrentPosition({
@@ -316,6 +337,16 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
+    const sendData = async () => {
+      try {
+        await analytics().logEvent('loadData', {
+          id: myId,
+          status: 'success',
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
     const loadData = async () => {
       try {
@@ -327,6 +358,7 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveOrganizationPost(),
           saveMyOrganizationPost(),
           saveNotification(),
+          sendData(),
         ]);
         setTimeout(
           () =>
@@ -340,6 +372,7 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
+    checkPermissions();
     loadData();
   }, [dispatch, myId, navigation, token]);
 

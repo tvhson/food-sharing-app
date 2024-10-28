@@ -16,6 +16,7 @@ import {RootState} from '../redux/Store';
 import {getRoomChats} from '../api/ChatApi';
 import {clearChatRooms, setChatRooms} from '../redux/ChatRoomReducer';
 import {useFocusEffect} from '@react-navigation/native';
+import {getFontFamily} from '../utils/fonts';
 
 const ChatScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
@@ -113,7 +114,8 @@ const ChatScreen = ({navigation}: any) => {
   return (
     <View style={{flex: 1, backgroundColor: Colors.background}}>
       <SearchBar
-        placeholder="Search user by name"
+        inputStyle={{fontFamily: getFontFamily('regular')}}
+        placeholder="Tìm kiếm"
         containerStyle={{
           backgroundColor: 'transparent',
           borderColor: 'transparent',
@@ -127,7 +129,7 @@ const ChatScreen = ({navigation}: any) => {
       />
       <FlatList
         style={{marginHorizontal: 8}}
-        data={chatRoom}
+        data={chatRoom ?? chatRooms}
         keyExtractor={item => item.id.toString()}
         renderItem={({item}) => (
           <ChatRoomItem item={item} navigation={navigation} />
@@ -142,20 +144,6 @@ const ChatScreen = ({navigation}: any) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListFooterComponent={() => renderLoader()}
-        ListEmptyComponent={
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: 500,
-            }}>
-            <Image
-              source={require('../assets/images/BgNoMessage.png')}
-              style={{width: 300, height: 400}}
-            />
-          </View>
-        }
       />
     </View>
   );

@@ -21,6 +21,9 @@ import {createNotifications} from 'react-native-notificated';
 import {createPost, updatePost} from '../api/PostApi';
 import {useDispatch} from 'react-redux';
 import {pushMyPost, updateMyPost} from '../redux/SharingPostReducer';
+import {getFontFamily} from '../utils/fonts';
+import ImageSwiper from '../components/ui/ImageSwiper';
+import screenWidth from '../global/Constant';
 
 const {useNotifications} = createNotifications();
 
@@ -48,59 +51,60 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const [pickUpEndDate, setPickUpEndDate] = useState(new Date());
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
-  const [imagePath, setImagePath] = useState('');
 
-  const mapRef = useRef<MapView | null>(null);
   const autocompleteRef = useRef<any | null>(null);
 
-  // const getLocationName = async (
-  //   latitudeCurrent: number,
-  //   longitudeCurrent: number,
-  // ) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
-  //     );
-  //     if (response.data.results.length > 0) {
-  //       setLocationName(response.data.results[0].formatted_address);
-  //       setLatitude(latitudeCurrent);
-  //       setLongitude(longitudeCurrent);
-  //       autocompleteRef.current?.setAddressText(
-  //         response.data.results[0].formatted_address,
-  //       );
-  //       return response.data.results[0].formatted_address;
-  //     }
-  //     return 'No location found';
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (location === null) {
-  //     GetLocation.getCurrentPosition({
-  //       enableHighAccuracy: true,
-  //       timeout: 30000,
-  //       rationale: {
-  //         title: 'Location permission',
-  //         message: 'The app needs the permission to request your location.',
-  //         buttonPositive: 'Ok',
-  //       },
-  //     })
-  //       .then(newLocation => {
-  //         setLocationCurrent(newLocation);
-  //       })
-  //       .catch(() => {
-  //         setLocationCurrent(null);
-  //       });
-  //   }
-  // }, [location]);
-
-  const postImage = async (image: any) => {
-    setImageUpload(image);
-    if (image.path) {
-      setImagePath(image.path);
+  const getLocationName = async (
+    latitudeCurrent: number,
+    longitudeCurrent: number,
+  ) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
+      );
+      if (response.data.results.length > 0) {
+        setLocationName(response.data.results[0].formatted_address);
+        setLatitude(latitudeCurrent);
+        setLongitude(longitudeCurrent);
+        autocompleteRef.current?.setAddressText(
+          response.data.results[0].formatted_address,
+        );
+        return response.data.results[0].formatted_address;
+      }
+      return 'No location found';
+    } catch (error) {
+      console.error(error);
     }
+  };
+
+  useEffect(() => {
+    if (location === null) {
+      GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 30000,
+        rationale: {
+          title: 'Location permission',
+          message: 'The app needs the permission to request your location.',
+          buttonPositive: 'Ok',
+        },
+      })
+        .then(newLocation => {
+          setLocationCurrent(newLocation);
+        })
+        .catch(() => {
+          setLocationCurrent(null);
+        });
+    }
+  }, [location]);
+
+  const postImage = async (newImages: any) => {
+    setImageUpload((prevImages: any) => {
+      if (prevImages && prevImages.length > 0) {
+        return [...prevImages, ...newImages];
+      } else {
+        return newImages;
+      }
+    });
   };
   const handleCreatePost = () => {
     let currentDate = new Date();
@@ -157,13 +161,24 @@ const CreatePostScreen = ({route, navigation}: any) => {
     }
 
     const dataForm = new FormData();
-    if (imageUpload) {
-      dataForm.append('file', {
-        uri: imageUpload.path,
-        name: imageUpload.filename || 'image.jpeg',
-        type: imageUpload.mime || 'image/jpeg',
-      });
+    if (imageUpload && imageUpload.length > 0) {
+      if (Array.isArray(imageUpload)) {
+        imageUpload.forEach(image => {
+          dataForm.append('file', {
+            uri: image.path,
+            name: image.filename || 'image.jpeg',
+            type: image.mime || 'image/jpeg',
+          });
+        });
+      } else {
+        dataForm.append('file', {
+          uri: imageUpload.path,
+          name: imageUpload.filename || 'image.jpeg',
+          type: imageUpload.mime || 'image/jpeg',
+        });
+      }
       uploadPhoto(dataForm, accessToken).then((response: any) => {
+        console.log(response);
         if (response.status === 200) {
           createPost(
             {
@@ -230,9 +245,10 @@ const CreatePostScreen = ({route, navigation}: any) => {
           width={350}
           isCircle={false}
           postImage={postImage}
+          isMultiple={true}
         />
         <TextInput
-          placeholder="Name"
+          placeholder="Tên món ăn"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -244,12 +260,13 @@ const CreatePostScreen = ({route, navigation}: any) => {
             borderWidth: 2,
             marginTop: 20,
             borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={title}
           onChangeText={setTitle}
         />
         <TextInput
-          placeholder="Description"
+          placeholder="Mô tả món ăn"
           placeholderTextColor={'#706d6d'}
           multiline
           numberOfLines={4}
@@ -264,12 +281,13 @@ const CreatePostScreen = ({route, navigation}: any) => {
             borderWidth: 2,
             marginTop: 20,
             borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={description}
           onChangeText={setDescription}
         />
         <TextInput
-          placeholder="Weight"
+          placeholder="Trọng lượng"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -281,13 +299,14 @@ const CreatePostScreen = ({route, navigation}: any) => {
             borderWidth: 2,
             marginTop: 20,
             borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={weight}
           onChangeText={setWeight}
           keyboardType="numeric"
         />
         <TextInput
-          placeholder="Note"
+          placeholder="Ghi chú"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -299,6 +318,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
             borderWidth: 2,
             marginTop: 20,
             borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={note}
           onChangeText={setNote}
@@ -310,23 +330,28 @@ const CreatePostScreen = ({route, navigation}: any) => {
               alignItems: 'center',
             }}>
             <DatePickerInput
-              locale="en"
-              label="Expired Date"
+              locale="vi"
+              label="Ngày hết hạn"
               value={expiredDate}
               onChange={(date: Date | undefined) =>
                 setExpiredDate(date || new Date())
               }
               inputMode="start"
+              saveLabel="Lưu"
               style={{
                 backgroundColor: '#eff2ff',
                 color: 'black',
                 maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
               }}
               mode="outlined"
               outlineStyle={{
                 borderColor: Colors.greenPrimary,
                 borderRadius: 8,
                 borderWidth: 2,
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
               }}
             />
           </View>
@@ -338,17 +363,22 @@ const CreatePostScreen = ({route, navigation}: any) => {
               alignItems: 'center',
             }}>
             <DatePickerInput
-              locale="en"
-              label="Pickup Date Start"
+              locale="vi"
+              label="Ngày bắt đầu nhận"
               value={pickUpStartDate}
               onChange={(date: Date | undefined) =>
                 setPickUpStartDate(date || new Date())
               }
+              saveLabel="Lưu"
               inputMode="start"
               style={{
                 backgroundColor: '#eff2ff',
                 color: 'black',
                 maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
               }}
               mode="outlined"
               outlineStyle={{
@@ -366,8 +396,9 @@ const CreatePostScreen = ({route, navigation}: any) => {
               alignItems: 'center',
             }}>
             <DatePickerInput
-              locale="en"
-              label="Pickup Date End"
+              locale="vi"
+              label="Ngày kết thúc nhận"
+              saveLabel="Lưu"
               value={pickUpEndDate}
               onChange={(date: Date | undefined) =>
                 setPickUpEndDate(date || new Date())
@@ -377,6 +408,10 @@ const CreatePostScreen = ({route, navigation}: any) => {
                 backgroundColor: '#eff2ff',
                 color: 'black',
                 maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
               }}
               mode="outlined"
               outlineStyle={{
@@ -391,22 +426,12 @@ const CreatePostScreen = ({route, navigation}: any) => {
         <GooglePlacesAutocomplete
           ref={autocompleteRef}
           fetchDetails={true}
-          placeholder="Enter your place"
-          // onPress={(data, details = null) => {
-          //   setLocationName(data.description);
-          //   setLatitude(details?.geometry.location.lat || 0);
-          //   setLongitude(details?.geometry.location.lng || 0);
-          //   if (details && mapRef.current) {
-          //     const lat = details.geometry.location.lat;
-          //     const lng = details.geometry.location.lng;
-          //     mapRef.current.animateToRegion({
-          //       latitude: lat,
-          //       longitude: lng,
-          //       latitudeDelta: 0.01,
-          //       longitudeDelta: 0.01,
-          //     });
-          //   }
-          // }}
+          placeholder="Địa chỉ nhận"
+          onPress={(data, details = null) => {
+            setLocationName(data.description);
+            setLatitude(details?.geometry.location.lat || 0);
+            setLongitude(details?.geometry.location.lng || 0);
+          }}
           disableScroll={true}
           query={{
             key: MAP_API_KEY,
@@ -425,11 +450,12 @@ const CreatePostScreen = ({route, navigation}: any) => {
               fontSize: 16,
               color: 'black',
               backgroundColor: '#eff2ff',
+              fontFamily: getFontFamily('regular'),
             },
           }}
         />
-        {/* <Button
-          title="Get my current location"
+        <Button
+          title="Sử dụng vị trí hiện tại"
           onPress={() => getLocationName(location.latitude, location.longitude)}
           buttonStyle={{
             backgroundColor: Colors.greenPrimary,
@@ -438,38 +464,8 @@ const CreatePostScreen = ({route, navigation}: any) => {
             marginTop: 20,
             borderRadius: 10,
           }}
-        /> */}
-        <View
-          style={{
-            width: '90%',
-            height: 350,
-            alignSelf: 'center',
-            borderColor: Colors.greenPrimary,
-            borderRadius: 20,
-            borderWidth: 2,
-            overflow: 'hidden',
-            marginTop: 20,
-          }}>
-          {/* <MapView
-            ref={mapRef}
-            initialRegion={{
-              latitude: latitude === '' ? locationCurrent.latitude : latitude,
-              longitude:
-                longitude === '' ? locationCurrent.longitude : longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-            onPress={() => {}}
-            style={{flex: 1, borderRadius: 20}}>
-            <Marker
-              coordinate={{
-                latitude: latitude === '' ? locationCurrent.latitude : latitude,
-                longitude:
-                  longitude === '' ? locationCurrent.longitude : longitude,
-              }}
-            />
-          </MapView> */}
-        </View>
+          titleStyle={{fontFamily: getFontFamily('bold')}}
+        />
         <View
           style={{
             width: '90%',
@@ -484,55 +480,46 @@ const CreatePostScreen = ({route, navigation}: any) => {
             alignItems: 'center',
             backgroundColor: '#eff2ff',
           }}>
-          {imageUpload && imagePath ? (
+          {imageUpload && imageUpload.length > 0 ? (
             <>
-              <View style={{position: 'relative', width: 350, height: 300}}>
-                <Image
-                  source={{uri: imagePath}}
-                  style={{width: '100%', height: '100%'}}
-                />
-                <TouchableOpacity
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 10,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    alignContent: 'center',
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    backgroundColor: 'black',
-                    zIndex: 1,
-                  }}
-                  onPress={() => {
-                    setImagePath('');
-                  }}>
-                  <Icon name="close" type="ionicon" size={20} color="white" />
-                </TouchableOpacity>
-              </View>
+              <ImageSwiper
+                style={{width: screenWidth * 0.9, height: 300}}
+                images={imageUpload}
+                isCreatePost={true}
+                setImageUpload={setImageUpload}
+                setIsUploadVisible={setIsUploadVisible}
+                isUploadVisible={isUploadVisible}
+              />
             </>
           ) : (
             <>
-              <Icon
-                name="camera"
-                type="ionicon"
-                size={60}
-                color={Colors.greenPrimary}
+              <TouchableOpacity
                 style={{marginTop: 20}}
                 onPress={() => {
                   setIsUploadVisible(!isUploadVisible);
-                }}
-              />
-              <Text style={{color: Colors.greenPrimary, fontSize: 18}}>
-                Add image
+                }}>
+                <Icon
+                  name="camera"
+                  type="ionicon"
+                  size={60}
+                  color={Colors.greenPrimary}
+                />
+              </TouchableOpacity>
+
+              <Text
+                style={{
+                  color: Colors.greenPrimary,
+                  fontSize: 18,
+                  fontFamily: getFontFamily('regular'),
+                }}>
+                Thêm ảnh
               </Text>
             </>
           )}
         </View>
 
         <Button
-          title="Create Post"
+          title="Tạo bài viết"
           onPress={handleCreatePost}
           buttonStyle={{
             backgroundColor: Colors.greenPrimary,

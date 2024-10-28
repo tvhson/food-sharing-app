@@ -12,16 +12,26 @@ import Colors from '../global/Color';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
 import PostRenderItem2 from '../components/ui/PostRenderItem2';
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
+import {UserInfo} from '../redux/UserReducer';
 
 const PersonalPage = ({navigation}: any) => {
-  const renderHeader = () => {
+  const userInfo = useSelector((state: RootState) => state.userInfo);
+  console.log(userInfo);
+
+  const renderHeader = (userInfo: UserInfo) => {
     return (
       <View>
         <View style={[styles.row, {paddingTop: 20, paddingHorizontal: 16}]}>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <View style={styles.avaContainer}>
               <Image
-                source={require('../assets/images/user.png')}
+                source={
+                  userInfo.imageUrl
+                    ? {uri: userInfo.imageUrl}
+                    : require('../assets/images/user.png')
+                }
                 style={{width: 66, height: 66, borderRadius: 33}}
               />
 
@@ -35,7 +45,7 @@ const PersonalPage = ({navigation}: any) => {
                 />
               </TouchableOpacity>
             </View>
-            <Text style={styles.textName}>Nguyễn Văn A</Text>
+            <Text style={styles.textName}>{userInfo.name}</Text>
           </View>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <Text style={styles.textNumberStat}>0</Text>
@@ -53,21 +63,14 @@ const PersonalPage = ({navigation}: any) => {
         <TouchableOpacity style={styles.btnEdit}>
           <Image
             source={require('../assets/images/edit-white.png')}
-            style={{width: 25, height: 25}}
+            style={{width: (576 * 25) / 512, height: 25}}
           />
           <Text style={styles.textBtnEdit}>Chỉnh sửa thông tin cá nhân</Text>
         </TouchableOpacity>
       </View>
     );
   };
-  return (
-    <View style={styles.container}>
-      <FlatList
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={<PostRenderItem2 navigation={navigation} />}
-      />
-    </View>
-  );
+  return <View style={styles.container}>{renderHeader(userInfo)}</View>;
 };
 
 export default PersonalPage;
