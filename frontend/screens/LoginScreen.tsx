@@ -8,7 +8,6 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import {createNotifications} from 'react-native-notificated';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
@@ -21,7 +20,6 @@ import {enableScreens} from 'react-native-screens';
 import {RootState} from '../redux/Store';
 import AppLoader from '../components/ui/AppLoader';
 import Colors from '../global/Color';
-import crashlytics from '@react-native-firebase/crashlytics';
 
 enableScreens();
 
@@ -174,7 +172,7 @@ const LoginScreen = ({navigation}: any) => {
               fontWeight: 'bold',
               color: 'white',
             }}>
-            Welcome!{'\n  '}Sign in
+            Chào mừng!{'\n '}Đăng nhập
           </Text>
         </Animated.View>
         <Animated.View
@@ -187,7 +185,7 @@ const LoginScreen = ({navigation}: any) => {
                 color: 'white',
                 textDecorationLine: 'underline',
               }}>
-              Not having account? Register
+              Chưa có tài khoản? Đăng ký ngay
             </Text>
           </TouchableOpacity>
         </Animated.View>
@@ -223,7 +221,7 @@ const LoginScreen = ({navigation}: any) => {
               alignItems: 'center',
             }}>
             <TextInput
-              placeholder="Password"
+              placeholder="Mật khẩu"
               placeholderTextColor={'#706d6d'}
               style={{
                 fontSize: 16,
@@ -255,7 +253,7 @@ const LoginScreen = ({navigation}: any) => {
             width: '100%',
           }}>
           <Button
-            title="Login"
+            title="Đăng nhập"
             onPress={handleLogin}
             titleStyle={{fontWeight: '700', fontSize: 20}}
             buttonStyle={{

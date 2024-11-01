@@ -3,13 +3,11 @@
 import React, {useEffect, useState} from 'react';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import ChatScreen from '../screens/ChatScreen';
 import {Badge, Icon, MD3Colors} from 'react-native-paper';
 import NotificationScreen from '../screens/NotificationScreen';
 import {FundingScreen} from '../screens/FundingScreen';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
-import TestScreen from '../screens/TestScreen';
 import {Image, View} from 'react-native';
 import Colors from '../global/Color';
 import Header from '../components/ui/HeaderHome';

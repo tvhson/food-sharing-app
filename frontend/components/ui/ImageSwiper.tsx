@@ -24,6 +24,7 @@ const ImageSwiper = (props: any) => {
       setCurrentIndex(viewableItems[0].index);
     }
   });
+  console.log('props.images', props.images);
 
   const viewConfigRef = useRef({viewAreaCoveragePercentThreshold: 50});
 
@@ -52,7 +53,7 @@ const ImageSwiper = (props: any) => {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           <View style={[styles.imageContainer, props.style]}>
-            <Image source={{uri: item.uri || item.path}} style={styles.image} />
+            <Image source={{uri: item.path || item}} style={styles.image} />
           </View>
         )}
         onViewableItemsChanged={onViewRef.current}

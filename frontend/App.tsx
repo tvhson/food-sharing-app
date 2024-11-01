@@ -16,6 +16,8 @@ import {encode as btoa} from 'base-64';
 import {LogBox} from 'react-native';
 import {ZegoCallInvitationDialog} from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import analytics from '@react-native-firebase/analytics';
+import {LoadingProvider, useLoading} from './utils/LoadingContext';
+import LoadingUI from './utils/LoadingUI';
 
 LogBox.ignoreAllLogs();
 
@@ -49,35 +51,43 @@ function App() {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <Provider store={Store}>
-        <PaperProvider>
-          <NotificationsProvider>
-            <NavigationContainer
-              ref={navigationRef}
-              onReady={() => {
-                routeNameRef.current =
-                  navigationRef.current.getCurrentRoute().name;
-              }}
-              onStateChange={async () => {
-                const previousRouteName = routeNameRef.current;
-                const currentRouteName =
-                  navigationRef.current.getCurrentRoute().name;
+        <LoadingProvider>
+          <PaperProvider>
+            <NotificationsProvider>
+              <NavigationContainer
+                ref={navigationRef}
+                onReady={() => {
+                  routeNameRef.current =
+                    navigationRef.current.getCurrentRoute().name;
+                }}
+                onStateChange={async () => {
+                  const previousRouteName = routeNameRef.current;
+                  const currentRouteName =
+                    navigationRef.current.getCurrentRoute().name;
 
-                if (previousRouteName !== currentRouteName) {
-                  await analytics().logScreenView({
-                    screen_name: currentRouteName,
-                    screen_class: currentRouteName,
-                  });
-                }
-                routeNameRef.current = currentRouteName;
-              }}>
-              <ZegoCallInvitationDialog />
-              <Router />
-            </NavigationContainer>
-          </NotificationsProvider>
-        </PaperProvider>
+                  if (previousRouteName !== currentRouteName) {
+                    await analytics().logScreenView({
+                      screen_name: currentRouteName,
+                      screen_class: currentRouteName,
+                    });
+                  }
+                  routeNameRef.current = currentRouteName;
+                }}>
+                <ZegoCallInvitationDialog />
+                <Router />
+              </NavigationContainer>
+              <GlobalLoading />
+            </NotificationsProvider>
+          </PaperProvider>
+        </LoadingProvider>
       </Provider>
     </GestureHandlerRootView>
   );
 }
 
 export default App;
+
+const GlobalLoading = () => {
+  const {loading} = useLoading();
+  return <LoadingUI visible={loading} />;
+};

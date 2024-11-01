@@ -55,12 +55,6 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
     setSearch(search);
   };
 
-  const renderLoader = () => (
-    <View style={styles.loaderStyle}>
-      <ActivityIndicator size="large" color="#aaa" />
-    </View>
-  );
-
   const loadMoreItem = () => {
     setCurrentPage(currentPage + 1);
   };
@@ -223,7 +217,7 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        ListFooterComponent={renderLoader}
+        ListFooterComponent={<View style={{height: 16}} />}
         renderItem={({item}: any) => (
           <PostRenderItem2
             item={item}
@@ -283,11 +277,3 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  loaderStyle: {
-    marginVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

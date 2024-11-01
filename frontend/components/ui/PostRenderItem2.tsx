@@ -25,24 +25,6 @@ import {RootState} from '../../redux/Store';
 import {deletePost, reportPost} from '../../api/PostApi';
 import {deleteMyPost} from '../../redux/SharingPostReducer';
 
-const images = [
-  {
-    uri: 'https://i.pinimg.com/736x/2b/8d/b3/2b8db3475614637b47fde73b0723fa34.jpg',
-    title: 'Hello Swiper',
-    caption: 'Hello Swiper',
-  },
-  {
-    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaEj3BtwAHp34BuEm6r7OKJJQc6OuQuDAGXg&s',
-    title: 'Beautiful',
-    caption: 'Beautiful',
-  },
-  {
-    uri: 'https://5.imimg.com/data5/WM/OX/MY-33847593/doremon-cartoon-wallpaper-500x500.jpg',
-    title: 'And simple',
-    caption: 'And simple',
-  },
-];
-
 const PostRenderItem2 = (props: any) => {
   const {
     item,
@@ -52,8 +34,6 @@ const PostRenderItem2 = (props: any) => {
     distance,
     location,
   } = props;
-  console.log('item', item);
-
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const accessToken = useSelector((state: RootState) => state.token.key);

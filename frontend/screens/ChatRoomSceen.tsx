@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, Text, Image} from 'react-native';
-import {GiftedChat, Send} from 'react-native-gifted-chat';
+import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {Bubble, GiftedChat, InputToolbar, Send} from 'react-native-gifted-chat';
 import {
   connectMessage,
   disconnectMessage,
@@ -23,16 +23,19 @@ import {getFontFamily} from '../utils/fonts';
 import dayjs from 'dayjs';
 import dayvi from 'dayjs/locale/vi';
 import analytics from '@react-native-firebase/analytics';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 dayjs.locale('vi');
 
 const ChatRoomScreen = ({navigation, route}: any) => {
+  const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
   const accessToken = useSelector((state: RootState) => state.token.key);
   const item = route.params.item;
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const [roomId, setRoomId] = useState(item.id ? item.id : null);
   const [infoOther, setInfoOther] = useState<any>(null);
+  const [text, setText] = useState('');
 
   const recipientProfilePic =
     item.recipientProfilePic === null
@@ -332,22 +335,88 @@ const ChatRoomScreen = ({navigation, route}: any) => {
         }}
         renderSend={props => {
           return (
-            <Send {...props}>
-              <View style={{marginRight: 10, marginBottom: 10}}>
-                <Image
-                  source={require('../assets/images/send-message.png')}
-                  style={{width: 30, height: 30}}
-                />
-              </View>
-            </Send>
+            <View
+              style={{
+                flexDirection: 'row',
+                height: 50,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 10,
+              }}>
+              <Send {...props}>
+                <View style={{marginRight: 10, marginBottom: 10}}>
+                  <Image
+                    source={require('../assets/images/send-message.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                </View>
+              </Send>
+            </View>
           );
         }}
+        renderInputToolbar={props => (
+          <InputToolbar
+            {...props}
+            renderActions={() => (
+              <View
+                style={{
+                  height: 50,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Image
+                  source={require('../assets/images/paperclip.png')}
+                  style={{width: 30, height: 30, marginLeft: 10}}
+                />
+              </View>
+            )}
+          />
+        )}
+        renderBubble={props => (
+          <Bubble
+            {...props}
+            // wrapperStyle={{
+            //   left: {
+            //     backgroundColor: Colors.primary,
+            //   },
+            //   right: {
+            //     backgroundColor: Colors.primary,
+            //   },
+            // }}
+            textStyle={{
+              left: {
+                color: Colors.black,
+                fontFamily: getFontFamily('regular'),
+                fontSize: 16,
+              },
+              right: {
+                color: Colors.white,
+                fontFamily: getFontFamily('regular'),
+                fontSize: 16,
+              },
+            }}
+          />
+        )}
+        textInputProps={styles.composer}
+        onInputTextChanged={setText}
         alwaysShowSend
         keyboardShouldPersistTaps={'handled'}
         placeholder="Nhập tin nhắn..."
+        bottomOffset={insets.bottom}
       />
     </View>
   );
 };
 
 export default ChatRoomScreen;
+
+const styles = StyleSheet.create({
+  composer: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    alignSelf: 'center',
+    fontFamily: getFontFamily('regular'),
+    fontSize: 16,
+  },
+});
