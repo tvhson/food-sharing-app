@@ -49,13 +49,19 @@ const RegisterScreen = ({navigation}: any) => {
       confirmPassword === ''
     ) {
       notify('error', {
-        params: {description: 'Please fill all fields.', title: 'Error'},
+        params: {
+          description: 'Vui lòng nhập hết tất cả thông tin',
+          title: 'Lỗi',
+        },
       });
       return;
     }
     if (!validateEmail(username)) {
       notify('error', {
-        params: {description: 'Invalid email.', title: 'Error'},
+        params: {
+          description: 'Email không hợp lệ.',
+          title: 'Lỗi',
+        },
       });
       return;
     }
@@ -64,8 +70,8 @@ const RegisterScreen = ({navigation}: any) => {
       notify('error', {
         params: {
           description:
-            'Password must contain at least 8 characters, including letters and numbers.',
-          title: 'Error',
+            'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái và số.',
+          title: 'Lỗi',
           style: {multiline: 100},
         },
       });
@@ -73,7 +79,10 @@ const RegisterScreen = ({navigation}: any) => {
     }
     if (!validateConfirmPassword(password, confirmPassword)) {
       notify('error', {
-        params: {description: 'Password does not match.', title: 'Error'},
+        params: {
+          description: 'Mật khẩu không khớp.',
+          title: 'Lỗi',
+        },
       });
       return;
     }
@@ -83,8 +92,8 @@ const RegisterScreen = ({navigation}: any) => {
         if (response.status === 200) {
           notify('success', {
             params: {
-              description: 'Register success',
-              title: 'Success',
+              description: 'Đăng ký thành công',
+              title: 'Thành công',
             },
           });
           setName('');
@@ -97,8 +106,8 @@ const RegisterScreen = ({navigation}: any) => {
         } else {
           notify('error', {
             params: {
-              description: response.data.message || 'Register failed.',
-              title: 'Error',
+              description: response.data.message || 'Đăng ký thất bại.',
+              title: 'Lỗi',
             },
           });
         }
@@ -107,12 +116,13 @@ const RegisterScreen = ({navigation}: any) => {
         notify('error', {
           params: {
             description: error.message,
-            title: 'Error',
+            title: 'Lỗi',
             style: {multiline: 100},
           },
         });
       });
   };
+
   const handleLogin = () => {
     setName('');
     setUsername('');
@@ -168,7 +178,7 @@ const RegisterScreen = ({navigation}: any) => {
               fontWeight: 'bold',
               color: 'white',
             }}>
-            Create new{'\n  '} Account
+            Tạo tài khoản mới
           </Text>
         </Animated.View>
         <Animated.View
@@ -181,15 +191,15 @@ const RegisterScreen = ({navigation}: any) => {
                 color: 'white',
                 textDecorationLine: 'underline',
               }}>
-              Already Registered? Login
+              Đã đăng ký? Đăng nhập ngay
             </Text>
           </TouchableOpacity>
         </Animated.View>
         <Animated.View
           entering={FadeInUp.delay(400).duration(1000).springify()}
-          style={{marginTop: 55, alignItems: 'center'}}>
+          style={{marginTop: 85, alignItems: 'center'}}>
           <TextInput
-            placeholder="Name"
+            placeholder="Tên"
             placeholderTextColor={'#706d6d'}
             style={{
               fontSize: 16,
@@ -234,7 +244,7 @@ const RegisterScreen = ({navigation}: any) => {
               alignItems: 'center',
             }}>
             <TextInput
-              placeholder="Password"
+              placeholder="Mật khẩu"
               placeholderTextColor={'#706d6d'}
               style={{
                 fontSize: 16,
@@ -272,7 +282,7 @@ const RegisterScreen = ({navigation}: any) => {
               alignItems: 'center',
             }}>
             <TextInput
-              placeholder="Confirm password"
+              placeholder="Nhập lại mật khẩu"
               placeholderTextColor={'#706d6d'}
               style={{
                 fontSize: 16,
@@ -304,7 +314,7 @@ const RegisterScreen = ({navigation}: any) => {
             width: '100%',
           }}>
           <Button
-            title="Register"
+            title="Đăng ký"
             onPress={handleRegister}
             titleStyle={{fontWeight: '700', fontSize: 20}}
             buttonStyle={{

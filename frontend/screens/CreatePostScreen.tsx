@@ -13,7 +13,7 @@ import {Button, Icon, Image} from '@rneui/themed';
 import MAP_API_KEY from '../components/data/SecretData';
 import axios from 'axios';
 import UploadPhoto from '../components/ui/UploadPhoto';
-import {DatePickerInput} from 'react-native-paper-dates';
+import {DatePickerInput, hi} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import GetLocation from 'react-native-get-location';
 import {uploadPhoto} from '../api/UploadPhotoApi';
@@ -24,15 +24,16 @@ import {pushMyPost, updateMyPost} from '../redux/SharingPostReducer';
 import {getFontFamily} from '../utils/fonts';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import screenWidth from '../global/Constant';
+import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();
 
 const CreatePostScreen = ({route, navigation}: any) => {
+  const {showLoading, hideLoading} = useLoading();
   const dispatch = useDispatch();
   const {notify} = useNotifications();
   const location = route.params.location;
   const accessToken = route.params.accessToken;
-  const [locationCurrent, setLocationCurrent] = useState(location);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [weight, setWeight] = useState('');
@@ -59,6 +60,12 @@ const CreatePostScreen = ({route, navigation}: any) => {
     longitudeCurrent: number,
   ) => {
     try {
+      if (!latitudeCurrent || !longitudeCurrent) {
+        notify('error', {
+          params: {description: 'Không thể lấy vị trí hiện tại.', title: 'Lỗi'},
+        });
+        return;
+      }
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
@@ -71,31 +78,14 @@ const CreatePostScreen = ({route, navigation}: any) => {
         );
         return response.data.results[0].formatted_address;
       }
-      return 'No location found';
+      notify('error', {
+        params: {description: 'Không thể lấy vị trí hiện tại.', title: 'Lỗi'},
+      });
+      return '';
     } catch (error) {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    if (location === null) {
-      GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 30000,
-        rationale: {
-          title: 'Location permission',
-          message: 'The app needs the permission to request your location.',
-          buttonPositive: 'Ok',
-        },
-      })
-        .then(newLocation => {
-          setLocationCurrent(newLocation);
-        })
-        .catch(() => {
-          setLocationCurrent(null);
-        });
-    }
-  }, [location]);
 
   const postImage = async (newImages: any) => {
     setImageUpload((prevImages: any) => {
@@ -106,54 +96,55 @@ const CreatePostScreen = ({route, navigation}: any) => {
       }
     });
   };
+
   const handleCreatePost = () => {
     let currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     expiredDate.setHours(0, 0, 0, 0);
     pickUpStartDate.setHours(0, 0, 0, 0);
     pickUpEndDate.setHours(0, 0, 0, 0);
+
     if (title === '') {
       notify('error', {
-        params: {description: 'Title is required.', title: 'Error'},
+        params: {description: 'Tên món ăn là bắt buộc.', title: 'Lỗi'},
       });
       return;
     }
     if (locationName === '') {
       notify('error', {
-        params: {description: 'Location is required.', title: 'Error'},
+        params: {description: 'Địa điểm nhận là bắt buộc.', title: 'Lỗi'},
       });
       return;
     }
     if (imageUpload === null) {
       notify('error', {
-        params: {description: 'Image is required.', title: 'Error'},
+        params: {description: 'Ảnh là bắt buộc.', title: 'Lỗi'},
       });
       return;
     }
     if (expiredDate < currentDate) {
       notify('error', {
-        params: {description: 'Expired date is invalid.', title: 'Error'},
+        params: {description: 'Ngày hết hạn không hợp lệ.', title: 'Lỗi'},
       });
       return;
     }
     if (pickUpStartDate < currentDate) {
       notify('error', {
-        params: {description: 'Pickup start date is invalid.', title: 'Error'},
+        params: {description: 'Ngày bắt đầu nhận không hợp lệ.', title: 'Lỗi'},
       });
       return;
     }
     if (pickUpEndDate < currentDate) {
       notify('error', {
-        params: {description: 'Pickup end date is invalid.', title: 'Error'},
+        params: {description: 'Ngày kết thúc nhận không hợp lệ.', title: 'Lỗi'},
       });
       return;
     }
     if (pickUpEndDate < pickUpStartDate) {
       notify('error', {
         params: {
-          description:
-            'Pickup end date must be greater than pickup start date.',
-          title: 'Error',
+          description: 'Ngày kết thúc nhận phải lớn hơn ngày bắt đầu nhận.',
+          title: 'Lỗi',
           style: {multiline: 100},
         },
       });
@@ -177,54 +168,65 @@ const CreatePostScreen = ({route, navigation}: any) => {
           type: imageUpload.mime || 'image/jpeg',
         });
       }
-      uploadPhoto(dataForm, accessToken).then((response: any) => {
-        console.log(response);
-        if (response.status === 200) {
-          createPost(
-            {
-              title,
-              imageUrl: response.data[0],
-              content,
-              weight,
-              description,
-              note,
-              status,
-              locationName,
-              latitude,
-              longitude,
-              expiredDate,
-              pickUpStartDate,
-              pickUpEndDate,
-            },
-            accessToken,
-          )
-            .then((response2: any) => {
-              if (response2.status === 200) {
-                notify('success', {
+      showLoading();
+      uploadPhoto(dataForm, accessToken)
+        .then((response: any) => {
+          console.log(response);
+          if (response.status === 200) {
+            createPost(
+              {
+                title,
+                images: response.data,
+                content,
+                weight,
+                description,
+                note,
+                status,
+                locationName,
+                latitude,
+                longitude,
+                expiredDate,
+                pickUpStartDate,
+                pickUpEndDate,
+              },
+              accessToken,
+            )
+              .then((response2: any) => {
+                if (response2.status === 200) {
+                  notify('success', {
+                    params: {
+                      description: 'Tạo bài đăng thành công.',
+                      title: 'Thành công',
+                    },
+                  });
+                  dispatch(pushMyPost(response2.data));
+                  hideLoading();
+                  navigation.navigate('Home');
+                }
+              })
+              .catch((error: any) => {
+                notify('error', {
                   params: {
-                    description: 'Create post successful.',
-                    title: 'Success',
+                    description: error.message,
+                    title: 'Lỗi',
+                    style: {multiline: 100},
                   },
                 });
-                dispatch(pushMyPost(response2.data));
-                navigation.navigate('Home');
-              }
-            })
-            .catch((error: any) => {
-              notify('error', {
-                params: {
-                  description: error.message,
-                  title: 'Error',
-                  style: {multiline: 100},
-                },
+                hideLoading();
               });
+          } else {
+            notify('error', {
+              params: {description: response.data, title: 'Lỗi'},
             });
-        } else {
+            hideLoading();
+          }
+        })
+        .catch((error: any) => {
           notify('error', {
-            params: {description: response.data, title: 'Error'},
+            params: {description: error.message, title: 'Lỗi'},
           });
-        }
-      });
+          hideLoading();
+        });
     }
   };
 
@@ -287,7 +289,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
           onChangeText={setDescription}
         />
         <TextInput
-          placeholder="Trọng lượng"
+          placeholder="Trọng lượng (kg)"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,

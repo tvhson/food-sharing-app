@@ -25,6 +25,7 @@ import PostRenderItem2 from '../components/ui/PostRenderItem2';
 import Comment from '../components/ui/Comment';
 import OrganizationPost2 from '../components/ui/OrganizationPost2';
 import {useFocusEffect} from '@react-navigation/native';
+import {Icon} from '@rneui/themed';
 
 export const FundingScreen = ({navigation}: any) => {
   const FundingPostData = useSelector(
@@ -39,11 +40,6 @@ export const FundingScreen = ({navigation}: any) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <PostRenderItem2
-          setShowComment={setShowComment}
-          setCommentPostId={setCommentPostId}
-          navigation={navigation}
-        />
         <OrganizationPost2 navigation={navigation} />
         <View style={{height: 30}} />
       </ScrollView>
@@ -52,6 +48,20 @@ export const FundingScreen = ({navigation}: any) => {
         setVisible={setShowComment}
         commentPostId={commentPostId}
       />
+      <TouchableOpacity
+        // onPress={() =>
+        //   navigation.navigate('CreatePost', {location, accessToken})
+        // }
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          backgroundColor: Colors.button,
+          borderRadius: 100,
+          padding: 16,
+        }}>
+        <Icon name="add" color="white" size={24} />
+      </TouchableOpacity>
     </View>
   );
 };

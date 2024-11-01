@@ -8,9 +8,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from '../components/ui/Header';
 import {Icon} from 'react-native-paper';
 import Colors from '../global/Color';
@@ -18,24 +19,10 @@ import {getFontFamily} from '../utils/fonts';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import screenWidth from '../global/Constant';
 import CommentItem from '../components/ui/CommentItem';
-
-const images = [
-  {
-    uri: 'https://i.pinimg.com/736x/2b/8d/b3/2b8db3475614637b47fde73b0723fa34.jpg',
-    title: 'Hello Swiper',
-    caption: 'Hello Swiper',
-  },
-  {
-    uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaEj3BtwAHp34BuEm6r7OKJJQc6OuQuDAGXg&s',
-    title: 'Beautiful',
-    caption: 'Beautiful',
-  },
-  {
-    uri: 'https://5.imimg.com/data5/WM/OX/MY-33847593/doremon-cartoon-wallpaper-500x500.jpg',
-    title: 'And simple',
-    caption: 'And simple',
-  },
-];
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
+import {getInfoUserById} from '../api/AccountsApi';
+import {getRoomChats} from '../api/ChatApi';
 
 const CommentData = [
   {
@@ -72,8 +59,12 @@ const CommentData = [
 
 const PostDetail2 = ({route, navigation}: any) => {
   const [liked, setLiked] = React.useState(false);
+  const [roomChat, setRoomChat] = useState<any>(null);
+  const [createPostUser, setCreatePostUser] = useState<any>(null);
+  const accessToken = useSelector((state: RootState) => state.token.key);
   const commentInputRef = useRef<TextInput>(null);
   const item = route.params.item;
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const locationStart = {
     latitude: route.params.location.latitude,
     longitude: route.params.location.longitude,
@@ -85,6 +76,42 @@ const PostDetail2 = ({route, navigation}: any) => {
   const createdDate = route.params.createdDate;
   const distance = route.params.distance;
   const expiredString = route.params.expiredString;
+
+  useEffect(() => {
+    const getInfoUserCreatePost = async () => {
+      if (accessToken && item.createdById !== userInfo.id) {
+        getInfoUserById(item.createdById, accessToken)
+          .then((response: any) => {
+            if (response.status === 200) {
+              setCreatePostUser(response.data);
+              getRoomChats(accessToken.toString())
+                .then((response2: any) => {
+                  if (response2.status === 200) {
+                    const roomChats = response2.data;
+                    const roomChatFind = roomChats.find(
+                      (room: any) =>
+                        (room.senderId === userInfo.id &&
+                          room.recipientId === response.data.id) ||
+                        (room.senderId === response.data.id &&
+                          room.recipientId === userInfo.id),
+                    );
+                    setRoomChat(roomChatFind);
+                  } else {
+                    console.log(response);
+                  }
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    };
+    getInfoUserCreatePost();
+  }, [accessToken, item.createdById, userInfo.id]);
 
   const handleLiked = () => {
     setLiked(!liked);
@@ -105,6 +132,23 @@ const PostDetail2 = ({route, navigation}: any) => {
   };
 
   const handleCreateComment = () => {};
+
+  const handleGoToMessage = () => {
+    if (roomChat) {
+      navigation.navigate('ChatRoom', {item: roomChat});
+    } else {
+      navigation.navigate('ChatRoom', {
+        item: {
+          senderProfilePic: userInfo.imageUrl,
+          recipientProfilePic: createPostUser.imageUrl,
+          senderId: userInfo.id,
+          recipientId: createPostUser.id,
+          senderName: userInfo.name,
+          recipientName: createPostUser.name,
+        },
+      });
+    }
+  };
 
   const tags = [
     'Sản phẩm động vật',
@@ -138,264 +182,299 @@ const PostDetail2 = ({route, navigation}: any) => {
 
   const renderHeader = () => {
     return (
-      <View style={{padding: 16}}>
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity>
-            <Image
-              source={require('../assets/images/MealLogo.png')}
-              style={{width: 50, height: 50}}
-            />
-          </TouchableOpacity>
-          <View style={{alignSelf: 'center', marginLeft: 16}}>
-            <Text
-              style={{
-                fontSize: 18,
-                fontFamily: getFontFamily('semibold'),
-                color: Colors.text,
-              }}>
-              Nguyen Khoi
-            </Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          //dismiss keyboard
+          commentInputRef.current?.blur();
+        }}>
+        <View style={{padding: 16}}>
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity>
               <Image
-                source={require('../assets/images/ion_earth.png')}
-                style={{width: 20, height: 20}}
+                source={require('../assets/images/MealLogo.png')}
+                style={{width: 50, height: 50}}
               />
+            </TouchableOpacity>
+            <View style={{alignSelf: 'center', marginLeft: 16}}>
               <Text
                 style={{
-                  fontSize: 12,
-                  fontFamily: getFontFamily('regular'),
-                  color: Colors.grayText,
-                  marginLeft: 4,
+                  fontSize: 18,
+                  fontFamily: getFontFamily('semibold'),
+                  color: Colors.text,
                 }}>
-                {createdDate}
+                Nguyen Khoi
               </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Image
+                  source={require('../assets/images/ion_earth.png')}
+                  style={{width: 20, height: 20}}
+                />
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.grayText,
+                    marginLeft: 4,
+                  }}>
+                  {createdDate}
+                </Text>
+              </View>
             </View>
-          </View>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 20,
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 20,
 
-              height: 40,
-              alignSelf: 'center',
-              position: 'absolute',
-              right: 0,
-              flexDirection: 'row',
-            }}>
-            <TouchableOpacity onPress={handleDirection}>
-              <Icon source={'chat-processing'} size={30} color={Colors.black} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleDirection}
-              style={{marginLeft: 10}}>
-              <Icon source={'directions'} size={30} color={Colors.black} />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Image
-              source={require('../assets/images/foodIcon.png')}
-              style={{width: 25, height: 25}}
-            />
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 24,
-                  fontFamily: getFontFamily('bold'),
-                  color: Colors.text,
-                  marginLeft: 16,
-                }}>
-                {item.title}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Image
-              source={require('../assets/images/distance.png')}
-              style={{width: 25, height: 25}}
-            />
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: getFontFamily('regular'),
-                  color: Colors.text,
-                  marginLeft: 16,
-                }}>
-                Cách bạn{' '}
-                {distance < 0.1 ? `${distance * 1000}m` : `${distance}km`}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Image
-              source={require('../assets/images/clock.png')}
-              style={{width: 25, height: 25}}
-            />
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: getFontFamily('regular'),
-                  color: Colors.text,
-                  marginLeft: 16,
-                }}>
-                {expiredString === 'Hết hạn'
-                  ? 'Hết hạn'
-                  : `Hết hạn sau ${expiredString}`}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Image
-              source={require('../assets/images/part.png')}
-              style={{width: 25, height: 25}}
-            />
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: getFontFamily('regular'),
-                  color: Colors.text,
-                  marginLeft: 16,
-                }}>
-                2 portions left
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Image
-              source={require('../assets/images/scales.png')}
-              style={{width: 25, height: 25}}
-            />
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: getFontFamily('regular'),
-                  color: Colors.text,
-                  marginLeft: 16,
-                }}>
-                {item.weight} kg
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Image
-              source={require('../assets/images/pickUp.png')}
-              style={{width: 25, height: 25}}
-            />
-            <View style={{flex: 1}}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: getFontFamily('regular'),
-                  color: Colors.text,
-                  marginLeft: 16,
-                }}>
-                Lấy từ ngày{' '}
-                {new Date(item.pickUpStartDate).toLocaleDateString()} đến ngày{' '}
-                {new Date(item.pickUpEndDate).toLocaleDateString()}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              marginTop: 5,
-            }}>
-            <Image
-              source={require('../assets/images/tag.png')}
-              style={{width: 25, height: 25}}
-            />
-            <View style={styles.tagsContainer}>{renderTags()}</View>
-          </View>
-          <View
-            style={{
-              width: screenWidth * 0.85,
-              height: screenWidth,
-              borderRadius: 20,
-              marginTop: 10,
-              overflow: 'hidden',
-              alignSelf: 'center',
-            }}>
-            <ImageSwiper images={images} />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 15,
-            }}>
-            <TouchableOpacity onPress={handleLiked}>
-              <Image
-                source={
-                  liked
-                    ? require('../assets/images/liked.png')
-                    : require('../assets/images/like.png')
-                }
-                style={{width: 50, height: 50}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{marginLeft: 10}}
-              onPress={handleShowComment}>
-              <Image
-                source={require('../assets/images/comment.png')}
-                style={{width: 50, height: 50}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={{marginLeft: 10}}>
-              <Image
-                source={require('../assets/images/share.png')}
-                style={{width: 50, height: 50}}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                marginLeft: 10,
-                fontFamily: getFontFamily('regular'),
-                color: Colors.black,
-                fontSize: 14,
+                height: 40,
+                alignSelf: 'center',
+                position: 'absolute',
+                right: 0,
+                flexDirection: 'row',
               }}>
-              {liked ? 'Bạn và 10 người khác' : '10 người'}
-            </Text>
+              {item.createdById !== userInfo.id && (
+                <TouchableOpacity onPress={handleGoToMessage}>
+                  <Icon
+                    source={'chat-processing'}
+                    size={30}
+                    color={Colors.black}
+                  />
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                onPress={handleDirection}
+                style={{marginLeft: 10}}>
+                <Icon source={'directions'} size={30} color={Colors.black} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/foodIcon.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 24,
+                    fontFamily: getFontFamily('bold'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  {item.title}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/distance.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  Cách bạn{' '}
+                  {distance < 0.1 ? `${distance * 1000}m` : `${distance}km`}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/clock.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  {expiredString === 'Hết hạn'
+                    ? 'Hết hạn'
+                    : `Hết hạn sau ${expiredString}`}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/part.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  2 portions left
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/scales.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  {item.weight} kg
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/pickUp.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  Lấy từ ngày{' '}
+                  {new Date(item.pickUpStartDate).toLocaleDateString()} đến ngày{' '}
+                  {new Date(item.pickUpEndDate).toLocaleDateString()}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/location_color.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  Nhận tại {item.locationName}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+                marginTop: 5,
+              }}>
+              <Image
+                source={require('../assets/images/tag.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={styles.tagsContainer}>{renderTags()}</View>
+            </View>
+            <View
+              style={{
+                width: screenWidth * 0.85,
+                height: screenWidth,
+                borderRadius: 20,
+                marginTop: 10,
+                overflow: 'hidden',
+                alignSelf: 'center',
+              }}>
+              <ImageSwiper images={item.images} />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 15,
+              }}>
+              <TouchableOpacity onPress={handleLiked}>
+                <Image
+                  source={
+                    liked
+                      ? require('../assets/images/liked.png')
+                      : require('../assets/images/like.png')
+                  }
+                  style={{width: 50, height: 50}}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{marginLeft: 10}}
+                onPress={handleShowComment}>
+                <Image
+                  source={require('../assets/images/comment.png')}
+                  style={{width: 50, height: 50}}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={{marginLeft: 10}}>
+                <Image
+                  source={require('../assets/images/share.png')}
+                  style={{width: 50, height: 50}}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  marginLeft: 10,
+                  fontFamily: getFontFamily('regular'),
+                  color: Colors.black,
+                  fontSize: 14,
+                }}>
+                {liked ? 'Bạn và 10 người khác' : '10 người'}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   };
 

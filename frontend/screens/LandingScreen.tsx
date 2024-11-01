@@ -70,7 +70,7 @@ const LandingScreen = ({navigation}: any) => {
           entering={FadeInDown.delay(400).duration(1000).springify()}
           style={{width: 300, marginTop: 150, marginVertical: 10}}>
           <Button
-            title="Login"
+            title="Đăng nhập"
             icon={{
               name: 'user',
               type: 'font-awesome',
@@ -96,7 +96,7 @@ const LandingScreen = ({navigation}: any) => {
             <Text
               style={{fontSize: 16, color: Colors.button}} // Apply the color dynamically
             >
-              or Register
+              hoặc Đăng ký
             </Text>
           </TouchableOpacity>
         </Animated.View>

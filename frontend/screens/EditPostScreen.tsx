@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Colors from '../global/Color';
-import MapView, {Marker} from 'react-native-maps';
 import {Button, Icon, Image} from '@rneui/themed';
 import MAP_API_KEY from '../components/data/SecretData';
 import axios from 'axios';
@@ -21,11 +20,16 @@ import {createNotifications} from 'react-native-notificated';
 import {updatePost} from '../api/PostApi';
 import {useDispatch} from 'react-redux';
 import {updateMyPost} from '../redux/SharingPostReducer';
+import ImageSwiper from '../components/ui/ImageSwiper';
+import screenWidth from '../global/Constant';
+import {getFontFamily} from '../utils/fonts';
+import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();
 
 const EditPostScreen = ({route, navigation}: any) => {
   const dispatch = useDispatch();
+  const {showLoading, hideLoading} = useLoading();
   const item = route.params.item;
   const {notify} = useNotifications();
   const location = route.params.location;
@@ -48,11 +52,10 @@ const EditPostScreen = ({route, navigation}: any) => {
   const [pickUpStartDate, setPickUpStartDate] = useState(new Date());
   const [pickUpEndDate, setPickUpEndDate] = useState(new Date());
   const [isUploadVisible, setIsUploadVisible] = useState(false);
-  const [imageUpload, setImageUpload] = useState<any>(null);
-  const [imagePath, setImagePath] = useState('');
+  const [imageUpload, setImageUpload] = useState<any[]>([]);
+  const [oldImages, setOldImages] = useState<string[]>([]); // Add state for original images
   const [isImageAlreadyUpload, setIsImageAlreadyUpload] = useState(false);
 
-  const mapRef = useRef<MapView | null>(null);
   const autocompleteRef = useRef<any | null>(null);
 
   const getLocationName = async (
@@ -60,6 +63,12 @@ const EditPostScreen = ({route, navigation}: any) => {
     longitudeCurrent: number,
   ) => {
     try {
+      if (!latitudeCurrent || !longitudeCurrent) {
+        notify('error', {
+          params: {description: 'Không thể lấy vị trí hiện tại.', title: 'Lỗi'},
+        });
+        return;
+      }
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
@@ -72,30 +81,16 @@ const EditPostScreen = ({route, navigation}: any) => {
         );
         return response.data.results[0].formatted_address;
       }
-      return 'No location found';
+      notify('error', {
+        params: {description: 'Không thể lấy vị trí hiện tại.', title: 'Lỗi'},
+      });
+      return '';
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    if (location === null) {
-      GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 30000,
-        rationale: {
-          title: 'Location permission',
-          message: 'The app needs the permission to request your location.',
-          buttonPositive: 'Ok',
-        },
-      })
-        .then(newLocation => {
-          setLocationCurrent(newLocation);
-        })
-        .catch(() => {
-          setLocationCurrent(null);
-        });
-    }
     if (item) {
       setTitle(item.title);
       setDescription(item.description);
@@ -108,138 +103,100 @@ const EditPostScreen = ({route, navigation}: any) => {
       autocompleteRef.current?.setAddressText(
         item.locationName ? item.locationName : '',
       );
-      if (mapRef.current) {
-        mapRef.current.animateToRegion({
-          latitude: Number(item.latitude),
-          longitude: Number(item.longitude),
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        });
-      }
+      setOldImages(item.images);
       setExpiredDate(new Date(item.expiredDate));
       setPickUpStartDate(new Date(item.pickUpStartDate));
       setPickUpEndDate(new Date(item.pickUpEndDate));
-      setImagePath(item.imageUrl);
-      setImageUpload(item.imageUrl);
       setIsImageAlreadyUpload(true);
     }
   }, [item, location]);
 
-  const postImage = async (image: any) => {
-    setImageUpload(image);
-    if (image.path) {
-      setImagePath(image.path);
-    }
+  const postImage = async (newImages: any) => {
+    setImageUpload((prevImages: any) => {
+      if (Array.isArray(newImages)) {
+        return [...prevImages, ...newImages];
+      } else {
+        return [...prevImages, newImages];
+      }
+    });
+    setIsImageAlreadyUpload(false);
   };
+
   const handleEditPost = () => {
     let currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     expiredDate.setHours(0, 0, 0, 0);
     pickUpStartDate.setHours(0, 0, 0, 0);
     pickUpEndDate.setHours(0, 0, 0, 0);
+
     if (title === '') {
       notify('error', {
-        params: {description: 'Title is required.', title: 'Error'},
+        params: {description: 'Tên món ăn là bắt buộc.', title: 'Lỗi'},
       });
       return;
     }
     if (locationName === '') {
       notify('error', {
-        params: {description: 'Location is required.', title: 'Error'},
+        params: {description: 'Địa điểm nhận là bắt buộc.', title: 'Lỗi'},
+      });
+      return;
+    }
+    if (imageUpload.length === 0 && oldImages.length === 0) {
+      notify('error', {
+        params: {description: 'Ảnh là bắt buộc.', title: 'Lỗi'},
       });
       return;
     }
     if (expiredDate < currentDate) {
       notify('error', {
-        params: {description: 'Expired date is invalid.', title: 'Error'},
+        params: {description: 'Ngày hết hạn không hợp lệ.', title: 'Lỗi'},
       });
       return;
     }
     if (pickUpStartDate < currentDate) {
       notify('error', {
-        params: {description: 'Pickup start date is invalid.', title: 'Error'},
+        params: {description: 'Ngày bắt đầu nhận không hợp lệ.', title: 'Lỗi'},
       });
       return;
     }
     if (pickUpEndDate < currentDate) {
       notify('error', {
-        params: {description: 'Pickup end date is invalid.', title: 'Error'},
+        params: {description: 'Ngày kết thúc nhận không hợp lệ.', title: 'Lỗi'},
       });
       return;
     }
     if (pickUpEndDate < pickUpStartDate) {
       notify('error', {
         params: {
-          description:
-            'Pickup end date must be greater than pickup start date.',
-          title: 'Error',
+          description: 'Ngày kết thúc nhận phải lớn hơn ngày bắt đầu nhận.',
+          title: 'Lỗi',
           style: {multiline: 100},
         },
       });
       return;
     }
-    if (imageUpload === null && !isImageAlreadyUpload) {
-      notify('error', {
-        params: {description: 'Image is required.', title: 'Error'},
+    showLoading();
+    if (imageUpload.length > 0) {
+      const dataForm = new FormData();
+      imageUpload.forEach((image: any) => {
+        dataForm.append('file', {
+          uri: image.path,
+          name: image.filename || 'image.jpeg',
+          type: image.mime || 'image/jpeg',
+        });
       });
-      return;
-    }
-    if (isImageAlreadyUpload) {
-      updatePost(
-        item.id,
-        {
-          title,
-          imageUrl: imagePath,
-          content,
-          weight,
-          description,
-          note,
-          status,
-          locationName,
-          latitude,
-          longitude,
-          expiredDate,
-          pickUpStartDate,
-          pickUpEndDate,
-        },
-        accessToken,
-      )
+
+      uploadPhoto(dataForm, accessToken)
         .then((response: any) => {
           if (response.status === 200) {
-            notify('success', {
-              params: {
-                description: 'Edit post successful.',
-                title: 'Success',
-              },
-            });
-            dispatch(updateMyPost(response.data));
-            navigation.navigate('Home');
-          }
-        })
-        .catch((error: any) => {
-          notify('error', {
-            params: {
-              description: error.message,
-              title: 'Error',
-              style: {multiline: 100},
-            },
-          });
-        });
-    } else {
-      const dataForm = new FormData();
-      if (imageUpload) {
-        dataForm.append('file', {
-          uri: imageUpload.path,
-          name: imageUpload.filename || 'image.jpeg',
-          type: imageUpload.mime || 'image/jpeg',
-        });
-        uploadPhoto(dataForm, accessToken).then((response: any) => {
-          if (response.status === 200) {
+            // Combine new uploaded images with old images
+            const allImages = [...oldImages, ...response.data];
+
             updatePost(
               item.id,
               {
                 title,
-                imageUrl: response.data[0],
+                images: allImages,
                 content,
                 weight,
                 description,
@@ -258,11 +215,12 @@ const EditPostScreen = ({route, navigation}: any) => {
                 if (response2.status === 200) {
                   notify('success', {
                     params: {
-                      description: 'Edit post successful.',
-                      title: 'Success',
+                      description: 'Chỉnh sửa bài viết thành công',
+                      title: 'Thành công',
                     },
                   });
-                  dispatch(updateMyPost(response.data));
+                  dispatch(updateMyPost(response2.data));
+                  hideLoading();
                   navigation.navigate('Home');
                 }
               })
@@ -270,18 +228,67 @@ const EditPostScreen = ({route, navigation}: any) => {
                 notify('error', {
                   params: {
                     description: error.message,
-                    title: 'Error',
+                    title: 'Lỗi',
                     style: {multiline: 100},
                   },
                 });
+                hideLoading();
               });
-          } else {
-            notify('error', {
-              params: {description: response.data, title: 'Error'},
-            });
           }
+        })
+        .catch((error: any) => {
+          notify('error', {
+            params: {
+              description: error.message,
+              title: 'Lỗi',
+            },
+          });
+          hideLoading();
         });
-      }
+    } else {
+      // If no new images, just update with existing images
+      updatePost(
+        item.id,
+        {
+          title,
+          images: oldImages,
+          content,
+          weight,
+          description,
+          note,
+          status,
+          locationName,
+          latitude,
+          longitude,
+          expiredDate,
+          pickUpStartDate,
+          pickUpEndDate,
+        },
+        accessToken,
+      )
+        .then((response: any) => {
+          if (response.status === 200) {
+            notify('success', {
+              params: {
+                description: 'Chỉnh sửa bài viết thành công',
+                title: 'Thành công',
+              },
+            });
+            hideLoading();
+            dispatch(updateMyPost(response.data));
+            navigation.navigate('Home');
+          }
+        })
+        .catch((error: any) => {
+          notify('error', {
+            params: {
+              description: error.message,
+              title: 'Lỗi',
+              style: {multiline: 100},
+            },
+          });
+          hideLoading();
+        });
     }
   };
 
@@ -302,9 +309,10 @@ const EditPostScreen = ({route, navigation}: any) => {
           width={350}
           isCircle={false}
           postImage={postImage}
+          isMultiple={true}
         />
         <TextInput
-          placeholder="Name"
+          placeholder="Tên món ăn"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -315,13 +323,14 @@ const EditPostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={title}
           onChangeText={setTitle}
         />
         <TextInput
-          placeholder="Description"
+          placeholder="Mô tả món ăn"
           placeholderTextColor={'#706d6d'}
           multiline
           numberOfLines={4}
@@ -335,13 +344,14 @@ const EditPostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={description}
           onChangeText={setDescription}
         />
         <TextInput
-          placeholder="Weight"
+          placeholder="Trọng lượng (kg)"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -352,14 +362,15 @@ const EditPostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={weight}
           onChangeText={setWeight}
           keyboardType="numeric"
         />
         <TextInput
-          placeholder="Note"
+          placeholder="Ghi chú"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -370,7 +381,8 @@ const EditPostScreen = ({route, navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
+            fontFamily: getFontFamily('regular'),
           }}
           value={note}
           onChangeText={setNote}
@@ -382,23 +394,28 @@ const EditPostScreen = ({route, navigation}: any) => {
               alignItems: 'center',
             }}>
             <DatePickerInput
-              locale="en"
-              label="Expired Date"
+              locale="vi"
+              label="Ngày hết hạn"
               value={expiredDate}
               onChange={(date: Date | undefined) =>
                 setExpiredDate(date || new Date())
               }
               inputMode="start"
+              saveLabel="Lưu"
               style={{
                 backgroundColor: '#eff2ff',
                 color: 'black',
                 maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
               }}
               mode="outlined"
               outlineStyle={{
-                borderColor: Colors.postTitle,
+                borderColor: Colors.greenPrimary,
                 borderRadius: 8,
                 borderWidth: 2,
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
               }}
             />
           </View>
@@ -410,21 +427,26 @@ const EditPostScreen = ({route, navigation}: any) => {
               alignItems: 'center',
             }}>
             <DatePickerInput
-              locale="en"
-              label="Pickup Date Start"
+              locale="vi"
+              label="Ngày bắt đầu nhận"
               value={pickUpStartDate}
               onChange={(date: Date | undefined) =>
                 setPickUpStartDate(date || new Date())
               }
+              saveLabel="Lưu"
               inputMode="start"
               style={{
                 backgroundColor: '#eff2ff',
                 color: 'black',
                 maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
               }}
               mode="outlined"
               outlineStyle={{
-                borderColor: Colors.postTitle,
+                borderColor: Colors.greenPrimary,
                 borderRadius: 8,
                 borderWidth: 2,
               }}
@@ -438,8 +460,9 @@ const EditPostScreen = ({route, navigation}: any) => {
               alignItems: 'center',
             }}>
             <DatePickerInput
-              locale="en"
-              label="Pickup Date End"
+              locale="vi"
+              label="Ngày kết thúc nhận"
+              saveLabel="Lưu"
               value={pickUpEndDate}
               onChange={(date: Date | undefined) =>
                 setPickUpEndDate(date || new Date())
@@ -449,10 +472,14 @@ const EditPostScreen = ({route, navigation}: any) => {
                 backgroundColor: '#eff2ff',
                 color: 'black',
                 maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
               }}
               mode="outlined"
               outlineStyle={{
-                borderColor: Colors.postTitle,
+                borderColor: Colors.greenPrimary,
                 borderRadius: 8,
                 borderWidth: 2,
               }}
@@ -463,21 +490,11 @@ const EditPostScreen = ({route, navigation}: any) => {
         <GooglePlacesAutocomplete
           ref={autocompleteRef}
           fetchDetails={true}
-          placeholder="Enter your place"
+          placeholder="Địa chỉ nhận"
           onPress={(data, details = null) => {
             setLocationName(data.description);
             setLatitude(details?.geometry.location.lat || 0);
             setLongitude(details?.geometry.location.lng || 0);
-            if (details && mapRef.current) {
-              const lat = details.geometry.location.lat;
-              const lng = details.geometry.location.lng;
-              mapRef.current.animateToRegion({
-                latitude: lat,
-                longitude: lng,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              });
-            }
           }}
           disableScroll={true}
           query={{
@@ -486,7 +503,7 @@ const EditPostScreen = ({route, navigation}: any) => {
           }}
           styles={{
             container: {
-              borderColor: Colors.postTitle,
+              borderColor: Colors.greenPrimary,
               borderRadius: 8,
               borderWidth: 2,
               width: '90%',
@@ -497,6 +514,7 @@ const EditPostScreen = ({route, navigation}: any) => {
               fontSize: 16,
               color: 'black',
               backgroundColor: '#eff2ff',
+              fontFamily: getFontFamily('regular'),
             },
           }}
         />
@@ -504,7 +522,7 @@ const EditPostScreen = ({route, navigation}: any) => {
           title="Get my current location"
           onPress={() => getLocationName(location.latitude, location.longitude)}
           buttonStyle={{
-            backgroundColor: Colors.postTitle,
+            backgroundColor: Colors.greenPrimary,
             width: 200,
             alignSelf: 'center',
             marginTop: 20,
@@ -514,40 +532,9 @@ const EditPostScreen = ({route, navigation}: any) => {
         <View
           style={{
             width: '90%',
-            height: 350,
-            alignSelf: 'center',
-            borderColor: Colors.postTitle,
-            borderRadius: 20,
-            borderWidth: 2,
-            overflow: 'hidden',
-            marginTop: 20,
-          }}>
-          <MapView
-            ref={mapRef}
-            initialRegion={{
-              latitude: latitude === '' ? locationCurrent.latitude : latitude,
-              longitude:
-                longitude === '' ? locationCurrent.longitude : longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-            onPress={() => {}}
-            style={{flex: 1, borderRadius: 20}}>
-            <Marker
-              coordinate={{
-                latitude: latitude === '' ? locationCurrent.latitude : latitude,
-                longitude:
-                  longitude === '' ? locationCurrent.longitude : longitude,
-              }}
-            />
-          </MapView>
-        </View>
-        <View
-          style={{
-            width: '90%',
             height: 300,
             alignSelf: 'center',
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
             borderRadius: 20,
             borderWidth: 2,
             overflow: 'hidden',
@@ -556,59 +543,64 @@ const EditPostScreen = ({route, navigation}: any) => {
             alignItems: 'center',
             backgroundColor: '#eff2ff',
           }}>
-          {imageUpload && imagePath ? (
+          {(imageUpload && imageUpload.length > 0) ||
+          (oldImages && oldImages.length > 0) ? (
             <>
-              <View style={{position: 'relative', width: 350, height: 300}}>
-                <Image
-                  source={{uri: imagePath}}
-                  style={{width: '100%', height: '100%'}}
-                />
-                <TouchableOpacity
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 10,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    alignContent: 'center',
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    backgroundColor: 'black',
-                    zIndex: 1,
-                  }}
-                  onPress={() => {
-                    setImagePath('');
-                    setIsImageAlreadyUpload(false);
-                  }}>
-                  <Icon name="close" type="ionicon" size={20} color="white" />
-                </TouchableOpacity>
-              </View>
+              <ImageSwiper
+                style={{width: screenWidth * 0.9, height: 300}}
+                images={[
+                  ...oldImages.map(img => ({path: img})),
+                  ...imageUpload,
+                ]}
+                isCreatePost={true}
+                setImageUpload={(newImages: any[]) => {
+                  // Handle image removal by filtering both old and new images
+                  const removedPath = newImages.map(img => img.path);
+                  setOldImages(
+                    oldImages.filter((img: any) => removedPath.includes(img)),
+                  );
+                  setImageUpload(
+                    newImages.filter(
+                      img => img.path && !oldImages.includes(img.path),
+                    ),
+                  );
+                }}
+                setIsUploadVisible={setIsUploadVisible}
+                isUploadVisible={isUploadVisible}
+              />
             </>
           ) : (
             <>
-              <Icon
-                name="camera"
-                type="ionicon"
-                size={60}
-                color={Colors.postTitle}
+              <TouchableOpacity
                 style={{marginTop: 20}}
                 onPress={() => {
                   setIsUploadVisible(!isUploadVisible);
-                }}
-              />
-              <Text style={{color: Colors.postTitle, fontSize: 18}}>
-                Add image
+                }}>
+                <Icon
+                  name="camera"
+                  type="ionicon"
+                  size={60}
+                  color={Colors.greenPrimary}
+                />
+              </TouchableOpacity>
+
+              <Text
+                style={{
+                  color: Colors.greenPrimary,
+                  fontSize: 18,
+                  fontFamily: getFontFamily('regular'),
+                }}>
+                Thêm ảnh
               </Text>
             </>
           )}
         </View>
 
         <Button
-          title="Edit Post"
+          title="Chỉnh sửa"
           onPress={handleEditPost}
           buttonStyle={{
-            backgroundColor: Colors.postTitle,
+            backgroundColor: Colors.greenPrimary,
             width: 200,
             alignSelf: 'center',
             marginTop: 20,
