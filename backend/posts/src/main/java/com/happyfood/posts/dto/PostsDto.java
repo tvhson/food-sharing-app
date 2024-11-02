@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ public class PostsDto {
     private Long id;
     private String title;
     private String content;
-    private String imageUrl;
+    private List<String> images;
     private String weight;
     private String description;
     private String note;
