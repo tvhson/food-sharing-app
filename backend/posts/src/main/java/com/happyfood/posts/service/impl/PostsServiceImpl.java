@@ -2,6 +2,7 @@ package com.happyfood.posts.service.impl;
 
 import com.happyfood.posts.dto.Coordinates;
 import com.happyfood.posts.dto.PostsDto;
+import com.happyfood.posts.entity.Images;
 import com.happyfood.posts.entity.Posts;
 import com.happyfood.posts.exception.CustomException;
 import com.happyfood.posts.mapper.PostsMapper;
@@ -24,6 +25,11 @@ public class PostsServiceImpl implements IPostsService {
         posts.setCreatedById(userId);
         posts.setCreatedDate(new Date());
 
+        posts.setImages(new ArrayList<>());
+        for (String imageUrl : postsDto.getImages()) {
+            posts.getImages().add(Images.builder().url(imageUrl).post(posts).build());
+        }
+
         return PostsMapper.mapToPostsDto(postsRepository.save(posts));
     }
 
@@ -35,7 +41,6 @@ public class PostsServiceImpl implements IPostsService {
         }
         posts.setTitle(postsDto.getTitle());
         posts.setContent(postsDto.getContent());
-        posts.setImageUrl(postsDto.getImageUrl());
         posts.setWeight(postsDto.getWeight());
         posts.setDescription(postsDto.getDescription());
         posts.setNote(postsDto.getNote());
@@ -47,6 +52,12 @@ public class PostsServiceImpl implements IPostsService {
         posts.setLatitude(postsDto.getLatitude());
         posts.setLongitude(postsDto.getLongitude());
         posts.setReceiverId(postsDto.getReceiverId());
+
+        posts.getImages().clear();
+        for (String imageUrl : postsDto.getImages()) {
+            posts.getImages().add(Images.builder().url(imageUrl).post(posts).build());
+        }
+
         return PostsMapper.mapToPostsDto(postsRepository.save(posts));
     }
 
