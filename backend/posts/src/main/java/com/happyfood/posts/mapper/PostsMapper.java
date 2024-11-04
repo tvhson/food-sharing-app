@@ -1,7 +1,10 @@
 package com.happyfood.posts.mapper;
 
 import com.happyfood.posts.dto.PostsDto;
+import com.happyfood.posts.entity.Images;
 import com.happyfood.posts.entity.Posts;
+
+import java.util.stream.Collectors;
 
 public class PostsMapper {
     public static Posts mapToPosts(PostsDto postsDto) {
@@ -9,7 +12,6 @@ public class PostsMapper {
                 .id(postsDto.getId())
                 .title(postsDto.getTitle())
                 .content(postsDto.getContent())
-                .imageUrl(postsDto.getImageUrl())
                 .weight(postsDto.getWeight())
                 .description(postsDto.getDescription())
                 .note(postsDto.getNote())
@@ -29,7 +31,7 @@ public class PostsMapper {
                 .id(posts.getId())
                 .title(posts.getTitle())
                 .content(posts.getContent())
-                .imageUrl(posts.getImageUrl())
+                .images(posts.getImages() != null ? posts.getImages().stream().map(Images::getUrl).collect(Collectors.toList()) : null)
                 .weight(posts.getWeight())
                 .description(posts.getDescription())
                 .note(posts.getNote())

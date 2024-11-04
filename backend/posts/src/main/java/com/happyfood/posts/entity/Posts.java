@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,7 +22,6 @@ public class Posts {
     private Long id;
     private String title;
     private String content;
-    private String imageUrl;
     private String weight;
     private String description;
     private String note;
@@ -36,4 +36,8 @@ public class Posts {
     private Long createdById;
     private Long receiverId;
     private Date createdDate;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Images> images;
+
 }
