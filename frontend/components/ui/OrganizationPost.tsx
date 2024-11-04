@@ -287,7 +287,11 @@ export const OrganizationPost = ({
                 </Dialog.Actions>
               </Dialog>
             </Portal>
-            <Menu visible={visible} onDismiss={closeMenu} anchor={anchor}>
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={anchor}
+              contentStyle={{backgroundColor: 'white'}}>
               {item.accounts.id === userInfo.id && (
                 <>
                   <Menu.Item

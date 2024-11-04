@@ -33,11 +33,11 @@ function UploadPhoto(props: any) {
         // console.log(image);
         // props.setPhoto(image.path);
       })
-      .catch(error => {
+      .catch(() => {
         notify('error', {
           params: {
-            description: error.message,
-            title: 'Error',
+            description: 'Lỗi không thể chụp ảnh',
+            title: 'Lỗi',
             style: {multiline: 100},
           },
         });
@@ -60,11 +60,11 @@ function UploadPhoto(props: any) {
           // console.log(images);
           // props.setPhoto(image.path);
         })
-        .catch(error => {
+        .catch(() => {
           notify('error', {
             params: {
-              description: error.message,
-              title: 'Error',
+              description: 'Lỗi không thể chọn ảnh',
+              title: 'Lỗi',
               style: {multiline: 100},
             },
           });
@@ -81,11 +81,11 @@ function UploadPhoto(props: any) {
           // console.log(image);
           // props.setPhoto(image.path);
         })
-        .catch(error => {
+        .catch(() => {
           notify('error', {
             params: {
-              description: error.message,
-              title: 'Error',
+              description: 'Lỗi không thể chọn ảnh',
+              title: 'Lỗi',
               style: {multiline: 100},
             },
           });

@@ -11,17 +11,28 @@ import React from 'react';
 import {Icon} from 'react-native-paper';
 import Colors from '../../global/Color';
 import {getFontFamily} from '../../utils/fonts';
+import {attendOrganizationPost} from '../../api/OrganizationPostApi';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/Store';
 
 const screenWidth = Dimensions.get('window').width;
 const OrganizationPost2 = (props: any) => {
-  const {navigation} = props;
-  const [isJoin, setIsJoin] = React.useState(false);
+  const token = useSelector((state: RootState) => state.token.key);
+  const {navigation, item} = props;
+  const [isJoin, setIsJoin] = React.useState(item.organizationposts.attended);
 
-  const handleAttend = () => {
+  const handleAttend = async () => {
     setIsJoin(!isJoin);
+    const response: any = await attendOrganizationPost(
+      item.organizationposts.id,
+      token,
+    );
+    if (response.status !== 200) {
+      setIsJoin(!isJoin);
+    }
   };
   const handleNavigateToDetail = () => {
-    navigation.navigate('OrganizationPostDetail2');
+    navigation.navigate('OrganizationPostDetail2', {item});
   };
 
   return (
@@ -38,15 +49,19 @@ const OrganizationPost2 = (props: any) => {
       <View>
         <Image
           source={{
-            uri: 'https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp',
+            uri: item.organizationposts.imageUrl,
           }}
           style={styles.img}
         />
         <View style={styles.itemContainer}>
           <Text style={styles.textTime}>Hôm nay lúc 15:00</Text>
-          <Text style={styles.textTitle}>Tên của sự kiện</Text>
-          <Text style={styles.textTime}>Địa điểm: 123 ABC</Text>
-          <Text style={styles.textLocation}>31 người sẽ tham gia</Text>
+          <Text style={styles.textTitle}>{item.organizationposts.title}</Text>
+          <Text style={styles.textTime}>
+            Địa điểm: {item.organizationposts.locationName}
+          </Text>
+          <Text style={styles.textLocation}>
+            {item.organizationposts.peopleAttended} người sẽ tham gia
+          </Text>
         </View>
         <View
           style={{

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import {
   FlatList,
@@ -23,6 +24,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {getInfoUserById} from '../api/AccountsApi';
 import {getRoomChats} from '../api/ChatApi';
+import {getPostById} from '../api/PostApi';
 
 const CommentData = [
   {
@@ -63,7 +65,8 @@ const PostDetail2 = ({route, navigation}: any) => {
   const [createPostUser, setCreatePostUser] = useState<any>(null);
   const accessToken = useSelector((state: RootState) => state.token.key);
   const commentInputRef = useRef<TextInput>(null);
-  const item = route.params.item;
+  const [item, setItem] = useState(route.params.item);
+  const [refreshing, setRefreshing] = useState(false); // Add refreshing state
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const locationStart = {
     latitude: route.params.location.latitude,
@@ -113,8 +116,20 @@ const PostDetail2 = ({route, navigation}: any) => {
     getInfoUserCreatePost();
   }, [accessToken, item.createdById, userInfo.id]);
 
+  const getPostData = async () => {
+    const response: any = await getPostById(item.id, accessToken);
+    if (response.status === 200) {
+      setItem(response.data);
+    }
+  };
+
   const handleLiked = () => {
     setLiked(!liked);
+  };
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await getPostData();
+    setRefreshing(false);
   };
 
   const handleShowComment = () => {
@@ -487,6 +502,8 @@ const PostDetail2 = ({route, navigation}: any) => {
         data={CommentData}
         renderItem={({item}) => <CommentItem comment={item} />}
         keyExtractor={item => item.id.toString()}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
       />
       <View
         style={{
