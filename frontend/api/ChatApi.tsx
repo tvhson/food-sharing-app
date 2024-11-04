@@ -15,7 +15,7 @@ export const connectChat = async (
   userId: number,
   showNotification: (body: any) => void,
 ) => {
-  stompClient = connectStompClient(`${baseUrl}/ws-chats`);
+  stompClient = connectStompClient(`${baseUrl}ws-chats`);
 
   return new Promise((resolve, reject) => {
     stompClient.connect(
@@ -42,7 +42,7 @@ export const connectMessage = async (
   roomId: number,
   showNotification: (body: any) => void,
 ) => {
-  stompClientMessage = connectStompClient(`${baseUrl}/ws-chats`);
+  stompClientMessage = connectStompClient(`${baseUrl}ws-chats`);
 
   return new Promise((resolve, reject) => {
     stompClientMessage.connect(
