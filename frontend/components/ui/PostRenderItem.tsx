@@ -69,6 +69,8 @@ const PostRenderItem = ({item, navigation, location, distance}: any) => {
         console.log('Report post success');
       }
       setVisibleDialogReport(false);
+      setReason('Spam or Misleading Information');
+      setDescriptionReason('');
     }
   };
   return (
@@ -182,7 +184,11 @@ const PostRenderItem = ({item, navigation, location, distance}: any) => {
             </Dialog.Content>
             <Dialog.Actions>
               <Button
-                onPress={() => setVisibleDialogReport(false)}
+                onPress={() => {
+                  setVisibleDialogReport(false);
+                  setReason('Spam or Misleading Information');
+                  setDescriptionReason('');
+                }}
                 textColor="red">
                 Cancel
               </Button>

@@ -160,6 +160,8 @@ export const OrganizationPost = ({
         console.log('Report post success');
       }
       setVisibleDialogReport(false);
+      setReason('Spam or Misleading Information');
+      setDescriptionReason('');
     }
   };
 
@@ -279,7 +281,11 @@ export const OrganizationPost = ({
                 </Dialog.Content>
                 <Dialog.Actions>
                   <Button
-                    onPress={() => setVisibleDialogReport(false)}
+                    onPress={() => {
+                      setVisibleDialogReport(false);
+                      setReason('Spam or Misleading Information');
+                      setDescriptionReason('');
+                    }}
                     textColor="red">
                     Cancel
                   </Button>
