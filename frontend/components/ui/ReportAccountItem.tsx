@@ -229,7 +229,11 @@ const ReportAccountItem = ({item, isReport}: any) => {
                 </Dialog.Actions>
               </Dialog>
             </Portal>
-            <Menu visible={visible} onDismiss={closeMenu} anchor={anchor}>
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={anchor}
+              contentStyle={{backgroundColor: 'white'}}>
               <Menu.Item
                 onPress={() => {
                   setVisible(false);

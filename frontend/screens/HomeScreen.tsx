@@ -1,14 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
+import {View, FlatList, TouchableOpacity, RefreshControl} from 'react-native';
 import Colors from '../global/Color';
 import {Button, Icon, Image, SearchBar} from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,7 +10,7 @@ import {getPosts} from '../api/PostApi';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {clearSharingPosts, pushSharingPost} from '../redux/SharingPostReducer';
-import {ActivityIndicator, Menu} from 'react-native-paper';
+import {Menu} from 'react-native-paper';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
 import HeaderHome from '../components/ui/HeaderHome';
@@ -26,9 +19,8 @@ import Comment from '../components/ui/Comment';
 
 const {useNotifications} = createNotifications();
 
-const HomeScreen = ({navigation, route, setIsHome}: any) => {
+const HomeScreen = ({navigation}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
-  const userInfo = useSelector((state: RootState) => state.userInfo);
 
   const recommendedPost = useSelector(
     (state: RootState) => state.sharingPost.HomePage,
@@ -62,21 +54,26 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
   const onRefresh = async () => {
     setRefreshing(true);
     setIsLoading(true);
-    dispatch(clearSharingPosts());
 
     const getRecommendPost = async () => {
       if (accessToken) {
         const response: any = await getPosts(accessToken.toString());
         if (response.status === 200) {
+          dispatch(clearSharingPosts());
           AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
           setRecommendPost(response.data);
           response.data.forEach((post: any) => dispatch(pushSharingPost(post)));
         } else {
           console.log(response);
+          notify('error', {
+            params: {
+              description: 'Không thể tải dữ liệu mới',
+              title: 'Lỗi',
+            },
+          });
         }
       }
     };
-
     await getRecommendPost();
     setCurrentPage(0);
     setIsLoading(false);
@@ -94,6 +91,12 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
           setRecommendPost(response.data);
         } else {
           console.log(response);
+          notify('error', {
+            params: {
+              description: 'Không thể tải dữ liệu mới',
+              title: 'Lỗi',
+            },
+          });
         }
       }
     };
@@ -103,7 +106,7 @@ const HomeScreen = ({navigation, route, setIsHome}: any) => {
       setIsLoading(false);
     };
     fetchData();
-  }, [accessToken, recommendedPost]);
+  }, [accessToken, notify, recommendedPost]);
 
   useEffect(() => {
     const applyFilter = () => {

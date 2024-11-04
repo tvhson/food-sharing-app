@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
+import {View, FlatList, RefreshControl} from 'react-native';
 import Colors from '../global/Color';
 import {Image, SearchBar} from '@rneui/themed';
 import ChatRoomItem from '../components/ui/ChatRoomItem';
@@ -17,13 +10,12 @@ import {getRoomChats} from '../api/ChatApi';
 import {clearChatRooms, setChatRooms} from '../redux/ChatRoomReducer';
 import {useFocusEffect} from '@react-navigation/native';
 import {getFontFamily} from '../utils/fonts';
+import Header from '../components/ui/Header';
 
 const ChatScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
   const dispatch = useDispatch();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   const accessToken = useSelector((state: RootState) => state.token.key);
@@ -31,22 +23,12 @@ const ChatScreen = ({navigation}: any) => {
   const chatRooms = useSelector((state: RootState) => state.chatRoom.chatRooms);
   const [chatRoom, setChatRoom] = useState(chatRooms);
 
-  const renderLoader = () => {
-    return isLoading ? (
-      <View style={styles.loaderStyle}>
-        <ActivityIndicator size="large" color="#aaa" />
-      </View>
-    ) : null;
-  };
-  const loadMoreItem = () => {
-    setCurrentPage(currentPage + 1);
-  };
   const onRefresh = useCallback(() => {
     const saveChatRoom = async () => {
       if (accessToken) {
         getRoomChats(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
-            console.log(response.data);
+            dispatch(clearChatRooms());
             setChatRoom(response.data);
             dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
           } else {
@@ -56,9 +38,7 @@ const ChatScreen = ({navigation}: any) => {
       }
     };
     setRefreshing(true);
-    dispatch(clearChatRooms());
     saveChatRoom();
-    setCurrentPage(0);
     setRefreshing(false);
   }, [accessToken, dispatch, myId]);
   const updateSearch = (message: any) => {
@@ -71,7 +51,6 @@ const ChatScreen = ({navigation}: any) => {
       } else if (accessToken) {
         getRoomChats(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
-            console.log(response.data);
             setChatRoom(response.data);
             dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
           } else {
@@ -81,9 +60,7 @@ const ChatScreen = ({navigation}: any) => {
       }
     };
     const fetchData = async () => {
-      setIsLoading(true);
       await saveChatRoom();
-      setIsLoading(false);
     };
     fetchData();
   }, [dispatch, accessToken, chatRooms, myId]);
@@ -113,6 +90,7 @@ const ChatScreen = ({navigation}: any) => {
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.background}}>
+      <Header title="Nhắn tin" navigation={navigation} />
       <SearchBar
         inputStyle={{fontFamily: getFontFamily('regular')}}
         placeholder="Tìm kiếm"
@@ -134,25 +112,12 @@ const ChatScreen = ({navigation}: any) => {
         renderItem={({item}) => (
           <ChatRoomItem item={item} navigation={navigation} />
         )}
-        onEndReached={() => {
-          if (!isLoading) {
-            loadMoreItem();
-          }
-        }}
-        onEndReachedThreshold={0}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        ListFooterComponent={() => renderLoader()}
       />
     </View>
   );
 };
 
 export default ChatScreen;
-const styles = StyleSheet.create({
-  loaderStyle: {
-    marginVertical: 16,
-    alignItems: 'center',
-  },
-});

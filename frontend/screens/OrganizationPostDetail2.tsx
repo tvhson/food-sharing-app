@@ -16,8 +16,9 @@ import {getFontFamily} from '../utils/fonts';
 import {Linking} from 'react-native';
 
 const OrganizationPostDetail2 = (props: any) => {
-  const {navigation, item} = props;
-  const [isJoin, setIsJoin] = React.useState(false);
+  const {navigation} = props;
+  const item = props.route.params.item;
+  const [isJoin, setIsJoin] = React.useState(item.organizationposts.attended);
 
   const handleAttend = () => {
     setIsJoin(!isJoin);
@@ -26,7 +27,7 @@ const OrganizationPostDetail2 = (props: any) => {
     navigation.goBack();
   };
   const handleGoToWebsite = () => {
-    navigation.navigate('WebView', {url: 'https://google.com'});
+    navigation.navigate('WebView', {url: item.organizationposts.linkWebsites});
   };
   const handlePressLocation = () => {
     //open google map
@@ -43,14 +44,14 @@ const OrganizationPostDetail2 = (props: any) => {
       <View>
         <Image
           source={{
-            uri: 'https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp',
+            uri: item.organizationposts.imageUrl,
           }}
           style={styles.topImg}
         />
         <View style={{backgroundColor: '#00000004', paddingBottom: 10}}>
-          <Text style={styles.textTitle}>Tiêu đề ở đây</Text>
+          <Text style={styles.textTitle}>{item.organizationposts.title}</Text>
           <Text style={styles.textLink} onPress={handleGoToWebsite}>
-            Link website ở đây
+            {item.organizationposts.linkWebsites}
           </Text>
 
           <TouchableOpacity
@@ -98,8 +99,7 @@ const OrganizationPostDetail2 = (props: any) => {
               />
               <View style={{flex: 1}}>
                 <Text style={styles.textNormal}>
-                  Gán địa chỉ ở đây
-                  aksdfjhakjsdhfkajsdfkjabsdkfjhasdkjfhaslkdhfkashdfkjashdkfjhasdkjfhsakdj
+                  Địa điểm: {item.organizationposts.locationName}
                 </Text>
               </View>
             </View>
@@ -110,14 +110,18 @@ const OrganizationPostDetail2 = (props: any) => {
               style={styles.iconText}
             />
             <View style={{flex: 1}}>
-              <Text style={styles.textNormal}>177 người tham gia</Text>
+              <Text style={styles.textNormal}>
+                {item.organizationposts.peopleAttended} người tham gia
+              </Text>
             </View>
           </View>
         </View>
         <View style={{paddingVertical: 10, paddingHorizontal: 20}}>
           <Text style={styles.textTitle2}>Chi tiết sự kiện</Text>
           <View style={{flex: 1}}>
-            <Text style={styles.textNormal}>Mô tả sự kiện ở đây</Text>
+            <Text style={styles.textNormal}>
+              {item.organizationposts.description}
+            </Text>
           </View>
         </View>
       </View>
@@ -157,8 +161,9 @@ const styles = StyleSheet.create({
   textLink: {
     fontSize: 16,
     fontFamily: getFontFamily('regular'),
-    color: Colors.black,
+    color: '#3498db',
     textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   btnJoin: {
     width: '80%',

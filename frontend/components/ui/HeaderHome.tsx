@@ -3,11 +3,15 @@ import {Avatar, Icon} from '@rneui/themed';
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Colors from '../../global/Color';
-import {IconButton, Menu} from 'react-native-paper';
 import {getFontFamily} from '../../utils/fonts';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../redux/Store';
 
 const HeaderHome = (props: any) => {
   const {navigation} = props;
+  const numberOfUnreadChat = useSelector(
+    (state: RootState) => state.chatRoom.numberOfUnreadMessages,
+  );
 
   return (
     <View style={styles.container}>
@@ -27,6 +31,21 @@ const HeaderHome = (props: any) => {
             source={require('../../assets/images/chat.png')}
             style={{width: 24, height: 24}}
           />
+          {numberOfUnreadChat > 0 ? (
+            <View
+              style={{
+                position: 'absolute',
+                backgroundColor: 'red',
+                width: 12,
+                height: 12,
+                top: 0,
+                right: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 100,
+              }}
+            />
+          ) : null}
         </TouchableOpacity>
       </View>
     </View>

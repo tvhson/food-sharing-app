@@ -138,11 +138,14 @@ const LoadingScreen = ({navigation, route}: any) => {
         const audioGranted = await PermissionsAndroid.check(
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
         );
-
-        if (!cameraGranted || !audioGranted) {
+        const locationGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        );
+        if (!cameraGranted || !audioGranted || !locationGranted) {
           const permissions = [
             PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
             PermissionsAndroid.PERMISSIONS.CAMERA,
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           ];
           await PermissionsAndroid.requestMultiple(permissions);
         }

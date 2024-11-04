@@ -63,7 +63,7 @@ const PersonalPage = ({navigation}: any) => {
         <TouchableOpacity style={styles.btnEdit}>
           <Image
             source={require('../assets/images/edit-white.png')}
-            style={{width: (576 * 25) / 512, height: 25}}
+            style={{width: (576 * 20) / 512, height: 20}}
           />
           <Text style={styles.textBtnEdit}>Chỉnh sửa thông tin cá nhân</Text>
         </TouchableOpacity>
@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
   btnEdit: {
     alignSelf: 'center',
     flexDirection: 'row',
-    padding: 10,
-    width: screenWidth * 0.7,
+    padding: 5,
+    width: screenWidth * 0.65,
     backgroundColor: Colors.greenPrimary,
     borderRadius: 10,
     justifyContent: 'center',

@@ -519,7 +519,7 @@ const EditPostScreen = ({route, navigation}: any) => {
           }}
         />
         <Button
-          title="Get my current location"
+          title="Sử dụng vị trí hiện tại"
           onPress={() => getLocationName(location.latitude, location.longitude)}
           buttonStyle={{
             backgroundColor: Colors.greenPrimary,

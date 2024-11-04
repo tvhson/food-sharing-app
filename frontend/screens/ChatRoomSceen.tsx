@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
@@ -24,6 +25,7 @@ import dayjs from 'dayjs';
 import dayvi from 'dayjs/locale/vi';
 import analytics from '@react-native-firebase/analytics';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useLoading} from '../utils/LoadingContext';
 
 dayjs.locale('vi');
 
@@ -36,6 +38,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   const [roomId, setRoomId] = useState(item.id ? item.id : null);
   const [infoOther, setInfoOther] = useState<any>(null);
   const [text, setText] = useState('');
+  const {showLoading, hideLoading} = useLoading();
 
   const recipientProfilePic =
     item.recipientProfilePic === null
@@ -122,13 +125,16 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       };
     };
     const loadMessages = async () => {
+      showLoading();
       getMessages(roomId, accessToken).then((response: any) => {
         if (response.status === 200) {
           const convertedMessages = response.data
             .map((message: any) => convertMessage(message))
             .reverse();
           setMessages(convertedMessages);
+          hideLoading();
         } else {
+          hideLoading();
           console.log(response);
         }
       });

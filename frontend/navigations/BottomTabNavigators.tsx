@@ -1,29 +1,23 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/no-unstable-nested-components */
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import {Badge, Icon, MD3Colors} from 'react-native-paper';
+import {Badge} from 'react-native-paper';
 import NotificationScreen from '../screens/NotificationScreen';
 import {FundingScreen} from '../screens/FundingScreen';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {Image, View} from 'react-native';
-import Colors from '../global/Color';
-import Header from '../components/ui/HeaderHome';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import FoodPreferenceScreen from '../screens/FoodPreferenceScreen';
 import PersonalPage from '../screens/PersonalPage';
-import Conversation from '../screens/TestChat/Conversation';
+import {getFontFamily} from '../utils/fonts';
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = ({route, navigation}: any) => {
   const numberOfUnread = useSelector(
     (state: RootState) => state.notification.numberOfUnread,
-  );
-  const numberOfUnreadChat = useSelector(
-    (state: RootState) => state.chatRoom.numberOfUnreadMessages,
   );
 
   return (
@@ -68,7 +62,7 @@ const BottomTabNavigator = ({route, navigation}: any) => {
             ),
           }}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Conversation"
           component={Conversation}
           options={{
@@ -85,7 +79,7 @@ const BottomTabNavigator = ({route, navigation}: any) => {
               </>
             ),
           }}
-        />
+        /> */}
         <Tab.Screen
           name="Personal"
           component={PersonalPage}
@@ -123,9 +117,10 @@ const BottomTabNavigator = ({route, navigation}: any) => {
                   size={20}
                   style={{
                     position: 'absolute',
-                    top: 2,
-                    right: 15,
+                    top: 3,
+                    right: 18,
                     backgroundColor: 'red',
+                    fontFamily: getFontFamily('bold'),
                   }}>
                   {numberOfUnread}
                 </Badge>

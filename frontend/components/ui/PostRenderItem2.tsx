@@ -225,10 +225,12 @@ const PostRenderItem2 = (props: any) => {
       </Portal>
       <Portal>
         <Dialog
+          style={{backgroundColor: 'white'}}
           visible={visibleDialogReport}
           onDismiss={() => setVisibleDialogReport(false)}>
           <Dialog.Icon icon="alert" />
-          <Dialog.Title style={{textAlign: 'center'}}>
+          <Dialog.Title
+            style={{textAlign: 'center', fontFamily: getFontFamily('regular')}}>
             Báo cáo bài viết
           </Dialog.Title>
           <Dialog.Content style={{paddingHorizontal: 0}}>
@@ -242,7 +244,9 @@ const PostRenderItem2 = (props: any) => {
                   marginLeft: 20,
                 }}>
                 <RadioButton value="Spam or Misleading Information" />
-                <Text>Bài viết linh tinh, lặp lại, thông tin sai lệch</Text>
+                <Text style={{fontFamily: getFontFamily('regular')}}>
+                  Bài viết linh tinh, lặp lại, thông tin sai lệch
+                </Text>
               </View>
               <View
                 style={{
@@ -251,7 +255,9 @@ const PostRenderItem2 = (props: any) => {
                   marginLeft: 20,
                 }}>
                 <RadioButton value="Offensive Content" />
-                <Text>Nội dung không lành mạnh</Text>
+                <Text style={{fontFamily: getFontFamily('regular')}}>
+                  Nội dung không lành mạnh
+                </Text>
               </View>
               <View
                 style={{
@@ -260,7 +266,9 @@ const PostRenderItem2 = (props: any) => {
                   marginLeft: 20,
                 }}>
                 <RadioButton value="Scam or Fraudulent Activity" />
-                <Text>Bài viết lừa đảo</Text>
+                <Text style={{fontFamily: getFontFamily('regular')}}>
+                  Bài viết lừa đảo
+                </Text>
               </View>
               <View
                 style={{
@@ -269,7 +277,9 @@ const PostRenderItem2 = (props: any) => {
                   marginLeft: 20,
                 }}>
                 <RadioButton value="Health and Safety Concerns" />
-                <Text>Bài viết chứa các lo ngại về sức khỏe</Text>
+                <Text style={{fontFamily: getFontFamily('regular')}}>
+                  Bài viết chứa các lo ngại về sức khỏe
+                </Text>
               </View>
               <View
                 style={{
@@ -278,7 +288,7 @@ const PostRenderItem2 = (props: any) => {
                   marginLeft: 20,
                 }}>
                 <RadioButton value="Other" />
-                <Text>Khác</Text>
+                <Text style={{fontFamily: getFontFamily('regular')}}>Khác</Text>
               </View>
             </RadioButton.Group>
             {reason === 'Other' && (
@@ -289,6 +299,7 @@ const PostRenderItem2 = (props: any) => {
                     borderBottomColor: 'black',
                     color: 'black',
                     fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
                   }}
                   placeholder="Nhập lý do của bạn"
                   value={descriptionReason}
@@ -300,15 +311,24 @@ const PostRenderItem2 = (props: any) => {
           </Dialog.Content>
           <Dialog.Actions>
             <Button
+              labelStyle={{fontFamily: getFontFamily('bold')}}
               onPress={() => setVisibleDialogReport(false)}
               textColor="red">
               Hủy
             </Button>
-            <Button onPress={() => handleReportPost()}>Báo cáo</Button>
+            <Button
+              labelStyle={{fontFamily: getFontFamily('bold')}}
+              onPress={() => handleReportPost()}>
+              Báo cáo
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <Menu visible={visible} onDismiss={closeMenu} anchor={anchor}>
+      <Menu
+        visible={visible}
+        onDismiss={closeMenu}
+        anchor={anchor}
+        contentStyle={{backgroundColor: 'white'}}>
         {item.createdById === userInfo.id && (
           <>
             <Menu.Item
