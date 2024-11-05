@@ -70,3 +70,4 @@ yarn-error.log
 /android/secrets.properties
 # add secrets file
 /components/data/SecretData.tsx
+/android/app/google-services.json
