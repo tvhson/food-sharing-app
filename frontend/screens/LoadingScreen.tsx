@@ -56,6 +56,7 @@ import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn
 import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 import analytics from '@react-native-firebase/analytics';
+import BootSplash from 'react-native-bootsplash';
 
 enableScreens();
 
@@ -371,10 +372,12 @@ const LoadingScreen = ({navigation, route}: any) => {
             }),
           2000,
         );
+        BootSplash.hide();
       } catch (error) {
         console.log(error);
       }
     };
+
     checkPermissions();
     loadData();
   }, [dispatch, myId, navigation, token]);

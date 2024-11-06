@@ -7,6 +7,7 @@ import Colors from '../global/Color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {setStatus} from '../redux/LoadingReducer';
+import BootSplash from 'react-native-bootsplash';
 
 const LandingScreen = ({navigation}: any) => {
   const handleRegister = () => {
@@ -22,15 +23,18 @@ const LandingScreen = ({navigation}: any) => {
       dispatch(setStatus(true));
       try {
         await AsyncStorage.getItem('isLogin')
-          .then((isLogin: any) => {
+          .then(async (isLogin: any) => {
             if (isLogin === 'true') {
-              AsyncStorage.getItem('token').then((token: any) => {
+              await AsyncStorage.getItem('token').then((token: any) => {
                 navigation.navigate('Loading', {token: token});
               });
+            } else {
+              BootSplash.hide();
             }
           })
           .catch((error: any) => {
             console.log(error);
+            BootSplash.hide();
           })
           .finally(() => {
             dispatch(setStatus(false));
