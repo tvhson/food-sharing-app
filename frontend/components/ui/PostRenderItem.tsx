@@ -8,11 +8,13 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/Store';
 import {deletePost, reportPost} from '../../api/PostApi';
 import {deleteMyPost} from '../../redux/SharingPostReducer';
+import {useNotifications} from 'react-native-notificated';
 
 const PostRenderItem = ({item, navigation, location, distance}: any) => {
   const handleOnPress = () => {
     navigation.navigate('PostDetail', {item, location});
   };
+  const {notify} = useNotifications();
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const accessToken = useSelector((state: RootState) => state.token.key);
@@ -67,6 +69,13 @@ const PostRenderItem = ({item, navigation, location, distance}: any) => {
       });
       if (response.status === 200) {
         console.log('Report post success');
+        notify('success', {
+          params: {
+            description: 'Report post successfully',
+            title: 'Report',
+            style: {multiline: 100},
+          },
+        });
       }
       setVisibleDialogReport(false);
       setReason('Spam or Misleading Information');

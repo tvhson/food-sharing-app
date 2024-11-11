@@ -152,7 +152,7 @@ const EditFundingScreen = ({navigation, route}: any) => {
                 if (response2.status === 200) {
                   notify('success', {
                     params: {
-                      description: 'Create funding post successful.',
+                      description: 'Edit funding post successful.',
                       title: 'Success',
                     },
                   });

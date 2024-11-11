@@ -33,6 +33,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {deleteOrganizationPost} from '../../api/OrganizationPostApi';
 import {deleteMyFundingPost} from '../../redux/OrganizationPostReducer';
 import {reportPost} from '../../api/PostApi';
+import {useNotifications} from 'react-native-notificated';
 
 const {width: wWidth, height} = Dimensions.get('window');
 
@@ -46,6 +47,7 @@ export const OrganizationPost = ({
   index,
   navigation,
 }: any) => {
+  const {notify} = useNotifications();
   const [anchor, setAnchor] = useState({x: 0, y: 0});
   const [visible, setVisible] = useState<boolean>(false);
   const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -158,6 +160,13 @@ export const OrganizationPost = ({
       });
       if (response.status === 200) {
         console.log('Report post success');
+        notify('success', {
+          params: {
+            description: 'Report post successfully',
+            title: 'Report',
+            style: {multiline: 100},
+          },
+        });
       }
       setVisibleDialogReport(false);
       setReason('Spam or Misleading Information');

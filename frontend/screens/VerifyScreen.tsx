@@ -157,7 +157,7 @@ const VerifyScreen = ({navigation}: any) => {
             fontWeight: 'bold',
             color: 'white',
           }}>
-          Reports
+          Manage Accounts
         </Text>
       </View>
       <SearchBar
