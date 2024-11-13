@@ -7,6 +7,8 @@ import DashboardPage from "./pages/overview/DashboardPage.tsx";
 import AccountPage from "./pages/account/AccountPage.tsx";
 import ErrorPage from "./pages/error/ErrorPage.tsx";
 
+import SignIn from "./pages/sign-in/SignIn.tsx";
+
 const router = createBrowserRouter([
   {
     Component: App, // root layout route
@@ -26,6 +28,11 @@ const router = createBrowserRouter([
         ],
       },
     ],
+    ErrorBoundary: ErrorPage,
+  },
+  {
+    Component: SignIn,
+    path: "login",
     ErrorBoundary: ErrorPage,
   },
 ]);

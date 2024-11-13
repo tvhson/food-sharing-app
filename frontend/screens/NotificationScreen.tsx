@@ -123,18 +123,20 @@ const NotificationScreen = ({navigation}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <Text
-        style={{
-          fontSize: 24,
-          fontWeight: 'bold',
-          color: Colors.postTitle,
-          fontFamily: getFontFamily('bold'),
-          margin: 8,
-        }}>
-        Thông báo
-      </Text>
+      <View style={{backgroundColor: 'white', padding: 10, height: 50}}>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: 'bold',
+            color: Colors.greenText,
+            fontFamily: getFontFamily('bold'),
+          }}>
+          Thông báo
+        </Text>
+      </View>
+
       <FlatList
-        style={{marginHorizontal: 8}}
+        style={{marginTop: 20, marginHorizontal: 10}}
         data={notifications}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
