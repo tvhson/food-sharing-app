@@ -1,7 +1,6 @@
-import * as React from 'react';
-import { useColorScheme } from '@mui/material/styles';
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectProps } from '@mui/material/Select';
+import { useColorScheme } from "@mui/material/styles";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectProps } from "@mui/material/Select";
 
 export default function ColorModeSelect(props: SelectProps) {
   const { mode, setMode } = useColorScheme();
@@ -12,17 +11,17 @@ export default function ColorModeSelect(props: SelectProps) {
     <Select
       value={mode}
       onChange={(event) =>
-        setMode(event.target.value as 'system' | 'light' | 'dark')
+        setMode(event.target.value as "system" | "light" | "dark")
       }
       SelectDisplayProps={{
         // @ts-ignore
-        'data-screenshot': 'toggle-mode',
+        "data-screenshot": "toggle-mode",
       }}
       {...props}
     >
-      <MenuItem value="system">System</MenuItem>
-      <MenuItem value="light">Light</MenuItem>
-      <MenuItem value="dark">Dark</MenuItem>
+      <MenuItem value="system">Hệ thống</MenuItem>
+      <MenuItem value="light">Sáng</MenuItem>
+      <MenuItem value="dark">Tối</MenuItem>
     </Select>
   );
 }
