@@ -48,13 +48,13 @@ dependencies:
     version: 0.1.0
     repository: file://../../happyfood-services/posts
 
-  - name: organizationpostsdb
-    version: 0.1.0
-    repository: file://../../happyfood-services/organizationpostsdb
+#  - name: organizationpostsdb
+#    version: 0.1.0
+#    repository: file://../../happyfood-services/organizationpostsdb
 
-  - name: organizationposts
-    version: 0.1.0
-    repository: file://../../happyfood-services/organizationposts
+#  - name: organizationposts
+#    version: 0.1.0
+#    repository: file://../../happyfood-services/organizationposts
 
   - name: chatsdb
     version: 0.1.0
@@ -72,17 +72,17 @@ dependencies:
     version: 0.1.0
     repository: file://../../happyfood-services/notifications
 
-  - name: reportsdb
-    version: 0.1.0
-    repository: file://../../happyfood-services/reportsdb
+#  - name: reportsdb
+#    version: 0.1.0
+#    repository: file://../../happyfood-services/reportsdb
 
-  - name: reports
-    version: 0.1.0
-    repository: file://../../happyfood-services/reports
-
-  - name: auth
-    version: 0.1.0
-    repository: file://../../happyfood-services/auth
+#  - name: reports
+#    version: 0.1.0
+#    repository: file://../../happyfood-services/reports
+#
+#  - name: auth
+#    version: 0.1.0
+#    repository: file://../../happyfood-services/auth
 
   - name: gatewayserver
     version: 0.1.0

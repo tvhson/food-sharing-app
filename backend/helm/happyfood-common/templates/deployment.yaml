@@ -21,13 +21,6 @@ spec:
 {{- if .Values.allwayspull_enabled }}
         imagePullPolicy: Always
 {{- end }}
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "64Mi"
-            cpu: "500m"
         ports:
         - containerPort: {{ .Values.containerPort }}
           protocol: TCP
