@@ -103,7 +103,7 @@
 				<version>3.4.1</version>
 				<configuration>
 					<to>
-						<image>sontruong02003/${project.artifactId}:s1</image>
+						<image>sontruong02003/${project.artifactId}:s2</image>
 					</to>
 				</configuration>
 			</plugin>

@@ -88,6 +88,6 @@ dependencies:
     version: 0.1.0
     repository: file://../../happyfood-services/gatewayserver
 
-  - name: media
-    version: 0.1.0
-    repository: file://../../happyfood-services/media
+#  - name: media
+#    version: 0.1.0
+#    repository: file://../../happyfood-services/media
