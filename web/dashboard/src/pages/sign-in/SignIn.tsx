@@ -13,6 +13,11 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import AppTheme from "../../utils/shared-theme/AppTheme";
 import ColorModeSelect from "../../utils/shared-theme/ColorModeSelect";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { login } from "../../api/LoginApi";
+import { useDispatch } from "react-redux";
+import { setToken } from "../../redux/TokenReducer";
+import { useNavigate } from "react-router-dom"; // Add this import at the top
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -61,16 +66,41 @@ export default function SignIn() {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Add this line
+
+  //const query = useQuery({ queryKey: ["token"], queryFn: login });
+
+  //const mutation = useMutation({});
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: { email: string; password: string }) => {
+      const response = await login(credentials);
+      // Store token in localStorage
+      localStorage.setItem("token", response.accessToken);
+      return response;
+    },
+    onSuccess: (data) => {
+      // Update Redux store with user data
+      dispatch(setToken(data.accessToken));
+      // You can add navigation logic here
+      navigate("");
+    },
+    onError: (error) => {
+      console.error(error);
+      setPasswordError(true);
+      setPasswordErrorMessage("Invalid credentials");
+    },
+  });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
+    event.preventDefault();
+    if (!validateInputs()) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+    loginMutation.mutate({
+      email: data.get("email") as string,
+      password: data.get("password") as string,
     });
   };
 
@@ -176,12 +206,7 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Ghi nhớ đăng nhập"
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained">
               Đăng nhập
             </Button>
           </Box>
