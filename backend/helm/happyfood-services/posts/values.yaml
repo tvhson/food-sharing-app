@@ -12,7 +12,11 @@ replicaCount: 1
 
 image:
   repository: sontruong02003/posts
+<<<<<<< HEAD
+  tag: s1
+=======
   tag: s2
+>>>>>>> 284954572264b17e13bf877e6b0f8ab6e2d194d8
 
 containerPort: 8090
 
@@ -30,4 +34,8 @@ resouceserver_enabled: false
 otel_enabled: false
 kafka_enabled: false
 database_enabled: false
+<<<<<<< HEAD
 allwayspull_enabled: true
+=======
+allwayspull_enabled: true
+>>>>>>> 284954572264b17e13bf877e6b0f8ab6e2d194d8

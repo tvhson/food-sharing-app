@@ -8,6 +8,3 @@
 
 # media application.yaml
 /media/src/main/resources/application.yaml
-
-# account application.yaml
-/accounts/src/main/resources/application.yaml
