@@ -65,7 +65,7 @@ This guide provides instructions on how to set up, run, stop, and restart the ap
 2. **Stop and Start Services (Alternative)**  
    - Stop:
      ```bash
-     docker-compose down
+     docker compose down
      ```
    - Start:
      ```bash
