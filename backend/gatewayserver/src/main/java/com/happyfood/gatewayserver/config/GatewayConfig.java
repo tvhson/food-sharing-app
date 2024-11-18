@@ -10,36 +10,38 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableHystrix
 public class GatewayConfig {
-    @Autowired
-    private AuthenticationFilter filter;
+        @Autowired
+        private AuthenticationFilter filter;
 
-    @Bean
-    public RouteLocator routes(RouteLocatorBuilder builder) {
-        return builder.routes()
-                .route("AUTH", r -> r.path("/auth/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://auth:7080"))
-                .route("ACCOUNTS", r -> r.path("/accounts/**", "/accounts-details/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://accounts:8080"))
-                .route("POSTS", r -> r.path("/posts/**", "/posts-details/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://posts:8090"))
-                .route("MEDIA", r -> r.path("/media/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://media:9000"))
-                .route("ORGANIZATIONPOSTS", r -> r.path("/organizationposts/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://organizationposts:9010"))
-                .route("CHATS", r -> r.path("/chats/**", "/ws-chats/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://chats:9020"))
-                .route("NOTIFICATIONS", r -> r.path("/notifications/**", "/ws-notifications/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://notifications:9030"))
-                .route("REPORTS", r -> r.path("/reports/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://reports:9040"))
-                .build();
-    }
+        @Bean
+        public RouteLocator routes(RouteLocatorBuilder builder) {
+                return builder.routes()
+                                // .route("AUTH", r -> r.path("/auth/**")
+                                // .filters(f -> f.filter(filter))
+                                // .uri("http://auth:7080"))
+                                .route("ACCOUNTS", r -> r
+                                                .path("/accounts/**", "/accounts-details/**", "/auth/**", "/media/**")
+                                                .filters(f -> f.filter(filter))
+                                                .uri("http://accounts:8080"))
+                                .route("POSTS", r -> r.path("/posts/**", "/posts-details/**", "/organizationposts/**")
+                                                .filters(f -> f.filter(filter))
+                                                .uri("http://posts:8090"))
+                                // .route("MEDIA", r -> r.path("/media/**")
+                                // .filters(f -> f.filter(filter))
+                                // .uri("http://media:9000"))
+                                // .route("ORGANIZATIONPOSTS", r -> r.path("/organizationposts/**")
+                                // .filters(f -> f.filter(filter))
+                                // .uri("http://organizationposts:9010"))
+                                .route("CHATS", r -> r.path("/chats/**", "/ws-chats/**")
+                                                .filters(f -> f.filter(filter))
+                                                .uri("http://chats:9020"))
+                                .route("NOTIFICATIONS",
+                                                r -> r.path("/notifications/**", "/ws-notifications/**", "/reports/**")
+                                                                .filters(f -> f.filter(filter))
+                                                                .uri("http://notifications:9030"))
+                                // .route("REPORTS", r -> r.path("/reports/**")
+                                // .filters(f -> f.filter(filter))
+                                // .uri("http://reports:9040"))
+                                .build();
+        }
 }
