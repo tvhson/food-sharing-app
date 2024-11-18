@@ -43,12 +43,29 @@ management:
     web:
       exposure:
         include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   endpoint:
     gateway:
       enabled: true
+    shutdown:
+      enabled: true
+    health:
+      probes:
+        enabled: true
   info:
     env:
       enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+endpoints:
+  shutdown:
+    enabled: true
 
 info:
   app:
