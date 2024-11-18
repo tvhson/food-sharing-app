@@ -59,7 +59,7 @@ This guide provides instructions on how to set up, run, stop, and restart the ap
 1. **Restart All Services**  
    Use this command to restart all containers:
    ```bash
-   docker-compose restart
+   docker compose restart
    ```
 
 2. **Stop and Start Services (Alternative)**  
@@ -69,7 +69,7 @@ This guide provides instructions on how to set up, run, stop, and restart the ap
      ```
    - Start:
      ```bash
-     docker-compose up -d
+     docker compose up -d
      ```
 
 ---
@@ -78,14 +78,14 @@ This guide provides instructions on how to set up, run, stop, and restart the ap
 
 - **View Logs of All Services**  
   ```bash
-  docker-compose logs -f
+  docker compose logs -f
   ```
   The `-f` flag streams logs in real time.
 
 - **View Logs of a Specific Service**  
   Replace `<service-name>` with the name of the service (defined in `docker-compose.yml`):
   ```bash
-  docker-compose logs -f <service-name>
+  docker compose logs -f <service-name>
   ```
 
 ---
