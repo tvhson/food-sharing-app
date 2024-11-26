@@ -4,6 +4,7 @@ import com.happyfood.posts.dto.PostsDto;
 import com.happyfood.posts.entity.Images;
 import com.happyfood.posts.entity.Posts;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class PostsMapper {
@@ -24,6 +25,7 @@ public class PostsMapper {
                 .longitude(postsDto.getLongitude())
                 .createdById(postsDto.getCreatedById())
                 .receiverId(postsDto.getReceiverId())
+                .portion(postsDto.getPortion())
                 .build();
     }
     public static PostsDto mapToPostsDto(Posts posts) {
@@ -45,6 +47,10 @@ public class PostsMapper {
                 .createdById(posts.getCreatedById())
                 .receiverId(posts.getReceiverId())
                 .createdDate(posts.getCreatedDate())
+                .portion(posts.getPortion())
+                .tags(posts.getTags() != null && !posts.getTags().isEmpty() ? Arrays.asList(posts.getTags().split("-")) : null)
+                .isLiked(false)
+                .likeCount(posts.getUserIdLikes() != null && !posts.getUserIdLikes().isEmpty() ? Arrays.asList(posts.getUserIdLikes().split("-")).size() : 0)
                 .build();
     }
 }

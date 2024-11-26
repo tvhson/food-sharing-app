@@ -7,11 +7,7 @@ replicaCount: 1
 
 image:
   repository: sontruong02003/gatewayserver
-<<<<<<< HEAD
-  tag: s1
-=======
   tag: s2
->>>>>>> 284954572264b17e13bf877e6b0f8ab6e2d194d8
 
 containerPort: 8072
 

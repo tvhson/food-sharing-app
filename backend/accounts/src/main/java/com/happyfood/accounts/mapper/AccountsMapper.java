@@ -20,6 +20,8 @@ public class AccountsMapper {
                 .locationName(accountsDto.getLocationName())
                 .latitude(accountsDto.getLatitude())
                 .longitude(accountsDto.getLongitude())
+                .isVegan(accountsDto.getIsVegan())
+                .isChosenTag(accountsDto.getIsChosenTag())
                 .build();
     }
 
@@ -39,6 +41,8 @@ public class AccountsMapper {
                 .locationName(accounts.getLocationName())
                 .latitude(accounts.getLatitude())
                 .longitude(accounts.getLongitude())
+                .isVegan(accounts.getIsVegan())
+                .isChosenTag(accounts.getIsChosenTag())
                 .build();
     }
 }

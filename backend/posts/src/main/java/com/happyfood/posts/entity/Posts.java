@@ -36,6 +36,12 @@ public class Posts {
     private Long createdById;
     private Long receiverId;
     private Date createdDate;
+    private int portion;
+    private String tags;
+    private String userIdLikes;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comments> comments;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Images> images;

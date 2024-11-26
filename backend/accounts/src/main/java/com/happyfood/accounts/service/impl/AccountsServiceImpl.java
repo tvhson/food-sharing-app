@@ -34,6 +34,8 @@ public class AccountsServiceImpl implements IAccountsService {
         accounts.setRole("USER");
         accounts.setStatus("ACTIVE");
         accounts.setCreatedDate(new Date());
+        accounts.setIsVegan(false);
+        accounts.setIsChosenTag(false);
         accounts = accountsRepository.save(accounts);
 //        sendCommunication(accounts);
         return AccountsMapper.mapToAccountsDto(accounts);
@@ -100,6 +102,8 @@ public class AccountsServiceImpl implements IAccountsService {
         accounts.setBirthDate(accountsDto.getBirthDate());
         accounts.setImageUrl(accountsDto.getImageUrl());
         accounts.setBannedDate(accountsDto.getBannedDate());
+        accounts.setIsVegan(accountsDto.getIsVegan());
+        accounts.setIsChosenTag(accountsDto.getIsChosenTag());
 
         accounts = accountsRepository.save(accounts);
         return AccountsMapper.mapToAccountsDto(accounts);

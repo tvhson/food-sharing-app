@@ -11,55 +11,17 @@ dependencies:
 - name: accounts
   repository: file://../../happyfood-services/accounts
   version: 0.1.0
-- name: postsdb
-  repository: file://../../happyfood-services/postsdb
-  version: 0.1.0
 - name: posts
   repository: file://../../happyfood-services/posts
-  version: 0.1.0
-<<<<<<< HEAD
-- name: organizationpostsdb
-  repository: file://../../happyfood-services/organizationpostsdb
-  version: 0.1.0
-- name: organizationposts
-  repository: file://../../happyfood-services/organizationposts
-  version: 0.1.0
-=======
->>>>>>> 284954572264b17e13bf877e6b0f8ab6e2d194d8
-- name: chatsdb
-  repository: file://../../happyfood-services/chatsdb
   version: 0.1.0
 - name: chats
   repository: file://../../happyfood-services/chats
   version: 0.1.0
-- name: notificationsdb
-  repository: file://../../happyfood-services/notificationsdb
-  version: 0.1.0
 - name: notifications
   repository: file://../../happyfood-services/notifications
   version: 0.1.0
-<<<<<<< HEAD
-- name: reportsdb
-  repository: file://../../happyfood-services/reportsdb
-  version: 0.1.0
-- name: reports
-  repository: file://../../happyfood-services/reports
-  version: 0.1.0
-- name: auth
-  repository: file://../../happyfood-services/auth
-  version: 0.1.0
 - name: gatewayserver
   repository: file://../../happyfood-services/gatewayserver
   version: 0.1.0
-- name: media
-  repository: file://../../happyfood-services/media
-  version: 0.1.0
-digest: sha256:2e75d92ce7776a8a8d6ad40b2d5224c02b51c5920948d9ad40924ffb70a01f38
-generated: "2024-05-19T09:02:28.6910414+07:00"
-=======
-- name: gatewayserver
-  repository: file://../../happyfood-services/gatewayserver
-  version: 0.1.0
-digest: sha256:96138e20420fecfdd306c8c80d2555b58d0439aecd8f7699b63389d0deaafd51
-generated: "2024-11-16T10:00:59.952759698+07:00"
->>>>>>> 284954572264b17e13bf877e6b0f8ab6e2d194d8
+digest: sha256:90c223f8b400558fba26f94c6f7458abaf8b71b42dfd44fbed2b0accda1f4347
+generated: "2024-11-25T17:39:16.793015179+07:00"

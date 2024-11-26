@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +25,16 @@ public class PostsServiceImpl implements IPostsService {
         posts.setDeleted(false);
         posts.setCreatedById(userId);
         posts.setCreatedDate(new Date());
+        if (postsDto.getTags() != null && !postsDto.getTags().isEmpty()) {
+            posts.setTags(String.join("-", postsDto.getTags()));
+        }
 
         posts.setImages(new ArrayList<>());
         for (String imageUrl : postsDto.getImages()) {
             posts.getImages().add(Images.builder().url(imageUrl).post(posts).build());
         }
 
-        return PostsMapper.mapToPostsDto(postsRepository.save(posts));
+        return convertToResponse(postsRepository.save(posts), userId);
     }
 
     @Override
@@ -52,13 +56,17 @@ public class PostsServiceImpl implements IPostsService {
         posts.setLatitude(postsDto.getLatitude());
         posts.setLongitude(postsDto.getLongitude());
         posts.setReceiverId(postsDto.getReceiverId());
+        posts.setPortion(postsDto.getPortion());
+        if (postsDto.getTags() != null && !postsDto.getTags().isEmpty()) {
+            posts.setTags(String.join("-", postsDto.getTags()));
+        }
 
         posts.getImages().clear();
         for (String imageUrl : postsDto.getImages()) {
             posts.getImages().add(Images.builder().url(imageUrl).post(posts).build());
         }
 
-        return PostsMapper.mapToPostsDto(postsRepository.save(posts));
+        return convertToResponse(postsRepository.save(posts), userId);
     }
 
     @Override
@@ -72,12 +80,13 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public PostsDto getPostById(Long postId) {
-        return PostsMapper.mapToPostsDto(postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND)));
+    public PostsDto getPostById(Long userId, Long postId) {
+        return convertToResponse(postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND)), userId);
+
     }
 
     @Override
-    public List<PostsDto> getRecommendedPosts(Long userI ) {
+    public List<PostsDto> getRecommendedPosts(Long userId) {
         List<Posts> posts = postsRepository.findAll();
 
 //        double latitude = Double.parseDouble(location.getLatitude());
@@ -86,7 +95,7 @@ public class PostsServiceImpl implements IPostsService {
         List<PostsDto> recommendedPosts = new ArrayList<>(posts.stream()
                 .filter(post -> !post.isDeleted())
                 .filter(post -> !post.getStatus().equals("RECEIVED"))
-                .map(PostsMapper::mapToPostsDto)
+                .map(post -> convertToResponse(post, userId))
 //                .filter(post -> post.getReceiverId() == null)
 //                .filter(post -> post.getLatitude() != null)
 //                .filter(post -> post.getLongitude() != null)
@@ -108,6 +117,32 @@ public class PostsServiceImpl implements IPostsService {
         Collections.reverse(posts);
         return posts.stream()
                 .filter(post -> !post.isDeleted())
-                .map(PostsMapper::mapToPostsDto).toList();
+                .map(post -> convertToResponse(post, userId))
+                .toList();
+    }
+
+    @Override
+    public void toggleLikePost(Long userId, Long postId) {
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
+
+        if (posts.getUserIdLikes() == null || posts.getUserIdLikes().isEmpty()) {
+            posts.setUserIdLikes(userId.toString());
+        } else {
+            String[] userIdLikes = posts.getUserIdLikes().split("-");
+            if (Arrays.stream(userIdLikes).anyMatch(s -> s.equals(userId.toString()))) {
+                posts.setUserIdLikes(Arrays.stream(userIdLikes).filter(s -> !s.equals(userId.toString())).collect(Collectors.joining("-")));
+            } else {
+                posts.setUserIdLikes(posts.getUserIdLikes() + "-" + userId);
+            }
+        }
+        postsRepository.save(posts);
+    }
+
+    private PostsDto convertToResponse(Posts posts, Long userId) {
+        PostsDto postsDto = PostsMapper.mapToPostsDto(posts);
+        if (posts.getUserIdLikes() != null && !posts.getUserIdLikes().isEmpty()) {
+            postsDto.setIsLiked(Arrays.stream(posts.getUserIdLikes().split("-")).anyMatch(s -> s.equals(userId.toString())));
+        }
+        return postsDto;
     }
 }

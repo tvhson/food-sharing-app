@@ -1,7 +1,9 @@
 package com.happyfood.posts.controller;
 
+import com.happyfood.posts.dto.CommentsDto;
 import com.happyfood.posts.dto.Coordinates;
 import com.happyfood.posts.dto.PostsDto;
+import com.happyfood.posts.service.ICommentsService;
 import com.happyfood.posts.service.IPostsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import java.util.List;
 @RequestMapping("/posts")
 public class PostsController {
     private final IPostsService postsService;
+    private final ICommentsService commentsService;
 
     @PostMapping
     ResponseEntity<PostsDto> createPost(@RequestHeader Long userId, @RequestBody PostsDto postsDto) {
@@ -29,8 +32,8 @@ public class PostsController {
         return ResponseEntity.ok().build();
     }
     @GetMapping("/get/{postId}")
-    ResponseEntity<PostsDto> getPostById(@PathVariable Long postId) {
-        return ResponseEntity.ok(postsService.getPostById(postId));
+    ResponseEntity<PostsDto> getPostById(@RequestHeader Long userId, @PathVariable Long postId) {
+        return ResponseEntity.ok(postsService.getPostById(userId, postId));
     }
     @GetMapping("/recommended")
     ResponseEntity<List<PostsDto>> getRecommendedPosts(@RequestHeader Long userId) {
@@ -40,5 +43,36 @@ public class PostsController {
     ResponseEntity<List<PostsDto>> getPostsOfUser(@RequestHeader Long userId) {
         return ResponseEntity.ok(postsService.getPostsOfUser(userId));
     }
+    @PatchMapping("/like/{postId}")
+    ResponseEntity<?> toggleLikePost(@RequestHeader Long userId, @PathVariable Long postId) {
+        postsService.toggleLikePost(userId, postId);
+        return ResponseEntity.ok().build();
+    }
 
+    @GetMapping("/{postId}/comments")
+    ResponseEntity<List<CommentsDto>> getCommentsByPostId(@RequestHeader Long userId, @PathVariable Long postId) {
+        return ResponseEntity.ok(commentsService.getCommentsByPostId(userId, postId));
+    }
+
+    @PostMapping("/{postId}/comments")
+    ResponseEntity<CommentsDto> createComment(@RequestHeader Long userId, @PathVariable Long postId, @RequestBody CommentsDto commentsDto) {
+        return ResponseEntity.ok(commentsService.createComment(userId, postId, commentsDto));
+    }
+
+    @PutMapping("/{postId}/comments")
+    ResponseEntity<CommentsDto> updateComment(@RequestHeader Long userId, @PathVariable Long postId, @RequestBody CommentsDto commentsDto) {
+        return ResponseEntity.ok(commentsService.updateComment(userId, postId, commentsDto));
+    }
+
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    ResponseEntity<?> deleteComment(@RequestHeader Long userId, @PathVariable Long postId, @PathVariable Long commentId) {
+        commentsService.deleteComment(userId, postId, commentId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/lovecmt/{commentId}")
+    ResponseEntity<?> toggleLoveComment(@RequestHeader Long userId, @PathVariable Long commentId) {
+        commentsService.toggleLikeComment(userId, commentId);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -34,4 +34,6 @@ public class Accounts{
     private String latitude;
     private String longitude;
     private Date createdDate;
+    private Boolean isVegan;
+    private Boolean isChosenTag;
 }

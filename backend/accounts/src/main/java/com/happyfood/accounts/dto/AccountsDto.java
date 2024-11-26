@@ -39,4 +39,6 @@ public class AccountsDto {
     private String locationName;
     private String latitude;
     private String longitude;
+    private Boolean isVegan;
+    private Boolean isChosenTag;
 }

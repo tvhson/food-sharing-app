@@ -29,35 +29,35 @@ services:
       file: common-config.yml
       service: microservice-db-config
 
-  postsdb:
-    container_name: postsdb
-    ports:
-      - 3308:3306
-    environment:
-      MYSQL_DATABASE: postsdb
-    extends:
-      file: common-config.yml
-      service: microservice-db-config
+#  postsdb:
+#    container_name: postsdb
+#    ports:
+#      - 3308:3306
+#    environment:
+#      MYSQL_DATABASE: postsdb
+#    extends:
+#      file: common-config.yml
+#      service: microservice-db-config
 
-  chatsdb:
-    container_name: chatsdb
-    ports:
-      - 3310:3306
-    environment:
-      MYSQL_DATABASE: chatsdb
-    extends:
-      file: common-config.yml
-      service: microservice-db-config
+#  chatsdb:
+#    container_name: chatsdb
+#    ports:
+#      - 3310:3306
+#    environment:
+#      MYSQL_DATABASE: chatsdb
+#    extends:
+#      file: common-config.yml
+#      service: microservice-db-config
 
-  notificationsdb:
-    container_name: notificationsdb
-    ports:
-      - 3311:3306
-    environment:
-      MYSQL_DATABASE: notificationsdb
-    extends:
-      file: common-config.yml
-      service: microservice-db-config
+#  notificationsdb:
+#    container_name: notificationsdb
+#    ports:
+#      - 3311:3306
+#    environment:
+#      MYSQL_DATABASE: notificationsdb
+#    extends:
+#      file: common-config.yml
+#      service: microservice-db-config
 
   configserver:
     image: "sontruong02003/configserver:s1"
@@ -151,7 +151,7 @@ services:
       - "8090:8090"
     environment:
       SPRING_APPLICATION_NAME: "posts"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://postsdb:3306/postsdb"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
     healthcheck:
       test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -159,7 +159,7 @@ services:
       retries: 20
       start_period: 10s
     depends_on:
-      postsdb:
+      accountsdb:
         condition: service_healthy
       configserver:
         condition: service_healthy
@@ -174,7 +174,7 @@ services:
       - "9030:9030"
     environment:
       SPRING_APPLICATION_NAME: "notifications"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://notificationsdb:3306/notificationsdb"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
     healthcheck:
       test: "curl --fail --silent localhost:9030/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -182,7 +182,7 @@ services:
       retries: 20
       start_period: 10s
     depends_on:
-      notificationsdb:
+      accountsdb:
         condition: service_healthy
       configserver:
         condition: service_healthy
@@ -197,7 +197,7 @@ services:
       - "9020:9020"
     environment:
       SPRING_APPLICATION_NAME: "chats"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://chatsdb:3306/chatsdb"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
     healthcheck:
       test: "curl --fail --silent localhost:9020/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -205,7 +205,7 @@ services:
       retries: 20
       start_period: 10s
     depends_on:
-      chatsdb:
+      accountsdb:
         condition: service_healthy
       configserver:
         condition: service_healthy

@@ -7,7 +7,8 @@ spring:
   profiles:
     active: "default"
   datasource:
-    url: jdbc:mysql://localhost:3310/chatsdb
+#    url: jdbc:mysql://localhost:3310/chatsdb
+    url: jdbc:mysql://localhost:3306/devdb
     username: root
     password: root
   jpa:

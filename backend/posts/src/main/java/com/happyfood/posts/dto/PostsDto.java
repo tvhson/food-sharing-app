@@ -31,4 +31,8 @@ public class PostsDto {
     private Long createdById;
     private Long receiverId;
     private Date createdDate;
+    private int portion;
+    private List<String> tags;
+    private Boolean isLiked;
+    private int likeCount;
 }

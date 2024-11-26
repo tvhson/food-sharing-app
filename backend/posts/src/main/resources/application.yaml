@@ -6,7 +6,8 @@ spring:
   profiles:
     active: "default"
   datasource:
-    url: jdbc:mysql://localhost:3308/postsdb
+#    url: jdbc:mysql://localhost:3308/postsdb
+    url: jdbc:mysql://localhost:3306/devdb
     username: root
     password: root
   jpa:
