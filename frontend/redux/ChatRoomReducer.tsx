@@ -1,5 +1,31 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 
+interface GroupMessage {
+  id: number;
+  groupId: number;
+  senderId: number;
+  content: string;
+  createdDate: Date;
+  status: string;
+  timestamp: Date;
+}
+
+interface Member {
+  id: number;
+  name: string;
+  profilePic: string;
+}
+interface GroupRoom {
+  id: number;
+  name: string;
+  groupPic: string;
+  status: string; // UNREAD, READ
+  members: Member[];
+  lastMessage: string;
+  lastMessageCreatedDate: Date;
+  lastMessageSenderId: number;
+  numberOfUnreadMessages: number;
+}
 interface ChatRoom {
   id: number;
   senderId: number;

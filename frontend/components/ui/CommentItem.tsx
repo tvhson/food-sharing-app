@@ -9,25 +9,42 @@ import {
 import React, {useState} from 'react';
 import {getFontFamily} from '../../utils/fonts';
 import Colors from '../../global/Color';
+import {timeAgo} from '../../utils/helper';
+import {likeComment} from '../../api/PostApi';
+import {RootState} from '../../redux/Store';
+import {useSelector} from 'react-redux';
 
 const CommentItem = (props: any) => {
   const {comment} = props;
-  const [isLiked, setIsLiked] = useState(comment.isLiked || false);
-  const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
-  const handleLikeComment = () => {
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const [isLiked, setIsLiked] = useState(comment.isLove || false);
+  const [likeCount, setLikeCount] = useState(comment.loveCount || 0);
+  const handleLikeComment = async () => {
     setIsLiked(!isLiked);
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+    const response: any = await likeComment(comment.id, accessToken);
+    if (response.status !== 200) {
+      setIsLiked(isLiked);
+      setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+    }
   };
   return (
     <TouchableWithoutFeedback>
       <View style={styles.container}>
         <TouchableOpacity>
-          <Image source={comment.user.avatar} style={styles.avatar} />
+          <Image
+            source={{
+              uri:
+                comment.avatar ||
+                'https://randomuser.me/api/portraits/men/36.jpg',
+            }}
+            style={styles.avatar}
+          />
         </TouchableOpacity>
         <View style={styles.contentContainer}>
           <View style={styles.row}>
-            <Text style={styles.textName}>{comment.user.name}</Text>
-            <Text style={styles.textTime}>{comment.time}</Text>
+            <Text style={styles.textName}>{comment.userName}</Text>
+            <Text style={styles.textTime}>{timeAgo(comment.createdDate)}</Text>
           </View>
 
           <Text>{comment.content}</Text>

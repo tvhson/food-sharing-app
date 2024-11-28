@@ -117,7 +117,7 @@ const OrganizationPostDetail2 = (props: any) => {
           </View>
         </View>
         <View style={{paddingVertical: 10, paddingHorizontal: 20}}>
-          <Text style={styles.textTitle2}>Chi tiết sự kiện</Text>
+          <Text style={styles.textTitle2}>Chi tiết chiến dịch</Text>
           <View style={{flex: 1}}>
             <Text style={styles.textNormal}>
               {item.organizationposts.description}

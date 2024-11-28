@@ -36,7 +36,7 @@ const HomeScreen = ({navigation}: any) => {
   const [sortingMethod, setSortingMethod] = useState('');
   const [visible, setVisible] = useState(false);
   const [showComment, setShowComment] = useState(false);
-  const [commentPostId, setCommentPostId] = useState('');
+  const [commentPostId, setCommentPostId] = useState(-1);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -135,7 +135,6 @@ const HomeScreen = ({navigation}: any) => {
           return distanceA - distanceB;
         });
       }
-
       setFilterPosts(filtered);
     };
     if (recommendPost) {
@@ -228,6 +227,7 @@ const HomeScreen = ({navigation}: any) => {
             location={location}
             distance={calculateDistance(item)}
             setShowComment={setShowComment}
+            setCommentPostId={setCommentPostId}
           />
         )}
         ListEmptyComponent={

@@ -1,6 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
 import {
-  BackHandler,
   FlatList,
   Image,
   StyleSheet,
@@ -9,268 +8,59 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from 'react-native-modal';
 import Colors from '../../global/Color';
 import {getFontFamily} from '../../utils/fonts';
 import CommentItem from './CommentItem';
-
-const CommentData = [
-  {
-    id: 1,
-    user: {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 1',
-    time: '1 giờ trước',
-  },
-  {
-    id: 2,
-    user: {
-      id: 2,
-      name: 'Nguyễn Văn B',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 2',
-    time: '2 giờ trước',
-  },
-  {
-    id: 3,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 4,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 5,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 6,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 7,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 8,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 9,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 10,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 11,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 12,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 13,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 14,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 15,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 16,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 17,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 18,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 19,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 20,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 21,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 22,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 23,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 24,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-  {
-    id: 25,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-];
+import {RootState} from '../../redux/Store';
+import {useSelector} from 'react-redux';
+import {createCommentToPost, getCommentByPostId} from '../../api/PostApi';
+import {useNotifications} from 'react-native-notificated';
 
 const Comment = (props: any) => {
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const {commentPostId} = props;
   const {isVisible, setVisible} = props;
-  const handleCreateComment = () => {};
+  const [commentList, setCommentList] = useState([]);
+  const [comment, setComment] = useState('');
+  const {notify} = useNotifications();
+
+  useEffect(() => {
+    const getCommentList = async () => {
+      // get comment list
+      if (accessToken) {
+        // get comment list
+        getCommentByPostId(commentPostId, accessToken).then((response: any) => {
+          if (response.status === 200) {
+            setCommentList(response.data);
+          }
+        });
+      }
+    };
+    getCommentList();
+  }, [accessToken, commentPostId, notify, isVisible]);
+
+  const handleCreateComment = async () => {
+    const response: any = await createCommentToPost(
+      commentPostId,
+      {content: comment},
+      accessToken,
+    );
+    if (response.status === 200) {
+      setComment('');
+      getCommentByPostId(commentPostId, accessToken).then((response2: any) => {
+        if (response2.status === 200) {
+          setCommentList(response2.data);
+          console.log('commentList', commentList);
+        }
+      });
+    } else {
+      notify('error', {
+        params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+      });
+    }
+  };
 
   return (
     <Modal
@@ -294,9 +84,9 @@ const Comment = (props: any) => {
           <Text style={styles.panelTitle}>Bình luận</Text>
         </View>
         <FlatList
-          data={CommentData}
+          data={commentList}
           renderItem={({item}) => <CommentItem comment={item} />}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item: any) => item.id.toString()}
           ListFooterComponent={<View style={{height: 70}} />}
           keyboardShouldPersistTaps="handled"
           initialNumToRender={20}
@@ -317,6 +107,8 @@ const Comment = (props: any) => {
           <TextInput
             multiline
             placeholder="Viết bình luận"
+            value={comment}
+            onChangeText={setComment}
             style={{
               backgroundColor: Colors.background,
               borderRadius: 20,

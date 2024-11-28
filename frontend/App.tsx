@@ -46,8 +46,8 @@ var encoder = new encoding.TextEncoder();
 
 const {NotificationsProvider} = createNotifications();
 function App() {
-  const routeNameRef = React.useRef();
-  const navigationRef = React.useRef<NavigationContainerRef<any>>();
+  const routeNameRef = React.useRef<string | undefined>(undefined);
+  const navigationRef = React.useRef<NavigationContainerRef<any>>(null);
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <Provider store={Store}>
@@ -58,12 +58,12 @@ function App() {
                 ref={navigationRef}
                 onReady={() => {
                   routeNameRef.current =
-                    navigationRef.current.getCurrentRoute().name;
+                    navigationRef?.current?.getCurrentRoute()?.name ?? '';
                 }}
                 onStateChange={async () => {
                   const previousRouteName = routeNameRef.current;
                   const currentRouteName =
-                    navigationRef.current.getCurrentRoute().name;
+                    navigationRef.current?.getCurrentRoute()?.name;
 
                   if (previousRouteName !== currentRouteName) {
                     await analytics().logScreenView({

@@ -25,6 +25,7 @@ import {getFontFamily} from '../utils/fonts';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import screenWidth from '../global/Constant';
 import {useLoading} from '../utils/LoadingContext';
+import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
 
 const {useNotifications} = createNotifications();
 
@@ -32,13 +33,14 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();
   const dispatch = useDispatch();
   const {notify} = useNotifications();
+  const [isTagVisible, setIsTagVisible] = useState(false);
   const location = route.params.location;
   const accessToken = route.params.accessToken;
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [weight, setWeight] = useState('');
   const [description, setDescription] = useState('');
-  const [note, setNote] = useState('');
+  const [portion, setPortion] = useState('');
   const [status, setStatus] = useState('');
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude] = useState(
@@ -180,7 +182,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
                 content,
                 weight,
                 description,
-                note,
+                portion,
                 status,
                 locationName,
                 latitude,
@@ -308,7 +310,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
           keyboardType="numeric"
         />
         <TextInput
-          placeholder="Ghi chú"
+          placeholder="Số phần"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -322,9 +324,34 @@ const CreatePostScreen = ({route, navigation}: any) => {
             borderColor: Colors.greenPrimary,
             fontFamily: getFontFamily('regular'),
           }}
-          value={note}
-          onChangeText={setNote}
+          value={portion}
+          onChangeText={setPortion}
         />
+        <TouchableOpacity
+          style={{width: '90%'}}
+          onPress={() => {
+            setIsTagVisible(true);
+          }}>
+          <TextInput
+            placeholder="Loại thực phẩm"
+            placeholderTextColor={'#706d6d'}
+            style={{
+              fontSize: 16,
+              padding: 10,
+              backgroundColor: '#eff2ff',
+              borderRadius: 8,
+              color: 'black',
+              borderWidth: 2,
+              marginTop: 20,
+              borderColor: Colors.greenPrimary,
+              fontFamily: getFontFamily('regular'),
+            }}
+            value={portion}
+            onChangeText={setPortion}
+            readOnly
+          />
+        </TouchableOpacity>
+
         <View style={{marginHorizontal: 10, marginTop: 20}}>
           <View
             style={{
@@ -534,6 +561,10 @@ const CreatePostScreen = ({route, navigation}: any) => {
 
         <View style={{height: 30}} />
       </View>
+      <ChooseTagBottomSheet
+        isVisible={isTagVisible}
+        setVisible={setIsTagVisible}
+      />
     </ScrollView>
   );
 };

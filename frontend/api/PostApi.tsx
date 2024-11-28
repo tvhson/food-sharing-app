@@ -94,3 +94,82 @@ export const getPostById = async (postId: any, token: any) => {
     return error;
   }
 };
+
+export const likePost = async (postId: any, token: any) => {
+  try {
+    const response = await ApiManager(`posts/like/${postId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getCommentByPostId = async (postId: any, token: any) => {
+  try {
+    const response = await ApiManager(`posts/${postId}/comments`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const createCommentToPost = async (
+  postId: any,
+  data: any,
+  token: any,
+) => {
+  try {
+    const response = await ApiManager(`posts/${postId}/comments`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
+      },
+      data: data,
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const deleteComment = async (
+  postId: any,
+  commentId: any,
+  token: any,
+) => {
+  try {
+    const response = await ApiManager(`posts/${postId}/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const likeComment = async (commentId: any, token: any) => {
+  try {
+    const response = await ApiManager(`posts/lovecmt/${commentId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

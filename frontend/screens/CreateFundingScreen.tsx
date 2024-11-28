@@ -50,19 +50,19 @@ const CreateFundingScreen = ({navigation}: any) => {
   const handleCreatePost = () => {
     if (title === '') {
       notify('error', {
-        params: {description: 'Title is required.', title: 'Error'},
+        params: {description: 'Bắt buộc có tiêu đề', title: 'Lỗi'},
       });
       return;
     }
     if (locationName === '') {
       notify('error', {
-        params: {description: 'Location is required.', title: 'Error'},
+        params: {description: 'Bắt buộc có địa điểm', title: 'Lỗi'},
       });
       return;
     }
     if (imageUpload === null) {
       notify('error', {
-        params: {description: 'Image is required.', title: 'Error'},
+        params: {description: 'Bắt buộc có ảnh', title: 'Lỗi'},
       });
       return;
     }
@@ -91,8 +91,8 @@ const CreateFundingScreen = ({navigation}: any) => {
               if (response2.status === 200) {
                 notify('success', {
                   params: {
-                    description: 'Create funding post successful.',
-                    title: 'Success',
+                    description: 'Tạo chiến dịch thành công',
+                    title: 'Thành công',
                   },
                 });
                 dispatch(addToTheEndOfFundingPost(response2.data));
@@ -111,7 +111,7 @@ const CreateFundingScreen = ({navigation}: any) => {
             });
         } else {
           notify('error', {
-            params: {description: response.data, title: 'Error'},
+            params: {description: response.data, title: 'Lỗi'},
           });
         }
       });
@@ -137,7 +137,7 @@ const CreateFundingScreen = ({navigation}: any) => {
           postImage={postImage}
         />
         <TextInput
-          placeholder="Title"
+          placeholder="Tiêu đề"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -148,13 +148,13 @@ const CreateFundingScreen = ({navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
           }}
           value={title}
           onChangeText={setTitle}
         />
         <TextInput
-          placeholder="Description"
+          placeholder="Chi tiết chiến dịch"
           placeholderTextColor={'#706d6d'}
           multiline
           numberOfLines={4}
@@ -168,14 +168,14 @@ const CreateFundingScreen = ({navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
           }}
           value={description}
           onChangeText={setDescription}
         />
 
         <TextInput
-          placeholder="Link Website"
+          placeholder="Link website của chiến dịch"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -186,7 +186,7 @@ const CreateFundingScreen = ({navigation}: any) => {
             color: 'black',
             borderWidth: 2,
             marginTop: 20,
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
           }}
           value={linkWebsites}
           onChangeText={setLinkWebsites}
@@ -196,7 +196,7 @@ const CreateFundingScreen = ({navigation}: any) => {
       <GooglePlacesAutocomplete
         ref={autocompleteRef}
         fetchDetails={true}
-        placeholder="Enter your organization address"
+        placeholder="Địa điểm diễn ra"
         onPress={(data, details = null) => {
           setLocationName(data.description);
           if (details) {
@@ -213,7 +213,7 @@ const CreateFundingScreen = ({navigation}: any) => {
         }}
         styles={{
           container: {
-            borderColor: Colors.postTitle,
+            borderColor: Colors.greenPrimary,
             borderRadius: 8,
             borderWidth: 2,
             width: '90%',
@@ -233,7 +233,7 @@ const CreateFundingScreen = ({navigation}: any) => {
           width: '90%',
           height: 300,
           alignSelf: 'center',
-          borderColor: Colors.postTitle,
+          borderColor: Colors.greenPrimary,
           borderRadius: 20,
           borderWidth: 2,
           overflow: 'hidden',
@@ -272,28 +272,31 @@ const CreateFundingScreen = ({navigation}: any) => {
           </>
         ) : (
           <>
-            <Icon
-              name="camera"
-              type="ionicon"
-              size={60}
-              color={Colors.postTitle}
-              style={{marginTop: 20}}
+            <TouchableOpacity
               onPress={() => {
                 setIsUploadVisible(!isUploadVisible);
-              }}
-            />
-            <Text style={{color: Colors.postTitle, fontSize: 18}}>
-              Add image
+              }}>
+              <Icon
+                name="camera"
+                type="ionicon"
+                size={60}
+                color={Colors.greenPrimary}
+                style={{marginTop: 20}}
+              />
+            </TouchableOpacity>
+
+            <Text style={{color: Colors.greenPrimary, fontSize: 18}}>
+              Thêm ảnh
             </Text>
           </>
         )}
       </View>
 
       <Button
-        title="Create Post"
+        title="Tạo chiến dịch"
         onPress={handleCreatePost}
         buttonStyle={{
-          backgroundColor: Colors.postTitle,
+          backgroundColor: Colors.greenPrimary,
           width: 200,
           alignSelf: 'center',
           marginTop: 20,

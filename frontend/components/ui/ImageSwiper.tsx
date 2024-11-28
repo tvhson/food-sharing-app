@@ -24,8 +24,6 @@ const ImageSwiper = (props: any) => {
       setCurrentIndex(viewableItems[0].index);
     }
   });
-  console.log('props.images', props.images);
-
   const viewConfigRef = useRef({viewAreaCoveragePercentThreshold: 50});
 
   const removeImage = () => {

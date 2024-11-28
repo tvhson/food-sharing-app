@@ -9,6 +9,7 @@ import {
   ScrollView,
   BackHandler,
   Alert,
+  FlatList,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
@@ -58,18 +59,21 @@ const item = {
 };
 
 export const FundingScreen = ({navigation}: any) => {
+  const dispatch = useDispatch();
   const FundingPostData = useSelector(
     (state: RootState) => state.fundingPost.HomePage,
   );
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const token = useSelector((state: RootState) => state.token.key);
-  const dispatch = useDispatch();
-  const [showComment, setShowComment] = useState(false);
-  const [commentPostId, setCommentPostId] = useState('');
+  const location = useSelector((state: RootState) => state.location);
+  const [fundingPost, setFundingPost] = useState<any>(null);
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [filterPosts, setFilterPosts] = useState<any>(null);
   const [visible, setVisible] = useState(false);
   const [sortingMethod, setSortingMethod] = useState('');
-
   const updateSearch = (search: any) => {
     setSearch(search);
   };
@@ -126,20 +130,16 @@ export const FundingScreen = ({navigation}: any) => {
           />
         </Menu>
       </View>
-      <ScrollView>
+      {/* <ScrollView>
         <OrganizationPost2 navigation={navigation} item={item} />
         <View style={{height: 30}} />
-      </ScrollView>
+      </ScrollView> */}
 
-      <Comment
-        isVisible={showComment}
-        setVisible={setShowComment}
-        commentPostId={commentPostId}
-      />
+      <FlatList />
       <TouchableOpacity
-        // onPress={() =>
-        //   navigation.navigate('CreatePost', {location, accessToken})
-        // }
+        onPress={() =>
+          navigation.navigate('CreateFundingPost', {location, token})
+        }
         style={{
           position: 'absolute',
           bottom: 16,

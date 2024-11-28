@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {getFontFamily} from '../../utils/fonts';
 import Colors from '../../global/Color';
 import {
@@ -22,8 +22,9 @@ import {
 import ImageSwiper from './ImageSwiper';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/Store';
-import {deletePost, reportPost} from '../../api/PostApi';
-import {deleteMyPost} from '../../redux/SharingPostReducer';
+import {deletePost, likePost, reportPost} from '../../api/PostApi';
+import {deleteMyPost, likePostReducer} from '../../redux/SharingPostReducer';
+import {getInfoUserById} from '../../api/AccountsApi';
 
 const PostRenderItem2 = (props: any) => {
   const {
@@ -37,8 +38,11 @@ const PostRenderItem2 = (props: any) => {
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const accessToken = useSelector((state: RootState) => state.token.key);
+  const liked = useSelector(
+    (state: RootState) =>
+      state.sharingPost.HomePage.find(post => post.id === item.id)?.isLiked,
+  );
   const screenWidth = Dimensions.get('window').width;
-  const [liked, setLiked] = useState(false);
   const [visible, setVisible] = useState<boolean>(false);
   const [visibleDialogDelete, setVisibleDialogDelete] =
     useState<boolean>(false);
@@ -49,6 +53,7 @@ const PostRenderItem2 = (props: any) => {
     'Spam or Misleading Information',
   );
   const [descriptionReason, setDescriptionReason] = useState<string>('');
+  const [createPostUser, setCreatePostUser] = useState<any>();
 
   const createdDate = timeAgo(item.createdDate);
 
@@ -96,14 +101,33 @@ const PostRenderItem2 = (props: any) => {
       setVisibleDialogReport(false);
     }
   };
+  useEffect(() => {
+    const getInfoUserCreatePost = async () => {
+      // get info user create post
+      if (accessToken && item.createdById !== userInfo.id) {
+        // get info user create post
+        getInfoUserById(item.createdById, accessToken).then((response: any) => {
+          if (response.status === 200) {
+            console.log('User create post', response.data);
+            setCreatePostUser(response.data);
+          }
+        });
+      }
+    };
+    getInfoUserCreatePost();
+  }, [accessToken, item.createdById, userInfo.id]);
 
-  const handleLiked = () => {
-    setLiked(!liked);
+  const handleLiked = async () => {
+    dispatch(likePostReducer(item.id));
+    const response: any = await likePost(item.id, accessToken);
+    if (response.status !== 200) {
+      dispatch(likePostReducer(item.id));
+    }
   };
 
   const handleShowComment = () => {
     setShowComment(true);
-    //setCommentPostId(item.id);
+    setCommentPostId(item.id);
   };
   const handleGoToDetail = () => {
     navigation.navigate('PostDetail2', {
@@ -367,8 +391,13 @@ const PostRenderItem2 = (props: any) => {
         onPress={handleGoToDetail}>
         <TouchableOpacity>
           <Image
-            source={require('../../assets/images/MealLogo.png')}
-            style={{width: 50, height: 50}}
+            source={{
+              uri:
+                createPostUser?.avatar ||
+                userInfo.imageUrl ||
+                'https://randomuser.me/api/portraits/men/36.jpg',
+            }}
+            style={{width: 50, height: 50, borderRadius: 25}}
           />
         </TouchableOpacity>
         <View style={{alignSelf: 'center', marginLeft: 16}}>
@@ -378,7 +407,7 @@ const PostRenderItem2 = (props: any) => {
               fontFamily: getFontFamily('semibold'),
               color: Colors.text,
             }}>
-            Nguyen Khoi
+            {createPostUser?.name || userInfo.name}
           </Text>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
@@ -501,10 +530,10 @@ const PostRenderItem2 = (props: any) => {
               style={{
                 fontSize: 16,
                 fontFamily: getFontFamily('regular'),
-                color: Colors.text,
+                color: item.portion === 0 ? 'red' : Colors.text,
                 marginLeft: 16,
               }}>
-              Còn 2 phần
+              {item.portion > 0 ? `Còn ${item.portion} phần` : 'Hết phần'}
             </Text>
           </View>
         </View>
@@ -601,7 +630,11 @@ const PostRenderItem2 = (props: any) => {
               color: Colors.black,
               fontSize: 14,
             }}>
-            {liked ? 'Bạn và 10 người khác' : '10 người'}
+            {liked
+              ? item.likeCount === 1
+                ? 'Bạn'
+                : `Bạn và ${item.likeCount - 1} người khác`
+              : `${item.likeCount} người`}
           </Text>
         </View>
       </View>

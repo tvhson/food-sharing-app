@@ -20,11 +20,18 @@ import {getFontFamily} from '../utils/fonts';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import screenWidth from '../global/Constant';
 import CommentItem from '../components/ui/CommentItem';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {getInfoUserById} from '../api/AccountsApi';
 import {getRoomChats} from '../api/ChatApi';
-import {getPostById} from '../api/PostApi';
+import {
+  createCommentToPost,
+  getCommentByPostId,
+  getPostById,
+  likePost,
+} from '../api/PostApi';
+import {likePostReducer} from '../redux/SharingPostReducer';
+import {useNotifications} from 'react-native-notificated';
 
 const CommentData = [
   {
@@ -60,7 +67,6 @@ const CommentData = [
 ];
 
 const PostDetail2 = ({route, navigation}: any) => {
-  const [liked, setLiked] = React.useState(false);
   const [roomChat, setRoomChat] = useState<any>(null);
   const [createPostUser, setCreatePostUser] = useState<any>(null);
   const accessToken = useSelector((state: RootState) => state.token.key);
@@ -76,9 +82,15 @@ const PostDetail2 = ({route, navigation}: any) => {
     latitude: route.params.item.latitude,
     longitude: route.params.item.longitude,
   };
+  const [liked, setLiked] = React.useState(item.isLiked);
+  const [likeCount, setLikeCount] = React.useState(item.likeCount);
+  const [commentList, setCommentList] = useState([]);
+  const [comment, setComment] = useState('');
   const createdDate = route.params.createdDate;
   const distance = route.params.distance;
   const expiredString = route.params.expiredString;
+  const {notify} = useNotifications();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getInfoUserCreatePost = async () => {
@@ -113,8 +125,24 @@ const PostDetail2 = ({route, navigation}: any) => {
           });
       }
     };
+    const getCommentList = async () => {
+      // get comment list
+      if (accessToken) {
+        // get comment list
+        getCommentByPostId(item.id, accessToken).then((response: any) => {
+          if (response.status === 200) {
+            setCommentList(response.data);
+          } else {
+            notify('error', {
+              params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+            });
+          }
+        });
+      }
+    };
+    getCommentList();
     getInfoUserCreatePost();
-  }, [accessToken, item.createdById, userInfo.id]);
+  }, [accessToken, item.createdById, item.id, notify, userInfo.id]);
 
   const getPostData = async () => {
     const response: any = await getPostById(item.id, accessToken);
@@ -123,9 +151,18 @@ const PostDetail2 = ({route, navigation}: any) => {
     }
   };
 
-  const handleLiked = () => {
+  const handleLiked = async () => {
     setLiked(!liked);
+    dispatch(likePostReducer(item.id));
+    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+    const response: any = await likePost(item.id, accessToken);
+    if (response.status !== 200) {
+      dispatch(likePostReducer(item.id));
+      setLiked(!liked);
+      setLikeCount(liked ? likeCount + 1 : likeCount - 1);
+    }
   };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await getPostData();
@@ -146,7 +183,25 @@ const PostDetail2 = ({route, navigation}: any) => {
     Linking.openURL(url);
   };
 
-  const handleCreateComment = () => {};
+  const handleCreateComment = async () => {
+    const response: any = await createCommentToPost(
+      item.id,
+      {content: comment},
+      accessToken,
+    );
+    if (response.status === 200) {
+      setComment('');
+      getCommentByPostId(item.id, accessToken).then((response: any) => {
+        if (response.status === 200) {
+          setCommentList(response.data);
+        }
+      });
+    } else {
+      notify('error', {
+        params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+      });
+    }
+  };
 
   const handleGoToMessage = () => {
     if (roomChat) {
@@ -206,8 +261,13 @@ const PostDetail2 = ({route, navigation}: any) => {
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity>
               <Image
-                source={require('../assets/images/MealLogo.png')}
-                style={{width: 50, height: 50}}
+                source={{
+                  uri:
+                    createPostUser?.avatar ||
+                    userInfo.imageUrl ||
+                    'https://randomuser.me/api/portraits/men/36.jpg',
+                }}
+                style={{width: 50, height: 50, borderRadius: 25}}
               />
             </TouchableOpacity>
             <View style={{alignSelf: 'center', marginLeft: 16}}>
@@ -217,7 +277,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                   fontFamily: getFontFamily('semibold'),
                   color: Colors.text,
                 }}>
-                Nguyen Khoi
+                {createPostUser?.name || userInfo.name}
               </Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
@@ -325,7 +385,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                   style={{
                     fontSize: 16,
                     fontFamily: getFontFamily('regular'),
-                    color: Colors.text,
+                    color: expiredString === 'Hết hạn' ? 'red' : Colors.text,
                     marginLeft: 16,
                   }}>
                   {expiredString === 'Hết hạn'
@@ -349,10 +409,10 @@ const PostDetail2 = ({route, navigation}: any) => {
                   style={{
                     fontSize: 16,
                     fontFamily: getFontFamily('regular'),
-                    color: Colors.text,
+                    color: item.portion === 0 ? 'red' : Colors.text,
                     marginLeft: 16,
                   }}>
-                  2 portions left
+                  {item.portion > 0 ? `Còn ${item.portion} phần` : 'Hết phần'}
                 </Text>
               </View>
             </View>
@@ -393,7 +453,10 @@ const PostDetail2 = ({route, navigation}: any) => {
                   style={{
                     fontSize: 16,
                     fontFamily: getFontFamily('regular'),
-                    color: Colors.text,
+                    color:
+                      new Date(item.pickUpEndDate) < new Date()
+                        ? 'red'
+                        : Colors.text,
                     marginLeft: 16,
                   }}>
                   Lấy từ ngày{' '}
@@ -484,7 +547,11 @@ const PostDetail2 = ({route, navigation}: any) => {
                   color: Colors.black,
                   fontSize: 14,
                 }}>
-                {liked ? 'Bạn và 10 người khác' : '10 người'}
+                {liked
+                  ? likeCount === 1
+                    ? 'Bạn'
+                    : `Bạn và ${likeCount - 1} người khác`
+                  : `${likeCount} người`}
               </Text>
             </View>
           </View>
@@ -499,9 +566,9 @@ const PostDetail2 = ({route, navigation}: any) => {
       <FlatList
         ListHeaderComponent={renderHeader}
         ListFooterComponent={<View style={{height: 70}} />}
-        data={CommentData}
+        data={commentList}
         renderItem={({item}) => <CommentItem comment={item} />}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item: any) => item.id.toString()}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
@@ -528,6 +595,8 @@ const PostDetail2 = ({route, navigation}: any) => {
             padding: 10,
             flex: 1,
           }}
+          value={comment}
+          onChangeText={setComment}
         />
         <TouchableOpacity onPress={handleCreateComment}>
           <Image

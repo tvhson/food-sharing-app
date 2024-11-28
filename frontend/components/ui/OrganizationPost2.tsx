@@ -54,7 +54,7 @@ const OrganizationPost2 = (props: any) => {
           style={styles.img}
         />
         <View style={styles.itemContainer}>
-          <Text style={styles.textTime}>Hôm nay lúc 15:00</Text>
+          <Text style={styles.textTime}>Diễn ra vào hôm nay lúc 15:00</Text>
           <Text style={styles.textTitle}>{item.organizationposts.title}</Text>
           <Text style={styles.textTime}>
             Địa điểm: {item.organizationposts.locationName}
@@ -68,6 +68,7 @@ const OrganizationPost2 = (props: any) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
+            marginTop: 10,
           }}>
           <TouchableOpacity
             style={[
@@ -94,6 +95,12 @@ const OrganizationPost2 = (props: any) => {
               ]}>
               Tham gia
             </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{marginLeft: 10}}>
+            <Image
+              source={require('../../assets/images/share.png')}
+              style={{width: 50, height: 50}}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -157,11 +164,10 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   btnJoin: {
-    width: '80%',
-    height: 40,
+    width: '70%',
+    height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
     flexDirection: 'row',
     borderRadius: 10,
   },

@@ -16,6 +16,10 @@ interface SharingPost {
   createdById: number;
   receiverId: number;
   createdDate: Date;
+  portion: number;
+  tags: Array<string>;
+  isLiked: boolean;
+  likeCount: number;
 }
 
 interface SharingPosts {
@@ -69,6 +73,26 @@ const SharingPostSlice = createSlice({
     clearMyPosts: (state: SharingPosts) => {
       state.MyPosts = [];
     },
+    likePostReducer: (state: SharingPosts, action: PayloadAction<number>) => {
+      state.HomePage = state.HomePage.map(post =>
+        post.id === action.payload
+          ? {
+              ...post,
+              isLiked: !post.isLiked,
+              likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
+            }
+          : post,
+      );
+      state.MyPosts = state.MyPosts.map(post =>
+        post.id === action.payload
+          ? {
+              ...post,
+              isLiked: !post.isLiked,
+              likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
+            }
+          : post,
+      );
+    },
   },
 });
 
@@ -81,5 +105,6 @@ export const {
   deleteMyPost,
   clearSharingPosts,
   clearMyPosts,
+  likePostReducer,
 } = SharingPostSlice.actions;
 export default SharingPostSlice.reducer;
