@@ -27,4 +27,8 @@ public class Comments {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Posts post;
+
+    @ManyToOne
+    @JoinColumn(name = "organization_post_id")
+    private Organizationposts organizationPost;
 }

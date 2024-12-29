@@ -9,6 +9,7 @@ public class CommentsMapper {
                 .id(comments.getId())
                 .userId(comments.getUserId())
                 .postId(comments.getPost() != null ? comments.getPost().getId() : null)
+                .organizationPostId(comments.getOrganizationPost() != null ? comments.getOrganizationPost().getId() : null)
                 .content(comments.getContent())
                 .userName(comments.getUserName())
                 .avatar(comments.getAvatar())

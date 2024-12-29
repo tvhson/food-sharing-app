@@ -13,6 +13,7 @@ public class CommentsDto {
     private Long id;
     private Long userId;
     private Long postId;
+    private Long organizationPostId;
     private String content;
     private String userName;
     private String avatar;

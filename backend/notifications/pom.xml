@@ -110,11 +110,7 @@
 				<version>3.4.1</version>
 				<configuration>
 					<to>
-<<<<<<< HEAD
-						<image>sontruong02003/${project.artifactId}:s1</image>
-=======
 						<image>sontruong02003/${project.artifactId}:s2</image>
->>>>>>> 284954572264b17e13bf877e6b0f8ab6e2d194d8
 					</to>
 				</configuration>
 			</plugin>

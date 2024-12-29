@@ -60,8 +60,8 @@ public class PostsController {
     }
 
     @PutMapping("/{postId}/comments")
-    ResponseEntity<CommentsDto> updateComment(@RequestHeader Long userId, @PathVariable Long postId, @RequestBody CommentsDto commentsDto) {
-        return ResponseEntity.ok(commentsService.updateComment(userId, postId, commentsDto));
+    ResponseEntity<CommentsDto> updateComment(@RequestHeader Long userId, @RequestBody CommentsDto commentsDto) {
+        return ResponseEntity.ok(commentsService.updateComment(userId, commentsDto));
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")
