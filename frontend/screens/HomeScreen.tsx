@@ -73,11 +73,12 @@ const HomeScreen = ({navigation}: any) => {
           });
         }
       }
+      setCurrentPage(0);
+      setIsLoading(false);
+      setRefreshing(false);
     };
+
     await getRecommendPost();
-    setCurrentPage(0);
-    setIsLoading(false);
-    setRefreshing(false);
   };
 
   useEffect(() => {

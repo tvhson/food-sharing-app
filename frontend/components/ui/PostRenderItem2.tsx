@@ -393,7 +393,7 @@ const PostRenderItem2 = (props: any) => {
           <Image
             source={{
               uri:
-                createPostUser?.avatar ||
+                createPostUser?.imageUrl ||
                 userInfo.imageUrl ||
                 'https://randomuser.me/api/portraits/men/36.jpg',
             }}

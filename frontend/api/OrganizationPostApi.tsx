@@ -96,3 +96,77 @@ export const attendOrganizationPost = async (postId: any, token: any) => {
     return error;
   }
 };
+
+export const getCommentByOrganizationPostId = async (
+  postId: any,
+  token: any,
+) => {
+  try {
+    const response = await ApiManager(`organizationposts/${postId}/comments`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const createCommentToOrganizationPost = async (
+  postId: any,
+  data: any,
+  token: any,
+) => {
+  try {
+    const response = await ApiManager(`organizationposts/${postId}/comments`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
+      },
+      data: data,
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const deleteCommentOrganizationPost = async (
+  postId: any,
+  commentId: any,
+  token: any,
+) => {
+  try {
+    const response = await ApiManager(
+      `organizationposts/${postId}/comments/${commentId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const likeOrganizationComment = async (commentId: any, token: any) => {
+  try {
+    const response = await ApiManager(
+      `organizationposts/lovecmt/${commentId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: token,
+        },
+      },
+    );
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

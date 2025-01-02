@@ -99,15 +99,15 @@ const ProfileScreen = ({navigation, route}: any) => {
               dispatch(saveUser(userInfo2));
               notify('success', {
                 params: {
-                  description: 'Update avatar successful.',
-                  title: 'Success',
+                  description: 'Cập nhật ảnh đại diện thành công.',
+                  title: 'Thành công',
                 },
               });
             } else {
               notify('error', {
                 params: {
-                  description: 'Update avatar failed.',
-                  title: 'Error',
+                  description: 'Cập nhật ảnh đại diện thất bại.',
+                  title: 'Lỗi',
                 },
               });
             }
@@ -125,8 +125,8 @@ const ProfileScreen = ({navigation, route}: any) => {
       } else {
         notify('error', {
           params: {
-            description: 'Upload image failed.',
-            title: 'Error',
+            description: 'Cập nhật ảnh đại diện thất bại.',
+            title: 'Lỗi',
           },
         });
       }

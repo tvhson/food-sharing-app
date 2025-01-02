@@ -10,6 +10,7 @@ import {
   BackHandler,
   Alert,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
@@ -30,6 +31,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {Icon, SearchBar} from '@rneui/themed';
 import HeaderHome from '../components/ui/HeaderHome';
 import {getFontFamily} from '../utils/fonts';
+import {useNotifications} from 'react-native-notificated';
 
 const item = {
   accounts: {
@@ -63,6 +65,7 @@ export const FundingScreen = ({navigation}: any) => {
   const FundingPostData = useSelector(
     (state: RootState) => state.fundingPost.HomePage,
   );
+  const {notify} = useNotifications();
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const token = useSelector((state: RootState) => state.token.key);
   const location = useSelector((state: RootState) => state.location);
@@ -77,6 +80,87 @@ export const FundingScreen = ({navigation}: any) => {
   const updateSearch = (search: any) => {
     setSearch(search);
   };
+  const loadMoreItem = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setIsLoading(true);
+
+    const getFundingPost = async () => {
+      if (token) {
+        const response: any = await getOrganizationPost(token.toString());
+        if (response.status === 200) {
+          dispatch(clearFundingPosts());
+          setFundingPost(response.data);
+          response.data.forEach((post: any) => dispatch(pushFundingPost(post)));
+        } else {
+          console.log(response);
+          notify('error', {
+            params: {
+              description: 'Không thể tải dữ liệu mới',
+              title: 'Lỗi',
+            },
+          });
+        }
+      }
+      setCurrentPage(0);
+      setIsLoading(false);
+      setRefreshing(false);
+    };
+
+    getFundingPost();
+  };
+
+  useEffect(() => {
+    const getFundingPost = async () => {
+      if (token) {
+        const response: any = await getOrganizationPost(token.toString());
+        if (response.status === 200) {
+          dispatch(clearFundingPosts());
+          setFundingPost(response.data);
+          response.data.forEach((post: any) => dispatch(pushFundingPost(post)));
+        } else {
+          console.log(response);
+          notify('error', {
+            params: {
+              description: 'Không thể tải dữ liệu mới',
+              title: 'Lỗi',
+            },
+          });
+        }
+      }
+      setCurrentPage(0);
+      setIsLoading(false);
+      setRefreshing(false);
+    };
+    const fetchData = async () => {
+      setIsLoading(true);
+      getFundingPost();
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [dispatch, notify, token]);
+
+  useEffect(() => {
+    const applyFilter = () => {
+      let filtered = fundingPost;
+      if (search) {
+        filtered = filtered.filter((post: any) =>
+          post.title.toLowerCase().includes(search.toLowerCase()),
+        );
+      }
+      if (sortingMethod === 'distance') {
+        filtered = filtered.sort((a: any, b: any) => a.distance - b.distance);
+      }
+      setFilterPosts(filtered);
+    };
+    if (fundingPost) {
+      applyFilter();
+    }
+  }, [search, sortingMethod, fundingPost]);
+
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
@@ -135,7 +219,19 @@ export const FundingScreen = ({navigation}: any) => {
         <View style={{height: 30}} />
       </ScrollView> */}
 
-      <FlatList />
+      <FlatList
+        data={filterPosts ?? fundingPost}
+        renderItem={({item}) => (
+          <OrganizationPost2 navigation={navigation} item={item} />
+        )}
+        keyExtractor={item => item.organizationposts.id.toString()}
+        onEndReached={loadMoreItem}
+        onEndReachedThreshold={0.1}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListFooterComponent={<View style={{height: 16}} />}
+      />
       <TouchableOpacity
         onPress={() =>
           navigation.navigate('CreateFundingPost', {location, token})

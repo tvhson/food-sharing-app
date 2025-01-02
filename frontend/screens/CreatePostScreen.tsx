@@ -327,7 +327,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
           value={portion}
           onChangeText={setPortion}
         />
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{width: '90%'}}
           onPress={() => {
             setIsTagVisible(true);
@@ -350,7 +350,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
             onChangeText={setPortion}
             readOnly
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <View style={{marginHorizontal: 10, marginTop: 20}}>
           <View

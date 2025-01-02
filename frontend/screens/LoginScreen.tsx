@@ -53,13 +53,13 @@ const LoginScreen = ({navigation}: any) => {
     //console.log(email, password);
     if (email === '' || password === '') {
       notify('error', {
-        params: {description: 'Please fill all fields.', title: 'Error'},
+        params: {description: 'Hãy nhập các thông tin', title: 'Lỗi'},
       });
       return;
     }
     if (!validateEmail(email)) {
       notify('error', {
-        params: {description: 'Invalid email.', title: 'Error'},
+        params: {description: 'Email không hợp lệ', title: 'Lỗi'},
       });
       return;
     }

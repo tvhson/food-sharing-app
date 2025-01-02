@@ -1,24 +1,42 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import {
+  FlatList,
   Image,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Icon} from 'react-native-paper';
 import Colors from '../global/Color';
 import {getFontFamily} from '../utils/fonts';
 
 import {Linking} from 'react-native';
+import {
+  createCommentToOrganizationPost,
+  getCommentByOrganizationPostId,
+  getOrganizationPostById,
+} from '../api/OrganizationPostApi';
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
+import {useNotifications} from 'react-native-notificated';
+import CommentItem from '../components/ui/CommentItem';
 
 const OrganizationPostDetail2 = (props: any) => {
   const {navigation} = props;
-  const item = props.route.params.item;
+  const [item, setItem] = useState<any>(props.route.params.item);
   const [isJoin, setIsJoin] = React.useState(item.organizationposts.attended);
+  const commentInputRef = useRef<TextInput>(null);
+  const [commentList, setCommentList] = useState([]);
+  const [comment, setComment] = useState('');
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const [refreshing, setRefreshing] = useState(false);
+  const {notify} = useNotifications();
 
   const handleAttend = () => {
     setIsJoin(!isJoin);
@@ -36,96 +54,217 @@ const OrganizationPostDetail2 = (props: any) => {
     );
   };
 
-  return (
-    <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.floatBtn} onPress={handleBack}>
-        <Icon source={'arrow-left'} size={25} color={Colors.text} />
-      </TouchableOpacity>
-      <View>
-        <Image
-          source={{
-            uri: item.organizationposts.imageUrl,
-          }}
-          style={styles.topImg}
-        />
-        <View style={{backgroundColor: '#00000004', paddingBottom: 10}}>
-          <Text style={styles.textTitle}>{item.organizationposts.title}</Text>
-          <Text style={styles.textLink} onPress={handleGoToWebsite}>
-            {item.organizationposts.linkWebsites}
-          </Text>
+  useEffect(() => {
+    const getCommentList = async () => {
+      // get comment list
+      if (accessToken) {
+        // get comment list
+        getCommentByOrganizationPostId(
+          item.organizationposts.id,
+          accessToken,
+        ).then((response: any) => {
+          if (response.status === 200) {
+            setCommentList(response.data);
+          }
+        });
+      }
+    };
+    getCommentList();
+  }, [accessToken, item.organizationposts.id]);
 
-          <TouchableOpacity
-            style={[
-              styles.btnJoin,
-              {
-                backgroundColor: isJoin
-                  ? Colors.greenLight2
-                  : Colors.greenPrimary,
-              },
-            ]}
-            onPress={handleAttend}>
-            <Image
-              source={
-                isJoin
-                  ? require('../assets/images/star-green.png')
-                  : require('../assets/images/star-white.png')
-              }
-              style={{width: 20, height: 20}}
-            />
-            <Text
-              style={[
-                styles.textBtn,
-                {
-                  color: isJoin ? Colors.greenText : Colors.white,
-                },
-              ]}>
-              Tham gia
-            </Text>
-          </TouchableOpacity>
-        </View>
+  const handleCreateComment = async () => {
+    const response: any = await createCommentToOrganizationPost(
+      item.organizationposts.id,
+      {content: comment},
+      accessToken,
+    );
+    if (response.status === 200) {
+      setComment('');
+      getCommentByOrganizationPostId(
+        item.organizationposts.id,
+        accessToken,
+      ).then((response: any) => {
+        if (response.status === 200) {
+          setCommentList(response.data);
+        }
+      });
+    } else {
+      notify('error', {
+        params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+      });
+    }
+  };
 
-        <View
-          style={{
-            paddingBottom: 10,
-            marginHorizontal: 20,
-            borderBottomColor: '#ccc',
-            borderBottomWidth: 0.8,
-          }}>
-          <TouchableWithoutFeedback onPress={handlePressLocation}>
-            <View style={styles.row}>
+  const getOrganizationPostData = async () => {
+    const response: any = await getOrganizationPostById(item.id, accessToken);
+    if (response.status === 200) {
+      setItem(response.data);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await getOrganizationPostData();
+    setRefreshing(false);
+  };
+
+  const renderHeader = () => {
+    return (
+      <TouchableWithoutFeedback onPress={() => {}}>
+        <>
+          <View style={styles.container}>
+            <TouchableOpacity style={styles.floatBtn} onPress={handleBack}>
+              <Icon source={'arrow-left'} size={25} color={Colors.text} />
+            </TouchableOpacity>
+            <View>
               <Image
-                source={require('../assets/images/location.png')}
-                style={styles.iconText}
+                source={{
+                  uri: item.organizationposts.imageUrl,
+                }}
+                style={styles.topImg}
               />
-              <View style={{flex: 1}}>
-                <Text style={styles.textNormal}>
-                  Địa điểm: {item.organizationposts.locationName}
+              <View style={{backgroundColor: '#00000004', paddingBottom: 10}}>
+                <Text style={styles.textTitle}>
+                  {item.organizationposts.title}
                 </Text>
+                <Text style={styles.textLink} onPress={handleGoToWebsite}>
+                  {item.organizationposts.linkWebsites}
+                </Text>
+
+                <TouchableOpacity
+                  style={[
+                    styles.btnJoin,
+                    {
+                      backgroundColor: isJoin
+                        ? Colors.greenLight2
+                        : Colors.greenPrimary,
+                    },
+                  ]}
+                  onPress={handleAttend}>
+                  <Image
+                    source={
+                      isJoin
+                        ? require('../assets/images/star-green.png')
+                        : require('../assets/images/star-white.png')
+                    }
+                    style={{width: 20, height: 20}}
+                  />
+                  <Text
+                    style={[
+                      styles.textBtn,
+                      {
+                        color: isJoin ? Colors.greenText : Colors.white,
+                      },
+                    ]}>
+                    Tham gia
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View
+                style={{
+                  paddingBottom: 10,
+                  marginHorizontal: 20,
+                  borderBottomColor: '#ccc',
+                  borderBottomWidth: 0.8,
+                }}>
+                <TouchableWithoutFeedback onPress={handlePressLocation}>
+                  <View style={styles.row}>
+                    <Image
+                      source={require('../assets/images/location.png')}
+                      style={styles.iconText}
+                    />
+                    <View style={{flex: 1}}>
+                      <Text style={styles.textNormal}>
+                        Địa điểm: {item.organizationposts.locationName}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+                <View style={styles.row}>
+                  <Image
+                    source={require('../assets/images/care.png')}
+                    style={styles.iconText}
+                  />
+                  <View style={{flex: 1}}>
+                    <Text style={styles.textNormal}>
+                      {item.organizationposts.peopleAttended} người tham gia
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                }}>
+                <Text style={styles.textTitle2}>Chi tiết chiến dịch</Text>
+                <View style={{flex: 1}}>
+                  <Text style={styles.textNormal}>
+                    {item.organizationposts.description}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    height: 0.8,
+                    backgroundColor: '#ccc',
+                    marginTop: 20,
+                    marginBottom: 10,
+                  }}
+                />
               </View>
             </View>
-          </TouchableWithoutFeedback>
-          <View style={styles.row}>
-            <Image
-              source={require('../assets/images/care.png')}
-              style={styles.iconText}
-            />
-            <View style={{flex: 1}}>
-              <Text style={styles.textNormal}>
-                {item.organizationposts.peopleAttended} người tham gia
-              </Text>
-            </View>
           </View>
-        </View>
-        <View style={{paddingVertical: 10, paddingHorizontal: 20}}>
-          <Text style={styles.textTitle2}>Chi tiết chiến dịch</Text>
-          <View style={{flex: 1}}>
-            <Text style={styles.textNormal}>
-              {item.organizationposts.description}
-            </Text>
-          </View>
-        </View>
+        </>
+      </TouchableWithoutFeedback>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={<View style={{height: 70}} />}
+        data={commentList}
+        renderItem={({item}) => <CommentItem comment={item} />}
+        keyExtractor={(data: any) => data.id.toString()}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 10,
+          flexDirection: 'row',
+          borderTopWidth: 1,
+          borderTopColor: Colors.gray,
+          backgroundColor: Colors.white,
+        }}>
+        <TextInput
+          ref={commentInputRef}
+          multiline
+          placeholder="Viết bình luận"
+          style={{
+            backgroundColor: Colors.background,
+            borderRadius: 20,
+            padding: 10,
+            flex: 1,
+          }}
+          value={comment}
+          onChangeText={setComment}
+        />
+        <TouchableOpacity onPress={handleCreateComment}>
+          <Image
+            source={require('../assets/images/send.png')}
+            style={{width: 30, height: 30}}
+          />
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

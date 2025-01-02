@@ -562,7 +562,7 @@ const PostDetail2 = ({route, navigation}: any) => {
 
   return (
     <View style={styles.container}>
-      <Header title="PostDetail2" navigation={navigation} />
+      <Header title="Chi tiết bài viết" navigation={navigation} />
       <FlatList
         ListHeaderComponent={renderHeader}
         ListFooterComponent={<View style={{height: 70}} />}
