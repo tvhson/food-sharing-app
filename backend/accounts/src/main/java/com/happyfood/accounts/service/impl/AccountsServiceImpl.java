@@ -36,6 +36,7 @@ public class AccountsServiceImpl implements IAccountsService {
         accounts.setCreatedDate(new Date());
         accounts.setIsVegan(false);
         accounts.setIsChosenTag(false);
+        accounts.setImageUrl("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFzJq86PEV6gvN_r4_iHIxFyjzo73j0a4bRQ&s");
         accounts = accountsRepository.save(accounts);
 //        sendCommunication(accounts);
         return AccountsMapper.mapToAccountsDto(accounts);

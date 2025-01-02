@@ -31,4 +31,7 @@ public class Organizationposts {
 
     @OneToMany(mappedBy = "organizationPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<AttendeeId> attendees;
+
+    @OneToMany(mappedBy = "organizationPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Comments> comments;
 }

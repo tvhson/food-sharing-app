@@ -4,10 +4,12 @@ import com.happyfood.posts.adapter.AccountsAdapter;
 import com.happyfood.posts.dto.AccountsDto;
 import com.happyfood.posts.dto.CommentsDto;
 import com.happyfood.posts.entity.Comments;
+import com.happyfood.posts.entity.Organizationposts;
 import com.happyfood.posts.entity.Posts;
 import com.happyfood.posts.exception.CustomException;
 import com.happyfood.posts.mapper.CommentsMapper;
 import com.happyfood.posts.repository.CommentsRepository;
+import com.happyfood.posts.repository.OrganizationpostsRepository;
 import com.happyfood.posts.repository.PostsRepository;
 import com.happyfood.posts.service.ICommentsService;
 import com.happyfood.posts.service.client.AccountsFeignClient;
@@ -27,6 +29,7 @@ public class CommentsServiceImpl implements ICommentsService {
     private final CommentsRepository commentsRepository;
     private final PostsRepository postsRepository;
     private final AccountsAdapter accountsAdapter;
+    private final OrganizationpostsRepository organizationpostsRepository;
 
     @Override
     public CommentsDto createComment(Long userId, Long postId, CommentsDto commentsDto) {
@@ -38,7 +41,6 @@ public class CommentsServiceImpl implements ICommentsService {
         comment.setUserName(accountsDto.getName());
         comment.setAvatar(accountsDto.getImageUrl());
 
-
         Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
         comment.setPost(posts);
         posts.getComments().add(comment);
@@ -49,7 +51,25 @@ public class CommentsServiceImpl implements ICommentsService {
     }
 
     @Override
-    public CommentsDto updateComment(Long userId, Long postId, CommentsDto commentsDto) {
+    public CommentsDto createCommentForOrganizationPost(Long userId, Long organizationPostId, CommentsDto commentsDto) {
+        Comments comment = CommentsMapper.mapToComments(commentsDto);
+        comment.setCreatedDate(new Date());
+
+        AccountsDto accountsDto = accountsAdapter.getAccount(userId);
+        comment.setUserId(userId);
+        comment.setUserName(accountsDto.getName());
+        comment.setAvatar(accountsDto.getImageUrl());
+
+        Organizationposts organizationposts = organizationpostsRepository.findById(organizationPostId).orElseThrow(() -> new CustomException("Organization post not found", HttpStatus.NOT_FOUND));
+        comment.setOrganizationPost(organizationposts);
+        organizationposts.getComments().add(comment);
+
+        organizationpostsRepository.save(organizationposts);
+        return convertToResponse(comment, userId);
+    }
+
+    @Override
+    public CommentsDto updateComment(Long userId, CommentsDto commentsDto) {
         Comments comments = commentsRepository.findById(commentsDto.getId()).orElseThrow(() -> new CustomException("Comment not found", HttpStatus.NOT_FOUND));
         if (!comments.getUserId().equals(userId)) {
             throw new CustomException("You are not allowed to update this comment", HttpStatus.FORBIDDEN);
@@ -76,6 +96,16 @@ public class CommentsServiceImpl implements ICommentsService {
         }
         List<Comments> comments = posts.getComments();
 
+        return comments.stream().map(comment -> convertToResponse(comment, userId)).toList();
+    }
+
+    @Override
+    public List<CommentsDto> getCommentsByOrganizationPostId(Long userId, Long organizationPostId) {
+        Organizationposts organizationposts = organizationpostsRepository.findById(organizationPostId).orElseThrow(() -> new CustomException("Organization post not found", HttpStatus.NOT_FOUND));
+        if (organizationposts.getComments() == null || organizationposts.getComments().isEmpty()) {
+            return List.of();
+        }
+        List<Comments> comments = organizationposts.getComments();
         return comments.stream().map(comment -> convertToResponse(comment, userId)).toList();
     }
 

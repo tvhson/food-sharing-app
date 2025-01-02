@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CommentsRepository extends JpaRepository<Comments, Long> {
     List<Comments> findByPostId(Long postId);
+    List<Comments> findByOrganizationPostId(Long organizationPostId);
 }
