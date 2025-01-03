@@ -75,7 +75,9 @@ const NotificationItem = ({item, navigation}: any) => {
       };
     } else {
       return () => {
-        navigation.navigate('PostDetail', {item: postDetail, location});
+        if (postDetail) {
+          navigation.navigate('PostDetail', {item: postDetail, location});
+        }
       };
     }
   };
