@@ -40,6 +40,9 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   useEffect(() => {
     const connectToMessage = async () => {
       const convertMessage = (message: any) => {
+        const avatarhere = userInfo.imageUrl
+          ? userInfo.imageUrl
+          : 'https://randomuser.me/api/portraits/men/36.jpg';
         return {
           _id: message.id,
           text: message.content,
@@ -49,8 +52,8 @@ const ChatRoomScreen = ({navigation, route}: any) => {
             name: message.senderName,
             avatar:
               message.senderId === userInfo.id
-                ? userInfo.imageUrl
-                : senderProfilePic === userInfo.imageUrl
+                ? avatarhere
+                : senderProfilePic === avatarhere
                 ? recipientProfilePic
                 : senderProfilePic,
           },
@@ -74,6 +77,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
     recipientProfilePic,
     roomId,
     senderProfilePic,
+
     userInfo.id,
     userInfo.imageUrl,
     userInfo.name,
@@ -94,6 +98,10 @@ const ChatRoomScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     const convertMessage = (message: any) => {
+      const avatarhere = userInfo.imageUrl
+        ? userInfo.imageUrl
+        : 'https://randomuser.me/api/portraits/men/36.jpg';
+
       return {
         _id: message.id,
         text: message.content,
@@ -103,8 +111,8 @@ const ChatRoomScreen = ({navigation, route}: any) => {
           name: message.senderName,
           avatar:
             message.senderId === userInfo.id
-              ? userInfo.imageUrl
-              : senderProfilePic === userInfo.imageUrl
+              ? avatarhere
+              : senderProfilePic === avatarhere
               ? recipientProfilePic
               : senderProfilePic,
         },
@@ -130,6 +138,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
     recipientProfilePic,
     roomId,
     senderProfilePic,
+
     userInfo.id,
     userInfo.imageUrl,
   ]);
