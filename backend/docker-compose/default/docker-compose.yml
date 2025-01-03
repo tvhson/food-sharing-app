@@ -1,26 +1,24 @@
 services:
-  kafka:
-    image: docker.io/bitnami/kafka:latest
-    ports:
-      - "9092:9092"
-    volumes:
-      - "kafka_data:/bitnami"
-    environment:
-      # KRaft settings
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      # Listeners
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-    extends:
-      file: common-config.yml
-      service: network-deploy-service
-
-
+  #  kafka:
+  #    image: docker.io/bitnami/kafka:latest
+  #    ports:
+  #      - "9092:9092"
+  #    volumes:
+  #      - "kafka_data:/bitnami"
+  #    environment:
+  #      # KRaft settings
+  #      - KAFKA_CFG_NODE_ID=0
+  #      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+  #      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+  #      # Listeners
+  #      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+  #      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+  #      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+  #      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+  #      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+  #    extends:
+  #      file: common-config.yml
+  #      service: network-deploy-service
   accountsdb:
     container_name: accountsdb
     ports:
@@ -31,15 +29,35 @@ services:
       file: common-config.yml
       service: microservice-db-config
 
-  sharingpostsdb:
-    container_name: sharingpostsdb
-    ports:
-      - 3308:3306
-    environment:
-      MYSQL_DATABASE: sharingpostsdb
-    extends:
-      file: common-config.yml
-      service: microservice-db-config
+  #  postsdb:
+  #    container_name: postsdb
+  #    ports:
+  #      - 3308:3306
+  #    environment:
+  #      MYSQL_DATABASE: postsdb
+  #    extends:
+  #      file: common-config.yml
+  #      service: microservice-db-config
+
+  #  chatsdb:
+  #    container_name: chatsdb
+  #    ports:
+  #      - 3310:3306
+  #    environment:
+  #      MYSQL_DATABASE: chatsdb
+  #    extends:
+  #      file: common-config.yml
+  #      service: microservice-db-config
+
+  #  notificationsdb:
+  #    container_name: notificationsdb
+  #    ports:
+  #      - 3311:3306
+  #    environment:
+  #      MYSQL_DATABASE: notificationsdb
+  #    extends:
+  #      file: common-config.yml
+  #      service: microservice-db-config
 
   configserver:
     image: "sontruong02003/configserver:s1"
@@ -56,49 +74,49 @@ services:
       file: common-config.yml
       service: microservice-base-config
 
-  eurekaserver:
-    image: "sontruong02003/eurekaserver:s1"
-    container_name: eurekaserver-ms
-    ports:
-      - "8070:8070"
-    environment:
-      SPRING_APPLICATION_NAME: "eurekaserver"
-    healthcheck:
-      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
-      interval: 20s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
-    depends_on:
-      configserver:
-        condition: service_healthy
-    extends:
-      file: common-config.yml
-      service: microservice-configserver-config
+  #  eurekaserver:
+  #    image: "sontruong02003/eurekaserver:s1"
+  #    container_name: eurekaserver-ms
+  #    ports:
+  #      - "8070:8070"
+  #    environment:
+  #      SPRING_APPLICATION_NAME: "eurekaserver"
+  #    healthcheck:
+  #      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+  #      interval: 20s
+  #      timeout: 5s
+  #      retries: 20
+  #      start_period: 10s
+  #    depends_on:
+  #      configserver:
+  #        condition: service_healthy
+  #    extends:
+  #      file: common-config.yml
+  #      service: microservice-configserver-config
 
-  auth:
-    image: "sontruong02003/auth:s1"
-    container_name: auth-ms
-    ports:
-      - "7080:7080"
-    environment:
-      SPRING_APPLICATION_NAME: "auth"
-      JWT_SECRET: "MiAVzqUXy5Tfr1kVIGpPMiAVzqUXy5Tfr1kVIGpP"
-      JWT_EXPIRATION: "86400"
-    healthcheck:
-      test: "curl --fail --silent localhost:7080/actuator/health/readiness | grep UP || exit 1"
-      interval: 20s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
-    depends_on:
-      configserver:
-        condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
-    extends:
-      file: common-config.yml
-      service: microservice-eureka-config
+  #  auth:
+  #    image: "sontruong02003/auth:s1"
+  #    container_name: auth-ms
+  #    ports:
+  #      - "7080:7080"
+  #    environment:
+  #      SPRING_APPLICATION_NAME: "auth"
+  #      JWT_SECRET: "MiAVzqUXy5Tfr1kVIGpPMiAVzqUXy5Tfr1kVIGpP"
+  #      JWT_EXPIRATION: "86400"
+  #    healthcheck:
+  #      test: "curl --fail --silent localhost:7080/actuator/health/readiness | grep UP || exit 1"
+  #      interval: 20s
+  #      timeout: 5s
+  #      retries: 20
+  #      start_period: 10s
+  #    depends_on:
+  #      configserver:
+  #        condition: service_healthy
+  #      eurekaserver:
+  #        condition: service_healthy
+  #    extends:
+  #      file: common-config.yml
+  #      service: microservice-eureka-config
 
   accounts:
     image: "sontruong02003/accounts:s1"
@@ -108,7 +126,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "accounts"
       SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
-      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
+    #      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
     healthcheck:
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -120,20 +138,20 @@ services:
         condition: service_healthy
       configserver:
         condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
+    #      eurekaserver:
+    #        condition: service_healthy
     extends:
       file: common-config.yml
       service: microservice-eureka-config
 
-  sharingposts:
-    image: "sontruong02003/sharingposts:s1"
-    container_name: sharingposts-ms
+  posts:
+    image: "sontruong02003/posts:s1"
+    container_name: posts-ms
     ports:
       - "8090:8090"
     environment:
-      SPRING_APPLICATION_NAME: "sharingposts"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://sharingpostsdb:3306/sharingpostsdb"
+      SPRING_APPLICATION_NAME: "posts"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
     healthcheck:
       test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -141,24 +159,69 @@ services:
       retries: 20
       start_period: 10s
     depends_on:
-      sharingpostsdb:
+      accountsdb:
         condition: service_healthy
       configserver:
-        condition: service_healthy
-      eurekaserver:
         condition: service_healthy
     extends:
       file: common-config.yml
       service: microservice-eureka-config
 
-  message:
-    image: "sontruong02003/message:s1"
-    container_name: message-ms
+  notifications:
+    image: "sontruong02003/notifications:s1"
+    container_name: notifications-ms
+    ports:
+      - "9030:9030"
     environment:
-      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
+      SPRING_APPLICATION_NAME: "notifications"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
+    healthcheck:
+      test: "curl --fail --silent localhost:9030/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      accountsdb:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
     extends:
       file: common-config.yml
-      service: network-deploy-service
+      service: microservice-eureka-config
+
+  chats:
+    image: "sontruong02003/chats:s1"
+    container_name: chats-ms
+    ports:
+      - "9020:9020"
+    environment:
+      SPRING_APPLICATION_NAME: "chats"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
+    healthcheck:
+      test: "curl --fail --silent localhost:9020/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      accountsdb:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+
+
+  #  message:
+  #    image: "sontruong02003/message:s1"
+  #    container_name: message-ms
+  #    environment:
+  #      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
+  #    extends:
+  #      file: common-config.yml
+  #      service: network-deploy-service
 
   gatewayserver:
     image: "sontruong02003/gatewayserver:s1"
@@ -168,24 +231,34 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
       JWT_SECRET: "MiAVzqUXy5Tfr1kVIGpPMiAVzqUXy5Tfr1kVIGpP"
+    healthcheck:
+      test: "curl --fail --silent localhost:8072/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
     depends_on:
       configserver:
         condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
+      #      eurekaserver:
+      #        condition: service_healthy
       accounts:
         condition: service_healthy
-      sharingposts:
+      posts:
         condition: service_healthy
-      auth:
+      chats:
         condition: service_healthy
+      notifications:
+        condition: service_healthy
+    #      auth:
+    #        condition: service_healthy
     extends:
       file: common-config.yml
       service: microservice-eureka-config
 
-volumes:
-  kafka_data:
-    driver: local
+#volumes:
+#  kafka_data:
+#    driver: local
 
 networks:
   happyfood:
