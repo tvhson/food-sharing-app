@@ -186,11 +186,11 @@ const ChatRoomScreen = ({navigation, route}: any) => {
                 setRoomId(roomChat.id);
                 createNotification(
                   {
-                    title: 'You have a new message',
+                    title: 'Bạn có tin nhắn mới',
                     imageUrl:
                       userInfo.imageUrl ||
                       'https://randomuser.me/api/portraits/men/36.jpg',
-                    description: userInfo.name + ' has sent you a message',
+                    description: userInfo.name + ' đã gửi tin nhắn cho bạn',
                     type: 'MESSAGE',
                     linkId: roomChat.id,
                     userId: item.recipientId,

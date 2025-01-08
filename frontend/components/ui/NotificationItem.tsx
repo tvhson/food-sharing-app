@@ -11,55 +11,18 @@ import {
 } from '../../api/NotificationApi';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
 import {updatePost} from '../../api/PostApi';
+import {
+  calculateDistance,
+  calculateExpiredDate,
+  timeAgo,
+} from '../../utils/helper';
 
 const NotificationItem = ({item, navigation}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
   const location = useSelector((state: RootState) => state.location);
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
-  function timeAgo(dateInput: Date | string | number) {
-    const date = new Date(dateInput);
-    if (isNaN(date.getTime())) {
-      throw new Error('date must be a valid Date, string, or number');
-    }
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    if (diffInSeconds < 0) {
-      return 'Just now';
-    }
 
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds}s ago`;
-    }
-
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
-    }
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-      return `${diffInHours} hours ago`;
-    }
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) {
-      return `${diffInDays} days ago`;
-    }
-
-    if (diffInDays < 30) {
-      const diffInWeeks = Math.floor(diffInDays / 7);
-      return `${diffInWeeks} weeks ago`;
-    }
-
-    if (diffInDays < 365) {
-      const diffInMonths = Math.floor(diffInDays / 30);
-      return `${diffInMonths} months ago`;
-    }
-
-    const diffInYears = Math.floor(diffInDays / 365);
-    return `${diffInYears} years ago`;
-  }
   const roomChat = useSelector((state: RootState) =>
     state.chatRoom.chatRooms.find(chatRoom => chatRoom.id === item.linkId),
   );
@@ -70,21 +33,32 @@ const NotificationItem = ({item, navigation}: any) => {
   const handleNavigate = () => {
     if (item.type === 'MESSAGE') {
       return () => {
-        console.log('roomChat', roomChat);
+        if (!roomChat) {
+          return;
+        }
         navigation.navigate('ChatRoom', {item: roomChat});
       };
     } else {
       return () => {
-        navigation.navigate('PostDetail', {item: postDetail, location});
+        if (!postDetail) {
+          return;
+        }
+        navigation.navigate('PostDetail2', {
+          item: postDetail,
+          location,
+          createdDate: timeAgo(postDetail.createdDate),
+          expiredString: calculateExpiredDate(new Date(postDetail.expiredDate)),
+          distance: calculateDistance(postDetail, location),
+        });
       };
     }
   };
   const handleDecline = async () => {
     const notificationUpdate = {
       id: item.id,
-      title: 'Decline',
+      title: 'Từ chối',
       imageUrl: item.imageUrl,
-      description: 'You have declined the confirmation of giving',
+      description: 'Bạn đã từ chối xác nhận việc nhận thức ăn',
       type: 'DONE',
       createdDate: item.createdDate,
       linkId: item.linkId,
@@ -101,10 +75,10 @@ const NotificationItem = ({item, navigation}: any) => {
       dispatch(updateNotificationAfter(notificationUpdate));
       const response2: any = createNotification(
         {
-          title: 'Confirmation declined',
+          title: 'Từ chối xác nhận',
           imageUrl: item.imageUrl,
           description:
-            userInfo.name + ' has declined your confirmation to receive food',
+            userInfo.name + ' đã từ chối xác nhận việc nhận thức ăn của bạn',
           type: 'DONE',
           linkId: item.linkId,
           senderId: userInfo.id,
@@ -120,12 +94,11 @@ const NotificationItem = ({item, navigation}: any) => {
     }
   };
   const handleAccept = async () => {
-    console.log('Accept');
     const notificationUpdate = {
       id: item.id,
-      title: 'Accept',
+      title: 'Xác nhận',
       imageUrl: item.imageUrl,
-      description: 'You have accept the confirmation of giving',
+      description: 'Bạn đã xác nhận việc nhận thức ăn',
       type: 'DONE',
       createdDate: item.createdDate,
       linkId: item.linkId,
@@ -163,10 +136,9 @@ const NotificationItem = ({item, navigation}: any) => {
       );
       const response3: any = createNotification(
         {
-          title: 'Confirmation accepted',
+          title: 'Xác nhận việc nhận thức ăn',
           imageUrl: item.imageUrl,
-          description:
-            userInfo.name + ' has accepted your confirmation to receive food',
+          description: userInfo.name + ' đã xác nhận việc nhận thức ăn của bạn',
           type: 'DONE',
           linkId: item.linkId,
           senderId: userInfo.id,
@@ -242,7 +214,7 @@ const NotificationItem = ({item, navigation}: any) => {
                     marginVertical: 3,
                   }}>
                   <Button
-                    title={'Decline'}
+                    title={'Từ chối'}
                     buttonStyle={{
                       backgroundColor: Colors.red,
                       borderColor: 'transparent',
@@ -254,7 +226,7 @@ const NotificationItem = ({item, navigation}: any) => {
                     onPress={() => handleDecline()}
                   />
                   <Button
-                    title={'Accept'}
+                    title={'Chấp nhận'}
                     buttonStyle={{
                       backgroundColor: Colors.greenPrimary,
                       borderColor: 'transparent',

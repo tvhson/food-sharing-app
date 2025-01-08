@@ -40,10 +40,6 @@ import {getFontFamily} from '../utils/fonts';
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-  const isLoading = useSelector((state: RootState) => state.loading.status);
-  const token = useSelector((state: RootState) => state.token.key);
-  const dispatch = useDispatch();
-
   return (
     <>
       <Stack.Navigator screenOptions={{headerShown: false}}>

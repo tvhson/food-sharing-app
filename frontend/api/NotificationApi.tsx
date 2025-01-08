@@ -79,11 +79,10 @@ export const readAllNotifications = async (token: any) => {
 
 export const createNotification = async (data: any, token: any) => {
   try {
+    console.log('data', data);
     const result = await ApiManager('notifications', {
       method: 'POST',
-      headers: {
-        Authorization: token,
-      },
+
       data: data,
     });
     return result;

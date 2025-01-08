@@ -8,19 +8,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Colors from '../global/Color';
-import MapView, {Marker} from 'react-native-maps';
 import {Button, Icon, Image} from '@rneui/themed';
 import MAP_API_KEY from '../components/data/SecretData';
 import axios from 'axios';
 import UploadPhoto from '../components/ui/UploadPhoto';
-import {DatePickerInput, hi} from 'react-native-paper-dates';
+import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import GetLocation from 'react-native-get-location';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {createNotifications} from 'react-native-notificated';
-import {createPost, updatePost} from '../api/PostApi';
+import {createPost} from '../api/PostApi';
 import {useDispatch} from 'react-redux';
-import {pushMyPost, updateMyPost} from '../redux/SharingPostReducer';
+import {pushMyPost} from '../redux/SharingPostReducer';
 import {getFontFamily} from '../utils/fonts';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import screenWidth from '../global/Constant';
@@ -326,6 +324,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
           }}
           value={portion}
           onChangeText={setPortion}
+          keyboardType="numeric"
         />
         {/* <TouchableOpacity
           style={{width: '90%'}}

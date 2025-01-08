@@ -32,39 +32,7 @@ import {
 } from '../api/PostApi';
 import {likePostReducer} from '../redux/SharingPostReducer';
 import {useNotifications} from 'react-native-notificated';
-
-const CommentData = [
-  {
-    id: 1,
-    user: {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      avatar: require('../assets/images/user.png'),
-    },
-    content: 'Bình luận 1',
-    time: '1 giờ trước',
-  },
-  {
-    id: 2,
-    user: {
-      id: 2,
-      name: 'Nguyễn Văn B',
-      avatar: require('../assets/images/user.png'),
-    },
-    content: 'Bình luận 2',
-    time: '2 giờ trước',
-  },
-  {
-    id: 3,
-    user: {
-      id: 3,
-      name: 'Nguyễn Văn C',
-      avatar: require('../assets/images/user.png'),
-    },
-    content: 'Bình luận 3',
-    time: '3 giờ trước',
-  },
-];
+import {createNotification} from '../api/NotificationApi';
 
 const PostDetail2 = ({route, navigation}: any) => {
   const [roomChat, setRoomChat] = useState<any>(null);
@@ -148,6 +116,35 @@ const PostDetail2 = ({route, navigation}: any) => {
     const response: any = await getPostById(item.id, accessToken);
     if (response.status === 200) {
       setItem(response.data);
+    }
+  };
+  const handleReceived = async () => {
+    if (accessToken) {
+      try {
+        const response: any = await createNotification(
+          {
+            title: 'Xác nhận việc nhận thức ăn',
+            imageUrl: item.imageUrl,
+            description:
+              userInfo.name +
+              ' muốn bạn xác nhận rằng bạn đã đưa thức ăn cho họ',
+            type: 'RECEIVED',
+            linkId: item.id,
+            userId: createPostUser.id,
+            senderId: userInfo.id,
+          },
+          accessToken,
+        ).catch((error: any) => {
+          console.log(error);
+        });
+        if (response.status === 200) {
+          navigation.goBack();
+        } else {
+          console.log(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -308,15 +305,25 @@ const PostDetail2 = ({route, navigation}: any) => {
                 flexDirection: 'row',
               }}>
               {item.createdById !== userInfo.id && (
-                <TouchableOpacity onPress={handleGoToMessage}>
-                  <Icon
-                    source={'chat-processing'}
-                    size={30}
-                    color={Colors.black}
-                  />
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity onPress={handleReceived}>
+                    <Icon
+                      source={'hand-heart'}
+                      size={30}
+                      color={Colors.black}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleGoToMessage}
+                    style={{marginLeft: 10}}>
+                    <Icon
+                      source={'chat-processing'}
+                      size={30}
+                      color={Colors.black}
+                    />
+                  </TouchableOpacity>
+                </>
               )}
-
               <TouchableOpacity
                 onPress={handleDirection}
                 style={{marginLeft: 10}}>
@@ -487,7 +494,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                 </Text>
               </View>
             </View>
-            <View
+            {/* <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'flex-start',
@@ -498,7 +505,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                 style={{width: 25, height: 25}}
               />
               <View style={styles.tagsContainer}>{renderTags()}</View>
-            </View>
+            </View> */}
             <View
               style={{
                 width: screenWidth * 0.85,
@@ -598,7 +605,7 @@ const PostDetail2 = ({route, navigation}: any) => {
           value={comment}
           onChangeText={setComment}
         />
-        <TouchableOpacity onPress={handleCreateComment}>
+        <TouchableOpacity onPress={handleCreateComment} disabled={!comment}>
           <Image
             source={require('../assets/images/send.png')}
             style={{width: 30, height: 30}}

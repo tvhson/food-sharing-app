@@ -16,6 +16,7 @@ import {getFontFamily} from '../utils/fonts';
 import HeaderHome from '../components/ui/HeaderHome';
 import PostRenderItem2 from '../components/ui/PostRenderItem2';
 import Comment from '../components/ui/Comment';
+import {calculateDistance} from '../utils/helper';
 
 const {useNotifications} = createNotifications();
 
@@ -36,7 +37,7 @@ const HomeScreen = ({navigation}: any) => {
   const [sortingMethod, setSortingMethod] = useState('');
   const [visible, setVisible] = useState(false);
   const [showComment, setShowComment] = useState(false);
-  const [commentPostId, setCommentPostId] = useState(-1);
+  const [commentPostId, setCommentPostId] = useState(0);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -143,18 +144,6 @@ const HomeScreen = ({navigation}: any) => {
     }
   }, [location, recommendPost, search, sortingMethod]);
 
-  const calculateDistance = (item: any) => {
-    if (location && location.latitude && location.longitude) {
-      return (
-        getDistance(
-          {latitude: item.latitude, longitude: item.longitude},
-          {latitude: location.latitude, longitude: location.longitude},
-        ) / 1000
-      );
-    }
-    return 0;
-  };
-
   return (
     <View
       style={{
@@ -226,7 +215,7 @@ const HomeScreen = ({navigation}: any) => {
             item={item}
             navigation={navigation}
             location={location}
-            distance={calculateDistance(item)}
+            distance={calculateDistance(item, location)}
             setShowComment={setShowComment}
             setCommentPostId={setCommentPostId}
           />

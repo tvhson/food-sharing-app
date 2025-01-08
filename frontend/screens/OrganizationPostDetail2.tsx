@@ -3,7 +3,6 @@
 import {
   FlatList,
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -30,7 +29,11 @@ import CommentItem from '../components/ui/CommentItem';
 const OrganizationPostDetail2 = (props: any) => {
   const {navigation} = props;
   const [item, setItem] = useState<any>(props.route.params.item);
-  const [isJoin, setIsJoin] = React.useState(item.organizationposts.attended);
+  const [isJoin, setIsJoin] = useState(props.route.params.isJoin);
+  const [peopleAttended, setPeopleAttended] = useState(
+    props.route.params.peopleAttended,
+  );
+  const handleAttende = props.route.params.handleAttend;
   const commentInputRef = useRef<TextInput>(null);
   const [commentList, setCommentList] = useState([]);
   const [comment, setComment] = useState('');
@@ -40,6 +43,8 @@ const OrganizationPostDetail2 = (props: any) => {
 
   const handleAttend = () => {
     setIsJoin(!isJoin);
+    setPeopleAttended((prev: any) => (prev ? prev - 1 : prev + 1));
+    handleAttende();
   };
   const handleBack = () => {
     navigation.goBack();
@@ -188,7 +193,7 @@ const OrganizationPostDetail2 = (props: any) => {
                   />
                   <View style={{flex: 1}}>
                     <Text style={styles.textNormal}>
-                      {item.organizationposts.peopleAttended} người tham gia
+                      {peopleAttended} người tham gia
                     </Text>
                   </View>
                 </View>
@@ -257,7 +262,7 @@ const OrganizationPostDetail2 = (props: any) => {
           value={comment}
           onChangeText={setComment}
         />
-        <TouchableOpacity onPress={handleCreateComment}>
+        <TouchableOpacity onPress={handleCreateComment} disabled={!comment}>
           <Image
             source={require('../assets/images/send.png')}
             style={{width: 30, height: 30}}

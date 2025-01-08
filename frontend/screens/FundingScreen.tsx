@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
-  Text,
   TouchableOpacity,
-  ScrollView,
-  BackHandler,
-  Alert,
   FlatList,
   RefreshControl,
 } from 'react-native';
@@ -16,57 +12,21 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {getOrganizationPost} from '../api/OrganizationPostApi';
 import {
-  addToTheEndOfFundingPost,
   clearFundingPosts,
   pushFundingPost,
-  setHomePageFundingPost,
 } from '../redux/OrganizationPostReducer';
-import {OrganizationPost} from '../components/ui/OrganizationPost';
 import Colors from '../global/Color';
-import {Button, Menu} from 'react-native-paper';
-import PostRenderItem2 from '../components/ui/PostRenderItem2';
-import Comment from '../components/ui/Comment';
+import {Menu} from 'react-native-paper';
 import OrganizationPost2 from '../components/ui/OrganizationPost2';
-import {useFocusEffect} from '@react-navigation/native';
 import {Icon, SearchBar} from '@rneui/themed';
 import HeaderHome from '../components/ui/HeaderHome';
 import {getFontFamily} from '../utils/fonts';
 import {useNotifications} from 'react-native-notificated';
-
-const item = {
-  accounts: {
-    id: 3,
-    name: 'Khoi2',
-    imageUrl: 'https://happyfood.s3.amazonaws.com/1730110976168_image.jpeg',
-    locationName: null,
-    latitude: null,
-    longitude: null,
-  },
-  organizationposts: {
-    id: 1,
-    title: 'aaaab',
-    description: 'bbbb',
-    peopleAttended: 0,
-    imageUrl:
-      'https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp',
-    createdDate: '2024-11-01T09:04:43.951+00:00',
-    linkWebsites: 'https://yopmail.com/en/',
-    userId: 3,
-    locationName: 'aa',
-    latitude: 'bb',
-    longitude: 'cc',
-    distance: 0.0,
-    attended: false,
-  },
-};
+import getDistance from 'geolib/es/getDistance';
 
 export const FundingScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
-  const FundingPostData = useSelector(
-    (state: RootState) => state.fundingPost.HomePage,
-  );
   const {notify} = useNotifications();
-  const userInfo = useSelector((state: RootState) => state.userInfo);
   const token = useSelector((state: RootState) => state.token.key);
   const location = useSelector((state: RootState) => state.location);
   const [fundingPost, setFundingPost] = useState<any>(null);
@@ -77,9 +37,7 @@ export const FundingScreen = ({navigation}: any) => {
   const [filterPosts, setFilterPosts] = useState<any>(null);
   const [visible, setVisible] = useState(false);
   const [sortingMethod, setSortingMethod] = useState('');
-  const updateSearch = (search: any) => {
-    setSearch(search);
-  };
+
   const loadMoreItem = () => {
     setCurrentPage(currentPage + 1);
   };
@@ -145,21 +103,45 @@ export const FundingScreen = ({navigation}: any) => {
 
   useEffect(() => {
     const applyFilter = () => {
-      let filtered = fundingPost;
-      if (search) {
-        filtered = filtered.filter((post: any) =>
-          post.title.toLowerCase().includes(search.toLowerCase()),
-        );
+      try {
+        let filtered = fundingPost;
+        if (search) {
+          console.log(filtered);
+          filtered = filtered.filter((post: any) =>
+            post?.organizationposts?.title
+              ?.toLowerCase()
+              .includes(search.toLowerCase()),
+          );
+        }
+        if (sortingMethod === 'distance') {
+          filtered = filtered.sort((a: any, b: any) => {
+            const distanceA = getDistance(
+              {
+                latitude: a.organizationposts.latitude,
+                longitude: a.organizationposts.longitude,
+              },
+              location,
+            );
+            const distanceB = getDistance(
+              {
+                latitude: b.organizationposts.latitude,
+                longitude: b.organizationposts.longitude,
+              },
+              location,
+            );
+            return distanceA - distanceB;
+          });
+        }
+
+        setFilterPosts(filtered);
+      } catch (error) {
+        console.error('Error filtering posts: ', error);
       }
-      if (sortingMethod === 'distance') {
-        filtered = filtered.sort((a: any, b: any) => a.distance - b.distance);
-      }
-      setFilterPosts(filtered);
     };
     if (fundingPost) {
       applyFilter();
     }
-  }, [search, sortingMethod, fundingPost]);
+  }, [search, sortingMethod, fundingPost, location]);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -183,7 +165,7 @@ export const FundingScreen = ({navigation}: any) => {
               fontFamily: getFontFamily('regular'),
             }}
             round
-            onChangeText={updateSearch}
+            onChangeText={setSearch}
             value={search}
           />
         </View>
@@ -214,10 +196,6 @@ export const FundingScreen = ({navigation}: any) => {
           />
         </Menu>
       </View>
-      {/* <ScrollView>
-        <OrganizationPost2 navigation={navigation} item={item} />
-        <View style={{height: 30}} />
-      </ScrollView> */}
 
       <FlatList
         data={filterPosts ?? fundingPost}

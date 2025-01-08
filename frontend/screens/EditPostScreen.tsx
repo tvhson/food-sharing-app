@@ -8,13 +8,12 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Colors from '../global/Color';
-import {Button, Icon, Image} from '@rneui/themed';
+import {Button, Icon} from '@rneui/themed';
 import MAP_API_KEY from '../components/data/SecretData';
 import axios from 'axios';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import GetLocation from 'react-native-get-location';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {createNotifications} from 'react-native-notificated';
 import {updatePost} from '../api/PostApi';
@@ -34,27 +33,32 @@ const EditPostScreen = ({route, navigation}: any) => {
   const {notify} = useNotifications();
   const location = route.params.location;
   const accessToken = route.params.accessToken;
-  const [locationCurrent, setLocationCurrent] = useState(location);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [weight, setWeight] = useState('');
-  const [description, setDescription] = useState('');
-  const [note, setNote] = useState('');
-  const [status, setStatus] = useState('');
-  const [locationName, setLocationName] = useState('');
+  const [title, setTitle] = useState(item.title || '');
+  const [content, setContent] = useState(item.content || '');
+  const [weight, setWeight] = useState(item.weight || '');
+  const [description, setDescription] = useState(item.description || '');
+  const [note, setNote] = useState(item.note || '');
+  const [status, setStatus] = useState(item.status || '');
+  const [locationName, setLocationName] = useState(item.locationName || '');
+  const [portion, setPortion] = useState(item.portion || '');
   const [latitude, setLatitude] = useState(
     location && location.latitude ? location.latitude : null,
   );
   const [longitude, setLongitude] = useState(
     location && location.longitude ? location.longitude : null,
   );
-  const [expiredDate, setExpiredDate] = useState(new Date());
-  const [pickUpStartDate, setPickUpStartDate] = useState(new Date());
-  const [pickUpEndDate, setPickUpEndDate] = useState(new Date());
+  const [expiredDate, setExpiredDate] = useState(
+    new Date(item.expiredDate) || new Date(),
+  );
+  const [pickUpStartDate, setPickUpStartDate] = useState(
+    new Date(item.pickUpStartDate) || new Date(),
+  );
+  const [pickUpEndDate, setPickUpEndDate] = useState(
+    new Date(item.pickUpEndDate) || new Date(),
+  );
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any[]>([]);
-  const [oldImages, setOldImages] = useState<string[]>([]); // Add state for original images
-  const [isImageAlreadyUpload, setIsImageAlreadyUpload] = useState(false);
+  const [oldImages, setOldImages] = useState<string[]>(item.images || []); // Add state for original images
 
   const autocompleteRef = useRef<any | null>(null);
 
@@ -90,27 +94,6 @@ const EditPostScreen = ({route, navigation}: any) => {
     }
   };
 
-  useEffect(() => {
-    if (item) {
-      setTitle(item.title);
-      setDescription(item.description);
-      setWeight(item.weight);
-      setNote(item.note);
-      setStatus(item.status);
-      setLocationName(item.locationName);
-      setLatitude(Number(item.latitude));
-      setLongitude(Number(item.longitude));
-      autocompleteRef.current?.setAddressText(
-        item.locationName ? item.locationName : '',
-      );
-      setOldImages(item.images);
-      setExpiredDate(new Date(item.expiredDate));
-      setPickUpStartDate(new Date(item.pickUpStartDate));
-      setPickUpEndDate(new Date(item.pickUpEndDate));
-      setIsImageAlreadyUpload(true);
-    }
-  }, [item, location]);
-
   const postImage = async (newImages: any) => {
     setImageUpload((prevImages: any) => {
       if (Array.isArray(newImages)) {
@@ -119,7 +102,6 @@ const EditPostScreen = ({route, navigation}: any) => {
         return [...prevImages, newImages];
       }
     });
-    setIsImageAlreadyUpload(false);
   };
 
   const handleEditPost = () => {
@@ -200,6 +182,7 @@ const EditPostScreen = ({route, navigation}: any) => {
                 content,
                 weight,
                 description,
+                portion,
                 note,
                 status,
                 locationName,
@@ -255,6 +238,7 @@ const EditPostScreen = ({route, navigation}: any) => {
           content,
           weight,
           description,
+          portion,
           note,
           status,
           locationName,
@@ -370,7 +354,7 @@ const EditPostScreen = ({route, navigation}: any) => {
           keyboardType="numeric"
         />
         <TextInput
-          placeholder="Ghi chú"
+          placeholder="Số phần"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -384,8 +368,9 @@ const EditPostScreen = ({route, navigation}: any) => {
             borderColor: Colors.greenPrimary,
             fontFamily: getFontFamily('regular'),
           }}
-          value={note}
-          onChangeText={setNote}
+          value={portion}
+          onChangeText={setPortion}
+          keyboardType="numeric"
         />
         <View style={{marginHorizontal: 10, marginTop: 20}}>
           <View

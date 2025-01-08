@@ -30,6 +30,7 @@ const Comment = (props: any) => {
     const getCommentList = async () => {
       // get comment list
       if (accessToken) {
+        if (commentPostId === 0) return;
         // get comment list
         getCommentByPostId(commentPostId, accessToken).then((response: any) => {
           if (response.status === 200) {
@@ -116,7 +117,7 @@ const Comment = (props: any) => {
               flex: 1,
             }}
           />
-          <TouchableOpacity onPress={handleCreateComment}>
+          <TouchableOpacity onPress={handleCreateComment} disabled={!comment}>
             <Image
               source={require('../../assets/images/send.png')}
               style={{width: 30, height: 30}}

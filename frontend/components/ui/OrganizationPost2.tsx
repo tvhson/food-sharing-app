@@ -20,19 +20,33 @@ const OrganizationPost2 = (props: any) => {
   const token = useSelector((state: RootState) => state.token.key);
   const {navigation, item} = props;
   const [isJoin, setIsJoin] = React.useState(item.organizationposts.attended);
+  const [peopleAttended, setPeopleAttended] = React.useState(
+    item.organizationposts.peopleAttended,
+  );
 
   const handleAttend = async () => {
     setIsJoin(!isJoin);
+    setPeopleAttended(
+      (prev: any) => (prev ? prev - 1 : prev + 1), // Adjust count dynamically
+    );
     const response: any = await attendOrganizationPost(
       item.organizationposts.id,
       token,
     );
     if (response.status !== 200) {
       setIsJoin(!isJoin);
+      setPeopleAttended(
+        (prev: any) => (prev ? prev - 1 : prev + 1), // Adjust count dynamically
+      );
     }
   };
   const handleNavigateToDetail = () => {
-    navigation.navigate('OrganizationPostDetail2', {item});
+    navigation.navigate('OrganizationPostDetail2', {
+      item,
+      isJoin,
+      peopleAttended,
+      handleAttend,
+    });
   };
 
   return (
@@ -43,9 +57,9 @@ const OrganizationPost2 = (props: any) => {
       <TouchableOpacity style={styles.btnFloat}>
         <Icon source={'dots-horizontal'} size={30} color={Colors.grayPrimary} />
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.btnFloat, {right: 10}]}>
+      {/* <TouchableOpacity style={[styles.btnFloat, {right: 10}]}>
         <Icon source={'close'} size={25} color={Colors.grayPrimary} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <View>
         <Image
           source={{
@@ -60,7 +74,7 @@ const OrganizationPost2 = (props: any) => {
             Địa điểm: {item.organizationposts.locationName}
           </Text>
           <Text style={styles.textLocation}>
-            {item.organizationposts.peopleAttended} người sẽ tham gia
+            {peopleAttended} người tham gia
           </Text>
         </View>
         <View
@@ -129,7 +143,7 @@ const styles = StyleSheet.create({
     height: 40,
     alignSelf: 'center',
     position: 'absolute',
-    right: 60,
+    right: 10,
     top: 10,
     zIndex: 100,
   },
