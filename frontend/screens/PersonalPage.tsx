@@ -1,24 +1,39 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import {
-  FlatList,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import Colors from '../global/Color';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
-import PostRenderItem2 from '../components/ui/PostRenderItem2';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/Store';
 import {UserInfo} from '../redux/UserReducer';
+import {TabBar, TabView} from 'react-native-tab-view';
+import ListPost from '../components/ui/PersonalPageUI/ListPost';
 
 const PersonalPage = ({navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
-  console.log(userInfo);
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    {key: 'first', title: 'Bài viết'},
+    {key: 'second', title: 'Sự kiện'},
+  ]);
+
+  const FirstRoute = () => (
+    <View style={[styles.scene, {backgroundColor: '#ff4081'}]} />
+  );
+
+  const SecondRoute = () => (
+    <View style={[styles.scene, {backgroundColor: '#673ab7'}]} />
+  );
 
   const renderHeader = (userInfo: UserInfo) => {
     return (
@@ -70,7 +85,73 @@ const PersonalPage = ({navigation}: any) => {
       </View>
     );
   };
-  return <View style={styles.container}>{renderHeader(userInfo)}</View>;
+
+  const renderTabBar = (props: any) => {
+    const routes = props.navigationState.routes;
+    return (
+      <View
+        style={{
+          backgroundColor: Colors.white,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          borderBottomWidth: 1,
+          borderBottomColor: Colors.gray,
+        }}>
+        <View style={{flexDirection: 'row', flex: 1}}>
+          {routes.map((route: any, index: number) => {
+            return (
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  borderBottomColor:
+                    props.navigationState.index === index
+                      ? Colors.greenPrimary
+                      : 'transparent',
+                  borderBottomWidth: 3,
+                }}
+                key={index}
+                onPress={() => {
+                  props.jumpTo(route.key);
+                }}>
+                <Text
+                  style={{
+                    color:
+                      props.navigationState.index === index ? 'black' : 'gray',
+                    padding: 8,
+                    fontSize: 16,
+                    fontFamily: getFontFamily('bold'),
+                  }}>
+                  {route.title}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <>{renderHeader(userInfo)}</>
+      <TabView
+        navigationState={{index, routes}}
+        renderScene={({route}) => {
+          switch (route.key) {
+            case 'first':
+              return <ListPost />;
+            case 'second':
+              return <SecondRoute />;
+            default:
+              return null;
+          }
+        }}
+        onIndexChange={setIndex}
+        renderTabBar={renderTabBar}
+      />
+    </View>
+  );
 };
 
 export default PersonalPage;
@@ -134,5 +215,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  scene: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
