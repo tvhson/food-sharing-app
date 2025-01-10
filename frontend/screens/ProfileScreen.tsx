@@ -19,6 +19,7 @@ import {disconnectChat} from '../api/ChatApi';
 import {updateUser} from '../api/AccountsApi';
 import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import {ZIMKit} from '@zegocloud/zimkit-rn';
+import {getFontFamily} from '../utils/fonts';
 
 const {useNotifications} = createNotifications();
 
@@ -319,9 +320,23 @@ const ProfileScreen = ({navigation, route}: any) => {
           </>
         ) : null}
       </View>
+      <View>
+        <Button
+          title="Đổi quà"
+          buttonStyle={{
+            backgroundColor: Colors.button,
+            alignSelf: 'center',
+            borderRadius: 10,
+            paddingHorizontal: 100,
+          }}
+          titleStyle={{color: Colors.white}}
+          icon={{name: 'gift', type: 'ant-design', color: 'white'}}
+          onPress={() => navigation.navigate('ExchangeGift')}
+        />
+      </View>
       <View style={{flex: 1, justifyContent: 'flex-end'}}>
         <Button
-          title="Logout"
+          title="Đăng xuất"
           onPress={() => handleLogout()}
           buttonStyle={{
             backgroundColor: Colors.button,
@@ -330,6 +345,7 @@ const ProfileScreen = ({navigation, route}: any) => {
             borderRadius: 10,
             marginBottom: 50,
           }}
+          titleStyle={{fontSize: 16, fontFamily: getFontFamily('bold')}}
         />
       </View>
     </View>

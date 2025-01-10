@@ -36,6 +36,7 @@ import OrganizationPostDetail2 from '../screens/OrganizationPostDetail2';
 import WebViewScreen from '../screens/WebViewScreen';
 import PostDetail2 from '../screens/PostDetail2';
 import {getFontFamily} from '../utils/fonts';
+import ExchangeGiftScreen from '../screens/ExchangeGiftScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -150,6 +151,7 @@ const Router = () => {
               headerTintColor: 'black',
             }}
           />
+          <Stack.Screen name="ExchangeGift" component={ExchangeGiftScreen} />
           <Stack.Screen name="MessageListPage" component={MessageListPage} />
           <Stack.Screen
             options={{headerShown: false}}
