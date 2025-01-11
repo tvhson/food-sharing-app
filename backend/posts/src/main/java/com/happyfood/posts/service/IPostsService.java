@@ -12,5 +12,5 @@ public interface IPostsService {
     PostsDto getPostById(Long userId, Long postId);
     List<PostsDto> getRecommendedPosts(Long userId);
     List<PostsDto> getPostsOfUser(Long userId);
-    void toggleLikePost(Long userId, Long postId);
+    void toggleLikePost(Long userId, Long postId);;
 }

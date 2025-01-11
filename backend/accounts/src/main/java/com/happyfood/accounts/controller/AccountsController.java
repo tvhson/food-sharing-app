@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class AccountsController {
     private final IAccountsService iAccountsService;
 
-    @Value("${build.version}")
+//    @Value("${build.version}")
     private String buildVersion;
 
     @RateLimiter(name = "test", fallbackMethod = "testFallback")

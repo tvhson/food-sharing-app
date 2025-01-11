@@ -40,7 +40,11 @@ public class PostsController {
         return ResponseEntity.ok(postsService.getRecommendedPosts(userId));
     }
     @GetMapping("/user")
-    ResponseEntity<List<PostsDto>> getPostsOfUser(@RequestHeader Long userId) {
+    ResponseEntity<List<PostsDto>> getMyPosts(@RequestHeader Long userId) {
+        return ResponseEntity.ok(postsService.getPostsOfUser(userId));
+    }
+    @GetMapping("/user/{userId}")
+    ResponseEntity<List<PostsDto>> getPostsOfUser(@PathVariable Long userId) {
         return ResponseEntity.ok(postsService.getPostsOfUser(userId));
     }
     @PatchMapping("/like/{postId}")

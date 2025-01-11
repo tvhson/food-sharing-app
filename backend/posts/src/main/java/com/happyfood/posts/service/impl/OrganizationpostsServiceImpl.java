@@ -185,4 +185,35 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
         organizationposts.setDeleted(true);
         organizationpostsRepository.save(organizationposts);
     }
+
+    @Override
+    public List<OrganizationpostsDto> getOrganizationpostsByUserIdV2(Long userId) {
+        List<Organizationposts> organizationposts = organizationpostsRepository.findByUserId(userId);
+        Collections.reverse(organizationposts);
+        return organizationposts.stream()
+                .filter(organizationpost -> !organizationpost.isDeleted())
+                .map(organizationpost -> {
+                    OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost);
+                    organizationpostsDto.setAttended(organizationpost.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+                    organizationpostsDto.setPeopleAttended(organizationpost.getAttendees().size());
+                    return organizationpostsDto;
+                })
+                .toList();
+    }
+
+    @Override
+    public List<OrganizationpostsDto> getAttendedOrganizationpostsByUserId(Long userId) {
+        List<Organizationposts> organizationposts = organizationpostsRepository.findAll();
+        Collections.reverse(organizationposts);
+        return organizationposts.stream()
+                .filter(organizationpost -> !organizationpost.isDeleted())
+                .filter(organizationposts1 -> organizationposts1.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)))
+                .map(organizationpost -> {
+                    OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost);
+                    organizationpostsDto.setAttended(organizationpost.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+                    organizationpostsDto.setPeopleAttended(organizationpost.getAttendees().size());
+                    return organizationpostsDto;
+                })
+                .toList();
+    }
 }
