@@ -39,6 +39,7 @@ public class Posts {
     private int portion;
     private String tags;
     private String userIdLikes;
+    private String userIdReceived;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comments> comments;

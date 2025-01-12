@@ -50,6 +50,7 @@ public class PostsMapper {
                 .portion(posts.getPortion())
                 .tags(posts.getTags() != null && !posts.getTags().isEmpty() ? Arrays.asList(posts.getTags().split("-")) : null)
                 .isLiked(false)
+                .isReceived(false)
                 .likeCount(posts.getUserIdLikes() != null && !posts.getUserIdLikes().isEmpty() ? Arrays.asList(posts.getUserIdLikes().split("-")).size() : 0)
                 .build();
     }

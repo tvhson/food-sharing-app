@@ -34,5 +34,6 @@ public class PostsDto {
     private int portion;
     private List<String> tags;
     private Boolean isLiked;
+    private Boolean isReceived;
     private int likeCount;
 }

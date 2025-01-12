@@ -40,7 +40,7 @@ public class NotificationsServiceImpl implements INotificationsService {
 
     @Override
     public void readNotification(Long userId, Long notificationId) {
-        Notifications notification = notificationsRepository.findById(notificationId).orElseThrow(() -> new CustomException("Notification not found", HttpStatus.NOT_FOUND));
+        Notifications notification = notificationsRepository.findById(notificationId).orElseThrow(() -> new CustomException("Không tìm thấy thông báo", HttpStatus.NOT_FOUND));
         notification.setRead(true);
         notificationsRepository.save(notification);
     }
@@ -56,7 +56,7 @@ public class NotificationsServiceImpl implements INotificationsService {
 
     @Override
     public void updateNotification(Long notificationId, Notifications notificationNew) {
-        Notifications notification = notificationsRepository.findById(notificationId).orElseThrow(() -> new CustomException("Notification not found", HttpStatus.NOT_FOUND));
+        Notifications notification = notificationsRepository.findById(notificationId).orElseThrow(() -> new CustomException("Không tìm thấy thông báo", HttpStatus.NOT_FOUND));
         notification.setTitle(notificationNew.getTitle());
         notification.setImageUrl(notificationNew.getImageUrl());
         notification.setDescription(notificationNew.getDescription());

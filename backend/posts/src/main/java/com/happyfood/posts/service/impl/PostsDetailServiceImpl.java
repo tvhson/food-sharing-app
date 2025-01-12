@@ -21,7 +21,7 @@ public class PostsDetailServiceImpl implements IPostsDetailService {
     @Override
     public PostsDetailDto getPostDetailById(Long postId) {
         PostsDetailDto postsDetailDto = new PostsDetailDto();
-        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thấy bài viết", HttpStatus.NOT_FOUND));
         postsDetailDto.setPost(PostsMapper.mapToPostsDto(posts));
         ResponseEntity<AccountsDto> accountsDtoResponseEntity = accountsFeignClient.getAccount(posts.getCreatedById());
         if (accountsDtoResponseEntity != null && accountsDtoResponseEntity.getStatusCode().is2xxSuccessful()) {

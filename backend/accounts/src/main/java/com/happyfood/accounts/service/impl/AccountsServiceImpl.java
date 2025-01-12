@@ -26,7 +26,7 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public AccountsDto createAccount(AccountsDto accountsDto) {
         if (accountsRepository.existsByEmail(accountsDto.getEmail())) {
-            throw new CustomException("Account already exists", HttpStatus.BAD_REQUEST);
+            throw new CustomException("Email này đã tồn tại", HttpStatus.BAD_REQUEST);
         }
 
         Accounts accounts = AccountsMapper.mapToAccounts(accountsDto);
@@ -57,14 +57,14 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public AccountsDto getAccount(Long accountId) {
         Accounts accounts = accountsRepository.findById(accountId)
-                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND));
         return AccountsMapper.mapToAccountsDto(accounts);
     }
 
     @Override
     public AccountsDto authentication(String email, String password) {
         Accounts accounts = accountsRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Tài khoản không chính xác", HttpStatus.NOT_FOUND));
 
         if (accounts.getBannedDate() != null && accounts.getBannedDate().before(new Date())) {
             accounts.setStatus("ACTIVE");
@@ -81,7 +81,7 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public AccountsDto banAccount(Long accountId, Long days) {
         Accounts accounts = accountsRepository.findById(accountId)
-                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND));
         accounts.setStatus("BANNED");
         accounts.setBannedDate(new Date(System.currentTimeMillis() + days * 24 * 60 * 60 * 1000));
 
@@ -92,7 +92,7 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public AccountsDto updateAccount(Long accountId, AccountsDto accountsDto) {
         Accounts accounts = accountsRepository.findById(accountId)
-                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND));
         accounts.setName(accountsDto.getName());
         accounts.setPhone(accountsDto.getPhone());
         accounts.setDescription(accountsDto.getDescription());
@@ -113,14 +113,14 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public void changePassword(Long accountId,String oldPassword, String newPassword) {
         Accounts accounts = accountsRepository.findById(accountId)
-                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND));
 
         if (newPassword.length() < 6) {
-            throw new CustomException("Password must be at least 6 characters long", HttpStatus.BAD_REQUEST);
+            throw new CustomException("Mật khẩu phải ít nhất 6 ký tự", HttpStatus.BAD_REQUEST);
         }
 
         if (!passwordEncoder.matches(oldPassword, accounts.getPassword())) {
-            throw new CustomException("Old password is incorrect", HttpStatus.BAD_REQUEST);
+            throw new CustomException("Mật khẩu không khớp", HttpStatus.BAD_REQUEST);
         }
 
         accounts.setPassword(passwordEncoder.encode(newPassword));
@@ -130,7 +130,7 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public void changeRole(Long accountId, String role) {
         Accounts accounts = accountsRepository.findById(accountId)
-                .orElseThrow(() -> new CustomException("Account not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND));
         accounts.setRole(role);
         accountsRepository.save(accounts);
     }

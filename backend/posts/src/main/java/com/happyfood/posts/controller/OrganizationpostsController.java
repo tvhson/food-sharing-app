@@ -40,8 +40,16 @@ public class OrganizationpostsController {
     }
 
     @GetMapping("/get")
-    ResponseEntity<List<OrganizationpostsDetail>> getOrganizationpostsByUserId(@RequestHeader Long userId) {
+    ResponseEntity<List<OrganizationpostsDetail>> getMyOrganizationposts(@RequestHeader Long userId) {
         return ResponseEntity.ok(organizationpostsService.getOrganizationpostsByUserId(userId));
+    }
+
+    @GetMapping("/user/{userId}")
+    ResponseEntity<List<OrganizationpostsDto>> getOrganizationpostsByUserId(@PathVariable Long userId, @RequestHeader String role) {
+        if (role.equals("USER"))
+            return ResponseEntity.ok(organizationpostsService.getAttendedOrganizationpostsByUserId(userId));
+        else
+            return ResponseEntity.ok(organizationpostsService.getOrganizationpostsByUserIdV2(userId));
     }
 
     @GetMapping("/recommended")

@@ -22,6 +22,7 @@ public class Organizationposts {
     private String description;
     private String imageUrl;
     private Date createdDate;
+    private Date startDate;
     private boolean isDeleted;
     private String linkWebsites;
     private Long userId;

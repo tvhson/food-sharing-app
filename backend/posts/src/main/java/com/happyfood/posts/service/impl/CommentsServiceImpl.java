@@ -41,7 +41,7 @@ public class CommentsServiceImpl implements ICommentsService {
         comment.setUserName(accountsDto.getName());
         comment.setAvatar(accountsDto.getImageUrl());
 
-        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thất bài viết", HttpStatus.NOT_FOUND));
         comment.setPost(posts);
         posts.getComments().add(comment);
 
@@ -70,9 +70,9 @@ public class CommentsServiceImpl implements ICommentsService {
 
     @Override
     public CommentsDto updateComment(Long userId, CommentsDto commentsDto) {
-        Comments comments = commentsRepository.findById(commentsDto.getId()).orElseThrow(() -> new CustomException("Comment not found", HttpStatus.NOT_FOUND));
+        Comments comments = commentsRepository.findById(commentsDto.getId()).orElseThrow(() -> new CustomException("Không tìm thấy bình luận", HttpStatus.NOT_FOUND));
         if (!comments.getUserId().equals(userId)) {
-            throw new CustomException("You are not allowed to update this comment", HttpStatus.FORBIDDEN);
+            throw new CustomException("Bạn không có quyền chỉnh sửa bình luận này", HttpStatus.FORBIDDEN);
         }
         comments.setContent(commentsDto.getContent());
 
@@ -81,16 +81,16 @@ public class CommentsServiceImpl implements ICommentsService {
 
     @Override
     public void deleteComment(Long userId, Long postId, Long commentId) {
-        Comments comments = commentsRepository.findById(commentId).orElseThrow(() -> new CustomException("Comment not found", HttpStatus.NOT_FOUND));
+        Comments comments = commentsRepository.findById(commentId).orElseThrow(() -> new CustomException("Không tìm thấy bình luận", HttpStatus.NOT_FOUND));
         if (!comments.getUserId().equals(userId) && !comments.getPost().getCreatedById().equals(userId)) {
-            throw new CustomException("You are not allowed to delete this comment", HttpStatus.FORBIDDEN);
+            throw new CustomException("Bạn không có quyền chỉnh sửa bình luận này", HttpStatus.FORBIDDEN);
         }
         commentsRepository.delete(comments);
     }
 
     @Override
     public List<CommentsDto> getCommentsByPostId(Long userId, Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thấy bài viết này", HttpStatus.NOT_FOUND));
         if (posts.getComments() == null || posts.getComments().isEmpty()) {
             return List.of();
         }
@@ -101,7 +101,7 @@ public class CommentsServiceImpl implements ICommentsService {
 
     @Override
     public List<CommentsDto> getCommentsByOrganizationPostId(Long userId, Long organizationPostId) {
-        Organizationposts organizationposts = organizationpostsRepository.findById(organizationPostId).orElseThrow(() -> new CustomException("Organization post not found", HttpStatus.NOT_FOUND));
+        Organizationposts organizationposts = organizationpostsRepository.findById(organizationPostId).orElseThrow(() -> new CustomException("Không tìm thấy sự kiện này", HttpStatus.NOT_FOUND));
         if (organizationposts.getComments() == null || organizationposts.getComments().isEmpty()) {
             return List.of();
         }
@@ -111,7 +111,7 @@ public class CommentsServiceImpl implements ICommentsService {
 
     @Override
     public void toggleLikeComment(Long userId, Long commentId) {
-        Comments comments = commentsRepository.findById(commentId).orElseThrow(() -> new CustomException("Comment not found", HttpStatus.NOT_FOUND));
+        Comments comments = commentsRepository.findById(commentId).orElseThrow(() -> new CustomException("Không tìm thấy bình luận này", HttpStatus.NOT_FOUND));
         if (comments.getUserIdLikes() == null || comments.getUserIdLikes().isEmpty()) {
             comments.setUserIdLikes(userId.toString());
         } else {

@@ -14,4 +14,6 @@ public interface IOrganizationpostsService {
     OrganizationpostsDetail updateOrganizationposts(Long id, Long userId, OrganizationpostsDto organizationpostsDto);
     OrganizationpostsDetail toggleAttendOrganizationposts(Long id, Long userId);
     void deleteOrganizationposts(Long id, Long userId);
+    List<OrganizationpostsDto> getOrganizationpostsByUserIdV2(Long userId);
+    List<OrganizationpostsDto> getAttendedOrganizationpostsByUserId(Long userId);
 }

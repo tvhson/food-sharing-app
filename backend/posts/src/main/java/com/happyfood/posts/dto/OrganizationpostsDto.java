@@ -15,7 +15,6 @@ public class OrganizationpostsDto {
     private String description;
     private int peopleAttended;
     private String imageUrl;
-    private Date createdDate;
     private String linkWebsites;
     private Long userId;
     private String locationName;
@@ -23,4 +22,6 @@ public class OrganizationpostsDto {
     private String longitude;
     private double distance;
     private boolean isAttended;
+    private Date createdDate;
+    private Date startDate;
 }

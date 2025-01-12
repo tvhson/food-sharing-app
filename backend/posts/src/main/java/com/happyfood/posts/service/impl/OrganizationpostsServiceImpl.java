@@ -29,7 +29,7 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
     public OrganizationpostsDetail getOrganizationpostsById(Long id) {
         OrganizationpostsDetail postsDetailDto = new OrganizationpostsDetail();
 
-        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Organizationposts not found", HttpStatus.NOT_FOUND));
+        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Không tìm thấy sự kiện", HttpStatus.NOT_FOUND));
         OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationposts);
 
         organizationpostsDto.setAttended(organizationposts.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(organizationposts.getUserId())));
@@ -120,10 +120,10 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
 
     @Override
     public OrganizationpostsDetail updateOrganizationposts(Long id, Long userId, OrganizationpostsDto organizationpostsDto) {
-        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Organizationposts not found", HttpStatus.NOT_FOUND));
+        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Không tìm thấy sự kiện", HttpStatus.NOT_FOUND));
 
         if (!organizationposts.getUserId().equals(userId)) {
-            throw new CustomException("You are not authorized to update this post", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("Bạn không có quyền chỉnh sửa sự kiện này", HttpStatus.UNAUTHORIZED);
         }
 
         organizationposts.setTitle(organizationpostsDto.getTitle());
@@ -150,7 +150,7 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
 
     @Override
     public OrganizationpostsDetail toggleAttendOrganizationposts(Long id, Long userId) {
-        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Organizationposts not found", HttpStatus.NOT_FOUND));
+        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Không tìm thấy sự kiện", HttpStatus.NOT_FOUND));
 
         if (organizationposts.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId))) {
             organizationposts.getAttendees().removeIf(attendee -> attendee.getUserId().equals(userId));
@@ -176,13 +176,44 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
 
     @Override
     public void deleteOrganizationposts(Long id, Long userId) {
-        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Organizationposts not found", HttpStatus.NOT_FOUND));
+        Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Không tìm thấy sự kiện", HttpStatus.NOT_FOUND));
 
         if (!organizationposts.getUserId().equals(userId)) {
-            throw new CustomException("You are not authorized to delete this post", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("Bạn không có quyền chỉnh sửa sự kiện này", HttpStatus.UNAUTHORIZED);
         }
 
         organizationposts.setDeleted(true);
         organizationpostsRepository.save(organizationposts);
+    }
+
+    @Override
+    public List<OrganizationpostsDto> getOrganizationpostsByUserIdV2(Long userId) {
+        List<Organizationposts> organizationposts = organizationpostsRepository.findByUserId(userId);
+        Collections.reverse(organizationposts);
+        return organizationposts.stream()
+                .filter(organizationpost -> !organizationpost.isDeleted())
+                .map(organizationpost -> {
+                    OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost);
+                    organizationpostsDto.setAttended(organizationpost.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+                    organizationpostsDto.setPeopleAttended(organizationpost.getAttendees().size());
+                    return organizationpostsDto;
+                })
+                .toList();
+    }
+
+    @Override
+    public List<OrganizationpostsDto> getAttendedOrganizationpostsByUserId(Long userId) {
+        List<Organizationposts> organizationposts = organizationpostsRepository.findAll();
+        Collections.reverse(organizationposts);
+        return organizationposts.stream()
+                .filter(organizationpost -> !organizationpost.isDeleted())
+                .filter(organizationposts1 -> organizationposts1.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)))
+                .map(organizationpost -> {
+                    OrganizationpostsDto organizationpostsDto = OrganizationpostsMapper.mapToOrganizationpostsDto(organizationpost);
+                    organizationpostsDto.setAttended(organizationpost.getAttendees().stream().anyMatch(attendee -> attendee.getUserId().equals(userId)));
+                    organizationpostsDto.setPeopleAttended(organizationpost.getAttendees().size());
+                    return organizationpostsDto;
+                })
+                .toList();
     }
 }
