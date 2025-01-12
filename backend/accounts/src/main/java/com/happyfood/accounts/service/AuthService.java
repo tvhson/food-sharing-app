@@ -18,23 +18,23 @@ public class AuthService {
     public AuthResponse register(AuthRequest request, HttpServletResponse response) {
 
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
-            throw new CustomException("Email cannot be empty", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Email rỗng", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         if (!request.getEmail().contains("@")) {
-            throw new CustomException("Email is invalid", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Email không hợp lệ", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
-            throw new CustomException("Password cannot be empty", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Password rỗng", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         if (request.getPassword().length() < 6) {
-            throw new CustomException("Password must be at least 6 characters", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Password phải ít nhất 6 ký tự", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         if (request.getName() == null || request.getName().isEmpty()) {
-            throw new CustomException("Name cannot be empty", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Tên không được rỗng", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         AccountsDto registeredUser = new AccountsDto();
@@ -49,23 +49,19 @@ public class AuthService {
             String refreshToken = jwtUtil.generate(registeredUser.getId(), registeredUser.getRole(), "REFRESH");
             return new AuthResponse(accessToken, refreshToken);
         } catch (Exception e) {
-            throw new CustomException("Email is already taken", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Email đã được sử dụng", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
     public AuthResponse login(AuthRequest request, HttpServletResponse response) {
         AccountsDto accountsDto = null;
-        try {
-            accountsDto = accountingService.authentication(request.getEmail(), request.getPassword());
-        } catch (Exception e) {
-            throw new CustomException("Email/Password is wrong", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+        accountsDto = accountingService.authentication(request.getEmail(), request.getPassword());
 
         if (accountsDto == null) {
-            throw new CustomException("Email/Password is wrong", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Mật khẩu không đúng", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         if (accountsDto.getStatus().equals("BANNED")) {
-            throw new CustomException("Your account has been banned until " + accountsDto.getBannedDate().toString(), HttpStatus.UNAUTHORIZED);
+            throw new CustomException("Tài khoản của bạn đã bị khóa cho đến " + accountsDto.getBannedDate().toString(), HttpStatus.UNAUTHORIZED);
         }
 
         String accessToken = jwtUtil.generate(accountsDto.getId(), accountsDto.getRole(), "ACCESS");

@@ -46,7 +46,7 @@ public class PointsServiceImpl implements IPointsService {
 
     @Override
     public Points addPoints(Long accountId, Long point) {
-        Points pointsEntity = pointsRepository.findByAccountId(accountId).orElseThrow(() -> new CustomException("Points not found", HttpStatus.NOT_FOUND));
+        Points pointsEntity = pointsRepository.findByAccountId(accountId).orElseThrow(() -> new CustomException("Không tìm thấy thông tin điểm", HttpStatus.NOT_FOUND));
         pointsEntity.setPointsEarned(pointsEntity.getPointsEarned() + point);
         pointsEntity.setPointsBalance(pointsEntity.getPointsBalance() + point);
         pointsEntity.setTransactionDate(new Date());
@@ -64,7 +64,7 @@ public class PointsServiceImpl implements IPointsService {
 
     @Override
     public void redeemPoints(Long accountId, RedemptionsRequest redemptionsRequest) {
-        Points pointsEntity = pointsRepository.findByAccountId(accountId).orElseThrow(() -> new CustomException("Points not found", HttpStatus.NOT_FOUND));
+        Points pointsEntity = pointsRepository.findByAccountId(accountId).orElseThrow(() -> new CustomException("Không tìm thấy thông tin điểm", HttpStatus.NOT_FOUND));
         pointsEntity.setPointsRedeemed(pointsEntity.getPointsRedeemed() + redemptionsRequest.getPoint());
         pointsEntity.setPointsBalance(pointsEntity.getPointsBalance() - redemptionsRequest.getPoint());
 
@@ -106,7 +106,7 @@ public class PointsServiceImpl implements IPointsService {
 
     @Override
     public Redemptions updateRedemption(Long redemptionId, Redemptions redemptions) {
-        Redemptions redemptionsEntity = redemptionsRepository.findById(redemptionId).orElseThrow(() -> new CustomException("Redemption not found", HttpStatus.NOT_FOUND));
+        Redemptions redemptionsEntity = redemptionsRepository.findById(redemptionId).orElseThrow(() -> new CustomException("Không tìm thấy lịch sử", HttpStatus.NOT_FOUND));
 //        redemptionsEntity.setRewardId(redemptions.getRewardId());
 //        redemptionsEntity.setRewardName(redemptions.getRewardName());
 //        redemptionsEntity.setImageUrl(redemptions.getImageUrl());

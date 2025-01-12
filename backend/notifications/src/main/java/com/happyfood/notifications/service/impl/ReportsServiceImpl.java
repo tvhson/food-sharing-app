@@ -35,7 +35,7 @@ public class ReportsServiceImpl implements IReportsService {
 
     @Override
     public Reports updateReport(Long reportId, Reports report) {
-        Reports existingReport = reportsRepository.findById(reportId).orElseThrow(() -> new CustomException("Report not found", HttpStatus.NOT_FOUND));
+        Reports existingReport = reportsRepository.findById(reportId).orElseThrow(() -> new CustomException("Không tìm thấy report", HttpStatus.NOT_FOUND));
         existingReport.setTitle(report.getTitle());
         existingReport.setDescription(report.getDescription());
         existingReport.setImageUrl(report.getImageUrl());

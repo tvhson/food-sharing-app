@@ -29,7 +29,7 @@ public class RewardsServiceImpl implements IRewardsService {
 
      @Override
      public Rewards getReward(Long rewardId) {
-         return rewardsRepository.findById(rewardId).orElseThrow(() -> new CustomException("Reward not found", HttpStatus.NOT_FOUND));
+         return rewardsRepository.findById(rewardId).orElseThrow(() -> new CustomException("Không tìm thấy phần quà", HttpStatus.NOT_FOUND));
      }
 
      @Override
@@ -47,7 +47,7 @@ public class RewardsServiceImpl implements IRewardsService {
 
      @Override
      public Rewards updateReward(Long rewardId, Rewards rewards) {
-         Rewards reward = rewardsRepository.findById(rewardId).orElseThrow(() -> new CustomException("Reward not found", HttpStatus.NOT_FOUND));
+         Rewards reward = rewardsRepository.findById(rewardId).orElseThrow(() -> new CustomException("Không tìm thấy phần quà", HttpStatus.NOT_FOUND));
          reward.setRewardName(rewards.getRewardName());
          reward.setRewardDescription(rewards.getRewardDescription());
          reward.setPointsRequired(rewards.getPointsRequired());
@@ -59,7 +59,7 @@ public class RewardsServiceImpl implements IRewardsService {
 
      @Override
      public void deleteReward(Long rewardId) {
-         Rewards reward = rewardsRepository.findById(rewardId).orElseThrow(() -> new CustomException("Reward not found", HttpStatus.NOT_FOUND));
+         Rewards reward = rewardsRepository.findById(rewardId).orElseThrow(() -> new CustomException("Không tìm thấy phần quà", HttpStatus.NOT_FOUND));
          rewardsRepository.delete(reward);
      }
 }

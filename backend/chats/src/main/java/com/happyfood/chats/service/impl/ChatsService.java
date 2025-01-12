@@ -118,7 +118,7 @@ public class ChatsService implements IChatsService {
 
     @Override
     public void updateStatuses(Long userId, Long chatId) {
-        ChatRooms chatRooms = chatRoomsRepository.findById(chatId).orElseThrow(() -> new CustomException("Chat not found", HttpStatus.NOT_FOUND));
+        ChatRooms chatRooms = chatRoomsRepository.findById(chatId).orElseThrow(() -> new CustomException("Không tìm thấy phòng chat", HttpStatus.NOT_FOUND));
 
         if (Objects.equals(chatRooms.getRecipientId(), userId)) {
             chatRooms.setRecipientStatus("READ");
@@ -130,7 +130,7 @@ public class ChatsService implements IChatsService {
 
     @Override
     public ChatRooms updateChatRoom(Long userId, Long chatId, String status) {
-        ChatRooms chatRooms = chatRoomsRepository.findById(chatId).orElseThrow(() -> new CustomException("Chat not found", HttpStatus.NOT_FOUND));
+        ChatRooms chatRooms = chatRoomsRepository.findById(chatId).orElseThrow(() -> new CustomException("Không tìm thấy phòng chat", HttpStatus.NOT_FOUND));
         chatRooms.setSenderStatus(status);
         chatRoomsRepository.save(chatRooms);
         return chatRooms;

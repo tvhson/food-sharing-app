@@ -1,6 +1,7 @@
 package com.happyfood.posts.service.impl;
 
 import com.happyfood.posts.dto.Coordinates;
+import com.happyfood.posts.dto.NumberPostsReceivedDto;
 import com.happyfood.posts.dto.PostsDto;
 import com.happyfood.posts.entity.Images;
 import com.happyfood.posts.entity.Posts;
@@ -22,6 +23,7 @@ public class PostsServiceImpl implements IPostsService {
     @Override
     public PostsDto createPost(Long userId, PostsDto postsDto) {
         Posts posts = PostsMapper.mapToPosts(postsDto);
+        posts.setUserIdReceived("");
         posts.setDeleted(false);
         posts.setCreatedById(userId);
         posts.setCreatedDate(new Date());
@@ -39,9 +41,9 @@ public class PostsServiceImpl implements IPostsService {
 
     @Override
     public PostsDto updatePostById(Long userId, PostsDto postsDto, Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thấy bài viết", HttpStatus.NOT_FOUND));
         if (!Objects.equals(posts.getCreatedById(), userId)) {
-            throw new CustomException("You are not allowed to update this post", HttpStatus.FORBIDDEN);
+            throw new CustomException("Bạn không có quyền chỉnh sửa bài viết này", HttpStatus.FORBIDDEN);
         }
         posts.setTitle(postsDto.getTitle());
         posts.setContent(postsDto.getContent());
@@ -71,9 +73,9 @@ public class PostsServiceImpl implements IPostsService {
 
     @Override
     public void deletePostById(Long userId, Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thấy bài viết", HttpStatus.NOT_FOUND));
         if (!Objects.equals(posts.getCreatedById(), userId)) {
-            throw new CustomException("You are not allowed to delete this post", HttpStatus.FORBIDDEN);
+            throw new CustomException("Bạn không có quyền chỉnh sửa bài viết này", HttpStatus.FORBIDDEN);
         }
         posts.setDeleted(true);
         postsRepository.save(posts);
@@ -81,21 +83,31 @@ public class PostsServiceImpl implements IPostsService {
 
     @Override
     public PostsDto getPostById(Long userId, Long postId) {
-        return convertToResponse(postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND)), userId);
-
+        return convertToResponse(postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thấy bài viết", HttpStatus.NOT_FOUND)), userId);
     }
 
     @Override
     public List<PostsDto> getRecommendedPosts(Long userId) {
         List<Posts> posts = postsRepository.findAll();
 
+        for (Posts post : posts) {
+            if (post.getExpiredDate() != null && post.getExpiredDate().before(new Date())) {
+                post.setStatus("NOT_AVAILABLE");
+                postsRepository.save(post);
+            } else if (post.getPickUpEndDate() != null && post.getPickUpEndDate().before(new Date())) {
+                post.setStatus("NOT_AVAILABLE");
+                postsRepository.save(post);
+            }
+        }
+
 //        double latitude = Double.parseDouble(location.getLatitude());
 //        double longitude = Double.parseDouble(location.getLongitude());
 
         List<PostsDto> recommendedPosts = new ArrayList<>(posts.stream()
                 .filter(post -> !post.isDeleted())
-                .filter(post -> !post.getStatus().equals("RECEIVED"))
+                .filter(post -> !post.getStatus().equals("NOT_AVAILABLE"))
                 .map(post -> convertToResponse(post, userId))
+                .filter(postsDto -> !postsDto.getIsReceived())
 //                .filter(post -> post.getReceiverId() == null)
 //                .filter(post -> post.getLatitude() != null)
 //                .filter(post -> post.getLongitude() != null)
@@ -123,7 +135,7 @@ public class PostsServiceImpl implements IPostsService {
 
     @Override
     public void toggleLikePost(Long userId, Long postId) {
-        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Post not found", HttpStatus.NOT_FOUND));
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thấy bài viết", HttpStatus.NOT_FOUND));
 
         if (posts.getUserIdLikes() == null || posts.getUserIdLikes().isEmpty()) {
             posts.setUserIdLikes(userId.toString());
@@ -138,10 +150,43 @@ public class PostsServiceImpl implements IPostsService {
         postsRepository.save(posts);
     }
 
+    @Override
+    public void confirmReceivedPost(Long userId, Long postId) {
+        Posts posts = postsRepository.findById(postId).orElseThrow(() -> new CustomException("Không tìm thấy bài viết", HttpStatus.NOT_FOUND));
+
+        posts.setPortion(posts.getPortion() - 1);
+        if (posts.getPortion() == 0) {
+            posts.setStatus("NOT_AVAILABLE");
+        }
+        if (posts.getPortion() < 0) {
+            throw new CustomException("Thực phẩm này đã được nhận hết", HttpStatus.BAD_REQUEST);
+        }
+
+        if (posts.getUserIdReceived() == null || posts.getUserIdReceived().isEmpty()) {
+            posts.setUserIdReceived(userId.toString());
+        } else {
+            posts.setUserIdReceived(posts.getUserIdReceived() + "-" + userId);
+        }
+        postsRepository.save(posts);
+    }
+
+    @Override
+    public NumberPostsReceivedDto getNumberPostsReceived(Long userId) {
+        List<Posts> posts = postsRepository.findAll();
+        long numberPostsReceived = posts.stream()
+                .filter(post -> post.getUserIdReceived() != null && !post.getUserIdReceived().isEmpty())
+                .filter(post -> Arrays.stream(post.getUserIdReceived().split("-")).anyMatch(s -> s.equals(userId.toString())))
+                .count();
+        return NumberPostsReceivedDto.builder().numberPostsReceived(numberPostsReceived).build();
+    }
+
     private PostsDto convertToResponse(Posts posts, Long userId) {
         PostsDto postsDto = PostsMapper.mapToPostsDto(posts);
         if (posts.getUserIdLikes() != null && !posts.getUserIdLikes().isEmpty()) {
             postsDto.setIsLiked(Arrays.stream(posts.getUserIdLikes().split("-")).anyMatch(s -> s.equals(userId.toString())));
+        }
+        if (posts.getUserIdReceived() != null && !posts.getUserIdReceived().isEmpty()) {
+            postsDto.setIsReceived(Arrays.stream(posts.getUserIdReceived().split("-")).anyMatch(s -> s.equals(userId.toString())));
         }
         return postsDto;
     }

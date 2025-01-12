@@ -2,6 +2,7 @@ package com.happyfood.posts.controller;
 
 import com.happyfood.posts.dto.CommentsDto;
 import com.happyfood.posts.dto.Coordinates;
+import com.happyfood.posts.dto.NumberPostsReceivedDto;
 import com.happyfood.posts.dto.PostsDto;
 import com.happyfood.posts.service.ICommentsService;
 import com.happyfood.posts.service.IPostsService;
@@ -47,6 +48,16 @@ public class PostsController {
     ResponseEntity<List<PostsDto>> getPostsOfUser(@PathVariable Long userId) {
         return ResponseEntity.ok(postsService.getPostsOfUser(userId));
     }
+    @GetMapping("/number-posts-received/{userId}")
+    ResponseEntity<NumberPostsReceivedDto> getNumberPostsReceived(@PathVariable Long userId) {
+        return ResponseEntity.ok(postsService.getNumberPostsReceived(userId));
+    }
+    @PostMapping("/confirm-received")
+    ResponseEntity<?> confirmReceivedPost(@RequestParam Long userId, @RequestParam Long postId) {
+        postsService.confirmReceivedPost(userId, postId);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/like/{postId}")
     ResponseEntity<?> toggleLikePost(@RequestHeader Long userId, @PathVariable Long postId) {
         postsService.toggleLikePost(userId, postId);
