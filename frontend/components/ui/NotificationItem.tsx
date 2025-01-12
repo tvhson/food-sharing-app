@@ -111,9 +111,7 @@ const NotificationItem = ({item, navigation}: any) => {
       accessToken,
       notificationUpdate,
     );
-    console.log(response);
     if (response.status === 200) {
-      console.log('Accept success');
       dispatch(updateNotificationAfter(notificationUpdate));
       const response2: any = await updatePost(
         item.linkId,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
@@ -9,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Colors from '../global/Color';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
@@ -19,21 +20,53 @@ import {UserInfo} from '../redux/UserReducer';
 import {TabBar, TabView} from 'react-native-tab-view';
 import ListPost from '../components/ui/PersonalPageUI/ListPost';
 import EditProfileScreen from './EditProfileScreen';
+import {useLoading} from '../utils/LoadingContext';
+import {Icon} from 'react-native-paper';
+import {getInfoUserById} from '../api/AccountsApi';
+import {getPostOfOther} from '../api/PostApi';
+import {getOrganizationPostByUserId} from '../api/OrganizationPostApi';
 
-const PersonalPage = ({navigation}: any) => {
+const PersonalPageOfOther = ({navigation, route}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
+  const {showLoading, hideLoading} = useLoading();
+
+  const otherId = route.params.id;
+  const [otherInfo, setOtherInfo] = useState({});
+
   const [index, setIndex] = useState(0);
   const [routes, setRoutes] = useState([
     {key: 'first', title: 'Bài viết'},
     {key: 'second', title: 'Sự kiện'},
   ]);
-  const [isEditVisible, setIsEditVisible] = useState(false);
   const accessToken = useSelector((state: RootState) => state.token.key);
 
-  const renderHeader = (userInfo: UserInfo) => {
+  useEffect(() => {
+    const getOtherInfo = async () => {
+      const response: any = await getInfoUserById(otherId, accessToken);
+      if (response.status === 200) {
+        setOtherInfo(response.data);
+      } else {
+        console.log('error');
+      }
+    };
+
+    const fetchData = async () => {
+      showLoading();
+      await getOtherInfo();
+      hideLoading();
+    };
+    fetchData();
+  }, [accessToken, otherId]);
+
+  const renderHeader = (userInfo: any) => {
     return (
       <View>
-        <View style={[styles.row, {paddingTop: 20, paddingHorizontal: 16}]}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{paddingTop: 20, paddingHorizontal: 16}}>
+          <Icon source={'arrow-left'} size={30} color={Colors.black} />
+        </TouchableOpacity>
+        <View style={[styles.row]}>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <View style={styles.avaContainer}>
               <Image
@@ -44,16 +77,6 @@ const PersonalPage = ({navigation}: any) => {
                 }
                 style={{width: 66, height: 66, borderRadius: 33}}
               />
-
-              <TouchableOpacity style={styles.floatBtnChangeAva}>
-                <Image
-                  source={require('../assets/images/camera.png')}
-                  style={{
-                    width: 16,
-                    height: 16,
-                  }}
-                />
-              </TouchableOpacity>
             </View>
             <Text style={styles.textName}>{userInfo.name}</Text>
           </View>
@@ -70,14 +93,9 @@ const PersonalPage = ({navigation}: any) => {
             <Text style={styles.textSection1}>sự kiện </Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={styles.btnEdit}
-          onPress={() => setIsEditVisible(true)}>
-          <Image
-            source={require('../assets/images/edit-white.png')}
-            style={{width: (576 * 20) / 512, height: 20}}
-          />
-          <Text style={styles.textBtnEdit}>Chỉnh sửa thông tin cá nhân</Text>
+        <TouchableOpacity style={styles.btnEdit}>
+          <Icon source={'chat'} size={30} color={Colors.white} />
+          <Text style={styles.textBtnEdit}>Nhắn tin</Text>
         </TouchableOpacity>
       </View>
     );
@@ -131,13 +149,7 @@ const PersonalPage = ({navigation}: any) => {
 
   return (
     <View style={styles.container}>
-      <EditProfileScreen
-        isVisible={isEditVisible}
-        setVisible={setIsEditVisible}
-        userInfo={userInfo}
-        token={accessToken}
-      />
-      {renderHeader(userInfo)}
+      {renderHeader(otherInfo)}
       <TabView
         navigationState={{index, routes}}
         renderScene={({route}) => {
@@ -146,7 +158,7 @@ const PersonalPage = ({navigation}: any) => {
               return (
                 <ListPost
                   type="POST"
-                  otherId={userInfo.id}
+                  otherId={otherId}
                   navigation={navigation}
                 />
               );
@@ -154,7 +166,7 @@ const PersonalPage = ({navigation}: any) => {
               return (
                 <ListPost
                   type="OPOST"
-                  otherId={userInfo.id}
+                  otherId={otherId}
                   navigation={navigation}
                 />
               );
@@ -169,7 +181,7 @@ const PersonalPage = ({navigation}: any) => {
   );
 };
 
-export default PersonalPage;
+export default PersonalPageOfOther;
 
 const styles = StyleSheet.create({
   container: {
@@ -225,7 +237,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     flexDirection: 'row',
     padding: 5,
-    width: screenWidth * 0.65,
+    width: screenWidth * 0.5,
     backgroundColor: Colors.greenPrimary,
     borderRadius: 10,
     justifyContent: 'center',

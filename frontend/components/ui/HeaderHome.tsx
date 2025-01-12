@@ -17,12 +17,12 @@ const HeaderHome = (props: any) => {
     <View style={styles.container}>
       <Text style={styles.title}>Happy Food</Text>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Image
             source={require('../../assets/images/search.png')}
             style={{width: 24, height: 24, marginRight: 20}}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => {
             navigation.navigate('Chat');

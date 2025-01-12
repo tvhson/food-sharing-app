@@ -53,7 +53,6 @@ const Comment = (props: any) => {
       getCommentByPostId(commentPostId, accessToken).then((response2: any) => {
         if (response2.status === 200) {
           setCommentList(response2.data);
-          console.log('commentList', commentList);
         }
       });
     } else {

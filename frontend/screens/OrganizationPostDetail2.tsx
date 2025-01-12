@@ -17,6 +17,7 @@ import {getFontFamily} from '../utils/fonts';
 
 import {Linking} from 'react-native';
 import {
+  attendOrganizationPost,
   createCommentToOrganizationPost,
   getCommentByOrganizationPostId,
   getOrganizationPostById,
@@ -29,11 +30,14 @@ import CommentItem from '../components/ui/CommentItem';
 const OrganizationPostDetail2 = (props: any) => {
   const {navigation} = props;
   const [item, setItem] = useState<any>(props.route.params.item);
-  const [isJoin, setIsJoin] = useState(props.route.params.isJoin);
-  const [peopleAttended, setPeopleAttended] = useState(
-    props.route.params.peopleAttended,
+  const [isJoin, setIsJoin] = useState(
+    props.route.params?.isJoin || item.organizationposts.attended,
   );
-  const handleAttende = props.route.params.handleAttend;
+  const [peopleAttended, setPeopleAttended] = useState(
+    props.route?.params?.peopleAttended ||
+      item.organizationposts.peopleAttended,
+  );
+  const handleAttende = props.route?.params?.handleAttend;
   const commentInputRef = useRef<TextInput>(null);
   const [commentList, setCommentList] = useState([]);
   const [comment, setComment] = useState('');
@@ -41,9 +45,22 @@ const OrganizationPostDetail2 = (props: any) => {
   const [refreshing, setRefreshing] = useState(false);
   const {notify} = useNotifications();
 
-  const handleAttend = () => {
+  const handleAttend = async () => {
     setIsJoin(!isJoin);
     setPeopleAttended((prev: any) => (prev ? prev - 1 : prev + 1));
+    if (!handleAttende) {
+      const response: any = await attendOrganizationPost(
+        item.organizationposts.id,
+        accessToken,
+      );
+      if (response.status !== 200) {
+        setIsJoin(!isJoin);
+        setPeopleAttended(
+          (prev: any) => (prev ? prev - 1 : prev + 1), // Adjust count dynamically
+        );
+      }
+      return;
+    }
     handleAttende();
   };
   const handleBack = () => {
@@ -161,7 +178,7 @@ const OrganizationPostDetail2 = (props: any) => {
                         color: isJoin ? Colors.greenText : Colors.white,
                       },
                     ]}>
-                    Tham gia
+                    {isJoin ? 'Đã tham gia' : 'Tham gia'}
                   </Text>
                 </TouchableOpacity>
               </View>

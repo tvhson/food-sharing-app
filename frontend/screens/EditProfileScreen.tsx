@@ -198,7 +198,7 @@ function EditProfileScreen(props: any) {
             />
           </View>
 
-          <View style={{marginHorizontal: 10}}>
+          {/* <View style={{marginHorizontal: 10}}>
             <Text
               style={{
                 marginTop: 30,
@@ -220,7 +220,7 @@ function EditProfileScreen(props: any) {
               value={description}
               onChangeText={text => setDescription(text)}
             />
-          </View>
+          </View> */}
 
           <View style={{marginHorizontal: 10}}>
             <Text

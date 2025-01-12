@@ -1,9 +1,15 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import {Accessory} from '@rneui/base';
-import {Avatar, Button} from '@rneui/themed';
+import {Avatar, Button, Image} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, ImageBackground, ScrollView} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ImageBackground,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import Colors from '../global/Color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UploadPhoto from '../components/ui/UploadPhoto';
@@ -31,7 +37,6 @@ const ProfileScreen = ({navigation, route}: any) => {
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  console.log(userInfo);
   useEffect(() => {
     const getImageUrl = async () => {
       if (userInfo.imageUrl) {
@@ -71,7 +76,6 @@ const ProfileScreen = ({navigation, route}: any) => {
       name: image.filename || 'image.jpeg',
       type: image.mime || 'image/jpeg',
     });
-    console.log(image);
     uploadPhoto(dataForm, accessToken).then((response: any) => {
       if (response.status === 200) {
         const imageUrlString = response.data[0];

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import LandingScreen from '../screens/LandingScreen';
@@ -7,13 +7,7 @@ import BottomTabNavigator from './BottomTabNavigators';
 import PostDetail from '../screens/PostDetail';
 import CreatePostScreen from '../screens/CreatePostScreen';
 import Colors from '../global/Color';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingScreen from '../screens/LoadingScreen';
-import {getInfoUser} from '../api/AccountsApi';
-import {getPosts} from '../api/PostApi';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import AppLoader from '../components/ui/AppLoader';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import EditPostScreen from '../screens/EditPostScreen';
 import CreateFundingScreen from '../screens/CreateFundingScreen';
@@ -25,7 +19,6 @@ import {MyFundingPostScreen} from '../screens/MyFundingPostScreen';
 import ReportScreen from '../screens/ReportScreen';
 import ReportDetailScreen from '../screens/ReportDetailScreen';
 import VerifyScreen from '../screens/VerifyScreen';
-import TestScreen from '../screens/TestScreen';
 import ChatScreen from '../screens/ChatScreen';
 import {
   ZegoUIKitPrebuiltCallWaitingScreen,
@@ -37,6 +30,9 @@ import WebViewScreen from '../screens/WebViewScreen';
 import PostDetail2 from '../screens/PostDetail2';
 import {getFontFamily} from '../utils/fonts';
 import ExchangeGiftScreen from '../screens/ExchangeGiftScreen';
+import HistoryExchangeGiftScreen from '../screens/HistoryExchangeGiftScreen';
+import PointRuleScreen from '../screens/PointRuleScreen';
+import PersonalPageOfOther from '../screens/PersonalPageOfOther';
 
 const Stack = createNativeStackNavigator();
 
@@ -153,6 +149,15 @@ const Router = () => {
           />
           <Stack.Screen name="ExchangeGift" component={ExchangeGiftScreen} />
           <Stack.Screen name="MessageListPage" component={MessageListPage} />
+          <Stack.Screen
+            name="HistoryExchangeGift"
+            component={HistoryExchangeGiftScreen}
+          />
+          <Stack.Screen name="PointRule" component={PointRuleScreen} />
+          <Stack.Screen
+            name="PersonalPageOfOther"
+            component={PersonalPageOfOther}
+          />
           <Stack.Screen
             options={{headerShown: false}}
             name="ZegoUIKitPrebuiltCallWaitingScreen"

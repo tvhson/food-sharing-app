@@ -28,6 +28,7 @@ export const FundingScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
   const {notify} = useNotifications();
   const token = useSelector((state: RootState) => state.token.key);
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const location = useSelector((state: RootState) => state.location);
   const [fundingPost, setFundingPost] = useState<any>(null);
   const [search, setSearch] = useState('');
@@ -210,20 +211,22 @@ export const FundingScreen = ({navigation}: any) => {
         }
         ListFooterComponent={<View style={{height: 16}} />}
       />
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate('CreateFundingPost', {location, token})
-        }
-        style={{
-          position: 'absolute',
-          bottom: 16,
-          right: 16,
-          backgroundColor: Colors.button,
-          borderRadius: 100,
-          padding: 16,
-        }}>
-        <Icon name="add" color="white" size={24} />
-      </TouchableOpacity>
+      {userInfo.role === 'ORGANIZATION' && (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('CreateFundingPost', {location, token})
+          }
+          style={{
+            position: 'absolute',
+            bottom: 16,
+            right: 16,
+            backgroundColor: Colors.button,
+            borderRadius: 100,
+            padding: 16,
+          }}>
+          <Icon name="add" color="white" size={24} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

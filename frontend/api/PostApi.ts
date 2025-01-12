@@ -173,3 +173,17 @@ export const likeComment = async (commentId: any, token: any) => {
     return error;
   }
 };
+
+export const getPostOfOther = async (userId: any, token: any) => {
+  try {
+    const response = await ApiManager(`posts/user/${userId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

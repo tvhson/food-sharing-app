@@ -121,7 +121,6 @@ const PostRenderItem2 = (props: any) => {
         // get info user create post
         getInfoUserById(item.createdById, accessToken).then((response: any) => {
           if (response.status === 200) {
-            console.log('User create post', response.data);
             setCreatePostUser(response.data);
           }
         });
@@ -325,7 +324,10 @@ const PostRenderItem2 = (props: any) => {
       <TouchableOpacity
         style={{flexDirection: 'row'}}
         onPress={handleGoToDetail}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('PersonalPageOfOther', {id: item.createdById})
+          }>
           <Image
             source={{
               uri:

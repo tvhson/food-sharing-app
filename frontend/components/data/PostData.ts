@@ -163,3 +163,176 @@ export const notificationItems = [
     senderId: 'sender5',
   },
 ];
+
+export const rewardItems = [
+  {
+    id: 1,
+    rewardName: 'Áo',
+    rewardDescription: 'Đẹp',
+    imageUrl:
+      'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    pointsRequired: 1,
+    stockQuantity: 10,
+    createdDate: new Date(),
+  },
+  {
+    id: 2,
+    rewardName: 'Áo',
+    rewardDescription: 'Đẹp',
+    imageUrl:
+      'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+
+    pointsRequired: 1,
+    stockQuantity: 10,
+    createdDate: new Date(),
+  },
+  {
+    id: 3,
+    rewardName: 'Áo',
+    rewardDescription: 'Đẹp',
+    imageUrl:
+      'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    pointsRequired: 1,
+    stockQuantity: 10,
+    createdDate: new Date(),
+  },
+  {
+    id: 4,
+    rewardName: 'Áo',
+    rewardDescription: 'Đẹp',
+    imageUrl:
+      'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    pointsRequired: 1,
+    stockQuantity: 10,
+    createdDate: new Date(),
+  },
+  {
+    id: 5,
+    rewardName: 'Áo',
+    rewardDescription: 'Đẹp',
+    imageUrl:
+      'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    pointsRequired: 1,
+    stockQuantity: 10,
+    createdDate: new Date(),
+  },
+  {
+    id: 6,
+    rewardName: 'Áo',
+    rewardDescription: 'Đẹp',
+    imageUrl:
+      'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    pointsRequired: 1,
+    stockQuantity: 10,
+    createdDate: new Date(),
+  },
+  {
+    id: 7,
+    rewardName: 'Áo',
+    rewardDescription: 'Đẹp',
+    imageUrl:
+      'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    pointsRequired: 1,
+    stockQuantity: 10,
+    createdDate: new Date(),
+  },
+];
+
+export const historyExchangeItems = [
+  {
+    id: 1,
+    accountId: 1,
+    rewardDetail: {
+      rewardName: 'Áo',
+      rewardDescription: 'Đẹp',
+      imageUrl:
+        'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    },
+    pointsUsed: 2,
+    quantity: 8,
+    createdDate: '2025-01-06T14:54:35.136+00:00',
+    status: 'PENDING',
+    location: 'Ho Chi Minh City',
+    phone: '0123456789',
+  },
+  {
+    id: 2,
+    accountId: 1,
+    rewardDetail: {
+      rewardName: 'Áo',
+      rewardDescription: 'Đẹp',
+      imageUrl:
+        'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    },
+    pointsUsed: 2,
+    quantity: 8,
+    createdDate: '2025-01-06T14:54:35.136+00:00',
+    status: 'PENDING',
+    location: 'Ho Chi Minh City',
+    phone: '0123456789',
+  },
+  {
+    id: 3,
+    accountId: 1,
+    rewardDetail: {
+      rewardName: 'Áo',
+      rewardDescription: 'Đẹp',
+      imageUrl:
+        'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    },
+    pointsUsed: 2,
+    quantity: 8,
+    createdDate: '2025-01-06T14:54:35.136+00:00',
+    status: 'PENDING',
+    location: 'Ho Chi Minh City',
+    phone: '0123456789',
+  },
+  {
+    id: 4,
+    accountId: 1,
+    rewardDetail: {
+      rewardName: 'Áo',
+      rewardDescription: 'Đẹp',
+      imageUrl:
+        'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    },
+    pointsUsed: 2,
+    quantity: 8,
+    createdDate: '2025-01-06T14:54:35.136+00:00',
+    status: 'PENDING',
+    location: 'Ho Chi Minh City',
+    phone: '0123456789',
+  },
+  {
+    id: 5,
+    accountId: 1,
+    rewardDetail: {
+      rewardName: 'Áo',
+      rewardDescription: 'Đẹp',
+      imageUrl:
+        'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    },
+    pointsUsed: 2,
+    quantity: 8,
+    createdDate: '2025-01-06T14:54:35.136+00:00',
+    status: 'PENDING',
+    location: 'Ho Chi Minh City',
+    phone: '0123456789',
+  },
+  {
+    id: 6,
+    accountId: 1,
+    rewardDetail: {
+      rewardName: 'Áo',
+      rewardDescription: 'Đẹp',
+      imageUrl:
+        'https://hips.hearstapps.com/hmg-prod/images/apples-at-farmers-market-royalty-free-image-1627321463.jpg?crop=0.796xw:1.00xh;0.103xw,0&resize=640:*',
+    },
+    pointsUsed: 2,
+    quantity: 8,
+    createdDate: '2025-01-06T14:54:35.136+00:00',
+    status: 'PENDING',
+    location: 'Ho Chi Minh City',
+    phone: '0123456789',
+  },
+];

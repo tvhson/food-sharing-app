@@ -170,3 +170,17 @@ export const likeOrganizationComment = async (commentId: any, token: any) => {
     return error;
   }
 };
+
+export const getOrganizationPostByUserId = async (userId: any, token: any) => {
+  try {
+    const response = await ApiManager(`organizationposts/user/${userId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

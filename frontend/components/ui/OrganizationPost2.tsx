@@ -107,7 +107,7 @@ const OrganizationPost2 = (props: any) => {
                   color: isJoin ? Colors.greenPrimary : Colors.black,
                 },
               ]}>
-              Tham gia
+              {isJoin ? 'Đã tham gia' : 'Tham gia'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={{marginLeft: 10}}>
