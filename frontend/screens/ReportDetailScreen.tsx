@@ -179,7 +179,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
             fontWeight: 'bold',
             color: 'white',
           }}>
-          Reports
+          Quản lý báo cáo
         </Text>
       </View>
       <ScrollView style={{flex: 1, padding: 10}}>

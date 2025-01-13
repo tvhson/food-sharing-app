@@ -1,6 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 /* eslint-disable react-native/no-inline-styles */
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import React, {useEffect} from 'react';
 import Colors from '../global/Color';
 import {Button, Icon} from 'react-native-paper';
 import {getFontFamily} from '../utils/fonts';
@@ -8,8 +17,49 @@ import {Image} from '@rneui/themed';
 import screenWidth from '../global/Constant';
 import {rewardItems} from '../components/data/PostData';
 import RewardItem from '../components/ui/ExchangePageUI/RewardItem';
+import {useLoading} from '../utils/LoadingContext';
+import {getMyPoint, getRewards} from '../api/LoyaltyApi';
+import {useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
 
 const ExchangeGiftScreen = ({navigation}: any) => {
+  const {showLoading, hideLoading} = useLoading();
+  const [data, setData] = React.useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [myPoint, setMyPoint] = React.useState(0);
+  const accessToken = useSelector((state: RootState) => state.token.key);
+
+  const getRewardData = async () => {
+    const response: any = await getRewards(accessToken);
+    if (response.status === 200) {
+      setData(response.data);
+    }
+  };
+
+  const getPoint = async () => {
+    const response: any = await getMyPoint(accessToken);
+    if (response.status === 200) {
+      setMyPoint(response.data.pointsBalance);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      showLoading();
+      await getRewardData();
+      await getPoint();
+      hideLoading();
+    };
+    fetchData();
+  }, [accessToken]);
+
+  const onRefresh = async () => {
+    showLoading();
+    await getRewardData();
+    await getPoint();
+    hideLoading();
+  };
+
   const renderHeader = () => {
     return (
       <View style={styles.header}>
@@ -51,15 +101,14 @@ const ExchangeGiftScreen = ({navigation}: any) => {
                   style={{width: 60, height: 60}}
                 />
               </View>
-              <Text>
-                <Text
-                  style={{
-                    color: Colors.white,
-                    fontSize: 55,
-                    fontFamily: getFontFamily('bold'),
-                  }}>
-                  100
-                </Text>
+
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontSize: 55,
+                  fontFamily: getFontFamily('bold'),
+                }}>
+                {myPoint}
               </Text>
             </View>
             <Text
@@ -130,13 +179,20 @@ const ExchangeGiftScreen = ({navigation}: any) => {
           </Text>
         </View>
         <FlatList
-          data={rewardItems}
-          keyExtractor={item => item.id.toString()}
+          data={data}
+          keyExtractor={(item: any) => item.id.toString()}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           renderItem={({item}) => (
             <RewardItem
               imageUrl={item.imageUrl}
               rewardName={item.rewardName}
-              pointsRequired={item.pointsRequired}
+              id={item.id}
+              pointsRequired={item.pointsRequired || 0}
+              stockQuantity={item.stockQuantity || 0}
+              myPoint={myPoint}
+              onRefresh={onRefresh}
             />
           )}
           numColumns={2}

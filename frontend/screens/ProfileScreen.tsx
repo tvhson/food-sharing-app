@@ -299,7 +299,7 @@ const ProfileScreen = ({navigation, route}: any) => {
           <>
             <Button
               onPress={() => navigation.navigate('Report')}
-              title="Reports"
+              title="Quản lý báo cáo"
               buttonStyle={{
                 backgroundColor: 'transparent',
                 justifyContent: 'flex-start',
@@ -308,7 +308,7 @@ const ProfileScreen = ({navigation, route}: any) => {
               icon={{name: 'report', type: 'material-icon', color: 'black'}}
             />
             <Button
-              title="Manage Accounts"
+              title="Quản lý tài khoản"
               buttonStyle={{
                 backgroundColor: 'transparent',
                 justifyContent: 'flex-start',
@@ -321,12 +321,22 @@ const ProfileScreen = ({navigation, route}: any) => {
                 color: 'black',
               }}
             />
+            <Button
+              title="Quản lý quà tặng"
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              onPress={() => navigation.navigate('ManageReward')}
+              titleStyle={{color: 'black'}}
+              icon={{name: 'gift', type: 'ant-design', color: 'black'}}
+            />
           </>
         ) : null}
       </View>
       <View>
         <Button
-          title="Đổi quà"
+          title={userInfo.role === 'ADMIN' ? 'Tạo quà tặng' : 'Đổi quà'}
           buttonStyle={{
             backgroundColor: Colors.button,
             alignSelf: 'center',
@@ -335,7 +345,11 @@ const ProfileScreen = ({navigation, route}: any) => {
           }}
           titleStyle={{color: Colors.white}}
           icon={{name: 'gift', type: 'ant-design', color: 'white'}}
-          onPress={() => navigation.navigate('ExchangeGift')}
+          onPress={() => {
+            userInfo.role === 'ADMIN'
+              ? navigation.navigate('CreateReward')
+              : navigation.navigate('ExchangeGift');
+          }}
         />
       </View>
       <View style={{flex: 1, justifyContent: 'flex-end'}}>

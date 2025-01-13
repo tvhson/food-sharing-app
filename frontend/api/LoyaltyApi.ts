@@ -1,10 +1,10 @@
 import ApiManager from './ApiManager';
 
-interface IReward {
-  rewardName: number;
+export interface IReward {
+  rewardName: string;
   rewardDescription: string;
   imageUrl: string;
-  pointRequired: number;
+  pointsRequired: number;
   stockQuantity: number;
 }
 
@@ -55,7 +55,7 @@ export const redeemPoint = async (
       headers: {
         Authorization: token,
       },
-      params: data,
+      data: data,
     });
     return response;
   } catch (error) {

@@ -95,8 +95,8 @@ function UploadPhoto(props: any) {
 
   return (
     <Modal
-      onBackdropPress={() => props.setVisible(false)}
-      onBackButtonPress={() => props.setVisible(false)}
+      onBackdropPress={() => props.setVisible(0)}
+      onBackButtonPress={() => props.setVisible(0)}
       isVisible={props.isVisible}
       swipeDirection="down"
       onSwipeComplete={toggleModal}

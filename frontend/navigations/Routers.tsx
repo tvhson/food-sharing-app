@@ -33,6 +33,8 @@ import ExchangeGiftScreen from '../screens/ExchangeGiftScreen';
 import HistoryExchangeGiftScreen from '../screens/HistoryExchangeGiftScreen';
 import PointRuleScreen from '../screens/PointRuleScreen';
 import PersonalPageOfOther from '../screens/PersonalPageOfOther';
+import CreateRewardScreen from '../screens/ManageReward/CreateRewardScreen';
+import ManageReward from '../screens/ManageReward/ManageReward';
 
 const Stack = createNativeStackNavigator();
 
@@ -158,6 +160,8 @@ const Router = () => {
             name="PersonalPageOfOther"
             component={PersonalPageOfOther}
           />
+          <Stack.Screen name="CreateReward" component={CreateRewardScreen} />
+          <Stack.Screen name="ManageReward" component={ManageReward} />
           <Stack.Screen
             options={{headerShown: false}}
             name="ZegoUIKitPrebuiltCallWaitingScreen"
