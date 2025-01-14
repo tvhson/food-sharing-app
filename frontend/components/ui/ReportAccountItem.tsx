@@ -60,8 +60,8 @@ const ReportAccountItem = ({item, isReport}: any) => {
       );
       notify('success', {
         params: {
-          description: 'Role has been changed successfully',
-          title: 'Change role',
+          description: 'Đã thay đổi vai trò thành công',
+          title: 'Thay đổi vai trò',
           style: {multiline: 100},
         },
       });
@@ -79,8 +79,8 @@ const ReportAccountItem = ({item, isReport}: any) => {
       setVisibleDialogBan(false);
       notify('success', {
         params: {
-          description: 'Account has been banned successfully',
-          title: 'Ban account',
+          description: 'Đã khóa tài khoản thành công',
+          title: 'Khóa tài khoản',
           style: {multiline: 100},
         },
       });
@@ -106,7 +106,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                 onDismiss={() => setVisibleDialogRole(false)}>
                 <Dialog.Icon icon="alert" />
                 <Dialog.Title style={{textAlign: 'center'}}>
-                  Change role of {item.name}
+                  Thay đổi vai trò của {item.name}
                 </Dialog.Title>
                 <Dialog.Content>
                   <RadioButton.Group
@@ -128,7 +128,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="ORGANIZATION" />
-                      <Text>Organization</Text>
+                      <Text>Tổ chức</Text>
                     </View>
                   </RadioButton.Group>
                 </Dialog.Content>
@@ -148,7 +148,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                 onDismiss={() => setVisibleDialogBan(false)}>
                 <Dialog.Icon icon="alert" />
                 <Dialog.Title style={{textAlign: 'center'}}>
-                  Ban account {item.name}
+                  Khóa tài khoản {item.name}
                 </Dialog.Title>
                 <Dialog.Content>
                   <RadioButton.Group
@@ -161,7 +161,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="1" />
-                      <Text>1 day</Text>
+                      <Text>1 ngày</Text>
                     </View>
                     <View
                       style={{
@@ -170,7 +170,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="7" />
-                      <Text>1 week</Text>
+                      <Text>1 tuần</Text>
                     </View>
                     <View
                       style={{
@@ -179,7 +179,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="14" />
-                      <Text>2 weeks</Text>
+                      <Text>2 tuần</Text>
                     </View>
                     <View
                       style={{
@@ -188,7 +188,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="30" />
-                      <Text>1 month</Text>
+                      <Text>1 tháng</Text>
                     </View>
                     <View
                       style={{
@@ -197,7 +197,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="90" />
-                      <Text>3 months</Text>
+                      <Text>3 tháng</Text>
                     </View>
                     <View
                       style={{
@@ -206,7 +206,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="180" />
-                      <Text>6 months</Text>
+                      <Text>6 tháng</Text>
                     </View>
                     <View
                       style={{
@@ -215,7 +215,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                         marginLeft: 20,
                       }}>
                       <RadioButton value="365" />
-                      <Text>1 year</Text>
+                      <Text>1 năm</Text>
                     </View>
                   </RadioButton.Group>
                 </Dialog.Content>
@@ -223,9 +223,11 @@ const ReportAccountItem = ({item, isReport}: any) => {
                   <Button
                     onPress={() => setVisibleDialogBan(false)}
                     textColor="red">
-                    Cancel
+                    Hủy
                   </Button>
-                  <Button onPress={() => handleBanAccount()}>Ban</Button>
+                  <Button onPress={() => handleBanAccount()}>
+                    Khóa tài khoản
+                  </Button>
                 </Dialog.Actions>
               </Dialog>
             </Portal>
@@ -239,7 +241,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                   setVisible(false);
                   setVisibleDialogRole(true);
                 }}
-                title="Change role"
+                title="Thay đổi vai trò"
                 leadingIcon="account-wrench"
               />
               <Menu.Item
@@ -247,7 +249,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                   setVisible(false);
                   setVisibleDialogBan(true);
                 }}
-                title="Ban account"
+                title="Khóa tài khoản"
                 leadingIcon="account-lock"
               />
             </Menu>
@@ -287,7 +289,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
               </Text>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
                 <Text style={{fontWeight: '500', color: 'black'}}>
-                  {'\u2022'} Role:{' '}
+                  {'\u2022'} Vai trò:{' '}
                 </Text>
                 {item.role.charAt(0).toUpperCase() +
                   item.role.slice(1).toLowerCase()}
@@ -295,7 +297,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
               {item.birthDate ? (
                 <Text style={{fontSize: 16, color: Colors.grayText}}>
                   <Text style={{fontWeight: '500', color: 'black'}}>
-                    {'\u2022'} Birth date:{' '}
+                    {'\u2022'} Ngày sinh:{' '}
                   </Text>
                   {new Date(item.birthDate).toLocaleDateString()}
                 </Text>
@@ -303,7 +305,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
               {item.locationName ? (
                 <Text style={{fontSize: 16, color: Colors.grayText}}>
                   <Text style={{fontWeight: '500', color: 'black'}}>
-                    {'\u2022'} Location:{' '}
+                    {'\u2022'} Địa chỉ:{' '}
                   </Text>
                   {item.locationName}
                 </Text>

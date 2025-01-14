@@ -87,14 +87,19 @@ const ManageReward = ({navigation}: any) => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           keyExtractor={(item: any) => item.id.toString()}
-          renderItem={({item}) => (
-            <RewardItem
-              imageUrl={item.imageUrl}
-              rewardName={item.rewardName}
-              id={item.id}
-              pointsRequired={item.pointsRequired}
-            />
-          )}
+          renderItem={({item}) => {
+            console.log(item.stockQuantity);
+            return (
+              <RewardItem
+                imageUrl={item.imageUrl}
+                rewardName={item.rewardName}
+                id={item.id}
+                pointsRequired={item.pointsRequired}
+                stockQuantity={item.stockQuantity}
+                onRefresh={onRefresh}
+              />
+            );
+          }}
           numColumns={2}
           style={{flex: 1, alignSelf: 'center'}}
         />

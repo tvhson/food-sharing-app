@@ -124,7 +124,7 @@ const PostDetail2 = ({route, navigation}: any) => {
         const response: any = await createNotification(
           {
             title: 'Xác nhận việc nhận thức ăn',
-            imageUrl: item.imageUrl,
+            imageUrl: item.images[0],
             description:
               userInfo.name +
               ' muốn bạn xác nhận rằng bạn đã đưa thức ăn cho họ',

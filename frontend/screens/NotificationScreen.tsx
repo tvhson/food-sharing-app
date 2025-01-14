@@ -29,8 +29,6 @@ const NotificationScreen = ({navigation}: any) => {
     (state: RootState) => state.notification.notifications,
   );
 
-  const dummyData = notificationItems;
-
   const accessToken = useSelector((state: RootState) => state.token.key);
   const dispatch = useDispatch();
   const [notifications, setNotificationsList] = useState<any>(null);

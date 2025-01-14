@@ -38,8 +38,8 @@ const ReportPostItem = ({item, navigation, location}: any) => {
         }}>
         <Image
           source={{
-            uri: item.imageUrl
-              ? item.imageUrl
+            uri: item.images[0]
+              ? item.images[0]
               : 'https://www.w3schools.com/w3images/avatar2.png',
           }}
           style={{width: 150, height: 150, borderRadius: 8}}
@@ -77,25 +77,25 @@ const ReportPostItem = ({item, navigation, location}: any) => {
             <View>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
                 <Text style={{fontWeight: '500', color: 'black'}}>
-                  {'\u2022'} Description:{' '}
+                  {'\u2022'} Mô tả:{' '}
                 </Text>
                 {item.description}
               </Text>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
                 <Text style={{fontWeight: '500', color: 'black'}}>
-                  {'\u2022'} Expired date:{' '}
+                  {'\u2022'} Hạn sử dụng:{' '}
                 </Text>
                 {new Date(item.expiredDate).toLocaleDateString()}
               </Text>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
                 <Text style={{fontWeight: '500', color: 'black'}}>
-                  {'\u2022'} Pickup start:{' '}
+                  {'\u2022'} Ngày bắt đầu nhận:{' '}
                 </Text>
                 {new Date(item.pickUpStartDate).toLocaleDateString()}
               </Text>
               <Text style={{fontSize: 16, color: Colors.grayText}}>
                 <Text style={{fontWeight: '500', color: 'black'}}>
-                  {'\u2022'} Pickup end:{' '}
+                  {'\u2022'} Ngày kết thúc nhận:{' '}
                 </Text>
                 {new Date(item.pickUpEndDate).toLocaleDateString()}
               </Text>

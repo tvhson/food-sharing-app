@@ -44,7 +44,6 @@ const ReportItem = ({item, navigation}: any) => {
     const diffInYears = Math.floor(diffInDays / 365);
     return `${diffInYears} years ago`;
   }
-
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -73,7 +72,7 @@ const ReportItem = ({item, navigation}: any) => {
                 fontWeight: 'bold',
                 color: 'black',
               }}>
-              {item.senderName} reported the post
+              {item.senderName} báo cáo bài viết
             </Text>
           </View>
           <View
@@ -83,7 +82,7 @@ const ReportItem = ({item, navigation}: any) => {
               justifyContent: 'space-between',
             }}>
             <Text style={{fontSize: 16, color: Colors.grayText}}>
-              Reason: {item.title}
+              Lý do: {item.title}
             </Text>
             <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
               <Text style={{fontSize: 12, color: Colors.grayText}}>

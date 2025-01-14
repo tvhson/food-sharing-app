@@ -180,7 +180,7 @@ const VerifyScreen = ({navigation}: any) => {
         buttons={[
           {
             value: 'User',
-            label: 'User',
+            label: 'Người',
             checkedColor: 'white',
             style: {
               backgroundColor:
@@ -189,7 +189,7 @@ const VerifyScreen = ({navigation}: any) => {
           },
           {
             value: 'Organization',
-            label: 'Organization',
+            label: 'Tổ chức',
             checkedColor: 'white',
             style: {
               backgroundColor:

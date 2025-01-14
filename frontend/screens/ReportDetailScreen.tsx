@@ -184,7 +184,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
       </View>
       <ScrollView style={{flex: 1, padding: 10}}>
         <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
-          Reported Post
+          Bài viết bị báo cáo
         </Text>
         {postData && item.type === 'POST' ? (
           <ReportPostItem
@@ -200,19 +200,19 @@ const ReportDetailScreen = ({navigation, route}: any) => {
           />
         ) : null}
         <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
-          Accuser
+          Người báo cáo
         </Text>
         {senderInfo ? (
           <ReportAccountItem item={senderInfo} isReport={true} />
         ) : null}
         <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
-          Accused
+          Người bị báo cáo
         </Text>
         {accusedInfo ? (
           <ReportAccountItem item={accusedInfo} isReport={true} />
         ) : null}
         <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
-          Report reason
+          Lý do báo cáo
         </Text>
         <View
           style={{
@@ -228,7 +228,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         {item.status === 'PENDING' ? (
           <>
             <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
-              Ban account
+              Khóa tài khoản
             </Text>
             <View
               style={{
@@ -246,7 +246,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="1" />
-                  <Text>1 day</Text>
+                  <Text>1 ngày</Text>
                 </View>
                 <View
                   style={{
@@ -254,7 +254,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="7" />
-                  <Text>1 week</Text>
+                  <Text>1 tuần</Text>
                 </View>
                 <View
                   style={{
@@ -262,7 +262,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="14" />
-                  <Text>2 weeks</Text>
+                  <Text>2 tuần</Text>
                 </View>
                 <View
                   style={{
@@ -270,7 +270,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="30" />
-                  <Text>1 month</Text>
+                  <Text>1 tháng</Text>
                 </View>
                 <View
                   style={{
@@ -278,7 +278,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="90" />
-                  <Text>3 months</Text>
+                  <Text>3 tháng</Text>
                 </View>
                 <View
                   style={{
@@ -286,7 +286,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="180" />
-                  <Text>6 months</Text>
+                  <Text>6 tháng</Text>
                 </View>
                 <View
                   style={{
@@ -294,7 +294,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="365" />
-                  <Text>1 year</Text>
+                  <Text>1 năm</Text>
                 </View>
                 <View
                   style={{
@@ -302,7 +302,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                     alignItems: 'center',
                   }}>
                   <RadioButton value="0" />
-                  <Text>Not ban</Text>
+                  <Text>Không khóa</Text>
                 </View>
               </RadioButton.Group>
             </View>
@@ -313,7 +313,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                 marginTop: 20,
               }}>
               <Button
-                title={'Cancel'}
+                title={'Hủy'}
                 buttonStyle={{
                   backgroundColor: Colors.grayText,
                   borderColor: 'transparent',
@@ -326,9 +326,9 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                 titleStyle={{fontWeight: '700', fontSize: 18}}
               />
               <Button
-                title={'Done'}
+                title={'Xong'}
                 buttonStyle={{
-                  backgroundColor: Colors.postTitle,
+                  backgroundColor: Colors.greenPrimary,
                   borderColor: 'transparent',
                   borderWidth: 0,
                   width: 150,

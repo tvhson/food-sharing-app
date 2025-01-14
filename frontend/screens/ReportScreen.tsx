@@ -120,7 +120,7 @@ const ReportScreen = ({navigation}: any) => {
             fontWeight: 'bold',
             color: 'white',
           }}>
-          Reports
+          Quản lý báo cáo
         </Text>
       </View>
       <SegmentedButtons
@@ -130,7 +130,7 @@ const ReportScreen = ({navigation}: any) => {
         buttons={[
           {
             value: 'Pending',
-            label: 'Pending',
+            label: 'Đang chờ',
             checkedColor: 'white',
             style: {
               backgroundColor:
@@ -141,7 +141,7 @@ const ReportScreen = ({navigation}: any) => {
           },
           {
             value: 'Finished',
-            label: 'Finished',
+            label: 'Đã xử lý',
             checkedColor: 'white',
             style: {
               backgroundColor:
@@ -171,20 +171,6 @@ const ReportScreen = ({navigation}: any) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListFooterComponent={() => renderLoader()}
-        ListEmptyComponent={
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: 500,
-            }}>
-            <Image
-              source={require('../assets/images/BgNoData.png')}
-              style={{width: 300, height: 400}}
-            />
-          </View>
-        }
       />
     </View>
   );

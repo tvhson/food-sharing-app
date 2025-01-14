@@ -93,7 +93,7 @@ const PostRenderItem2 = (props: any) => {
       const response: any = await reportPost(accessToken, {
         title: reason,
         description: descriptionReason,
-        imageUrl: item.imageUrl,
+        imageUrl: item.images[0],
         status: 'PENDING',
         linkId: item.id,
         note: '',

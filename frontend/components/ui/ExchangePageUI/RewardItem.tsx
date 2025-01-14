@@ -11,12 +11,21 @@ import {Image} from '@rneui/themed';
 import {Button, Dialog, Icon, Menu, Portal} from 'react-native-paper';
 import Colors from '../../../global/Color';
 import {getFontFamily} from '../../../utils/fonts';
-import {redeemPoint} from '../../../api/LoyaltyApi';
+import {
+  deleteReward,
+  IReward,
+  redeemPoint,
+  updateReward,
+} from '../../../api/LoyaltyApi';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../redux/Store';
 import MAP_API_KEY from '../../data/SecretData';
 import axios from 'axios';
 import {useNotifications} from 'react-native-notificated';
+import UploadPhoto from '../UploadPhoto';
+import {uploadPhoto} from '../../../api/UploadPhotoApi';
+import {FormProvider, useForm} from 'react-hook-form';
+import EditRewardItem from './EditRewardItem';
 
 const RewardItem = (props: {
   id: number;
@@ -29,6 +38,8 @@ const RewardItem = (props: {
 }) => {
   const {notify} = useNotifications();
   const [dialogRedeemVisible, setDialogRedeemVisible] = React.useState(false);
+  const [dialogEditVisible, setDialogEditVisible] = React.useState(false);
+  const [dialogDeleteVisible, setDialogDeleteVisible] = React.useState(false);
   const [quantity, setQuantity] = React.useState(1);
   const [point, setPoint] = React.useState(props.pointsRequired);
   const accessToken = useSelector((state: RootState) => state.token.key);
@@ -38,8 +49,17 @@ const RewardItem = (props: {
   const [phone, setPhone] = React.useState('');
   const [visible, setVisible] = useState<boolean>(false);
   const userInfo = useSelector((state: RootState) => state.userInfo);
-
+  const [isUploadVisible, setIsUploadVisible] = useState(0);
   const [anchor, setAnchor] = React.useState({x: 0, y: 0});
+
+  const methods = useForm<IReward>({
+    defaultValues: {
+      rewardName: props.rewardName,
+      pointsRequired: props.pointsRequired,
+      stockQuantity: props.stockQuantity,
+      imageUrl: props.imageUrl,
+    },
+  });
 
   const openMenu = () => {
     setVisible(true);
@@ -96,22 +116,36 @@ const RewardItem = (props: {
     //regex phone number
     const phoneRegex = new RegExp('^[0-9]{10}$');
     if (!phoneRegex.test(phone)) {
+      setDialogRedeemVisible(false);
+
+      setQuantity(1);
+      setPoint(props.pointsRequired);
+      setPhone('');
+      setLocationName('');
       notify('error', {
         params: {
           description: 'Số điện thoại không hợp lệ.',
           title: 'Lỗi',
         },
       });
+
       return;
     }
 
     if (!locationName || !phone) {
+      setDialogRedeemVisible(false);
+
+      setQuantity(1);
+      setPoint(props.pointsRequired);
+      setPhone('');
+      setLocationName('');
       notify('error', {
         params: {
           description: 'Vui lòng điền đầy đủ thông tin.',
           title: 'Lỗi',
         },
       });
+
       return;
     }
 
@@ -154,6 +188,59 @@ const RewardItem = (props: {
     }
   };
 
+  const handleEdit = async (data: IReward) => {
+    setDialogEditVisible(false);
+    const response: any = await updateReward(data, accessToken, props.id);
+
+    if (response.status === 200) {
+      notify('success', {
+        params: {
+          description: 'Chỉnh sửa quà thành công.',
+          title: 'Thành công',
+        },
+      });
+      props.onRefresh?.();
+    } else {
+      notify('error', {
+        params: {
+          description: 'Chỉnh sửa quà không thành công.',
+          title: 'Lỗi',
+        },
+      });
+    }
+  };
+
+  const onError = (errors: any) => {
+    setDialogEditVisible(false);
+    notify('error', {
+      params: {
+        description: 'Vui lòng điền đầy đủ thông tin.',
+        title: 'Lỗi',
+      },
+    });
+  };
+
+  const handleDelete = async () => {
+    setDialogDeleteVisible(false);
+    const response: any = await deleteReward(props.id, accessToken);
+
+    if (response.status === 200) {
+      notify('success', {
+        params: {
+          description: 'Xóa quà thành công.',
+          title: 'Thành công',
+        },
+      });
+      props.onRefresh?.();
+    } else {
+      notify('error', {
+        params: {
+          description: 'Xóa quà không thành công.',
+          title: 'Lỗi',
+        },
+      });
+    }
+  };
   const dialogRedeem = () => {
     return (
       <Portal>
@@ -199,7 +286,11 @@ const RewardItem = (props: {
                   {props.rewardName}
                 </Text>
                 <View
-                  style={{flexDirection: 'row', gap: 10, alignItems: 'center'}}>
+                  style={{
+                    flexDirection: 'row',
+                    gap: 10,
+                    alignItems: 'center',
+                  }}>
                   <TouchableOpacity
                     onPress={() => {
                       if (quantity > 1) {
@@ -349,14 +440,165 @@ const RewardItem = (props: {
                 setLocationName('');
               }}
               textColor="red"
-              labelStyle={{fontFamily: getFontFamily('regular'), fontSize: 20}}>
+              labelStyle={{
+                fontFamily: getFontFamily('regular'),
+                fontSize: 20,
+              }}>
               Hủy
             </Button>
             <Button
               onPress={handleRedeem}
               textColor={Colors.greenPrimary}
-              labelStyle={{fontFamily: getFontFamily('regular'), fontSize: 20}}>
+              labelStyle={{
+                fontFamily: getFontFamily('regular'),
+                fontSize: 20,
+              }}>
               Đổi quà
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    );
+  };
+
+  const dialogEdit = () => {
+    const postImage = async (image: any) => {
+      const dataForm = new FormData();
+      dataForm.append('file', {
+        uri: image.path,
+        type: image.mime || 'image/jpeg',
+        name: image.filename || 'image.jpg',
+      });
+      const response: any = await uploadPhoto(dataForm, accessToken);
+      if (response.status === 200) {
+        methods.setValue('imageUrl', response.data[0]);
+      } else {
+        notify('error', {
+          params: {
+            description: 'Lỗi không thể tải ảnh lên',
+            title: 'Lỗi',
+          },
+        });
+      }
+    };
+    return (
+      <Portal>
+        <UploadPhoto
+          isVisible={isUploadVisible}
+          setVisible={setIsUploadVisible}
+          height={300}
+          width={350}
+          isCircle={false}
+          postImage={postImage}
+          isMultiple={false}
+        />
+        <Dialog
+          style={{backgroundColor: 'white', paddingHorizontal: 20}}
+          visible={dialogEditVisible}
+          onDismiss={() => {
+            setDialogEditVisible(false);
+          }}>
+          <Dialog.Content>
+            <View
+              style={{
+                paddingBottom: 10,
+              }}>
+              <Text
+                style={{
+                  alignSelf: 'center',
+                  fontSize: 24,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                }}>
+                Chỉnh sửa
+              </Text>
+            </View>
+            <FormProvider {...methods}>
+              <EditRewardItem setUploadPhoto={setIsUploadVisible} />
+            </FormProvider>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => {
+                setDialogEditVisible(false);
+              }}
+              textColor="red"
+              labelStyle={{
+                fontFamily: getFontFamily('regular'),
+                fontSize: 20,
+              }}>
+              Hủy
+            </Button>
+            <Button
+              onPress={methods.handleSubmit(handleEdit, onError)}
+              textColor={Colors.greenPrimary}
+              labelStyle={{
+                fontFamily: getFontFamily('regular'),
+                fontSize: 20,
+              }}>
+              Lưu
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    );
+  };
+
+  const dialogDelete = () => {
+    return (
+      <Portal>
+        <Dialog
+          style={{backgroundColor: 'white', paddingHorizontal: 20}}
+          visible={dialogDeleteVisible}
+          onDismiss={() => {
+            setDialogDeleteVisible(false);
+          }}>
+          <Dialog.Content>
+            <View
+              style={{
+                paddingBottom: 10,
+              }}>
+              <Text
+                style={{
+                  alignSelf: 'center',
+                  fontSize: 24,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                }}>
+                Xóa quà
+              </Text>
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontFamily: getFontFamily('semibold'),
+                  color: Colors.black,
+                }}>
+                Bạn có chắc chắn muốn xóa quà này không?
+              </Text>
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => {
+                setDialogDeleteVisible(false);
+              }}
+              textColor="red"
+              labelStyle={{
+                fontFamily: getFontFamily('regular'),
+                fontSize: 20,
+              }}>
+              Hủy
+            </Button>
+            <Button
+              onPress={handleDelete}
+              textColor={Colors.greenPrimary}
+              labelStyle={{
+                fontFamily: getFontFamily('regular'),
+                fontSize: 20,
+              }}>
+              Xóa
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -367,9 +609,22 @@ const RewardItem = (props: {
   const menuList = () => {
     return (
       <Menu visible={visible} onDismiss={closeMenu} anchor={anchor}>
-        <Menu.Item title="Edit" leadingIcon="pencil" />
-        <Menu.Item title="Delete" leadingIcon="delete" />
-        <Menu.Item title="Report" leadingIcon="alert-octagon" />
+        <Menu.Item
+          title="Chỉnh sửa"
+          leadingIcon="pencil"
+          onPress={() => {
+            setDialogEditVisible(true);
+            closeMenu();
+          }}
+        />
+        <Menu.Item
+          title="Xóa"
+          leadingIcon="delete"
+          onPress={() => {
+            setDialogDeleteVisible(true);
+            closeMenu();
+          }}
+        />
       </Menu>
     );
   };
@@ -383,7 +638,9 @@ const RewardItem = (props: {
           height: 280,
         }}>
         {dialogRedeem()}
+        {userInfo.role === 'ADMIN' ? dialogEdit() : null}
         {userInfo.role === 'ADMIN' ? menuList() : null}
+        {userInfo.role === 'ADMIN' ? dialogDelete() : null}
         <Image
           source={{uri: props.imageUrl}}
           style={{width: '100%', height: 145, borderRadius: 10}}

@@ -82,7 +82,9 @@ export const createNotification = async (data: any, token: any) => {
     console.log('data', data);
     const result = await ApiManager('notifications', {
       method: 'POST',
-
+      headers: {
+        Authorization: token,
+      },
       data: data,
     });
     return result;
