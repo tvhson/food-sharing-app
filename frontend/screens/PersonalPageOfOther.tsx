@@ -25,13 +25,15 @@ import {Icon} from 'react-native-paper';
 import {getInfoUserById} from '../api/AccountsApi';
 import {getPostOfOther} from '../api/PostApi';
 import {getOrganizationPostByUserId} from '../api/OrganizationPostApi';
+import {getRoomChats} from '../api/ChatApi';
 
 const PersonalPageOfOther = ({navigation, route}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const {showLoading, hideLoading} = useLoading();
 
   const otherId = route.params.id;
-  const [otherInfo, setOtherInfo] = useState({});
+  const [otherInfo, setOtherInfo] = useState<any>();
+  const [roomChat, setRoomChat] = useState();
 
   const [index, setIndex] = useState(0);
   const [routes, setRoutes] = useState([
@@ -45,6 +47,25 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
       const response: any = await getInfoUserById(otherId, accessToken);
       if (response.status === 200) {
         setOtherInfo(response.data);
+        getRoomChats(accessToken.toString())
+          .then((response2: any) => {
+            if (response2.status === 200) {
+              const roomChats = response2.data;
+              const roomChatFind = roomChats.find(
+                (room: any) =>
+                  (room.senderId === userInfo.id &&
+                    room.recipientId === response.data.id) ||
+                  (room.senderId === response.data.id &&
+                    room.recipientId === userInfo.id),
+              );
+              setRoomChat(roomChatFind);
+            } else {
+              console.log(response);
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
       } else {
         console.log('error');
       }
@@ -58,7 +79,30 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
     fetchData();
   }, [accessToken, otherId]);
 
+  const handleNavigate = () => {
+    if (roomChat) {
+      navigation.navigate('ChatRoom', {item: roomChat});
+    } else {
+      if (!userInfo || !otherInfo) {
+        return;
+      }
+      navigation.navigate('ChatRoom', {
+        item: {
+          senderProfilePic: userInfo.imageUrl,
+          recipientProfilePic: otherInfo.imageUrl,
+          senderId: userInfo.id,
+          recipientId: otherInfo.id,
+          senderName: userInfo.name,
+          recipientName: otherInfo.name,
+        },
+      });
+    }
+  };
+
   const renderHeader = (userInfo: any) => {
+    if (!userInfo) {
+      return null;
+    }
     return (
       <View>
         <TouchableOpacity
@@ -71,7 +115,7 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
             <View style={styles.avaContainer}>
               <Image
                 source={
-                  userInfo.imageUrl
+                  userInfo?.imageUrl
                     ? {uri: userInfo.imageUrl}
                     : require('../assets/images/user.png')
                 }
@@ -93,7 +137,7 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
             <Text style={styles.textSection1}>sự kiện </Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.btnEdit}>
+        <TouchableOpacity style={styles.btnEdit} onPress={handleNavigate}>
           <Icon source={'chat'} size={30} color={Colors.white} />
           <Text style={styles.textBtnEdit}>Nhắn tin</Text>
         </TouchableOpacity>

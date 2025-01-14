@@ -10,7 +10,7 @@ import {
   updateNotification,
 } from '../../api/NotificationApi';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
-import {updatePost} from '../../api/PostApi';
+import {confirmReceiveFood, updatePost} from '../../api/PostApi';
 import {
   calculateDistance,
   calculateExpiredDate,
@@ -38,6 +38,7 @@ const NotificationItem = ({item, navigation}: any) => {
         }
         navigation.navigate('ChatRoom', {item: roomChat});
       };
+    } else if (item.type === 'RATING') {
     } else {
       return () => {
         if (!postDetail) {
@@ -113,31 +114,20 @@ const NotificationItem = ({item, navigation}: any) => {
     );
     if (response.status === 200) {
       dispatch(updateNotificationAfter(notificationUpdate));
-      const response2: any = await updatePost(
+      const response2: any = await confirmReceiveFood(
         item.linkId,
-        {
-          id: postDetail.id,
-          title: postDetail.title,
-          description: postDetail.description,
-          imageUrl: postDetail.imageUrl,
-          note: postDetail.note,
-          expiredDate: postDetail.expiredDate,
-          pickUpStartDate: postDetail.pickUpStartDate,
-          pickUpEndDate: postDetail.pickUpEndDate,
-          status: 'RECEIVED',
-          locationName: postDetail.locationName,
-          latitude: postDetail.latitude,
-          longitude: postDetail.longitude,
-          receiverId: item.senderId,
-        },
+        item.senderId,
         accessToken,
       );
+
       const response3: any = createNotification(
         {
           title: 'Xác nhận việc nhận thức ăn',
           imageUrl: item.imageUrl,
-          description: userInfo.name + ' đã xác nhận việc nhận thức ăn của bạn',
-          type: 'DONE',
+          description:
+            userInfo.name +
+            ' đã xác nhận việc nhận thức ăn của bạn. Vui lòng bấm vào thông báo để đánh giá thức ăn',
+          type: 'RATING',
           linkId: item.linkId,
           senderId: userInfo.id,
           userId: item.senderId,
@@ -147,7 +137,6 @@ const NotificationItem = ({item, navigation}: any) => {
       if (response2.status === 200 && response3.status === 200) {
         console.log('Accept success');
       } else {
-        console.log(response2);
         console.log(response3);
       }
     }

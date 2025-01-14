@@ -17,13 +17,15 @@ import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {createNotifications} from 'react-native-notificated';
 import {createPost} from '../api/PostApi';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {pushMyPost} from '../redux/SharingPostReducer';
 import {getFontFamily} from '../utils/fonts';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import screenWidth from '../global/Constant';
 import {useLoading} from '../utils/LoadingContext';
 import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
+import {earnPoint} from '../api/LoyaltyApi';
+import {RootState} from '../redux/Store';
 
 const {useNotifications} = createNotifications();
 
@@ -31,6 +33,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();
   const dispatch = useDispatch();
   const {notify} = useNotifications();
+  const userInfo = useSelector((state: RootState) => state.userInfo);
   const [isTagVisible, setIsTagVisible] = useState(false);
   const location = route.params.location;
   const accessToken = route.params.accessToken;
@@ -200,6 +203,11 @@ const CreatePostScreen = ({route, navigation}: any) => {
                     },
                   });
                   dispatch(pushMyPost(response2.data));
+                  const response3: any = earnPoint(
+                    {point: 10, accountId: userInfo.id},
+                    accessToken,
+                  );
+
                   hideLoading();
                   navigation.navigate('Home');
                 }

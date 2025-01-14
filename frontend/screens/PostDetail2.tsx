@@ -30,9 +30,13 @@ import {
   getPostById,
   likePost,
 } from '../api/PostApi';
-import {likePostReducer} from '../redux/SharingPostReducer';
+import {
+  likePostReducer,
+  receivedPostReducer,
+} from '../redux/SharingPostReducer';
 import {useNotifications} from 'react-native-notificated';
 import {createNotification} from '../api/NotificationApi';
+import {set} from 'react-hook-form';
 
 const PostDetail2 = ({route, navigation}: any) => {
   const [roomChat, setRoomChat] = useState<any>(null);
@@ -116,8 +120,31 @@ const PostDetail2 = ({route, navigation}: any) => {
     const response: any = await getPostById(item.id, accessToken);
     if (response.status === 200) {
       setItem(response.data);
+      setLiked(response.data.isLiked);
+      setLikeCount(
+        response.data.isLiked
+          ? response.data.likeCount + 1
+          : response.data.likeCount,
+      );
     }
   };
+
+  const getCommentList = async () => {
+    // get comment list
+    if (accessToken) {
+      // get comment list
+      getCommentByPostId(item.id, accessToken).then((response: any) => {
+        if (response.status === 200) {
+          setCommentList(response.data);
+        } else {
+          notify('error', {
+            params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+          });
+        }
+      });
+    }
+  };
+
   const handleReceived = async () => {
     if (accessToken) {
       try {
@@ -139,6 +166,12 @@ const PostDetail2 = ({route, navigation}: any) => {
         });
         if (response.status === 200) {
           navigation.goBack();
+          notify('success', {
+            params: {
+              description: 'Đã gửi yêu cầu nhận thức ăn',
+              title: 'Yêu cầu đã được gửi',
+            },
+          });
         } else {
           console.log(response);
         }
@@ -163,6 +196,8 @@ const PostDetail2 = ({route, navigation}: any) => {
   const handleRefresh = async () => {
     setRefreshing(true);
     await getPostData();
+    await getCommentList();
+
     setRefreshing(false);
   };
 
@@ -306,13 +341,15 @@ const PostDetail2 = ({route, navigation}: any) => {
               }}>
               {item.createdById !== userInfo.id && (
                 <>
-                  <TouchableOpacity onPress={handleReceived}>
-                    <Icon
-                      source={'hand-heart'}
-                      size={30}
-                      color={Colors.black}
-                    />
-                  </TouchableOpacity>
+                  {!item.isReceived && (
+                    <TouchableOpacity onPress={handleReceived}>
+                      <Icon
+                        source={'hand-heart'}
+                        size={30}
+                        color={Colors.black}
+                      />
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity
                     onPress={handleGoToMessage}
                     style={{marginLeft: 10}}>

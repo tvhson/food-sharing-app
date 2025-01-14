@@ -187,3 +187,25 @@ export const getPostOfOther = async (userId: any, token: any) => {
     return error;
   }
 };
+
+export const confirmReceiveFood = async (
+  postId: any,
+  receiverId: number,
+  token: any,
+) => {
+  try {
+    const response = await ApiManager('posts/confirm-received', {
+      method: 'POST',
+      headers: {
+        Authorization: token,
+      },
+      params: {
+        userId: receiverId,
+        postId: postId,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

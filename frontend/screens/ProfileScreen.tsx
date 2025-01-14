@@ -246,56 +246,16 @@ const ProfileScreen = ({navigation, route}: any) => {
         </View>
       ) : null}
 
-      <View
-        style={{
-          marginHorizontal: 35,
-          backgroundColor: 'white',
-          borderRadius: 8,
-          marginVertical: 20,
-          overflow: 'hidden',
-          padding: 10,
-        }}>
-        {userInfo.role !== 'ADMIN' ? (
-          <Button
-            title="Edit profile"
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black'}}
-            icon={{name: 'profile', type: 'antdesign', color: 'black'}}
-            onPress={() => setIsEditVisible(!isEditVisible)}
-          />
-        ) : null}
-        {userInfo.role !== 'ADMIN' ? (
-          <Button
-            title="My posts"
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black'}}
-            icon={{
-              name: 'post-outline',
-              type: 'material-community',
-              color: 'black',
-            }}
-            onPress={() => navigation.navigate('MyPost')}
-          />
-        ) : null}
-        {userInfo.role === 'ORGANIZATION' ? (
-          <Button
-            title="My organization posts"
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black'}}
-            onPress={() => navigation.navigate('MyFundingPost')}
-            icon={{name: 'organization', type: 'octicon', color: 'black'}}
-          />
-        ) : null}
-        {userInfo.role === 'ADMIN' ? (
+      {userInfo.role === 'ADMIN' ? (
+        <View
+          style={{
+            marginHorizontal: 35,
+            backgroundColor: 'white',
+            borderRadius: 8,
+            marginVertical: 20,
+            overflow: 'hidden',
+            padding: 10,
+          }}>
           <>
             <Button
               onPress={() => navigation.navigate('Report')}
@@ -332,8 +292,8 @@ const ProfileScreen = ({navigation, route}: any) => {
               icon={{name: 'gift', type: 'ant-design', color: 'black'}}
             />
           </>
-        ) : null}
-      </View>
+        </View>
+      ) : null}
       <View>
         <Button
           title={userInfo.role === 'ADMIN' ? 'Tạo quà tặng' : 'Đổi quà'}
