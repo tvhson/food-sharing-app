@@ -221,12 +221,14 @@ const CreatePostScreen = ({route, navigation}: any) => {
                   },
                 });
                 hideLoading();
+                navigation.navigate('Home');
               });
           } else {
             notify('error', {
               params: {description: response.data, title: 'Lỗi'},
             });
             hideLoading();
+            navigation.navigate('Home');
           }
         })
         .catch((error: any) => {
@@ -234,7 +236,10 @@ const CreatePostScreen = ({route, navigation}: any) => {
             params: {description: error.message, title: 'Lỗi'},
           });
           hideLoading();
+          navigation.navigate('Home');
         });
+      navigation.navigate('Home');
+      hideLoading();
     }
   };
 
