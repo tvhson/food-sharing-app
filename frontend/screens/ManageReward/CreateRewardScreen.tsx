@@ -48,7 +48,6 @@ const CreateRewardScreen = ({navigation}: any) => {
   });
 
   const onSubmit = async (data: RewardList) => {
-    showLoading();
     const response: any = await createRewards(data, accessToken);
     if (response.status === 200) {
       notify('success', {
@@ -60,7 +59,6 @@ const CreateRewardScreen = ({navigation}: any) => {
         params: {description: 'Tạo quà không thành công', title: 'Lỗi'},
       });
     }
-    hideLoading();
   };
 
   const onError = (errors: any) => {
@@ -184,6 +182,11 @@ const CreateRewardScreen = ({navigation}: any) => {
           elevation: 20,
         }}>
         <TouchableOpacity
+          onPress={async () => {
+            showLoading();
+            await methods.handleSubmit(onSubmit, onError)();
+            hideLoading();
+          }}
           style={{
             backgroundColor: Colors.greenPrimary,
             padding: 10,
@@ -191,7 +194,6 @@ const CreateRewardScreen = ({navigation}: any) => {
             paddingHorizontal: 50,
           }}>
           <Text
-            onPress={methods.handleSubmit(onSubmit, onError)}
             style={{
               color: Colors.white,
               fontSize: 16,

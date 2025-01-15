@@ -36,7 +36,7 @@ const HistoryRenderItem = ({item}: any) => {
       <View style={{flexDirection: 'row', gap: 20}}>
         <Image
           source={{uri: item.imageUrl}}
-          style={{width: 130, height: 'auto', borderRadius: 5}}
+          style={{width: screenWidth * 0.3, height: 'auto', borderRadius: 5}}
         />
         <View>
           <Text
