@@ -68,6 +68,7 @@ const DialogRating = (props: {
             linkId: item.linkId,
             senderId: item.userId,
             userId: item.senderId,
+            imageUrl: item.imageUrl,
           },
           accessToken,
         );

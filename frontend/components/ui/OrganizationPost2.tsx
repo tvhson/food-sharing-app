@@ -68,7 +68,10 @@ const OrganizationPost2 = (props: any) => {
           style={styles.img}
         />
         <View style={styles.itemContainer}>
-          <Text style={styles.textTime}>Diễn ra vào hôm nay lúc 15:00</Text>
+          <Text style={styles.textTime}>
+            Diễn ra vào{' '}
+            {new Date(item.organizationposts.startDate).toLocaleString()}
+          </Text>
           <Text style={styles.textTitle}>{item.organizationposts.title}</Text>
           <Text style={styles.textTime}>
             Địa điểm: {item.organizationposts.locationName}

@@ -8,6 +8,7 @@ import {RootState} from '../../../redux/Store';
 import {useSelector} from 'react-redux';
 import {Switch} from 'react-native-paper';
 import {updateStatusRedemption} from '../../../api/LoyaltyApi';
+import screenWidth from '../../../global/Constant';
 
 const HistoryRenderItem = ({item}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -90,7 +91,7 @@ const HistoryRenderItem = ({item}: any) => {
               <View
                 style={{
                   flexDirection: 'column',
-                  width: '90%',
+                  width: (screenWidth * 50) / 100,
                 }}>
                 <Text
                   style={{

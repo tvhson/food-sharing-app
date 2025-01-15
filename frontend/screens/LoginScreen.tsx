@@ -91,7 +91,7 @@ const LoginScreen = ({navigation}: any) => {
               notify('error', {
                 params: {
                   description: response.data.message || 'Login failed.',
-                  title: 'Error',
+                  title: 'Lỗi',
                   style: {multiline: 100},
                 },
               });
@@ -100,7 +100,7 @@ const LoginScreen = ({navigation}: any) => {
             notify('error', {
               params: {
                 description: response.data.message || 'Login failed.',
-                title: 'Error',
+                title: 'Lỗi',
                 style: {multiline: 100},
               },
             });
@@ -110,7 +110,7 @@ const LoginScreen = ({navigation}: any) => {
           notify('error', {
             params: {
               description: error.message || 'Login failed.',
-              title: 'Error',
+              title: 'Lỗi',
               style: {multiline: 100},
             },
           });
@@ -122,7 +122,7 @@ const LoginScreen = ({navigation}: any) => {
       notify('error', {
         params: {
           description: error.message || 'Login failed.',
-          title: 'Error',
+          title: 'Lỗi',
           style: {multiline: 100},
         },
       });

@@ -26,6 +26,7 @@ import UploadPhoto from '../UploadPhoto';
 import {uploadPhoto} from '../../../api/UploadPhotoApi';
 import {FormProvider, useForm} from 'react-hook-form';
 import EditRewardItem from './EditRewardItem';
+import screenWidth from '../../../global/Constant';
 
 const RewardItem = (props: {
   id: number;
@@ -633,9 +634,9 @@ const RewardItem = (props: {
     <TouchableWithoutFeedback onLongPress={event => handleOnLongPress(event)}>
       <View
         style={{
-          padding: 15,
-          width: 175,
-          height: 280,
+          padding: 10,
+          width: screenWidth * 0.45,
+          height: 'auto',
         }}>
         {dialogRedeem()}
         {userInfo.role === 'ADMIN' ? dialogEdit() : null}

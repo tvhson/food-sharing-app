@@ -7,6 +7,7 @@ import {getFontFamily} from '../../../utils/fonts';
 import {Controller, useFormContext} from 'react-hook-form';
 import {Image} from 'react-native';
 import {IReward} from '../../../api/LoyaltyApi';
+import screenWidth from '../../../global/Constant';
 
 const EditRewardItem = (props: {setUploadPhoto: any}) => {
   const {setUploadPhoto} = props;
@@ -23,6 +24,8 @@ const EditRewardItem = (props: {setUploadPhoto: any}) => {
         borderRadius: 20,
         justifyContent: 'center',
         gap: 10,
+        flexDirection: 'column',
+        alignItems: 'center',
       }}>
       <Controller
         control={control}
@@ -32,7 +35,7 @@ const EditRewardItem = (props: {setUploadPhoto: any}) => {
           return (
             <View
               style={{
-                width: 250,
+                width: (screenWidth * 60) / 100,
                 height: 170,
                 borderRadius: 20,
                 overflow: 'hidden',
@@ -100,6 +103,7 @@ const EditRewardItem = (props: {setUploadPhoto: any}) => {
                 fontFamily: getFontFamily('regular'),
                 fontSize: 16,
                 color: Colors.black,
+                width: (screenWidth * 60) / 100,
               }}
               placeholder="Tên quà"
               value={value}
@@ -121,6 +125,7 @@ const EditRewardItem = (props: {setUploadPhoto: any}) => {
                 fontFamily: getFontFamily('regular'),
                 fontSize: 16,
                 color: Colors.black,
+                width: (screenWidth * 60) / 100,
               }}
               placeholder="Số lượng Star Point"
               value={value ? value.toString() : ''}
@@ -143,6 +148,7 @@ const EditRewardItem = (props: {setUploadPhoto: any}) => {
                 fontFamily: getFontFamily('regular'),
                 fontSize: 16,
                 color: Colors.black,
+                width: (screenWidth * 60) / 100,
               }}
               placeholder="Số lượng quà"
               value={value ? value.toString() : '0'}

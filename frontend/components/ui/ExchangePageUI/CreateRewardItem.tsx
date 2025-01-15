@@ -7,6 +7,7 @@ import {getFontFamily} from '../../../utils/fonts';
 import {Controller, useFieldArray, useFormContext} from 'react-hook-form';
 import {RewardList} from '../../../screens/ManageReward/CreateRewardScreen';
 import {Image} from 'react-native';
+import screenWidth from '../../../global/Constant';
 
 const CreateRewardItem = (props: {
   item: any;
@@ -24,6 +25,7 @@ const CreateRewardItem = (props: {
       style={{
         backgroundColor: Colors.greenPrimary,
         padding: 30,
+        paddingHorizontal: 10,
         alignItems: 'center',
         borderRadius: 20,
         justifyContent: 'center',
@@ -32,7 +34,7 @@ const CreateRewardItem = (props: {
         marginVertical: 15,
       }}>
       <TouchableOpacity
-        style={{position: 'absolute', top: 10, right: 10}}
+        style={{position: 'absolute', top: 5, right: 5}}
         disabled={isDisable}
         onPress={() => remove(index)}>
         <Icon source={'close'} size={30} color={Colors.white} />
@@ -45,8 +47,8 @@ const CreateRewardItem = (props: {
           return (
             <View
               style={{
-                width: 170,
-                height: 170,
+                width: screenWidth / 3,
+                height: screenWidth / 3,
                 borderRadius: 20,
                 overflow: 'hidden',
                 backgroundColor: Colors.white,
@@ -57,7 +59,7 @@ const CreateRewardItem = (props: {
                 <View>
                   <Image
                     source={{uri: value}}
-                    style={{width: 170, height: 170}}
+                    style={{width: screenWidth / 3, height: screenWidth / 3}}
                   />
                   <TouchableOpacity
                     onPress={() => {
@@ -113,6 +115,7 @@ const CreateRewardItem = (props: {
                 fontFamily: getFontFamily('regular'),
                 fontSize: 16,
                 color: Colors.black,
+                height: 40,
               }}
               placeholder="Tên quà"
               value={value}
@@ -134,6 +137,7 @@ const CreateRewardItem = (props: {
                 fontFamily: getFontFamily('regular'),
                 fontSize: 16,
                 color: Colors.black,
+                height: 40,
               }}
               placeholder="Số lượng Star Point"
               value={value ? value.toString() : ''}
@@ -156,6 +160,7 @@ const CreateRewardItem = (props: {
                 fontFamily: getFontFamily('regular'),
                 fontSize: 16,
                 color: Colors.black,
+                height: 40,
               }}
               placeholder="Số lượng quà"
               value={value ? value.toString() : ''}

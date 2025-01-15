@@ -21,6 +21,7 @@ interface OrganizationPost {
   latitude: number;
   longitude: number;
   attended: boolean;
+  startDate: Date;
 }
 interface FundingPost {
   accounts: Account;

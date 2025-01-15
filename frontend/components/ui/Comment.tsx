@@ -17,9 +17,11 @@ import {RootState} from '../../redux/Store';
 import {useSelector} from 'react-redux';
 import {createCommentToPost, getCommentByPostId} from '../../api/PostApi';
 import {useNotifications} from 'react-native-notificated';
+import {useLoading} from '../../utils/LoadingContext';
 
 const Comment = (props: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
+  const {showLoading, hideLoading} = useLoading();
   const {commentPostId} = props;
   const {isVisible, setVisible} = props;
   const [commentList, setCommentList] = useState([]);
@@ -30,7 +32,9 @@ const Comment = (props: any) => {
     const getCommentList = async () => {
       // get comment list
       if (accessToken) {
-        if (commentPostId === 0) return;
+        if (commentPostId === 0) {
+          return;
+        }
         // get comment list
         getCommentByPostId(commentPostId, accessToken).then((response: any) => {
           if (response.status === 200) {
@@ -43,6 +47,7 @@ const Comment = (props: any) => {
   }, [accessToken, commentPostId, notify, isVisible]);
 
   const handleCreateComment = async () => {
+    showLoading();
     const response: any = await createCommentToPost(
       commentPostId,
       {content: comment},
@@ -60,6 +65,7 @@ const Comment = (props: any) => {
         params: {description: 'Không thể tạo comment', title: 'Lỗi'},
       });
     }
+    hideLoading();
   };
 
   return (

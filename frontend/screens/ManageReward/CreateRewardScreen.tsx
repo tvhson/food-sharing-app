@@ -19,6 +19,7 @@ import {uploadPhoto} from '../../api/UploadPhotoApi';
 import {RootState} from '../../redux/Store';
 import {useSelector} from 'react-redux';
 import {createRewards, IReward} from '../../api/LoyaltyApi';
+import {useLoading} from '../../utils/LoadingContext';
 
 export type RewardList = {
   rewards: IReward[];
@@ -26,6 +27,7 @@ export type RewardList = {
 
 const CreateRewardScreen = ({navigation}: any) => {
   const {notify} = useNotifications();
+  const {showLoading, hideLoading} = useLoading();
   const accessToken = useSelector((state: RootState) => state.token.key);
   const [isUploadVisible, setIsUploadVisible] = React.useState(0);
   const methods = useForm<RewardList>({
@@ -46,6 +48,7 @@ const CreateRewardScreen = ({navigation}: any) => {
   });
 
   const onSubmit = async (data: RewardList) => {
+    showLoading();
     const response: any = await createRewards(data, accessToken);
     if (response.status === 200) {
       notify('success', {
@@ -57,6 +60,7 @@ const CreateRewardScreen = ({navigation}: any) => {
         params: {description: 'Tạo quà không thành công', title: 'Lỗi'},
       });
     }
+    hideLoading();
   };
 
   const onError = (errors: any) => {

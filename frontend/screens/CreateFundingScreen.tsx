@@ -22,6 +22,8 @@ import {
   pushFundingPost,
   pushMyFundingPost,
 } from '../redux/OrganizationPostReducer';
+import {DatePickerInput} from 'react-native-paper-dates';
+import {getFontFamily} from '../utils/fonts';
 
 const {useNotifications} = createNotifications();
 
@@ -38,6 +40,7 @@ const CreateFundingScreen = ({navigation}: any) => {
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
   const [imagePath, setImagePath] = useState('');
+  const [startDate, setStartDate] = useState(new Date());
 
   const autocompleteRef = useRef<any | null>(null);
 
@@ -84,6 +87,7 @@ const CreateFundingScreen = ({navigation}: any) => {
               latitude,
               longitude,
               linkWebsites,
+              startDate,
             },
             accessToken,
           )
@@ -191,6 +195,40 @@ const CreateFundingScreen = ({navigation}: any) => {
           value={linkWebsites}
           onChangeText={setLinkWebsites}
         />
+        <View
+          style={{
+            height: 70,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 10,
+          }}>
+          <DatePickerInput
+            locale="vi"
+            label="Ngày bắt đầu"
+            value={startDate}
+            onChange={(date: Date | undefined) =>
+              setStartDate(date || new Date())
+            }
+            inputMode="start"
+            saveLabel="Lưu"
+            style={{
+              backgroundColor: '#eff2ff',
+              color: 'black',
+              maxWidth: '90%',
+              alignSelf: 'center',
+              fontFamily: getFontFamily('regular'),
+            }}
+            mode="outlined"
+            outlineStyle={{
+              borderColor: Colors.greenPrimary,
+              borderRadius: 8,
+              borderWidth: 2,
+            }}
+            contentStyle={{
+              fontFamily: getFontFamily('regular'),
+            }}
+          />
+        </View>
       </View>
 
       <GooglePlacesAutocomplete
