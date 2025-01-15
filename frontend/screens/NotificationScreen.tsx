@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import Colors from '../global/Color';
 import NotificationItem from '../components/ui/NotificationItem';
@@ -32,6 +33,7 @@ const NotificationScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
   const [notifications, setNotificationsList] = useState<any>(null);
   const [visible, setVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -57,7 +59,6 @@ const NotificationScreen = ({navigation}: any) => {
               'notifications',
               JSON.stringify(response.data),
             );
-            console.log('Im here heheheheheeh');
             setNotificationsList(response.data);
             dispatch(setNotifications(response.data));
           } else {
@@ -122,7 +123,11 @@ const NotificationScreen = ({navigation}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <DialogRating visible={visible} setVisible={setVisible} />
+      <DialogRating
+        visible={visible}
+        setVisible={setVisible}
+        item={selectedItem}
+      />
       <View style={{backgroundColor: 'white', padding: 10, height: 50}}>
         <Text
           style={{
@@ -136,7 +141,7 @@ const NotificationScreen = ({navigation}: any) => {
       </View>
 
       <FlatList
-        style={{marginTop: 20, marginHorizontal: 10}}
+        style={{marginTop: 20, marginHorizontal: 10, pointerEvents: 'none'}}
         data={notificationDatas}
         keyExtractor={item => item.id.toString()}
         renderItem={({item}) => {
@@ -145,6 +150,7 @@ const NotificationScreen = ({navigation}: any) => {
               item={item}
               navigation={navigation}
               setVisible={setVisible}
+              setSelectedItem={setSelectedItem}
             />
           );
         }}

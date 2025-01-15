@@ -1,12 +1,24 @@
 /* eslint-disable react-native/no-inline-styles */
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import React from 'react';
-import {Button, Icon} from 'react-native-paper';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import React, {useEffect} from 'react';
+import {Button, Icon, Switch} from 'react-native-paper';
 import Colors from '../global/Color';
 import {getFontFamily} from '../utils/fonts';
 import {Image} from '@rneui/themed';
 import {historyExchangeItems} from '../components/data/PostData';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
+import {useLoading} from '../utils/LoadingContext';
+import {RootState} from '../redux/Store';
+import {useSelector} from 'react-redux';
+import {getAllRedemptions, getMyHistoryRedeem} from '../api/LoyaltyApi';
+import HistoryRenderItem from '../components/ui/ExchangePageUI/HistoryRenderItem';
 
 interface Props {
   navigation: NavigationProp<any>;
@@ -15,6 +27,41 @@ interface Props {
 
 const HistoryExchangeGiftScreen = ({navigation, route}: Props) => {
   const type = route?.params?.type;
+  const {showLoading, hideLoading} = useLoading();
+  const userInfo = useSelector((state: RootState) => state.userInfo);
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const [data, setData] = React.useState();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const getHistoryExchange = async () => {
+    if (userInfo.role === 'ADMIN') {
+      const response: any = await getAllRedemptions(accessToken);
+      if (response.status === 200) {
+        setData(response.data);
+      }
+    } else {
+      const response: any = await getMyHistoryRedeem(accessToken);
+      if (response.status === 200) {
+        setData(response.data);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      showLoading();
+      await getHistoryExchange();
+      hideLoading();
+    };
+    fetchData();
+  }, [accessToken]);
+
+  const onRefresh = async () => {
+    showLoading();
+    await getHistoryExchange();
+    hideLoading();
+  };
+
   const renderHeader = () => {
     return (
       <View style={styles.header}>
@@ -54,66 +101,13 @@ const HistoryExchangeGiftScreen = ({navigation, route}: Props) => {
           Lịch sử
         </Text>
         <FlatList
-          data={historyExchangeItems}
+          data={data}
           style={{flex: 1}}
           keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => (
-            <View
-              style={{
-                padding: 15,
-              }}>
-              <View style={{flexDirection: 'row', gap: 20}}>
-                <Image
-                  source={{uri: item.rewardDetail.imageUrl}}
-                  style={{width: 130, height: 'auto', borderRadius: 5}}
-                />
-                <View>
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      fontFamily: getFontFamily('bold'),
-                      color: Colors.black,
-                    }}>
-                    {item.rewardDetail.rewardName}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontFamily: getFontFamily('regular'),
-                      color: Colors.gray,
-                    }}>
-                    -{item.pointsUsed} Star Point
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontFamily: getFontFamily('regular'),
-                      color:
-                        item.status === 'PENDING'
-                          ? Colors.bluePrimary
-                          : Colors.greenPrimary,
-                    }}>
-                    {item.status === 'PENDING' ? 'Đang xử lý' : 'Đã giao'}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontFamily: getFontFamily('regular'),
-                      color: Colors.black,
-                    }}>
-                    {new Date(item.createdDate).toLocaleString('vi', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: true,
-                      month: '2-digit',
-                      day: '2-digit',
-                      year: 'numeric',
-                    })}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          renderItem={({item}) => <HistoryRenderItem item={item} />}
         />
       </View>
     </View>

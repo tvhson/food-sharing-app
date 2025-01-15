@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {View, Image, Text, TouchableWithoutFeedback} from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from 'react-native';
 import Colors from '../../global/Color';
 import {Button} from '@rneui/themed';
 import {useDispatch, useSelector} from 'react-redux';
@@ -17,7 +23,12 @@ import {
   timeAgo,
 } from '../../utils/helper';
 
-const NotificationItem = ({item, navigation}: any) => {
+const NotificationItem = ({
+  item,
+  navigation,
+  setVisible,
+  setSelectedItem,
+}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
   const location = useSelector((state: RootState) => state.location);
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -39,6 +50,8 @@ const NotificationItem = ({item, navigation}: any) => {
         navigation.navigate('ChatRoom', {item: roomChat});
       };
     } else if (item.type === 'RATING') {
+      setSelectedItem(item);
+      setVisible(true);
     } else {
       return () => {
         if (!postDetail) {
@@ -143,7 +156,7 @@ const NotificationItem = ({item, navigation}: any) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleNavigate()}>
+    <TouchableWithoutFeedback onPress={handleNavigate}>
       <View
         style={{
           padding: 10,

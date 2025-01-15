@@ -291,6 +291,16 @@ const ProfileScreen = ({navigation, route}: any) => {
               titleStyle={{color: 'black'}}
               icon={{name: 'gift', type: 'ant-design', color: 'black'}}
             />
+            <Button
+              title="Lịch sử đổi quà"
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              onPress={() => navigation.navigate('HistoryExchangeGift')}
+              titleStyle={{color: 'black'}}
+              icon={{name: 'history', type: 'material-icon', color: 'black'}}
+            />
           </>
         </View>
       ) : null}

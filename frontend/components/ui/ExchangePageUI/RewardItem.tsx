@@ -653,7 +653,7 @@ const RewardItem = (props: {
                 ? Colors.gray
                 : props.myPoint === undefined
                 ? Colors.greenPrimary
-                : props.myPoint > props.pointsRequired
+                : props.myPoint >= props.pointsRequired
                 ? Colors.greenPrimary
                 : Colors.red,
             fontFamily: getFontFamily('semibold'),
@@ -670,7 +670,7 @@ const RewardItem = (props: {
                 ? Colors.gray
                 : props.myPoint === undefined
                 ? Colors.greenPrimary
-                : props.myPoint > props.pointsRequired
+                : props.myPoint >= props.pointsRequired
                 ? Colors.greenPrimary
                 : Colors.red,
             fontFamily: getFontFamily('regular'),

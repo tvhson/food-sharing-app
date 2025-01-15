@@ -152,3 +152,22 @@ export const getAllRedemptions = async (token: any) => {
     return error;
   }
 };
+
+export const updateStatusRedemption = async (
+  data: {status: string},
+  redemptionId: number,
+  token: any,
+) => {
+  try {
+    const response = await ApiManager(`loyalty/redemptions/${redemptionId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: token,
+      },
+      data: data,
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

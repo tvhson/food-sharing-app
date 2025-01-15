@@ -57,6 +57,7 @@ import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 import analytics from '@react-native-firebase/analytics';
 import BootSplash from 'react-native-bootsplash';
+import {getMyPoint} from '../api/LoyaltyApi';
 
 enableScreens();
 
@@ -175,7 +176,6 @@ const LoadingScreen = ({navigation, route}: any) => {
     };
     const saveInfo = async () => {
       const saveNotification = (body: any) => {
-        console.log(body);
         dispatch(addNotification(body));
       };
       const saveChatRoom = (body: any) => {
@@ -189,7 +189,6 @@ const LoadingScreen = ({navigation, route}: any) => {
             const data = response.data;
             dispatch(setReports(data));
           } else {
-            console.log(response);
             throw new Error(response);
           }
         } catch (error) {
@@ -203,7 +202,6 @@ const LoadingScreen = ({navigation, route}: any) => {
             const data = response.data;
             dispatch(setAccounts(data));
           } else {
-            console.log(response);
             throw new Error(response);
           }
         } catch (error) {
@@ -217,7 +215,6 @@ const LoadingScreen = ({navigation, route}: any) => {
             const data = response.data;
             dispatch(setChatRooms({chatRooms: data, myId}));
           } else {
-            console.log(response);
             throw new Error(response);
           }
         } catch (error) {
@@ -351,6 +348,17 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
+    const getPoint = async () => {
+      try {
+        const response: any = await getMyPoint(token.toString());
+        if (response.status === 200) {
+        } else {
+          throw new Error(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
     const loadData = async () => {
       try {
@@ -363,6 +371,7 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveMyOrganizationPost(),
           saveNotification(),
           sendData(),
+          getPoint(),
         ]);
         setTimeout(
           () =>

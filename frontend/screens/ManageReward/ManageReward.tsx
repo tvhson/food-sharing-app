@@ -13,7 +13,7 @@ import {Button, Icon} from 'react-native-paper';
 import Colors from '../../global/Color';
 import {getFontFamily} from '../../utils/fonts';
 import RewardItem from '../../components/ui/ExchangePageUI/RewardItem';
-import {rewardItems} from '../../components/data/PostData';
+
 import {getRewards} from '../../api/LoyaltyApi';
 import {useSelector} from 'react-redux';
 import {useLoading} from '../../utils/LoadingContext';
@@ -88,7 +88,6 @@ const ManageReward = ({navigation}: any) => {
           }
           keyExtractor={(item: any) => item.id.toString()}
           renderItem={({item}) => {
-            console.log(item.stockQuantity);
             return (
               <RewardItem
                 imageUrl={item.imageUrl}
