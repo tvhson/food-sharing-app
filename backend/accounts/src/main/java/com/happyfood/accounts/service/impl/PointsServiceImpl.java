@@ -68,9 +68,9 @@ public class PointsServiceImpl implements IPointsService {
         pointsEntity.setPointsRedeemed(pointsEntity.getPointsRedeemed() + redemptionsRequest.getPoint());
         pointsEntity.setPointsBalance(pointsEntity.getPointsBalance() - redemptionsRequest.getPoint());
 
-        Rewards rewards = rewardsRepository.findById(redemptionsRequest.getRewardId()).orElseThrow(() -> new RuntimeException("Reward not found"));
+        Rewards rewards = rewardsRepository.findById(redemptionsRequest.getRewardId()).orElseThrow(() -> new CustomException("Không tìm thấy phần quà", HttpStatus.NOT_FOUND));
         rewards.setStockQuantity(rewards.getStockQuantity() - (int) (redemptionsRequest.getPoint() / rewards.getPointsRequired()));
-        if (rewards.getStockQuantity() <= 0) throw new CustomException("Kho không đủ phần quà nhé!", HttpStatus.BAD_REQUEST);
+        if (rewards.getStockQuantity() < 0) throw new CustomException("Kho không đủ phần quà nhé!", HttpStatus.NOT_FOUND);
         pointsRepository.save(pointsEntity);
         rewardsRepository.save(rewards);
 
