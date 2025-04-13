@@ -104,3 +104,15 @@ resilience4j.ratelimiter:
       timeoutDuration: 1000
       limitRefreshPeriod: 5000
       limitForPeriod: 5
+
+openai:
+  api:
+    key: "sk-"
+    url: "https://api.openai.com/v1/chat/completions"
+    model: "gpt-3.5-turbo"
+    temperature: 0.7
+    max_tokens: 1000
+    top_p: 1
+    frequency_penalty: 0
+    presence_penalty: 0
+    prompt: "Chào bạn, tôi là Sơn"
