@@ -1,28 +1,28 @@
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  RefreshControl,
-  TouchableOpacity,
-} from 'react-native';
-import Colors from '../global/Color';
-import NotificationItem from '../components/ui/NotificationItem';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
 import {
   clearNotifications,
   setNotifications,
   setReadAllNotifications,
 } from '../redux/NotificationReducer';
 import {getNotifications, readAllNotifications} from '../api/NotificationApi';
+import {useDispatch, useSelector} from 'react-redux';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
-import {getFontFamily} from '../utils/fonts';
+import Colors from '../global/Color';
 import DialogRating from '../components/ui/DialogRating';
+import NotificationItem from '../components/ui/NotificationItem';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {useFocusEffect} from '@react-navigation/native';
 
 const NotificationScreen = ({navigation}: any) => {
   const notificationDatas = useSelector(
@@ -30,8 +30,8 @@ const NotificationScreen = ({navigation}: any) => {
   );
 
   const accessToken = useSelector((state: RootState) => state.token.key);
+
   const dispatch = useDispatch();
-  const [notifications, setNotificationsList] = useState<any>(null);
   const [visible, setVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
@@ -59,7 +59,7 @@ const NotificationScreen = ({navigation}: any) => {
               'notifications',
               JSON.stringify(response.data),
             );
-            setNotificationsList(response.data);
+
             dispatch(setNotifications(response.data));
           } else {
             console.log(response);
@@ -76,9 +76,7 @@ const NotificationScreen = ({navigation}: any) => {
 
   useEffect(() => {
     const saveNotifications = async () => {
-      if (notificationDatas) {
-        setNotificationsList(notificationDatas);
-      } else if (accessToken) {
+      if (accessToken) {
         getNotifications(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
             AsyncStorage.setItem(
