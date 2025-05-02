@@ -1,63 +1,64 @@
-/* eslint-disable no-labels */
-/* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable react-native/no-inline-styles */
-import LottieView from 'lottie-react-native';
-import React, {useEffect, useState} from 'react';
+import * as ZIM from 'zego-zim-react-native';
+import * as ZPNs from 'zego-zpns-react-native';
 
-import {View, Text, StyleSheet, Image, PermissionsAndroid} from 'react-native';
-import Colors from '../global/Color';
-import {useDispatch} from 'react-redux';
-import {getAllAccounts, getInfoUser} from '../api/AccountsApi';
+import {Image, PermissionsAndroid, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {UserInfo, saveUser} from '../redux/UserReducer';
-import {setToken} from '../redux/TokenReducer';
-import {getPostOfUser, getPosts} from '../api/PostApi';
-import {enableScreens} from 'react-native-screens';
+import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '../components/data/SecretData';
 import {
-  clearMyPosts,
-  clearSharingPosts,
-  pushMyPost,
-  pushSharingPost,
-} from '../redux/SharingPostReducer';
+  addNotification,
+  countNumberOfUnread,
+  setNotifications,
+} from '../redux/NotificationReducer';
 import {
-  getOrganizationPost,
-  getOrganizationPostOfUser,
-} from '../api/OrganizationPostApi';
+  calculateUnreadMessages,
+  pushChatRoom,
+  setChatRooms,
+} from '../redux/ChatRoomReducer';
 import {
   clearFundingPosts,
   clearMyFundingPosts,
   pushFundingPost,
   pushMyFundingPost,
 } from '../redux/OrganizationPostReducer';
-import GetLocation from 'react-native-get-location';
-import {setLocation} from '../redux/LocationReducer';
+import {
+  clearMyPosts,
+  clearSharingPosts,
+  pushMyPost,
+  pushSharingPost,
+} from '../redux/SharingPostReducer';
+import {connectChat, disconnectChat, getRoomChats} from '../api/ChatApi';
 import {
   connectNotification,
   disconnectSocket,
   getNotifications,
 } from '../api/NotificationApi';
+import {getAllAccounts, getInfoUser} from '../api/AccountsApi';
 import {
-  addNotification,
-  countNumberOfUnread,
-  setNotifications,
-} from '../redux/NotificationReducer';
-import {connectChat, disconnectChat, getRoomChats} from '../api/ChatApi';
-import {
-  calculateUnreadMessages,
-  pushChatRoom,
-  setChatRooms,
-} from '../redux/ChatRoomReducer';
-import {getReport} from '../api/ReportApi';
-import {setReports} from '../redux/ReportReducer';
-import {setAccounts} from '../redux/AccountsReducer';
+  getOrganizationPost,
+  getOrganizationPostOfUser,
+} from '../api/OrganizationPostApi';
+import {getPostOfUser, getPosts} from '../api/PostApi';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '../components/data/SecretData';
+import BootSplash from 'react-native-bootsplash';
+import Colors from '../global/Color';
+import GetLocation from 'react-native-get-location';
+/* eslint-disable no-labels */
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react-native/no-inline-styles */
+import LottieView from 'lottie-react-native';
 import {ZIMKit} from '@zegocloud/zimkit-rn';
 import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import * as ZIM from 'zego-zim-react-native';
-import * as ZPNs from 'zego-zpns-react-native';
 import analytics from '@react-native-firebase/analytics';
-import BootSplash from 'react-native-bootsplash';
+import {enableScreens} from 'react-native-screens';
 import {getMyPoint} from '../api/LoyaltyApi';
+import {getReport} from '../api/ReportApi';
+import {setAccounts} from '../redux/AccountsReducer';
+import {setLocation} from '../redux/LocationReducer';
+import {setReports} from '../redux/ReportReducer';
+import {setToken} from '../redux/TokenReducer';
+import {useDispatch} from 'react-redux';
 
 enableScreens();
 
@@ -98,7 +99,7 @@ const LoadingScreen = ({navigation, route}: any) => {
               channelID: 'ZegoUIKit',
               channelName: 'ZegoUIKit',
             },
-            avatarBuilder: ({userInfo}) => {
+            avatarBuilder: () => {
               return (
                 <View style={{width: '100%', height: '100%'}}>
                   <Image
@@ -131,7 +132,7 @@ const LoadingScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     dispatch(setToken(token));
-    ZIMKit.init(ZEGO_APP_ID, ZEGO_APP_SIGN);
+    ZIMKit.init(parseInt(ZEGO_APP_ID || '0', 10), ZEGO_APP_SIGN);
     const checkPermissions = async () => {
       try {
         const cameraGranted = await PermissionsAndroid.check(

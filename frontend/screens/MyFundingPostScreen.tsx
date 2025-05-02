@@ -1,17 +1,18 @@
+import {Button, IconButton} from 'react-native-paper';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
-import {useSharedValue} from 'react-native-reanimated';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {getOrganizationPostOfUser} from '../api/OrganizationPostApi';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {
   clearMyFundingPosts,
   setMyFundingPosts,
 } from '../redux/OrganizationPostReducer';
-import {OrganizationPost} from '../components/ui/OrganizationPost';
+import {useDispatch, useSelector} from 'react-redux';
+
 import Colors from '../global/Color';
-import {Button, IconButton} from 'react-native-paper';
+import {OrganizationPost} from '../components/ui/OrganizationPost';
+import {RootState} from '../redux/Store';
+import {getOrganizationPostOfUser} from '../api/OrganizationPostApi';
+import {useSharedValue} from 'react-native-reanimated';
 
 export const MyFundingPostScreen = ({navigation}: any) => {
   const FundingPostData = useSelector(

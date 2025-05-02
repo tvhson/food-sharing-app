@@ -1,11 +1,14 @@
-/* eslint-disable react-native/no-inline-styles */
-import {Avatar, Icon} from '@rneui/themed';
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {moderateScale, scale, verticalScale} from '../../utils/scale';
+
 import Colors from '../../global/Color';
+import {Icon} from '@rneui/themed';
+/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
 import {getFontFamily} from '../../utils/fonts';
 import {useSelector} from 'react-redux';
-import {RootState} from '../../redux/Store';
 
 const HeaderHome = (props: any) => {
   const {navigation} = props;
@@ -17,27 +20,48 @@ const HeaderHome = (props: any) => {
     <View style={styles.container}>
       <Text style={styles.title}>Happy Food</Text>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(Route.MapView);
+          }}
+          style={{
+            width: scale(24),
+            height: verticalScale(24),
+            marginRight: scale(20),
+          }}>
+          <Icon
+            name="map-marked-alt"
+            type="font-awesome-5"
+            size={24}
+            color={Colors.black}
+          />
+        </TouchableOpacity>
         {/* <TouchableOpacity>
           <Image
             source={require('../../assets/images/search.png')}
-            style={{width: 24, height: 24, marginRight: 20}}
+            style={{
+              width: scale(24),
+              height: verticalScale(24),
+              marginRight: scale(20),
+            }}
           />
         </TouchableOpacity> */}
+
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('Chat');
+            navigation.navigate(Route.Chat);
           }}>
           <Image
             source={require('../../assets/images/chat.png')}
-            style={{width: 24, height: 24}}
+            style={{width: scale(24), height: verticalScale(24)}}
           />
           {numberOfUnreadChat > 0 ? (
             <View
               style={{
                 position: 'absolute',
                 backgroundColor: 'red',
-                width: 12,
-                height: 12,
+                width: scale(12),
+                height: verticalScale(12),
                 top: 0,
                 right: 0,
                 alignItems: 'center',
@@ -56,13 +80,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    padding: 10,
-    height: 50,
+    padding: scale(10),
+    height: verticalScale(50),
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: 'bold',
     color: Colors.greenText,
     fontFamily: getFontFamily('bold'),

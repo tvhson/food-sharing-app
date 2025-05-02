@@ -1,23 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  Image,
-  Text,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {
-  Button,
-  Dialog,
-  Icon,
-  Menu,
-  Portal,
-  RadioButton,
-} from 'react-native-paper';
 import Animated, {
   Easing,
   useAnimatedReaction,
@@ -27,12 +7,34 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {snapPoint} from 'react-native-redash';
-import {RootState} from '../../redux/Store';
+import {
+  Button,
+  Dialog,
+  Icon,
+  Menu,
+  Portal,
+  RadioButton,
+} from 'react-native-paper';
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {deleteOrganizationPost} from '../../api/OrganizationPostApi';
+
+import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
 import {deleteMyFundingPost} from '../../redux/OrganizationPostReducer';
+import {deleteOrganizationPost} from '../../api/OrganizationPostApi';
 import {reportPost} from '../../api/PostApi';
+import {snapPoint} from 'react-native-redash';
 
 const {width: wWidth, height} = Dimensions.get('window');
 
@@ -179,7 +181,7 @@ export const OrganizationPost = ({
             onLongPress={event => handleOnLongPress(event)}
             activeOpacity={1}
             onPress={() => {
-              navigation.navigate('OrganizationPostDetail', {item: item});
+              navigation.navigate(Route.OrganizationPostDetail, {item: item});
             }}>
             <Portal>
               <Dialog
@@ -297,7 +299,7 @@ export const OrganizationPost = ({
                   <Menu.Item
                     onPress={() => {
                       setVisible(false);
-                      navigation.navigate('EditFundingPost', {
+                      navigation.navigate(Route.EditFundingPost, {
                         item: item,
                       });
                     }}

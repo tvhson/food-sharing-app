@@ -1,17 +1,19 @@
+import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
+import {Icon, Image} from '@rneui/themed';
+import React, {useEffect, useState} from 'react';
 /* eslint-disable react-native/no-inline-styles */
 import {Text, TextInput, TouchableWithoutFeedback, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Icon, Image} from '@rneui/themed';
-import Colors from '../../global/Color';
-import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../redux/Store';
 import {deletePost, reportPost} from '../../api/PostApi';
+import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../../global/Color';
+import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
 import {deleteMyPost} from '../../redux/SharingPostReducer';
 
 const PostRenderItem = ({item, navigation, location, distance}: any) => {
   const handleOnPress = () => {
-    navigation.navigate('PostDetail', {item, location});
+    navigation.navigate(Route.PostDetail, {item, location});
   };
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -196,7 +198,7 @@ const PostRenderItem = ({item, navigation, location, distance}: any) => {
               <Menu.Item
                 onPress={() => {
                   setVisible(false);
-                  navigation.navigate('EditPost', {
+                  navigation.navigate(Route.EditPost, {
                     location: location,
                     accessToken: accessToken,
                     item: item,

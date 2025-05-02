@@ -1,16 +1,18 @@
-/* eslint-disable react-native/no-inline-styles */
-import React from 'react';
 import {
-  View,
-  StyleSheet,
   Image,
+  StyleSheet,
   Text,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
+
 import Colors from '../../global/Color';
-import {useSelector} from 'react-redux';
+/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
 import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
 import {getFontFamily} from '../../utils/fonts';
+import {useSelector} from 'react-redux';
 
 const ChatRoomItem = ({item, navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -68,7 +70,7 @@ const ChatRoomItem = ({item, navigation}: any) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        navigation.navigate('ChatRoom', {item});
+        navigation.navigate(Route.ChatRoom, {item});
       }}>
       <View
         style={{

@@ -7,13 +7,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
-import {Icon} from 'react-native-paper';
+
 import Colors from '../../global/Color';
-import {getFontFamily} from '../../utils/fonts';
-import {attendOrganizationPost} from '../../api/OrganizationPostApi';
-import {useSelector} from 'react-redux';
+import {Icon} from 'react-native-paper';
+import React from 'react';
 import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
+import {attendOrganizationPost} from '../../api/OrganizationPostApi';
+import {getFontFamily} from '../../utils/fonts';
+import {useSelector} from 'react-redux';
 
 const screenWidth = Dimensions.get('window').width;
 const OrganizationPost2 = (props: any) => {
@@ -41,7 +43,7 @@ const OrganizationPost2 = (props: any) => {
     }
   };
   const handleNavigateToDetail = () => {
-    navigation.navigate('OrganizationPostDetail2', {
+    navigation.navigate(Route.OrganizationPostDetail2, {
       item,
       isJoin,
       peopleAttended,

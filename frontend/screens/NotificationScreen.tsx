@@ -36,7 +36,6 @@ const NotificationScreen = ({navigation}: any) => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   const renderLoader = () => {
@@ -46,9 +45,7 @@ const NotificationScreen = ({navigation}: any) => {
       </View>
     ) : null;
   };
-  const loadMoreItem = () => {
-    setCurrentPage(currentPage + 1);
-  };
+
   const onRefresh = () => {
     const saveNotifications = async () => {
       if (accessToken) {
@@ -70,7 +67,6 @@ const NotificationScreen = ({navigation}: any) => {
     setRefreshing(true);
     dispatch(clearNotifications());
     saveNotifications();
-    setCurrentPage(0);
     setRefreshing(false);
   };
 
@@ -152,12 +148,6 @@ const NotificationScreen = ({navigation}: any) => {
             />
           );
         }}
-        onEndReached={() => {
-          if (!isLoading) {
-            loadMoreItem();
-          }
-        }}
-        onEndReachedThreshold={0}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

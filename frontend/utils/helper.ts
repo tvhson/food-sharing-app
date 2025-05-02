@@ -75,7 +75,13 @@ export const calculateExpiredDate = (expiredDate: Date) => {
 
   return 'Hết hạn';
 };
-export const calculateDistance = (item: any, location: any) => {
+export const calculateDistance = (
+  item: {
+    latitude: number;
+    longitude: number;
+  },
+  location: {latitude: number; longitude: number},
+) => {
   if (location && location.latitude && location.longitude) {
     return (
       getDistance(

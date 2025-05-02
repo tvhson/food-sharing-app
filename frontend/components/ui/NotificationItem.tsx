@@ -1,27 +1,23 @@
+import {Image, Text, TouchableWithoutFeedback, View} from 'react-native';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {
-  View,
-  Image,
-  Text,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-} from 'react-native';
-import Colors from '../../global/Color';
-import {Button} from '@rneui/themed';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../redux/Store';
-import {
-  createNotification,
-  updateNotification,
-} from '../../api/NotificationApi';
-import {updateNotificationAfter} from '../../redux/NotificationReducer';
-import {confirmReceiveFood, updatePost} from '../../api/PostApi';
 import {
   calculateDistance,
   calculateExpiredDate,
   timeAgo,
 } from '../../utils/helper';
+import {confirmReceiveFood, updatePost} from '../../api/PostApi';
+import {
+  createNotification,
+  updateNotification,
+} from '../../api/NotificationApi';
+import {useDispatch, useSelector} from 'react-redux';
+
+import {Button} from '@rneui/themed';
+import Colors from '../../global/Color';
+import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
+import {updateNotificationAfter} from '../../redux/NotificationReducer';
 
 const NotificationItem = ({
   item,
@@ -47,7 +43,7 @@ const NotificationItem = ({
         if (!roomChat) {
           return;
         }
-        navigation.navigate('ChatRoom', {item: roomChat});
+        navigation.navigate(Route.ChatRoom, {item: roomChat});
       };
     } else if (item.type === 'RATING') {
       setSelectedItem(item);
@@ -57,7 +53,7 @@ const NotificationItem = ({
         if (!postDetail) {
           return;
         }
-        navigation.navigate('PostDetail2', {
+        navigation.navigate(Route.PostDetail2, {
           item: postDetail,
           location,
           createdDate: timeAgo(postDetail.createdDate),

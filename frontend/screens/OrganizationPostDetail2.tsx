@@ -11,21 +11,21 @@ import {
   View,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {Icon} from 'react-native-paper';
-import Colors from '../global/Color';
-import {getFontFamily} from '../utils/fonts';
-
-import {Linking} from 'react-native';
 import {
   attendOrganizationPost,
   createCommentToOrganizationPost,
   getCommentByOrganizationPostId,
   getOrganizationPostById,
 } from '../api/OrganizationPostApi';
-import {useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {useNotifications} from 'react-native-notificated';
+
+import Colors from '../global/Color';
 import CommentItem from '../components/ui/CommentItem';
+import {Icon} from 'react-native-paper';
+import {Linking} from 'react-native';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {useNotifications} from 'react-native-notificated';
+import {useSelector} from 'react-redux';
 
 const OrganizationPostDetail2 = (props: any) => {
   const {navigation} = props;

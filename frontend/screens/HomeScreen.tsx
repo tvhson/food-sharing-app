@@ -1,22 +1,23 @@
+import {Button, Icon, Image, SearchBar} from '@rneui/themed';
+import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {View, FlatList, TouchableOpacity, RefreshControl} from 'react-native';
-import Colors from '../global/Color';
-import {Button, Icon, Image, SearchBar} from '@rneui/themed';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createNotifications} from 'react-native-notificated';
-import {getPosts} from '../api/PostApi';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
 import {clearSharingPosts, pushSharingPost} from '../redux/SharingPostReducer';
+import {useDispatch, useSelector} from 'react-redux';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Colors from '../global/Color';
+import Comment from '../components/ui/Comment';
+import HeaderHome from '../components/ui/HeaderHome';
 import {Menu} from 'react-native-paper';
+import PostRenderItem2 from '../components/ui/PostRenderItem2';
+import {RootState} from '../redux/Store';
+import {calculateDistance} from '../utils/helper';
+import {createNotifications} from 'react-native-notificated';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
-import HeaderHome from '../components/ui/HeaderHome';
-import PostRenderItem2 from '../components/ui/PostRenderItem2';
-import Comment from '../components/ui/Comment';
-import {calculateDistance} from '../utils/helper';
+import {getPosts} from '../api/PostApi';
 
 const {useNotifications} = createNotifications();
 
@@ -30,7 +31,6 @@ const HomeScreen = ({navigation}: any) => {
   const [recommendPost, setRecommendPost] = useState<any>(null);
   const {notify} = useNotifications();
   const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<any>(null);
@@ -46,10 +46,6 @@ const HomeScreen = ({navigation}: any) => {
 
   const updateSearch = (search: any) => {
     setSearch(search);
-  };
-
-  const loadMoreItem = () => {
-    setCurrentPage(currentPage + 1);
   };
 
   const onRefresh = async () => {
@@ -74,7 +70,6 @@ const HomeScreen = ({navigation}: any) => {
           });
         }
       }
-      setCurrentPage(0);
       setIsLoading(false);
       setRefreshing(false);
     };
@@ -204,8 +199,6 @@ const HomeScreen = ({navigation}: any) => {
         style={{marginHorizontal: 8}}
         data={filterPosts ?? recommendPost} // Fallback if `filterPosts` is empty
         keyExtractor={item => item.id}
-        onEndReached={loadMoreItem}
-        onEndReachedThreshold={0.1}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

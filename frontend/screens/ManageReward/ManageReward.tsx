@@ -1,23 +1,23 @@
+import {Button, Icon} from 'react-native-paper';
 /* eslint-disable react-native/no-inline-styles */
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
   FlatList,
+  Image,
   RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import React, {useEffect} from 'react';
-import {Button, Icon} from 'react-native-paper';
-import Colors from '../../global/Color';
-import {getFontFamily} from '../../utils/fonts';
-import RewardItem from '../../components/ui/ExchangePageUI/RewardItem';
 
-import {getRewards} from '../../api/LoyaltyApi';
-import {useSelector} from 'react-redux';
-import {useLoading} from '../../utils/LoadingContext';
+import Colors from '../../global/Color';
+import RewardItem from '../../components/ui/ExchangePageUI/RewardItem';
 import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
+import {getRewards} from '../../api/LoyaltyApi';
+import {useLoading} from '../../utils/LoadingContext';
+import {useSelector} from 'react-redux';
 
 const ManageReward = ({navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();

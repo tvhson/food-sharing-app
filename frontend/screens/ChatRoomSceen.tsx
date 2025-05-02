@@ -1,8 +1,9 @@
+import {Avatar, Icon, IconButton} from 'react-native-paper';
+import {Bubble, GiftedChat, InputToolbar, Send} from 'react-native-gifted-chat';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
-import {Bubble, GiftedChat, InputToolbar, Send} from 'react-native-gifted-chat';
 import {
   connectMessage,
   disconnectMessage,
@@ -11,21 +12,21 @@ import {
   readAllMessagesOfRoom,
   sendMessage,
 } from '../api/ChatApi';
-import Colors from '../global/Color';
-import {Avatar, Icon, IconButton} from 'react-native-paper';
-import {BackHandler} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+
+import {BackHandler} from 'react-native';
+import Colors from '../global/Color';
 import {RootState} from '../redux/Store';
-import {createNotification} from '../api/NotificationApi';
-import {useFocusEffect} from '@react-navigation/native';
-import {readAllMessageOfRoomChatId} from '../redux/ChatRoomReducer';
 import {ZegoSendCallInvitationButton} from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import {getFontFamily} from '../utils/fonts';
+import analytics from '@react-native-firebase/analytics';
+import {createNotification} from '../api/NotificationApi';
 import dayjs from 'dayjs';
 import dayvi from 'dayjs/locale/vi';
-import analytics from '@react-native-firebase/analytics';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {getFontFamily} from '../utils/fonts';
+import {readAllMessageOfRoomChatId} from '../redux/ChatRoomReducer';
+import {useFocusEffect} from '@react-navigation/native';
 import {useLoading} from '../utils/LoadingContext';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 dayjs.locale('vi');
 

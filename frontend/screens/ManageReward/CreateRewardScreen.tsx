@@ -1,25 +1,25 @@
+import {FormProvider, useFieldArray, useForm} from 'react-hook-form';
+import {IReward, createRewards} from '../../api/LoyaltyApi';
 /* eslint-disable react-native/no-inline-styles */
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import React from 'react';
-import {Icon} from 'react-native-paper';
-import {getFontFamily} from '../../utils/fonts';
 
 import Colors from '../../global/Color';
-import {useForm, useFieldArray, FormProvider} from 'react-hook-form';
 import CreateRewardItem from '../../components/ui/ExchangePageUI/CreateRewardItem';
-import {useNotifications} from 'react-native-notificated';
-import UploadPhoto from '../../components/ui/UploadPhoto';
-import {uploadPhoto} from '../../api/UploadPhotoApi';
+import {Icon} from 'react-native-paper';
+import React from 'react';
 import {RootState} from '../../redux/Store';
-import {useSelector} from 'react-redux';
-import {createRewards, IReward} from '../../api/LoyaltyApi';
+import UploadPhoto from '../../components/ui/UploadPhoto';
+import {getFontFamily} from '../../utils/fonts';
+import {uploadPhoto} from '../../api/UploadPhotoApi';
 import {useLoading} from '../../utils/LoadingContext';
+import {useNotifications} from 'react-native-notificated';
+import {useSelector} from 'react-redux';
 
 export type RewardList = {
   rewards: IReward[];
@@ -61,7 +61,7 @@ const CreateRewardScreen = ({navigation}: any) => {
     }
   };
 
-  const onError = (errors: any) => {
+  const onError = () => {
     notify('error', {
       params: {description: 'Vui lòng điền đầy đủ thông tin', title: 'Lỗi'},
     });
