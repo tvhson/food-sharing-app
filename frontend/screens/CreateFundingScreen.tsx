@@ -1,29 +1,30 @@
+import {Button, Icon, Image} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  View,
+  ScrollView,
   Text,
   TextInput,
-  ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import Colors from '../global/Color';
-import {Button, Icon, Image} from '@rneui/themed';
-import MAP_API_KEY from '../components/data/SecretData';
-import UploadPhoto from '../components/ui/UploadPhoto';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {uploadPhoto} from '../api/UploadPhotoApi';
-import {createNotifications} from 'react-native-notificated';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {createOrganizationPost} from '../api/OrganizationPostApi';
 import {
   addToTheEndOfFundingPost,
   pushFundingPost,
   pushMyFundingPost,
 } from '../redux/OrganizationPostReducer';
+import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../global/Color';
 import {DatePickerInput} from 'react-native-paper-dates';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import MAP_API_KEY from '@env';
+import {RootState} from '../redux/Store';
+import UploadPhoto from '../components/ui/UploadPhoto';
+import {createNotifications} from 'react-native-notificated';
+import {createOrganizationPost} from '../api/OrganizationPostApi';
 import {getFontFamily} from '../utils/fonts';
+import {uploadPhoto} from '../api/UploadPhotoApi';
 
 const {useNotifications} = createNotifications();
 

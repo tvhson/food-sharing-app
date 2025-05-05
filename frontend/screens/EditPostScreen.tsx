@@ -1,27 +1,28 @@
+import {Button, Icon} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  View,
+  ScrollView,
   Text,
   TextInput,
-  ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
+
 import Colors from '../global/Color';
-import {Button, Icon} from '@rneui/themed';
-import MAP_API_KEY from '../components/data/SecretData';
-import axios from 'axios';
-import UploadPhoto from '../components/ui/UploadPhoto';
 import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {uploadPhoto} from '../api/UploadPhotoApi';
-import {createNotifications} from 'react-native-notificated';
-import {updatePost} from '../api/PostApi';
-import {useDispatch} from 'react-redux';
-import {updateMyPost} from '../redux/SharingPostReducer';
 import ImageSwiper from '../components/ui/ImageSwiper';
-import screenWidth from '../global/Constant';
+import MAP_API_KEY from '@env';
+import UploadPhoto from '../components/ui/UploadPhoto';
+import axios from 'axios';
+import {createNotifications} from 'react-native-notificated';
 import {getFontFamily} from '../utils/fonts';
+import screenWidth from '../global/Constant';
+import {updateMyPost} from '../redux/SharingPostReducer';
+import {updatePost} from '../api/PostApi';
+import {uploadPhoto} from '../api/UploadPhotoApi';
+import {useDispatch} from 'react-redux';
 import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();

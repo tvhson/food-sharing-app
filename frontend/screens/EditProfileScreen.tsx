@@ -1,25 +1,26 @@
-/* eslint-disable react-native/no-inline-styles */
-import {Icon} from '@rneui/themed';
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import Modal from 'react-native-modal';
-import MAP_API_KEY from '../components/data/SecretData';
-import {updateUser} from '../api/AccountsApi';
-import {createNotifications} from 'react-native-notificated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {DatePickerInput} from 'react-native-paper-dates';
 import {UserInfo, saveUser} from '../redux/UserReducer';
-import {useDispatch} from 'react-redux';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../global/Color';
+import {DatePickerInput} from 'react-native-paper-dates';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+/* eslint-disable react-native/no-inline-styles */
+import {Icon} from '@rneui/themed';
+import MAP_API_KEY from '@env';
+import Modal from 'react-native-modal';
+import {createNotifications} from 'react-native-notificated';
 import {getFontFamily} from '../utils/fonts';
+import {updateUser} from '../api/AccountsApi';
+import {useDispatch} from 'react-redux';
 
 const {useNotifications, ModalNotificationsProvider} = createNotifications();
 function EditProfileScreen(props: any) {

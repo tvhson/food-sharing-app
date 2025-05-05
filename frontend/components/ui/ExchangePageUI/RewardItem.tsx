@@ -1,32 +1,33 @@
-/* eslint-disable react-native/no-inline-styles */
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import React, {useRef, useState} from 'react';
-import {Image} from '@rneui/themed';
 import {Button, Dialog, Icon, Menu, Portal} from 'react-native-paper';
-import Colors from '../../../global/Color';
-import {getFontFamily} from '../../../utils/fonts';
+import {FormProvider, useForm} from 'react-hook-form';
 import {
-  deleteReward,
   IReward,
+  deleteReward,
   redeemPoint,
   updateReward,
 } from '../../../api/LoyaltyApi';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../../redux/Store';
-import MAP_API_KEY from '../../data/SecretData';
-import axios from 'axios';
-import {useNotifications} from 'react-native-notificated';
-import UploadPhoto from '../UploadPhoto';
-import {uploadPhoto} from '../../../api/UploadPhotoApi';
-import {FormProvider, useForm} from 'react-hook-form';
+import React, {useRef, useState} from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+
+import Colors from '../../../global/Color';
 import EditRewardItem from './EditRewardItem';
+import {Image} from '@rneui/themed';
+import MAP_API_KEY from '@env';
+import {RootState} from '../../../redux/Store';
+import UploadPhoto from '../UploadPhoto';
+import axios from 'axios';
+import {getFontFamily} from '../../../utils/fonts';
 import screenWidth from '../../../global/Constant';
+import {uploadPhoto} from '../../../api/UploadPhotoApi';
+import {useNotifications} from 'react-native-notificated';
+import {useSelector} from 'react-redux';
 
 const RewardItem = (props: {
   id: number;
