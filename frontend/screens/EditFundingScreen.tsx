@@ -21,7 +21,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../global/Color';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import MAP_API_KEY from '@env';
+import {MAP_API_KEY} from '@env';
 import {RootState} from '../redux/Store';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {createNotifications} from 'react-native-notificated';

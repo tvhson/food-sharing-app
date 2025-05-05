@@ -19,7 +19,7 @@ import {
 import Colors from '../../../global/Color';
 import EditRewardItem from './EditRewardItem';
 import {Image} from '@rneui/themed';
-import MAP_API_KEY from '@env';
+import {MAP_API_KEY} from '@env';
 import {RootState} from '../../../redux/Store';
 import UploadPhoto from '../UploadPhoto';
 import axios from 'axios';

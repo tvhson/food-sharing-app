@@ -15,7 +15,7 @@ import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 /* eslint-disable react-native/no-inline-styles */
 import {Icon} from '@rneui/themed';
-import MAP_API_KEY from '@env';
+import {MAP_API_KEY} from '@env';
 import Modal from 'react-native-modal';
 import {createNotifications} from 'react-native-notificated';
 import {getFontFamily} from '../utils/fonts';

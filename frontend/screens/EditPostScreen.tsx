@@ -13,7 +13,7 @@ import Colors from '../global/Color';
 import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import ImageSwiper from '../components/ui/ImageSwiper';
-import MAP_API_KEY from '@env';
+import {MAP_API_KEY} from '@env';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import axios from 'axios';
 import {createNotifications} from 'react-native-notificated';
