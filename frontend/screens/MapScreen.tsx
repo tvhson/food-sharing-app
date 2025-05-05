@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import {Button, Icon} from 'react-native-paper';
+import {Button, Checkbox, Icon, Menu} from 'react-native-paper';
 /* eslint-disable react/self-closing-comp */
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {moderateScale, scale, verticalScale} from '../utils/scale';
 
 import Colors from '../global/Color';
@@ -21,22 +21,32 @@ const dummyLocations = [
   {id: 2, title: 'Place B', latitude: 34, longitude: -123},
   {id: 3, title: 'Place C', latitude: 35, longitude: -121},
 ];
+
+const listFilter = [
+  {id: 1, title: 'Khoảng cách < 2km', value: '<2'},
+  {id: 2, title: 'Khoảng cách từ 2 đến 5km', value: '2-5'},
+  {id: 3, title: 'Khoảng cách > 5km', value: '>5'},
+  {id: 4, title: 'Tất cả', value: 'all'},
+];
 const {useNotifications} = createNotifications();
 
-const MapScreen = () => {
+const MapScreen = ({navigation}: any) => {
   const location = useSelector((state: RootState) => state.location);
   const {notify} = useNotifications();
+  const markerRef = useRef<any>(null);
 
-  const [filter, setFilter] = useState<'<2' | '2-5' | '>5' | null>(null);
+  const [filter, setFilter] = useState<string>();
+  const [visible, setVisible] = useState(false);
 
-  const filteredMarkers = dummyLocations.filter(place => {
-    const distance = calculateDistance(place, location);
-
-    if (filter === '<2') return distance < 2;
-    if (filter === '2-5') return distance >= 2 && distance <= 5;
-    if (filter === '>5') return distance > 5;
-    return true;
-  });
+  const filteredMarkers = useMemo(() => {
+    return dummyLocations.filter(place => {
+      const distance = calculateDistance(place, location);
+      if (filter === '<2') return distance < 2;
+      if (filter === '2-5') return distance >= 2 && distance <= 5;
+      if (filter === '>5') return distance > 5;
+      return true;
+    });
+  }, [filter, location]);
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
@@ -45,8 +55,11 @@ const MapScreen = () => {
     if (filteredMarkers.length === 0) {
       notify('error', {
         params: {
-          description: 'No markers found in the selected range',
-          title: 'Error',
+          description: 'Không tìm thấy địa điểm nào trong khu vực này',
+          title: 'Thông báo',
+          style: {
+            multiline: 100,
+          },
         },
       });
       return;
@@ -76,20 +89,59 @@ const MapScreen = () => {
         1000,
       );
     }
-  }, [filter]);
+    if (markerRef.current) {
+      markerRef.current.showCallout();
+    }
+  }, [filter, mapRef]);
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Happy Food</Text>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <TouchableOpacity
-            style={{
-              width: scale(24),
-              height: verticalScale(24),
-              marginRight: scale(20),
-            }}></TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={handleBack}>
+          <Icon source={'arrow-left'} size={25} color={Colors.white} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Tìm kiếm đồ ăn gần bạn</Text>
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          contentStyle={{backgroundColor: 'white'}}
+          anchor={
+            <TouchableOpacity onPress={openMenu}>
+              <Icon source={'filter-variant'} size={24} color={'white'} />
+            </TouchableOpacity>
+          }>
+          {listFilter.map(item => (
+            <Menu.Item
+              key={item.id}
+              onPress={() => {
+                setFilter(item.value);
+                setVisible(false);
+              }}
+              title={
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Checkbox
+                    color={Colors.greenText}
+                    status={filter === item.value ? 'checked' : 'unchecked'}
+                  />
+                  <Text
+                    style={{
+                      color: Colors.black,
+                      marginLeft: scale(8),
+                      fontFamily: getFontFamily('regular'),
+                    }}>
+                    {item.title}
+                  </Text>
+                </View>
+              }
+            />
+          ))}
+        </Menu>
       </View>
       <MapView
         ref={mapRef}
@@ -102,6 +154,7 @@ const MapScreen = () => {
           longitudeDelta: 0.0121,
         }}>
         <Marker
+          ref={markerRef}
           coordinate={{
             latitude: location.latitude,
             longitude: location.longitude,
@@ -112,32 +165,6 @@ const MapScreen = () => {
           <CustomMarker key={marker.id} marker={marker} />
         ))}
       </MapView>
-      <View style={styles.filterContainer}>
-        <Button
-          mode="contained"
-          onPress={() => setFilter('<2')}
-          style={{margin: 5}}>
-          <Text>{'Distance < 2km'}</Text>
-        </Button>
-        <Button
-          mode="contained"
-          onPress={() => setFilter('2-5')}
-          style={{margin: 5}}>
-          <Text>{'Distance 2-5km'}</Text>
-        </Button>
-        <Button
-          mode="contained"
-          onPress={() => setFilter('>5')}
-          style={{margin: 5}}>
-          <Text>{'Distance > 5km'}</Text>
-        </Button>
-        <Button
-          mode="contained"
-          onPress={() => setFilter(null)}
-          style={{margin: 5}}>
-          <Text>Reset</Text>
-        </Button>
-      </View>
     </View>
   );
 };
@@ -166,7 +193,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: Colors.greenText,
     padding: scale(10),
     height: verticalScale(50),
     justifyContent: 'space-between',
@@ -175,7 +202,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: moderateScale(24),
     fontWeight: 'bold',
-    color: Colors.greenText,
+    color: Colors.white,
     fontFamily: getFontFamily('bold'),
+  },
+  floatBtn: {
+    position: 'absolute',
+    left: 10,
+    zIndex: 100,
   },
 });

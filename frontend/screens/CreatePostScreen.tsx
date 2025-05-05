@@ -1,31 +1,32 @@
+import {Button, Icon, Image} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  View,
+  ScrollView,
   Text,
   TextInput,
-  ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+
+import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
 import Colors from '../global/Color';
-import {Button, Icon, Image} from '@rneui/themed';
-import MAP_API_KEY from '../components/data/SecretData';
-import axios from 'axios';
-import UploadPhoto from '../components/ui/UploadPhoto';
 import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import {uploadPhoto} from '../api/UploadPhotoApi';
+import ImageSwiper from '../components/ui/ImageSwiper';
+import {MAP_API_KEY} from '@env';
+import {RootState} from '../redux/Store';
+import UploadPhoto from '../components/ui/UploadPhoto';
+import axios from 'axios';
 import {createNotifications} from 'react-native-notificated';
 import {createPost} from '../api/PostApi';
-import {useDispatch, useSelector} from 'react-redux';
-import {pushMyPost} from '../redux/SharingPostReducer';
-import {getFontFamily} from '../utils/fonts';
-import ImageSwiper from '../components/ui/ImageSwiper';
-import screenWidth from '../global/Constant';
-import {useLoading} from '../utils/LoadingContext';
-import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
 import {earnPoint} from '../api/LoyaltyApi';
-import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {pushMyPost} from '../redux/SharingPostReducer';
+import screenWidth from '../global/Constant';
+import {uploadPhoto} from '../api/UploadPhotoApi';
+import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();
 
@@ -55,6 +56,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const [pickUpEndDate, setPickUpEndDate] = useState(new Date());
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
+  console.log('MAP_API_KEY', MAP_API_KEY);
 
   const autocompleteRef = useRef<any | null>(null);
 

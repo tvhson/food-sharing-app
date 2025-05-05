@@ -4,7 +4,7 @@ import * as ZPNs from 'zego-zpns-react-native';
 import {Image, PermissionsAndroid, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {UserInfo, saveUser} from '../redux/UserReducer';
-import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '../components/data/SecretData';
+import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '@env';
 import {
   addNotification,
   countNumberOfUnread,
