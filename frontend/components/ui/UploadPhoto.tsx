@@ -1,18 +1,13 @@
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+
+import Colors from '../../global/Color';
+import ImagePicker from 'react-native-image-crop-picker';
+import Modal from 'react-native-modal';
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Modal from 'react-native-modal';
-import ImagePicker from 'react-native-image-crop-picker';
-import Colors from '../../global/Color';
 import {createNotifications} from 'react-native-notificated';
 import {getFontFamily} from '../../utils/fonts';
+
 const {useNotifications} = createNotifications();
 
 function UploadPhoto(props: any) {
@@ -30,7 +25,7 @@ function UploadPhoto(props: any) {
     })
       .then(image => {
         props.postImage(image);
-        // console.log(image);
+        console.log(image);
         // props.setPhoto(image.path);
       })
       .catch(() => {
@@ -51,9 +46,10 @@ function UploadPhoto(props: any) {
         waitAnimationEnd: false,
         compressImageQuality: 1,
         multiple: true,
-        maxFiles: 10,
+        maxFiles: 5,
         cropping: true,
         cropperCircleOverlay: props.isCircle,
+        cropperToolbarTitle: 'Chỉnh sửa ảnh',
       })
         .then(images => {
           props.postImage(images);

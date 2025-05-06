@@ -1,28 +1,29 @@
+import {
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {Icon, SearchBar} from '@rneui/themed';
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {getOrganizationPost} from '../api/OrganizationPostApi';
-import {
   clearFundingPosts,
   pushFundingPost,
 } from '../redux/OrganizationPostReducer';
+import {useDispatch, useSelector} from 'react-redux';
+
 import Colors from '../global/Color';
+import HeaderHome from '../components/ui/HeaderHome';
 import {Menu} from 'react-native-paper';
 import OrganizationPost2 from '../components/ui/OrganizationPost2';
-import {Icon, SearchBar} from '@rneui/themed';
-import HeaderHome from '../components/ui/HeaderHome';
-import {getFontFamily} from '../utils/fonts';
-import {useNotifications} from 'react-native-notificated';
+import {RootState} from '../redux/Store';
 import getDistance from 'geolib/es/getDistance';
+import {getFontFamily} from '../utils/fonts';
+import {getOrganizationPost} from '../api/OrganizationPostApi';
+import {useNotifications} from 'react-native-notificated';
 
 export const FundingScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
@@ -38,10 +39,6 @@ export const FundingScreen = ({navigation}: any) => {
   const [filterPosts, setFilterPosts] = useState<any>(null);
   const [visible, setVisible] = useState(false);
   const [sortingMethod, setSortingMethod] = useState('');
-
-  const loadMoreItem = () => {
-    setCurrentPage(currentPage + 1);
-  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -64,7 +61,6 @@ export const FundingScreen = ({navigation}: any) => {
           });
         }
       }
-      setCurrentPage(0);
       setIsLoading(false);
       setRefreshing(false);
     };
@@ -204,29 +200,28 @@ export const FundingScreen = ({navigation}: any) => {
           <OrganizationPost2 navigation={navigation} item={item} />
         )}
         keyExtractor={item => item.organizationposts.id.toString()}
-        onEndReached={loadMoreItem}
-        onEndReachedThreshold={0.1}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListFooterComponent={<View style={{height: 16}} />}
+        ListHeaderComponent={
+          userInfo.role === 'ORGANIZATION' ? (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('CreateFundingPost', {location, token})
+              }
+              style={{
+                backgroundColor: Colors.button,
+                borderRadius: 100,
+                padding: 16,
+                alignSelf: 'flex-end',
+                margin: 16,
+              }}>
+              <Icon name="add" color="white" size={24} />
+            </TouchableOpacity>
+          ) : null
+        }
       />
-      {userInfo.role === 'ORGANIZATION' && (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('CreateFundingPost', {location, token})
-          }
-          style={{
-            position: 'absolute',
-            bottom: 16,
-            right: 16,
-            backgroundColor: Colors.button,
-            borderRadius: 100,
-            padding: 16,
-          }}>
-          <Icon name="add" color="white" size={24} />
-        </TouchableOpacity>
-      )}
     </View>
   );
 };

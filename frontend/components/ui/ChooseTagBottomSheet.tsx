@@ -1,26 +1,23 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import Modal from 'react-native-modal';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+
 import Colors from '../../global/Color';
-import {getFontFamily} from '../../utils/fonts';
+import Modal from 'react-native-modal';
+import React from 'react';
 import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
 import {useSelector} from 'react-redux';
 
 const ChooseTagBottomSheet = (props: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
+  const {isVisible, setVisible, setType, selectedType} = props;
 
-  const {isVisible, setVisible} = props;
+  const types = ['Chay', 'Mặn'];
 
-  const handleSave = () => {};
+  const handleSelect = (type: string) => {
+    setType(type);
+    setVisible(false);
+  };
 
   return (
     <Modal
@@ -39,19 +36,31 @@ const ChooseTagBottomSheet = (props: any) => {
       onSwipeComplete={() => setVisible(false)}
       propagateSwipe={true}>
       <View style={styles.modalContent}>
-        <TouchableOpacity style={{position: 'absolute', right: 25, top: 25}}>
-          <Text
-            style={{
-              color: Colors.greenPrimary,
-              fontFamily: getFontFamily('regular'),
-              fontSize: 20,
-            }}>
-            Lưu
-          </Text>
-        </TouchableOpacity>
         <View style={styles.barIcon} />
         <View style={{alignItems: 'center'}}>
           <Text style={styles.panelTitle}>Chọn loại thực phẩm</Text>
+        </View>
+
+        <View style={styles.optionContainer}>
+          {types.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.optionItem,
+                selectedType === item && styles.selectedOption,
+              ]}
+              onPress={() => handleSelect(item)}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color:
+                    selectedType === item ? Colors.greenPrimary : Colors.black,
+                  fontFamily: getFontFamily('medium'),
+                }}>
+                {item}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
     </Modal>
@@ -62,14 +71,17 @@ export default ChooseTagBottomSheet;
 
 const styles = StyleSheet.create({
   modal: {
+    justifyContent: 'flex-end',
     margin: 0,
   },
   modalContent: {
-    flex: 1,
     backgroundColor: '#fff',
     paddingTop: 12,
+    paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
+    minHeight: 100,
+    paddingBottom: 20,
     elevation: 5,
   },
   barIcon: {
@@ -84,5 +96,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: Colors.black,
     fontFamily: getFontFamily('bold'),
+  },
+  optionContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  optionItem: {
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  selectedOption: {
+    backgroundColor: '#f0f8f5',
   },
 });

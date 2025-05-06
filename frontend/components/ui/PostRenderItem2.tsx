@@ -1,16 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {getFontFamily} from '../../utils/fonts';
-import Colors from '../../global/Color';
 import {
   Button,
   Dialog,
@@ -19,14 +6,27 @@ import {
   Portal,
   RadioButton,
 } from 'react-native-paper';
-import ImageSwiper from './ImageSwiper';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../redux/Store';
-import {deletePost, likePost, reportPost} from '../../api/PostApi';
+/* eslint-disable react-native/no-inline-styles */
+import {
+  Dimensions,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {calculateExpiredDate, timeAgo} from '../../utils/helper';
 import {deleteMyPost, likePostReducer} from '../../redux/SharingPostReducer';
+import {deletePost, likePost, reportPost} from '../../api/PostApi';
+import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../../global/Color';
+import ImageSwiper from './ImageSwiper';
+import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
 import {getInfoUserById} from '../../api/AccountsApi';
 import {notify} from 'react-native-notificated';
-import {calculateExpiredDate, timeAgo} from '../../utils/helper';
 
 const PostRenderItem2 = (props: any) => {
   const {
@@ -36,6 +36,7 @@ const PostRenderItem2 = (props: any) => {
     navigation,
     distance,
     location,
+    setDetailPost,
   } = props;
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -533,7 +534,19 @@ const PostRenderItem2 = (props: any) => {
             alignSelf: 'center',
             pointerEvents: 'box-none',
           }}>
-          <ImageSwiper images={item.images} />
+          <ImageSwiper
+            images={item.images}
+            onPressImage={() => {
+              const detailPost = {
+                item,
+                user:
+                  item.createdById !== userInfo.id ? createPostUser : userInfo,
+                distance,
+              };
+
+              setDetailPost(detailPost);
+            }}
+          />
         </View>
         <View
           style={{flexDirection: 'row', alignItems: 'center', marginTop: 15}}>

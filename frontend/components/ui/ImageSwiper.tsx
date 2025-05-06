@@ -1,17 +1,18 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useState, useRef} from 'react';
 import {
-  View,
+  Dimensions,
   FlatList,
   Image,
-  Dimensions,
   StyleSheet,
   TouchableOpacity,
+  View,
 } from 'react-native';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useRef, useState} from 'react';
+
+import Colors from '../../global/Color';
+import {Icon} from '@rneui/themed';
 import {Text} from 'react-native-paper';
 import {getFontFamily} from '../../utils/fonts';
-import {Icon} from '@rneui/themed';
-import Colors from '../../global/Color';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -51,7 +52,13 @@ const ImageSwiper = (props: any) => {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           <View style={[styles.imageContainer, props.style]}>
-            <Image source={{uri: item.path || item}} style={styles.image} />
+            <TouchableOpacity
+              style={{flex: 1, width: '100%', height: '100%'}}
+              onPress={() => {
+                props.onPressImage && props.onPressImage();
+              }}>
+              <Image source={{uri: item.path || item}} style={styles.image} />
+            </TouchableOpacity>
           </View>
         )}
         onViewableItemsChanged={onViewRef.current}

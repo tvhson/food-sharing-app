@@ -8,6 +8,7 @@ import ChatRoomScreen from '../screens/ChatRoomSceen';
 import ChatScreen from '../screens/ChatScreen';
 import Colors from '../global/Color';
 import CreateFundingScreen from '../screens/CreateFundingScreen';
+import CreateGroupScreen from '../screens/CreateGroupScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
 import CreateRewardScreen from '../screens/ManageReward/CreateRewardScreen';
 import EditFundingScreen from '../screens/EditFundingScreen';
@@ -169,6 +170,7 @@ const Router = () => {
         />
         <Stack.Screen name={Route.ManageReward} component={ManageReward} />
         <Stack.Screen name={Route.MapView} component={MapScreen} />
+        <Stack.Screen name={Route.CreateGroup} component={CreateGroupScreen} />
         <Stack.Screen
           name={Route.ZegoUIKitPrebuiltCallWaitingScreen}
           component={ZegoUIKitPrebuiltCallWaitingScreen}

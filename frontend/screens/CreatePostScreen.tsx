@@ -44,6 +44,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const [description, setDescription] = useState('');
   const [portion, setPortion] = useState('');
   const [status, setStatus] = useState('');
+  const [type, setType] = useState('');
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude] = useState(
     location && location.latitude ? location.latitude : null,
@@ -56,7 +57,6 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const [pickUpEndDate, setPickUpEndDate] = useState(new Date());
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
-  console.log('MAP_API_KEY', MAP_API_KEY);
 
   const autocompleteRef = useRef<any | null>(null);
 
@@ -93,12 +93,15 @@ const CreatePostScreen = ({route, navigation}: any) => {
   };
 
   const postImage = async (newImages: any) => {
+    console.log('newImages', newImages);
+
+    // Ensure newImages is always an array
+    const imagesArray = Array.isArray(newImages) ? newImages : [newImages];
+
     setImageUpload((prevImages: any) => {
-      if (prevImages && prevImages.length > 0) {
-        return [...prevImages, ...newImages];
-      } else {
-        return newImages;
-      }
+      return prevImages && prevImages.length > 0
+        ? [...prevImages, ...imagesArray]
+        : imagesArray;
     });
   };
 
@@ -336,6 +339,33 @@ const CreatePostScreen = ({route, navigation}: any) => {
           onChangeText={setPortion}
           keyboardType="numeric"
         />
+
+        <TouchableOpacity
+          onPress={() => {
+            setIsTagVisible(true);
+          }}
+          style={{
+            padding: 10,
+            paddingVertical: 13,
+            backgroundColor: '#eff2ff',
+            borderRadius: 8,
+            width: '90%',
+            borderWidth: 2,
+            marginTop: 20,
+            borderColor: Colors.greenPrimary,
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: type === '' ? '#706d6d' : 'black',
+              fontFamily: getFontFamily('regular'),
+            }}>
+            {type === '' ? 'Loại thực phẩm' : type}
+          </Text>
+          <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
+        </TouchableOpacity>
         {/* <TouchableOpacity
           style={{width: '90%'}}
           onPress={() => {
@@ -573,6 +603,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
       <ChooseTagBottomSheet
         isVisible={isTagVisible}
         setVisible={setIsTagVisible}
+        setType={setType}
       />
     </ScrollView>
   );

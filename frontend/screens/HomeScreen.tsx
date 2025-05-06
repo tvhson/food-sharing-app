@@ -10,14 +10,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../global/Color';
 import Comment from '../components/ui/Comment';
 import HeaderHome from '../components/ui/HeaderHome';
+import ImageDetailModal from '../components/ui/ImageDetailModal';
 import {Menu} from 'react-native-paper';
 import PostRenderItem2 from '../components/ui/PostRenderItem2';
 import {RootState} from '../redux/Store';
+import {Text} from 'react-native';
 import {calculateDistance} from '../utils/helper';
 import {createNotifications} from 'react-native-notificated';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
 import {getPosts} from '../api/PostApi';
+import {scale} from '../utils/scale';
 
 const {useNotifications} = createNotifications();
 
@@ -37,7 +40,12 @@ const HomeScreen = ({navigation}: any) => {
   const [sortingMethod, setSortingMethod] = useState('');
   const [visible, setVisible] = useState(false);
   const [showComment, setShowComment] = useState(false);
+  const [showDetailImage, setShowDetailImage] = useState<boolean | number>(
+    false,
+  );
+  const [detailPost, setDetailPost] = useState<any>(null);
   const [commentPostId, setCommentPostId] = useState(0);
+  const [foodType, setFoodType] = useState();
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -167,6 +175,7 @@ const HomeScreen = ({navigation}: any) => {
             value={search}
           />
         </View>
+
         <Menu
           visible={visible}
           onDismiss={closeMenu}
@@ -194,7 +203,18 @@ const HomeScreen = ({navigation}: any) => {
           />
         </Menu>
       </View>
-
+      <View style={{flexDirection: 'row', marginVertical: scale(6)}}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('MapScreen', {
+              location: location,
+              accessToken: accessToken,
+            })
+          }
+          style={{padding: scale(10)}}>
+          <Text>Đồ ăn mặn</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         style={{marginHorizontal: 8}}
         data={filterPosts ?? recommendPost} // Fallback if `filterPosts` is empty
@@ -211,38 +231,23 @@ const HomeScreen = ({navigation}: any) => {
             distance={calculateDistance(item, location)}
             setShowComment={setShowComment}
             setCommentPostId={setCommentPostId}
+            setDetailPost={(item: any) => {
+              setDetailPost(item);
+              setShowDetailImage(true);
+            }}
           />
         )}
-        ListEmptyComponent={
-          isLoading ? (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                height: 500,
-              }}>
-              <Image
-                source={require('../assets/images/BgNoPost.png')}
-                style={{width: 300, height: 400}}
-              />
-              <Button
-                title="Tạo bài viết"
-                containerStyle={{borderRadius: 8}}
-                buttonStyle={{backgroundColor: Colors.button}}
-                onPress={() =>
-                  navigation.navigate('CreatePost', {location, accessToken})
-                }
-              />
-            </View>
-          ) : null
-        }
       />
 
       <Comment
         isVisible={showComment}
         setVisible={setShowComment}
         commentPostId={commentPostId}
+      />
+      <ImageDetailModal
+        isVisible={showDetailImage}
+        setVisible={setShowDetailImage}
+        item={detailPost}
       />
       <TouchableOpacity
         onPress={() =>
