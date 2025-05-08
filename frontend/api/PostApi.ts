@@ -1,10 +1,13 @@
 import ApiManager from './ApiManager';
-export const getPosts = async (token: any) => {
+export const getPosts = async (token: any, type: string) => {
   try {
     const response = await ApiManager('posts/recommended', {
       method: 'GET',
       headers: {
         Authorization: token,
+      },
+      params: {
+        type: type,
       },
     });
     return response;

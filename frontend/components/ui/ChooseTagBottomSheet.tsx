@@ -1,20 +1,20 @@
 /* eslint-disable react-native/no-inline-styles */
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import Colors from '../../global/Color';
+import {FoodType} from '../../screens/CreatePostScreen';
 import Modal from 'react-native-modal';
 import React from 'react';
-import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
-import {useSelector} from 'react-redux';
 
 const ChooseTagBottomSheet = (props: any) => {
-  const accessToken = useSelector((state: RootState) => state.token.key);
-  const {isVisible, setVisible, setType, selectedType} = props;
+  const {isVisible, setVisible, setType, selectedType, isHome} = props;
 
-  const types = ['Chay', 'Mặn'];
+  const types = !isHome
+    ? Object.values(FoodType).filter(type => type !== FoodType.ALL)
+    : Object.values(FoodType);
 
-  const handleSelect = (type: string) => {
+  const handleSelect = (type: FoodType) => {
     setType(type);
     setVisible(false);
   };

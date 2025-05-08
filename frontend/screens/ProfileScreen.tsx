@@ -1,31 +1,32 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import {Accessory} from '@rneui/base';
 import {Avatar, Button, Image} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
 import {
-  View,
-  StyleSheet,
   ImageBackground,
   ScrollView,
+  StyleSheet,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import Colors from '../global/Color';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import UploadPhoto from '../components/ui/UploadPhoto';
-import {uploadPhoto} from '../api/UploadPhotoApi';
-
-import EditProfileScreen from './EditProfileScreen';
-import {createNotifications} from 'react-native-notificated';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+
+import {Accessory} from '@rneui/base';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Colors from '../global/Color';
+import EditProfileScreen from './EditProfileScreen';
 import {RootState} from '../redux/Store';
-import {saveUser} from '../redux/UserReducer';
-import {disconnectSocket} from '../api/NotificationApi';
-import {disconnectChat} from '../api/ChatApi';
-import {updateUser} from '../api/AccountsApi';
-import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import {Route} from '../constants/route';
+import UploadPhoto from '../components/ui/UploadPhoto';
 import {ZIMKit} from '@zegocloud/zimkit-rn';
+import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import {createNotifications} from 'react-native-notificated';
+import {disconnectChat} from '../api/ChatApi';
+import {disconnectSocket} from '../api/NotificationApi';
 import {getFontFamily} from '../utils/fonts';
+import {saveUser} from '../redux/UserReducer';
+import {updateUser} from '../api/AccountsApi';
+import {uploadPhoto} from '../api/UploadPhotoApi';
 
 const {useNotifications} = createNotifications();
 
@@ -242,6 +243,23 @@ const ProfileScreen = ({navigation, route}: any) => {
             }}
             titleStyle={{color: 'black'}}
             icon={{name: 'location', type: 'entypo', color: 'black'}}
+          />
+          <Button
+            title={'Hội nhóm'}
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              justifyContent: 'flex-start',
+            }}
+            titleStyle={{color: 'black'}}
+            icon={{
+              name: 'account-group',
+              type: 'material-community',
+              color: 'black',
+            }}
+            onPress={() => {
+              console.log('navigate');
+              navigation.navigate(Route.GroupList);
+            }}
           />
         </View>
       ) : null}

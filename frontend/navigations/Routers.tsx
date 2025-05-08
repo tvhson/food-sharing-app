@@ -17,6 +17,7 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import ExchangeGiftScreen from '../screens/ExchangeGiftScreen';
 import HistoryExchangeGiftScreen from '../screens/HistoryExchangeGiftScreen';
 import LandingScreen from '../screens/LandingScreen';
+import ListGroupScreen from '../screens/ListGroupScreen';
 import LoadingScreen from '../screens/LoadingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ManageReward from '../screens/ManageReward/ManageReward';
@@ -170,7 +171,34 @@ const Router = () => {
         />
         <Stack.Screen name={Route.ManageReward} component={ManageReward} />
         <Stack.Screen name={Route.MapView} component={MapScreen} />
-        <Stack.Screen name={Route.CreateGroup} component={CreateGroupScreen} />
+        <Stack.Screen
+          name={Route.CreateGroup}
+          component={CreateGroupScreen}
+          options={{
+            headerShown: true,
+            headerTitle: 'Tạo nhóm',
+            headerStyle: {backgroundColor: Colors.button},
+            headerTitleStyle: {
+              color: 'white',
+              fontFamily: getFontFamily('semibold'),
+            },
+            headerTintColor: 'white',
+          }}
+        />
+        <Stack.Screen
+          name={Route.GroupList}
+          component={ListGroupScreen}
+          options={{
+            headerShown: true,
+            headerTitle: 'Hội nhóm',
+            headerStyle: {backgroundColor: Colors.button},
+            headerTitleStyle: {
+              color: 'white',
+              fontFamily: getFontFamily('semibold'),
+            },
+            headerTintColor: 'white',
+          }}
+        />
         <Stack.Screen
           name={Route.ZegoUIKitPrebuiltCallWaitingScreen}
           component={ZegoUIKitPrebuiltCallWaitingScreen}

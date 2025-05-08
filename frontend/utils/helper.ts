@@ -1,3 +1,4 @@
+import {FoodType} from '../screens/CreatePostScreen';
 import getDistance from 'geolib/es/getDistance';
 
 export function timeAgo(dateInput: Date | string | number) {
@@ -91,4 +92,12 @@ export const calculateDistance = (
     );
   }
   return 0;
+};
+
+export const getFoodTypeKey = (
+  value: string,
+): keyof typeof FoodType | undefined => {
+  return (Object.keys(FoodType) as Array<keyof typeof FoodType>).find(
+    key => FoodType[key] === value,
+  );
 };

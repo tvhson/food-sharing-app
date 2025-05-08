@@ -32,4 +32,5 @@ export enum Route {
   ZegoUIKitPrebuiltCallInCallScreen = 'ZegoUIKitPrebuiltCallInCallScreen',
   EditProfile = 'EditProfile',
   CreateGroup = 'CreateGroup',
+  GroupList = 'GroupList',
 }

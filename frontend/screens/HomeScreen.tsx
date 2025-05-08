@@ -1,21 +1,27 @@
-import {Button, Icon, Image, SearchBar} from '@rneui/themed';
 import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
+import {Icon, SearchBar} from '@rneui/themed';
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {clearSharingPosts, pushSharingPost} from '../redux/SharingPostReducer';
+import {
+  SharingPost,
+  clearSharingPosts,
+  pushSharingPost,
+} from '../redux/SharingPostReducer';
+import {calculateDistance, getFoodTypeKey} from '../utils/helper';
 import {useDispatch, useSelector} from 'react-redux';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
 import Colors from '../global/Color';
 import Comment from '../components/ui/Comment';
+import {FoodType} from './CreatePostScreen';
 import HeaderHome from '../components/ui/HeaderHome';
 import ImageDetailModal from '../components/ui/ImageDetailModal';
 import {Menu} from 'react-native-paper';
 import PostRenderItem2 from '../components/ui/PostRenderItem2';
 import {RootState} from '../redux/Store';
 import {Text} from 'react-native';
-import {calculateDistance} from '../utils/helper';
 import {createNotifications} from 'react-native-notificated';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
@@ -31,10 +37,10 @@ const HomeScreen = ({navigation}: any) => {
     (state: RootState) => state.sharingPost.HomePage,
   );
   const dispatch = useDispatch();
-  const [recommendPost, setRecommendPost] = useState<any>(null);
+  const [recommendPost, setRecommendPost] =
+    useState<SharingPost[]>(recommendedPost);
   const {notify} = useNotifications();
   const [search, setSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<any>(null);
   const [sortingMethod, setSortingMethod] = useState('');
@@ -45,8 +51,8 @@ const HomeScreen = ({navigation}: any) => {
   );
   const [detailPost, setDetailPost] = useState<any>(null);
   const [commentPostId, setCommentPostId] = useState(0);
-  const [foodType, setFoodType] = useState();
-
+  const [foodType, setFoodType] = useState<FoodType | null>(null);
+  const [isTagVisible, setIsTagVisible] = useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
@@ -58,11 +64,12 @@ const HomeScreen = ({navigation}: any) => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    setIsLoading(true);
 
     const getRecommendPost = async () => {
       if (accessToken) {
-        const response: any = await getPosts(accessToken.toString());
+        const type = foodType === null ? 'ALL' : getFoodTypeKey(foodType);
+        if (!type) return;
+        const response: any = await getPosts(accessToken.toString(), type);
         if (response.status === 200) {
           dispatch(clearSharingPosts());
           AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
@@ -78,7 +85,6 @@ const HomeScreen = ({navigation}: any) => {
           });
         }
       }
-      setIsLoading(false);
       setRefreshing(false);
     };
 
@@ -87,10 +93,10 @@ const HomeScreen = ({navigation}: any) => {
 
   useEffect(() => {
     const getRecommendPost = async () => {
-      if (recommendedPost) {
-        setRecommendPost(recommendedPost);
-      } else if (accessToken) {
-        const response: any = await getPosts(accessToken.toString());
+      if (accessToken) {
+        const type = foodType === null ? 'ALL' : getFoodTypeKey(foodType);
+        if (!type) return;
+        const response: any = await getPosts(accessToken.toString(), type);
         if (response.status === 200) {
           AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
           setRecommendPost(response.data);
@@ -106,12 +112,10 @@ const HomeScreen = ({navigation}: any) => {
       }
     };
     const fetchData = async () => {
-      setIsLoading(true);
       await getRecommendPost();
-      setIsLoading(false);
     };
     fetchData();
-  }, [accessToken, notify, recommendedPost]);
+  }, [accessToken, notify, recommendedPost, foodType]);
 
   useEffect(() => {
     const applyFilter = () => {
@@ -203,16 +207,36 @@ const HomeScreen = ({navigation}: any) => {
           />
         </Menu>
       </View>
-      <View style={{flexDirection: 'row', marginVertical: scale(6)}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginVertical: scale(6),
+          justifyContent: 'flex-end',
+        }}>
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('MapScreen', {
-              location: location,
-              accessToken: accessToken,
-            })
-          }
-          style={{padding: scale(10)}}>
-          <Text>Đồ ăn mặn</Text>
+          onPress={() => setIsTagVisible(true)}
+          style={{
+            padding: scale(4),
+            backgroundColor: Colors.white,
+            borderRadius: scale(8),
+            marginHorizontal: scale(18),
+            paddingHorizontal: scale(50),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            position: 'relative',
+          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: foodType === null ? '#706d6d' : 'black',
+              fontFamily: getFontFamily('regular'),
+            }}>
+            {foodType === null ? 'Tất cả' : foodType}
+          </Text>
+          <View style={{position: 'absolute', right: scale(6)}}>
+            <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
+          </View>
         </TouchableOpacity>
       </View>
       <FlatList
@@ -263,6 +287,12 @@ const HomeScreen = ({navigation}: any) => {
         }}>
         <Icon name="add" color="white" size={24} />
       </TouchableOpacity>
+      <ChooseTagBottomSheet
+        isVisible={isTagVisible}
+        setVisible={setIsTagVisible}
+        setType={setFoodType}
+        isHome
+      />
     </View>
   );
 };

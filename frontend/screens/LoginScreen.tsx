@@ -1,27 +1,28 @@
+import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 /* eslint-disable react-native/no-inline-styles */
-import {Icon, Button} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
+import {Button, Icon} from '@rneui/themed';
 import {
-  View,
-  TextInput,
-  StyleSheet,
   Image,
+  Keyboard,
+  StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Keyboard,
+  View,
 } from 'react-native';
-import {createNotifications} from 'react-native-notificated';
-import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
-import {login} from '../api/LoginApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+
+import AppLoader from '../components/ui/AppLoader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Colors from '../global/Color';
+import {RootState} from '../redux/Store';
+import {createNotifications} from 'react-native-notificated';
+import {enableScreens} from 'react-native-screens';
+import {login} from '../api/LoginApi';
 import {setStatus} from '../redux/LoadingReducer';
 import {setToken} from '../redux/TokenReducer';
-import {enableScreens} from 'react-native-screens';
-import {RootState} from '../redux/Store';
-import AppLoader from '../components/ui/AppLoader';
-import Colors from '../global/Color';
 
 enableScreens();
 
@@ -79,13 +80,11 @@ const LoginScreen = ({navigation}: any) => {
             // });
             // crashlytics().crash();
             if (response.data) {
-              const token: any = response.data;
-              console.log(response);
-              AsyncStorage.setItem('token', token.accessToken);
+              AsyncStorage.setItem('token', response.data.accessToken);
               AsyncStorage.setItem('isLogin', 'true');
-              dispatch(setToken(token.accessToken));
+              dispatch(setToken(response.data.accessToken));
               navigation.navigate('Loading', {
-                token: token.accessToken,
+                token: response.data.accessToken,
               });
             } else {
               notify('error', {

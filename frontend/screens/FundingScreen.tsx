@@ -2,6 +2,7 @@ import {
   FlatList,
   RefreshControl,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -20,9 +21,13 @@ import HeaderHome from '../components/ui/HeaderHome';
 import {Menu} from 'react-native-paper';
 import OrganizationPost2 from '../components/ui/OrganizationPost2';
 import {RootState} from '../redux/Store';
+import {Route} from '../constants/route';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
 import {getOrganizationPost} from '../api/OrganizationPostApi';
+import {moderateScale} from 'react-native-size-matters';
+import {scale} from '../utils/scale';
+import screenWidth from '../global/Constant';
 import {useNotifications} from 'react-native-notificated';
 
 export const FundingScreen = ({navigation}: any) => {
@@ -208,16 +213,32 @@ export const FundingScreen = ({navigation}: any) => {
           userInfo.role === 'ORGANIZATION' ? (
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate('CreateFundingPost', {location, token})
+                navigation.navigate(Route.CreateGroup, {
+                  location,
+                  token,
+                })
               }
               style={{
                 backgroundColor: Colors.button,
-                borderRadius: 100,
-                padding: 16,
-                alignSelf: 'flex-end',
+                width: screenWidth * 0.7,
+                alignSelf: 'center',
+                borderRadius: scale(10),
+                padding: 10,
                 margin: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}>
               <Icon name="add" color="white" size={24} />
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: moderateScale(16),
+                  fontFamily: getFontFamily('bold'),
+                  textAlign: 'center',
+                }}>
+                Tạo nhóm
+              </Text>
             </TouchableOpacity>
           ) : null
         }

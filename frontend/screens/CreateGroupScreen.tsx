@@ -1,6 +1,6 @@
-import {Button, Icon, Image} from '@rneui/themed';
+import {Button, Icon} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {
   ScrollView,
   Text,
@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../global/Color';
 import ImageSwiper from '../components/ui/ImageSwiper';
@@ -17,6 +16,7 @@ import {createNotifications} from 'react-native-notificated';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
 import {uploadPhoto} from '../api/UploadPhotoApi';
+import {useDispatch} from 'react-redux';
 import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();

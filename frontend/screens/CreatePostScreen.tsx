@@ -1,6 +1,6 @@
-import {Button, Icon, Image} from '@rneui/themed';
+import {Button, Icon} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   ScrollView,
   Text,
@@ -23,12 +23,19 @@ import {createNotifications} from 'react-native-notificated';
 import {createPost} from '../api/PostApi';
 import {earnPoint} from '../api/LoyaltyApi';
 import {getFontFamily} from '../utils/fonts';
+import {getFoodTypeKey} from '../utils/helper';
 import {pushMyPost} from '../redux/SharingPostReducer';
 import screenWidth from '../global/Constant';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();
+
+export enum FoodType {
+  VEGETARIAN = 'Chay',
+  NON_VEGETARIAN = 'Mặn',
+  ALL = 'Tất cả',
+}
 
 const CreatePostScreen = ({route, navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();
@@ -44,7 +51,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const [description, setDescription] = useState('');
   const [portion, setPortion] = useState('');
   const [status, setStatus] = useState('');
-  const [type, setType] = useState('');
+  const [type, setType] = useState<FoodType | null>(null);
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude] = useState(
     location && location.latitude ? location.latitude : null,
@@ -158,6 +165,12 @@ const CreatePostScreen = ({route, navigation}: any) => {
       });
       return;
     }
+    if (type === null) {
+      notify('error', {
+        params: {description: 'Phải chọn loại thực phẩm.', title: 'Lỗi'},
+      });
+      return;
+    }
 
     const dataForm = new FormData();
     if (imageUpload && imageUpload.length > 0) {
@@ -196,6 +209,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
                 expiredDate,
                 pickUpStartDate,
                 pickUpEndDate,
+                type: getFoodTypeKey(type),
               },
               accessToken,
             )
@@ -359,10 +373,10 @@ const CreatePostScreen = ({route, navigation}: any) => {
           <Text
             style={{
               fontSize: 16,
-              color: type === '' ? '#706d6d' : 'black',
+              color: type === null ? '#706d6d' : 'black',
               fontFamily: getFontFamily('regular'),
             }}>
-            {type === '' ? 'Loại thực phẩm' : type}
+            {type === null ? 'Loại thực phẩm' : type}
           </Text>
           <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
         </TouchableOpacity>

@@ -1,6 +1,6 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-interface SharingPost {
+export interface SharingPost {
   id: number;
   title: string;
   description: string;
@@ -21,9 +21,10 @@ interface SharingPost {
   isLiked: boolean;
   likeCount: number;
   isReceived: boolean;
+  type: string;
 }
 
-interface SharingPosts {
+export interface SharingPosts {
   HomePage: SharingPost[];
   MyPosts: SharingPost[];
 }
