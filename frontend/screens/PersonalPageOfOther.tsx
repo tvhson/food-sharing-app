@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
@@ -95,11 +96,30 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
     }
     return (
       <View>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{paddingTop: 20, paddingHorizontal: 16}}>
-          <Icon source={'arrow-left'} size={30} color={Colors.black} />
-        </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingTop: 20,
+            paddingHorizontal: 16,
+          }}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon source={'arrow-left'} size={30} color={Colors.grayText} />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 20,
+              fontFamily: getFontFamily('bold'),
+              marginLeft: 10,
+              color: Colors.text,
+              textTransform: 'capitalize',
+              textAlign: 'center',
+              flex: 1,
+              marginRight: 30,
+            }}>
+            {userInfo.name}
+          </Text>
+        </View>
         <View style={[styles.row]}>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <View style={styles.avaContainer}>

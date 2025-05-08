@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {Avatar, IconButton} from 'react-native-paper';
 import {Bubble, GiftedChat, InputToolbar, Send} from 'react-native-gifted-chat';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
@@ -17,6 +18,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {BackHandler} from 'react-native';
 import Colors from '../global/Color';
 import {RootState} from '../redux/Store';
+import UploadPhoto from '../components/ui/UploadPhoto';
 import {ZegoSendCallInvitationButton} from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import analytics from '@react-native-firebase/analytics';
 import {createNotification} from '../api/NotificationApi';
@@ -24,6 +26,7 @@ import dayjs from 'dayjs';
 import dayvi from 'dayjs/locale/vi';
 import {getFontFamily} from '../utils/fonts';
 import {readAllMessageOfRoomChatId} from '../redux/ChatRoomReducer';
+import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useFocusEffect} from '@react-navigation/native';
 import {useLoading} from '../utils/LoadingContext';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -40,6 +43,16 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   const [infoOther, setInfoOther] = useState<any>(null);
   const [text, setText] = useState('');
   const {showLoading, hideLoading} = useLoading();
+  const [isUploadVisible, setIsUploadVisible] = useState(false);
+  const [imageUpload, setImageUpload] = useState<any>(null);
+  const [imagePath, setImagePath] = useState('');
+
+  const postImage = async (image: any) => {
+    setImageUpload(image);
+    if (image.path) {
+      setImagePath(image.path);
+    }
+  };
 
   const recipientProfilePic =
     item.recipientProfilePic === null
@@ -221,6 +234,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       userInfo.name,
     ],
   );
+
   useFocusEffect(
     useCallback(() => {
       const readAllMessages = async () => {
@@ -244,8 +258,36 @@ const ChatRoomScreen = ({navigation, route}: any) => {
     }, [accessToken, dispatch, roomId]),
   );
 
+  const handleUploadImage = async () => {
+    const dataForm = new FormData();
+    if (imageUpload) {
+      dataForm.append('file', {
+        uri: imageUpload.path,
+        name: imageUpload.filename || 'image.jpeg',
+        type: imageUpload.mime || 'image/jpeg',
+      });
+    }
+
+    uploadPhoto(dataForm, accessToken).then((response: any) => {
+      if (response.status === 200) {
+        console.log(response.data);
+      } else {
+        console.log(response);
+      }
+    });
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: Colors.white}}>
+      <UploadPhoto
+        title="Thêm ảnh"
+        isVisible={isUploadVisible}
+        setVisible={setIsUploadVisible}
+        height={300}
+        width={350}
+        isCircle={false}
+        postImage={postImage}
+      />
       <View
         style={{
           height: 60,
@@ -371,10 +413,12 @@ const ChatRoomScreen = ({navigation, route}: any) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <Image
-                  source={require('../assets/images/paperclip.png')}
-                  style={{width: 30, height: 30, marginLeft: 10}}
-                />
+                <TouchableOpacity onPress={() => setIsUploadVisible(true)}>
+                  <Image
+                    source={require('../assets/images/paperclip.png')}
+                    style={{width: 30, height: 30, marginLeft: 10}}
+                  />
+                </TouchableOpacity>
               </View>
             )}
           />
