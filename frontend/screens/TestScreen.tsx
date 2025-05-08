@@ -1,9 +1,10 @@
-/* eslint-disable react-native/no-inline-styles */
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useEffect} from 'react';
-import {getFontFamily} from '../utils/fonts';
+
 import Colors from '../global/Color';
 import {Icon} from 'react-native-paper';
+/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import {getFontFamily} from '../utils/fonts';
 
 const TestScreen = () => {
   const tags = [

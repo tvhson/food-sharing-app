@@ -1,17 +1,18 @@
+import {Image, View} from 'react-native';
+
+import {Badge} from 'react-native-paper';
+import {FundingScreen} from '../screens/FundingScreen';
+import HomeScreen from '../screens/HomeScreen';
+import NotificationScreen from '../screens/NotificationScreen';
+import PersonalPage from '../screens/PersonalPage';
+import ProfileScreen from '../screens/ProfileScreen';
+import React from 'react';
+import {RootState} from '../redux/Store';
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/no-unstable-nested-components */
-import React from 'react';
-import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import {Badge} from 'react-native-paper';
-import NotificationScreen from '../screens/NotificationScreen';
-import {FundingScreen} from '../screens/FundingScreen';
-import {useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {Image, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import PersonalPage from '../screens/PersonalPage';
 import {getFontFamily} from '../utils/fonts';
+import {useSelector} from 'react-redux';
 
 const Tab = createBottomTabNavigator();
 

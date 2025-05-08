@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
+import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 
 const WebViewScreen = (props: any) => {

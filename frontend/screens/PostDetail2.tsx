@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
 import {
   FlatList,
   Image,
   Linking,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,31 +9,30 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
-import Header from '../components/ui/Header';
-import {Icon} from 'react-native-paper';
-import Colors from '../global/Color';
-import {getFontFamily} from '../utils/fonts';
-import ImageSwiper from '../components/ui/ImageSwiper';
-import screenWidth from '../global/Constant';
-import CommentItem from '../components/ui/CommentItem';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {getInfoUserById} from '../api/AccountsApi';
-import {getRoomChats} from '../api/ChatApi';
 import {
   createCommentToPost,
   getCommentByPostId,
   getPostById,
   likePost,
 } from '../api/PostApi';
-import {
-  likePostReducer,
-  receivedPostReducer,
-} from '../redux/SharingPostReducer';
-import {useNotifications} from 'react-native-notificated';
+import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../global/Color';
+import CommentItem from '../components/ui/CommentItem';
+import Header from '../components/ui/Header';
+import {Icon} from 'react-native-paper';
+import ImageSwiper from '../components/ui/ImageSwiper';
+import {RootState} from '../redux/Store';
 import {createNotification} from '../api/NotificationApi';
-import {set} from 'react-hook-form';
+import {getFontFamily} from '../utils/fonts';
+import {getInfoUserById} from '../api/AccountsApi';
+import {getRoomChats} from '../api/ChatApi';
+import {likePostReducer} from '../redux/SharingPostReducer';
+import screenWidth from '../global/Constant';
+import {useNotifications} from 'react-native-notificated';
 
 const PostDetail2 = ({route, navigation}: any) => {
   const [roomChat, setRoomChat] = useState<any>(null);

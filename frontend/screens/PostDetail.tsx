@@ -1,15 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
-import Colors from '../global/Color';
 import {Avatar, Button, Icon} from '@rneui/themed';
+import {
+  Image,
+  Linking,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
-import {Linking} from 'react-native';
-import {getInfoUserById} from '../api/AccountsApi';
-import {useSelector} from 'react-redux';
+import React, {useEffect, useState} from 'react';
+
+import Colors from '../global/Color';
 import {RootState} from '../redux/Store';
-import {getRoomChats} from '../api/ChatApi';
 import {createNotification} from '../api/NotificationApi';
+import {getInfoUserById} from '../api/AccountsApi';
+import {getRoomChats} from '../api/ChatApi';
+import {useSelector} from 'react-redux';
 
 const PostDetail = ({route, navigation}: any) => {
   const item = route.params.item;

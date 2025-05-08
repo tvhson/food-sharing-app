@@ -1,24 +1,18 @@
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
 import React, {useState} from 'react';
+
 import Colors from '../global/Color';
+import EditProfileScreen from './EditProfileScreen';
+import ListPost from '../components/ui/PersonalPageUI/ListPost';
+import {RootState} from '../redux/Store';
+import {TabView} from 'react-native-tab-view';
+import {UserInfo} from '../redux/UserReducer';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
 import {useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {UserInfo} from '../redux/UserReducer';
-import {TabBar, TabView} from 'react-native-tab-view';
-import ListPost from '../components/ui/PersonalPageUI/ListPost';
-import EditProfileScreen from './EditProfileScreen';
 
 const PersonalPage = ({navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);

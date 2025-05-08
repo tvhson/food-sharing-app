@@ -1,24 +1,23 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
-  View,
-  Text,
-  StyleSheet,
   FlatList,
-  TouchableOpacity,
   RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import React, {useEffect} from 'react';
-import {Button, Icon, Switch} from 'react-native-paper';
-import Colors from '../global/Color';
-import {getFontFamily} from '../utils/fonts';
-import {Image} from '@rneui/themed';
-import {historyExchangeItems} from '../components/data/PostData';
+/* eslint-disable react-native/no-inline-styles */
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {useLoading} from '../utils/LoadingContext';
-import {RootState} from '../redux/Store';
-import {useSelector} from 'react-redux';
+import React, {useEffect} from 'react';
 import {getAllRedemptions, getMyHistoryRedeem} from '../api/LoyaltyApi';
+
+import Colors from '../global/Color';
 import HistoryRenderItem from '../components/ui/ExchangePageUI/HistoryRenderItem';
+import {Icon} from 'react-native-paper';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {useLoading} from '../utils/LoadingContext';
+import {useSelector} from 'react-redux';
 
 interface Props {
   navigation: NavigationProp<any>;

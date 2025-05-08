@@ -1,31 +1,21 @@
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
 import React, {useEffect, useState} from 'react';
+
 import Colors from '../global/Color';
-import {getFontFamily} from '../utils/fonts';
-import screenWidth from '../global/Constant';
-import {useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {UserInfo} from '../redux/UserReducer';
-import {TabBar, TabView} from 'react-native-tab-view';
-import ListPost from '../components/ui/PersonalPageUI/ListPost';
-import EditProfileScreen from './EditProfileScreen';
-import {useLoading} from '../utils/LoadingContext';
 import {Icon} from 'react-native-paper';
+import ListPost from '../components/ui/PersonalPageUI/ListPost';
+import {RootState} from '../redux/Store';
+import {TabView} from 'react-native-tab-view';
+import {getFontFamily} from '../utils/fonts';
 import {getInfoUserById} from '../api/AccountsApi';
-import {getPostOfOther} from '../api/PostApi';
-import {getOrganizationPostByUserId} from '../api/OrganizationPostApi';
 import {getRoomChats} from '../api/ChatApi';
+import screenWidth from '../global/Constant';
+import {useLoading} from '../utils/LoadingContext';
+import {useSelector} from 'react-redux';
 
 const PersonalPageOfOther = ({navigation, route}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);

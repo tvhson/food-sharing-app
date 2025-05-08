@@ -1,10 +1,10 @@
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+
+import Colors from '../global/Color';
+import {Icon} from 'react-native-paper';
 /* eslint-disable react-native/no-inline-styles */
-import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import React from 'react';
 import {getFontFamily} from '../utils/fonts';
-import {Icon} from 'react-native-paper';
-import Colors from '../global/Color';
-import {id} from 'react-native-paper-dates';
 
 const PointRuleScreen = ({navigation}: any) => {
   const data = [

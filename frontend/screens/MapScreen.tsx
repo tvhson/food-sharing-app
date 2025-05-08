@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import {Button, Checkbox, Icon, Menu} from 'react-native-paper';
-/* eslint-disable react/self-closing-comp */
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Checkbox, Icon, Menu} from 'react-native-paper';
+import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
+/* eslint-disable react/self-closing-comp */
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {moderateScale, scale, verticalScale} from '../utils/scale';
 
 import Colors from '../global/Color';

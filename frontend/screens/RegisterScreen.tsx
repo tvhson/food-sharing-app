@@ -1,17 +1,17 @@
+import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
-import {Icon, Button} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
+import {Button, Icon} from '@rneui/themed';
 import {
-  View,
-  TextInput,
-  StyleSheet,
   Image,
+  StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
-import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
+import React, {useEffect, useState} from 'react';
+
 import Colors from '../global/Color';
 import {createNotifications} from 'react-native-notificated';
 import {register} from '../api/RegisterApi';

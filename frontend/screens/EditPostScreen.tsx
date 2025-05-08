@@ -1,6 +1,6 @@
 import {Button, Icon} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   ScrollView,
   Text,

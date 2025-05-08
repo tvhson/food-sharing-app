@@ -1,18 +1,18 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, StyleSheet, RefreshControl} from 'react-native';
-import Colors from '../global/Color';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {Image} from '@rneui/themed';
 import {
   ActivityIndicator,
   IconButton,
   SegmentedButtons,
 } from 'react-native-paper';
-import {getReport} from '../api/ReportApi';
+import {FlatList, RefreshControl, StyleSheet, Text, View} from 'react-native';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useEffect, useState} from 'react';
 import {clearReports, setReports} from '../redux/ReportReducer';
+import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../global/Color';
 import ReportItem from '../components/ui/ReportItem';
+import {RootState} from '../redux/Store';
+import {getReport} from '../api/ReportApi';
 
 const ReportScreen = ({navigation}: any) => {
   const ReportPendingDatas = useSelector(

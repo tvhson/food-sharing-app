@@ -8,15 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  createOrganizationPost,
-  updateOrganizationPost,
-} from '../api/OrganizationPostApi';
-import {
-  pushFundingPost,
-  pushMyFundingPost,
-  updateMyFundingPost,
-} from '../redux/OrganizationPostReducer';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../global/Color';
@@ -25,6 +16,8 @@ import {MAP_API_KEY} from '@env';
 import {RootState} from '../redux/Store';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {createNotifications} from 'react-native-notificated';
+import {updateMyFundingPost} from '../redux/OrganizationPostReducer';
+import {updateOrganizationPost} from '../api/OrganizationPostApi';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 
 const {useNotifications} = createNotifications();

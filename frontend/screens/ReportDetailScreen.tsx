@@ -1,19 +1,20 @@
-/* eslint-disable react-native/no-inline-styles */
+import {IconButton, RadioButton} from 'react-native-paper';
 import React, {useEffect, useState} from 'react';
 import {ScrollView, Text, View} from 'react-native';
-import Colors from '../global/Color';
-import {IconButton, RadioButton} from 'react-native-paper';
-import {getPostById} from '../api/PostApi';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {getOrganizationPostById} from '../api/OrganizationPostApi';
-import {getInfoUserById} from '../api/AccountsApi';
-import ReportPostItem from '../components/ui/ReportPostItem';
-import ReportOrganizationItem from '../components/ui/ReportOrganizationItem';
-import ReportAccountItem from '../components/ui/ReportAccountItem';
-import {Button} from '@rneui/themed';
 import {banAccount, updateReport} from '../api/ReportApi';
+import {useDispatch, useSelector} from 'react-redux';
+
+/* eslint-disable react-native/no-inline-styles */
+import {Button} from '@rneui/themed';
+import Colors from '../global/Color';
+import ReportAccountItem from '../components/ui/ReportAccountItem';
+import ReportOrganizationItem from '../components/ui/ReportOrganizationItem';
+import ReportPostItem from '../components/ui/ReportPostItem';
+import {RootState} from '../redux/Store';
 import {createNotifications} from 'react-native-notificated';
+import {getInfoUserById} from '../api/AccountsApi';
+import {getOrganizationPostById} from '../api/OrganizationPostApi';
+import {getPostById} from '../api/PostApi';
 import {updateTheReport} from '../redux/ReportReducer';
 
 const {useNotifications} = createNotifications();

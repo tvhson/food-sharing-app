@@ -1,25 +1,26 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
   ActivityIndicator,
-  StyleSheet,
+  FlatList,
   RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import Header from '../components/ui/HeaderHome';
-import Colors from '../global/Color';
 import {Button, Image, SearchBar} from '@rneui/themed';
-import PostRenderItem from '../components/ui/PostRenderItem';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createNotifications} from 'react-native-notificated';
+import React, {useEffect, useState} from 'react';
+import {clearMyPosts, pushMyPost} from '../redux/SharingPostReducer';
 import {getPostOfUser, getPosts} from '../api/PostApi';
 import {useDispatch, useSelector} from 'react-redux';
+
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-native/no-inline-styles */
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Colors from '../global/Color';
+import Header from '../components/ui/HeaderHome';
+import PostRenderItem from '../components/ui/PostRenderItem';
 import {RootState} from '../redux/Store';
-import {clearMyPosts, pushMyPost} from '../redux/SharingPostReducer';
+import {createNotifications} from 'react-native-notificated';
 import getDistance from 'geolib/es/getDistance';
 
 const {useNotifications} = createNotifications();

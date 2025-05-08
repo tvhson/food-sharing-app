@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
 import {
   FlatList,
   Image,
@@ -10,6 +8,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
 import {
   attendOrganizationPost,

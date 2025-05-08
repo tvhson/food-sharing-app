@@ -1,11 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, Image, ScrollView} from 'react-native';
-import Colors from '../global/Color';
 import {Avatar, Button, Icon} from '@rneui/themed';
+import {
+  Image,
+  Linking,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
-import {Linking} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../global/Color';
 import {RootState} from '../redux/Store';
 import {attendOrganizationPost} from '../api/OrganizationPostApi';
 import {attendPost} from '../redux/OrganizationPostReducer';

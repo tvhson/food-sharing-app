@@ -1,22 +1,22 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
 import {
-  View,
-  Text,
-  FlatList,
   ActivityIndicator,
-  StyleSheet,
+  FlatList,
   RefreshControl,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import Colors from '../global/Color';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {Image, SearchBar} from '@rneui/themed';
 import {IconButton, SegmentedButtons} from 'react-native-paper';
-import {getReport} from '../api/ReportApi';
-import {getAllAccounts} from '../api/AccountsApi';
+/* eslint-disable react-native/no-inline-styles */
+import {Image, SearchBar} from '@rneui/themed';
+import React, {useEffect, useState} from 'react';
 import {clearAccounts, setAccounts} from '../redux/AccountsReducer';
+import {useDispatch, useSelector} from 'react-redux';
+
+import Colors from '../global/Color';
 import ReportAccountItem from '../components/ui/ReportAccountItem';
+import {RootState} from '../redux/Store';
+import {getAllAccounts} from '../api/AccountsApi';
 
 const VerifyScreen = ({navigation}: any) => {
   const AccountUserDatas = useSelector(

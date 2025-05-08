@@ -1,14 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import {Avatar, Button, Image} from '@rneui/themed';
-import {
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Avatar, Button} from '@rneui/themed';
 import React, {useEffect, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {Accessory} from '@rneui/base';

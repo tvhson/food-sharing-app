@@ -1,13 +1,14 @@
-/* eslint-disable react-native/no-inline-styles */
-import {Button} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Image, Text, TouchableOpacity} from 'react-native';
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
-import Colors from '../global/Color';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useEffect} from 'react';
+
+/* eslint-disable react-native/no-inline-styles */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useDispatch} from 'react-redux';
-import {setStatus} from '../redux/LoadingReducer';
 import BootSplash from 'react-native-bootsplash';
+import {Button} from '@rneui/themed';
+import Colors from '../global/Color';
+import {setStatus} from '../redux/LoadingReducer';
+import {useDispatch} from 'react-redux';
 
 const LandingScreen = ({navigation}: any) => {
   const handleRegister = () => {

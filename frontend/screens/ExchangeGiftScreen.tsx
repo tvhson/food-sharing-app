@@ -1,26 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-/* eslint-disable react-native/no-inline-styles */
+import {Button, Icon} from 'react-native-paper';
 import {
-  View,
-  Text,
-  StyleSheet,
   FlatList,
-  TouchableOpacity,
   RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import React, {useEffect} from 'react';
-import Colors from '../global/Color';
-import {Button, Icon} from 'react-native-paper';
-import {getFontFamily} from '../utils/fonts';
-import {Image} from '@rneui/themed';
-import screenWidth from '../global/Constant';
-import {rewardItems} from '../components/data/PostData';
-import RewardItem from '../components/ui/ExchangePageUI/RewardItem';
-import {useLoading} from '../utils/LoadingContext';
 import {getMyPoint, getRewards} from '../api/LoyaltyApi';
-import {useSelector} from 'react-redux';
+
+import Colors from '../global/Color';
+/* eslint-disable react-native/no-inline-styles */
+import {Image} from '@rneui/themed';
+import RewardItem from '../components/ui/ExchangePageUI/RewardItem';
 import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {useLoading} from '../utils/LoadingContext';
+import {useSelector} from 'react-redux';
 
 const ExchangeGiftScreen = ({navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();

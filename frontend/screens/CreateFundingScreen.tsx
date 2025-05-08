@@ -1,6 +1,6 @@
 import {Button, Icon, Image} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   ScrollView,
   Text,
@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import {
   addToTheEndOfFundingPost,
-  pushFundingPost,
   pushMyFundingPost,
 } from '../redux/OrganizationPostReducer';
 import {useDispatch, useSelector} from 'react-redux';

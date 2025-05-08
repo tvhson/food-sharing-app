@@ -1,16 +1,17 @@
-/* eslint-disable react-native/no-inline-styles */
+import {FlatList, RefreshControl, View} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, FlatList, RefreshControl} from 'react-native';
-import Colors from '../global/Color';
-import {Image, SearchBar} from '@rneui/themed';
-import ChatRoomItem from '../components/ui/ChatRoomItem';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../redux/Store';
-import {getRoomChats} from '../api/ChatApi';
 import {clearChatRooms, setChatRooms} from '../redux/ChatRoomReducer';
-import {useFocusEffect} from '@react-navigation/native';
-import {getFontFamily} from '../utils/fonts';
+import {useDispatch, useSelector} from 'react-redux';
+
+import ChatRoomItem from '../components/ui/ChatRoomItem';
+import Colors from '../global/Color';
 import Header from '../components/ui/Header';
+import {RootState} from '../redux/Store';
+import {SearchBar} from '@rneui/themed';
+import {getFontFamily} from '../utils/fonts';
+import {getRoomChats} from '../api/ChatApi';
+/* eslint-disable react-native/no-inline-styles */
+import {useFocusEffect} from '@react-navigation/native';
 
 const ChatScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
