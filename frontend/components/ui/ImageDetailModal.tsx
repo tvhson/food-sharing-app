@@ -30,7 +30,6 @@ const ImageDetailModal = (props: {
       setCurrentIndex(viewableItems[0].index);
     }
   });
-  console.log('item', item);
 
   const viewConfigRef = useRef({viewAreaCoveragePercentThreshold: 50});
   const createdDate = timeAgo(item?.createdDate || new Date());

@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {Avatar, IconButton} from 'react-native-paper';
-import {Bubble, GiftedChat, InputToolbar, Send} from 'react-native-gifted-chat';
+import {
+  Bubble,
+  GiftedChat,
+  IMessage,
+  InputToolbar,
+  Send,
+} from 'react-native-gifted-chat';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
@@ -65,25 +71,27 @@ const ChatRoomScreen = ({navigation, route}: any) => {
 
   const [messages, setMessages] = useState<any>([]);
 
+  const convertMessage = (message: any) => {
+    return {
+      _id: message?.id,
+      text: message?.content,
+      createdAt: message?.timestamp,
+      user: {
+        _id: message?.senderId,
+        name: message?.senderName,
+        avatar:
+          message?.senderId === userInfo.id
+            ? userInfo.imageUrl
+            : senderProfilePic === userInfo.imageUrl
+            ? recipientProfilePic
+            : senderProfilePic,
+      },
+      image: message?.imageUrl,
+    };
+  };
+
   useEffect(() => {
     const connectToMessage = async () => {
-      const convertMessage = (message: any) => {
-        return {
-          _id: message.id,
-          text: message.content,
-          createdAt: message.timestamp,
-          user: {
-            _id: message.senderId,
-            name: message.senderName,
-            avatar:
-              message.senderId === userInfo.id
-                ? userInfo.imageUrl
-                : senderProfilePic === userInfo.imageUrl
-                ? recipientProfilePic
-                : senderProfilePic,
-          },
-        };
-      };
       const saveMessage = (message: any) => {
         if (message.senderId === userInfo.id) {
           return;
@@ -121,23 +129,6 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   }, [navigation]);
 
   useEffect(() => {
-    const convertMessage = (message: any) => {
-      return {
-        _id: message.id,
-        text: message.content,
-        createdAt: message.timestamp,
-        user: {
-          _id: message.senderId,
-          name: message.senderName,
-          avatar:
-            message.senderId === userInfo.id
-              ? userInfo.imageUrl
-              : senderProfilePic === userInfo.imageUrl
-              ? recipientProfilePic
-              : senderProfilePic,
-        },
-      };
-    };
     const loadMessages = async () => {
       showLoading();
       getMessages(roomId, accessToken).then((response: any) => {
@@ -166,8 +157,8 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   ]);
 
   const onSend = useCallback(
-    async (newMessage: any) => {
-      console.log(newMessage);
+    async (newMessage: IMessage[]) => {
+      const imageUrl = await handleUploadImage();
       const message = {
         senderId: userInfo.id,
         recipientId:
@@ -176,9 +167,10 @@ const ChatRoomScreen = ({navigation, route}: any) => {
         recipientName:
           userInfo.id === item.senderId ? item.recipientName : item.senderName,
         content: newMessage[0].text,
+        imageUrl: imageUrl,
       };
       sendMessage(message);
-      setMessages((previousMessages: any) =>
+      setMessages((previousMessages: IMessage[]) =>
         GiftedChat.append(previousMessages, newMessage),
       );
       if (roomId === null) {
@@ -269,12 +261,14 @@ const ChatRoomScreen = ({navigation, route}: any) => {
     }
 
     uploadPhoto(dataForm, accessToken).then((response: any) => {
-      if (response.status === 200) {
+      if (response?.status === 200) {
         console.log(response.data);
+        return response?.data[0];
       } else {
         console.log(response);
       }
     });
+    return null;
   };
 
   return (
@@ -374,7 +368,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       <GiftedChat
         messages={messages}
         locale={dayvi}
-        onSend={(newMessage: any) => onSend(newMessage)}
+        onSend={(newMessage: IMessage[]) => onSend(newMessage)}
         user={{
           _id: userInfo.id,
           name: userInfo.name,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {FlatList, RefreshControl, View} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {clearChatRooms, setChatRooms} from '../redux/ChatRoomReducer';
@@ -12,9 +13,11 @@ import {getFontFamily} from '../utils/fonts';
 import {getRoomChats} from '../api/ChatApi';
 /* eslint-disable react-native/no-inline-styles */
 import {useFocusEffect} from '@react-navigation/native';
+import {useLoading} from '../utils/LoadingContext';
 
 const ChatScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
+  const {showLoading, hideLoading} = useLoading();
   const dispatch = useDispatch();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -27,15 +30,22 @@ const ChatScreen = ({navigation}: any) => {
   const onRefresh = useCallback(() => {
     const saveChatRoom = async () => {
       if (accessToken) {
-        getRoomChats(accessToken.toString()).then((response: any) => {
-          if (response.status === 200) {
-            dispatch(clearChatRooms());
-            setChatRoom(response.data);
-            dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
-          } else {
-            console.log(response);
-          }
-        });
+        showLoading();
+        getRoomChats(accessToken.toString())
+          .then((response: any) => {
+            if (response.status === 200) {
+              dispatch(clearChatRooms());
+              setChatRoom(response.data);
+              dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
+            } else {
+              console.log(response);
+            }
+            hideLoading();
+          })
+          .catch((error: any) => {
+            console.log('error', error);
+            hideLoading();
+          });
       }
     };
     setRefreshing(true);
@@ -50,14 +60,21 @@ const ChatScreen = ({navigation}: any) => {
       if (chatRooms) {
         setChatRoom(chatRooms);
       } else if (accessToken) {
-        getRoomChats(accessToken.toString()).then((response: any) => {
-          if (response.status === 200) {
-            setChatRoom(response.data);
-            dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
-          } else {
-            console.log(response);
-          }
-        });
+        showLoading();
+        getRoomChats(accessToken.toString())
+          .then((response: any) => {
+            if (response.status === 200) {
+              setChatRoom(response.data);
+              dispatch(setChatRooms({chatRooms: response.data, myId: myId}));
+            } else {
+              console.log(response);
+            }
+            hideLoading();
+          })
+          .catch((error: any) => {
+            console.log('error', error);
+            hideLoading();
+          });
       }
     };
     const fetchData = async () => {
