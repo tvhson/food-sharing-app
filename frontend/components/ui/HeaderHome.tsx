@@ -22,6 +22,19 @@ const HeaderHome = (props: any) => {
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
           onPress={() => {
+            navigation.navigate(Route.GroupHomeScreen);
+          }}>
+          <Image
+            source={require('../../assets/images/search.png')}
+            style={{
+              width: scale(24),
+              height: verticalScale(24),
+              marginRight: scale(20),
+            }}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
             navigation.navigate(Route.MapView);
           }}
           style={{
@@ -36,16 +49,6 @@ const HeaderHome = (props: any) => {
             color={Colors.black}
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity>
-          <Image
-            source={require('../../assets/images/search.png')}
-            style={{
-              width: scale(24),
-              height: verticalScale(24),
-              marginRight: scale(20),
-            }}
-          />
-        </TouchableOpacity> */}
 
         <TouchableOpacity
           onPress={() => {

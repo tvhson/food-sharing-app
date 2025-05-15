@@ -27,14 +27,15 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
   const [roomChat, setRoomChat] = useState();
 
   const [index, setIndex] = useState(0);
-  const [routes, setRoutes] = useState([
+  const routes = [
     {key: 'first', title: 'Bài viết'},
-    {key: 'second', title: 'Sự kiện'},
-  ]);
+    {key: 'second', title: 'Hội nhóm'},
+  ];
   const accessToken = useSelector((state: RootState) => state.token.key);
 
   useEffect(() => {
     const getOtherInfo = async () => {
+      showLoading();
       const response: any = await getInfoUserById(otherId, accessToken);
       if (response.status === 200) {
         setOtherInfo(response.data);
@@ -55,17 +56,17 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
             }
           })
           .catch(error => {
+            hideLoading();
             console.log(error);
           });
       } else {
+        hideLoading();
         console.log('error');
       }
     };
 
     const fetchData = async () => {
-      showLoading();
       await getOtherInfo();
-      hideLoading();
     };
     fetchData();
   }, [accessToken, otherId]);

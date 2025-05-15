@@ -15,6 +15,7 @@ import EditFundingScreen from '../screens/EditFundingScreen';
 import EditPostScreen from '../screens/EditPostScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import ExchangeGiftScreen from '../screens/ExchangeGiftScreen';
+import GroupHomeScreen from '../screens/Group/GroupHomeScreen';
 import HistoryExchangeGiftScreen from '../screens/HistoryExchangeGiftScreen';
 import LandingScreen from '../screens/LandingScreen';
 import ListGroupScreen from '../screens/ListGroupScreen';
@@ -198,6 +199,10 @@ const Router = () => {
             },
             headerTintColor: 'white',
           }}
+        />
+        <Stack.Screen
+          name={Route.GroupHomeScreen}
+          component={GroupHomeScreen}
         />
         <Stack.Screen
           name={Route.ZegoUIKitPrebuiltCallWaitingScreen}

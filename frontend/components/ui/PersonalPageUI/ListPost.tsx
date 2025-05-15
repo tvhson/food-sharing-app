@@ -1,25 +1,27 @@
+import {
+  Image,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import {
-  View,
-  Text,
-  RefreshControl,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {FlatList} from 'react-native-gesture-handler';
-import screenWidth from '../../../global/Constant';
-import {useLoading} from '../../../utils/LoadingContext';
-import {getPostOfOther} from '../../../api/PostApi';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../../redux/Store';
-import {getOrganizationPostByUserId} from '../../../api/OrganizationPostApi';
 import {
   calculateDistance,
   calculateExpiredDate,
   timeAgo,
 } from '../../../utils/helper';
+
+import {FlatList} from 'react-native-gesture-handler';
+import {RootState} from '../../../redux/Store';
+import {getFontFamily} from '../../../utils/fonts';
+import {getOrganizationPostByUserId} from '../../../api/OrganizationPostApi';
+import {getPostOfOther} from '../../../api/PostApi';
+import screenWidth from '../../../global/Constant';
+import {useLoading} from '../../../utils/LoadingContext';
+import {useSelector} from 'react-redux';
 
 interface ListPostProps {
   type: 'POST' | 'OPOST';
@@ -39,14 +41,17 @@ const ListPost = (props: ListPostProps) => {
 
   useEffect(() => {
     const getPostCreate = async () => {
+      showLoading();
       const response: any = await getPostOfOther(otherId, accessToken);
       if (response.status === 200) {
         setPosts(response.data);
       } else {
         console.log('error');
       }
+      hideLoading();
     };
     const getOrganizationsPost = async () => {
+      showLoading();
       const response: any = await getOrganizationPostByUserId(
         otherId,
         accessToken,
@@ -56,15 +61,14 @@ const ListPost = (props: ListPostProps) => {
       } else {
         console.log('error');
       }
+      hideLoading();
     };
     const fetchData = async () => {
-      showLoading();
       if (type === 'POST') {
         await getPostCreate();
       } else {
         await getOrganizationsPost();
       }
-      hideLoading();
     };
     fetchData();
   }, [accessToken, otherId]);
@@ -72,11 +76,14 @@ const ListPost = (props: ListPostProps) => {
   const onRefresh = async () => {
     setRefreshing(true);
     if (type === 'POST') {
+      showLoading();
       const response: any = await getPostOfOther(otherId, accessToken);
       if (response.status === 200) {
         setPosts(response.data);
       }
+      hideLoading();
     } else {
+      showLoading();
       const response: any = await getOrganizationPostByUserId(
         otherId,
         accessToken,
@@ -84,6 +91,7 @@ const ListPost = (props: ListPostProps) => {
       if (response.status === 200) {
         setPosts(response.data);
       }
+      hideLoading();
     }
     setRefreshing(false);
   };
@@ -107,7 +115,7 @@ const ListPost = (props: ListPostProps) => {
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <FlatList
         data={posts}
         keyExtractor={item => item.id}
@@ -115,6 +123,30 @@ const ListPost = (props: ListPostProps) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              height: 300, // Ensure some height so user can pull
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                color: 'black',
+                fontSize: 20,
+                fontFamily: getFontFamily('semibold'),
+                marginTop: 20,
+              }}>
+              Không có bài viết nào
+            </Text>
+          </View>
+        }
+        contentContainerStyle={{
+          flexGrow: 1,
+          minHeight: '100%', // 👈 Key line: Chiếm toàn bộ chiều cao của View cha
+          flex: 1,
+        }}
         renderItem={({item}) => (
           <View
             style={{

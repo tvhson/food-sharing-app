@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {Button, Icon} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   ScrollView,
   Text,
@@ -9,19 +9,23 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 
 import AddPeopleModal from '../components/ui/AddPeopleModal';
 import Colors from '../global/Color';
 import {DatePickerInput} from 'react-native-paper-dates';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import ImageSwiper from '../components/ui/ImageSwiper';
+import {MAP_API_KEY} from '@env';
+import {RootState} from '../redux/Store';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {UserInfo} from '../redux/UserReducer';
+import axios from 'axios';
 import {createNotifications} from 'react-native-notificated';
 import {exampleData} from '../components/data/ExamplePeopleData';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
 import {uploadPhoto} from '../api/UploadPhotoApi';
-import {useDispatch} from 'react-redux';
 import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();
@@ -30,6 +34,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();
   const dispatch = useDispatch();
   const {notify} = useNotifications();
+  const location = useSelector((state: RootState) => state.location);
 
   const accessToken = route.params.accessToken;
   const [groupName, setGroupName] = useState('');
@@ -41,6 +46,13 @@ const CreateGroupScreen = ({route, navigation}: any) => {
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [isAddPeopleModalVisible, setIsAddPeopleModalVisible] = useState(false);
   const [selectedPeople, setSelectedPeople] = useState<Partial<UserInfo>[]>([]);
+  const [locationName, setLocationName] = useState('');
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
+
+  const [loadingGetLocation, setLoadingGetLocation] = useState(false);
+
+  const autocompleteRef = useRef<any | null>(null);
   const postImage = async (newImages: any) => {
     console.log('newImages', newImages);
 
@@ -52,6 +64,43 @@ const CreateGroupScreen = ({route, navigation}: any) => {
         ? [...prevImages, ...imagesArray]
         : imagesArray;
     });
+  };
+
+  const getLocationName = async (
+    latitudeCurrent: number,
+    longitudeCurrent: number,
+  ) => {
+    try {
+      if (!latitudeCurrent || !longitudeCurrent) {
+        notify('error', {
+          params: {
+            description: 'Không thể lấy vị trí hiện tại.',
+            title: 'Lỗi',
+          },
+        });
+        return;
+      }
+      setLoadingGetLocation(true);
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
+      );
+      if (response.data.results.length > 0) {
+        setLocationName(response.data.results[0].formatted_address);
+        setLatitude(latitudeCurrent);
+        setLongitude(longitudeCurrent);
+        autocompleteRef.current?.setAddressText(
+          response.data.results[0].formatted_address,
+        );
+        setLoadingGetLocation(false);
+        return response.data.results[0].formatted_address;
+      }
+      notify('error', {
+        params: {description: 'Không thể lấy vị trí hiện tại.', title: 'Lỗi'},
+      });
+      return '';
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleCreatePost = () => {
@@ -111,7 +160,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           isMultiple={true}
         />
         <TextInput
-          placeholder="Tên nhóm"
+          placeholder="Tên nhóm (bắt buộc)"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -129,7 +178,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           onChangeText={setGroupName}
         />
         <TextInput
-          placeholder="Giới thiệu về nhóm"
+          placeholder="Giới thiệu về nhóm (bắt buộc)"
           placeholderTextColor={'#706d6d'}
           multiline
           numberOfLines={4}
@@ -157,7 +206,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             }}>
             <DatePickerInput
               locale="vi"
-              label="Ngày bắt đầu chiến dịch"
+              label="Ngày bắt đầu (bắt buộc)"
               saveLabel="Lưu"
               value={startDate}
               onChange={(date: Date | undefined) =>
@@ -190,7 +239,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             }}>
             <DatePickerInput
               locale="vi"
-              label="Ngày kết thúc chiến dịch"
+              label="Ngày kết thúc (tùy chọn)"
               saveLabel="Lưu"
               value={endDate}
               onChange={(date: Date | undefined) =>
@@ -216,7 +265,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           </View>
         </View>
         <TextInput
-          placeholder="Link website của chiến dịch"
+          placeholder="Link website của chiến dịch (tùy chọn)"
           placeholderTextColor={'#706d6d'}
           style={{
             fontSize: 16,
@@ -263,30 +312,50 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             color="#333"
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          style={{width: '90%'}}
-          onPress={() => {
-            setIsTagVisible(true);
-          }}>
-          <TextInput
-            placeholder="Loại thực phẩm"
-            placeholderTextColor={'#706d6d'}
-            style={{
-              fontSize: 16,
-              padding: 10,
-              backgroundColor: '#eff2ff',
-              borderRadius: 8,
-              color: 'black',
-              borderWidth: 2,
-              marginTop: 20,
+        <GooglePlacesAutocomplete
+          ref={autocompleteRef}
+          fetchDetails={true}
+          placeholder="Địa chỉ nhận"
+          onPress={(data, details = null) => {
+            setLocationName(data.description);
+            setLatitude(details?.geometry.location.lat || 0);
+            setLongitude(details?.geometry.location.lng || 0);
+          }}
+          disableScroll={true}
+          query={{
+            key: MAP_API_KEY,
+            language: 'vi',
+          }}
+          styles={{
+            container: {
               borderColor: Colors.greenPrimary,
+              borderRadius: 8,
+              borderWidth: 2,
+              width: '90%',
+              backgroundColor: '#eff2ff',
+              marginTop: 20,
+            },
+            textInput: {
+              fontSize: 16,
+              color: 'black',
+              backgroundColor: '#eff2ff',
               fontFamily: getFontFamily('regular'),
-            }}
-            value={portion}
-            onChangeText={setPortion}
-            readOnly
-          />
-        </TouchableOpacity> */}
+            },
+          }}
+        />
+        <Button
+          title="Sử dụng vị trí hiện tại"
+          onPress={() => getLocationName(location.latitude, location.longitude)}
+          buttonStyle={{
+            backgroundColor: Colors.greenPrimary,
+            width: 200,
+            alignSelf: 'center',
+            marginTop: 20,
+            borderRadius: 10,
+          }}
+          loading={loadingGetLocation}
+          titleStyle={{fontFamily: getFontFamily('bold')}}
+        />
 
         <View
           style={{
@@ -334,7 +403,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
                   fontSize: 18,
                   fontFamily: getFontFamily('regular'),
                 }}>
-                Thêm ảnh
+                Thêm ảnh (bắt buộc)
               </Text>
             </>
           )}

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   FlatList,
   RefreshControl,
@@ -28,18 +29,18 @@ import {getOrganizationPost} from '../api/OrganizationPostApi';
 import {moderateScale} from 'react-native-size-matters';
 import {scale} from '../utils/scale';
 import screenWidth from '../global/Constant';
+import {useLoading} from '../utils/LoadingContext';
 import {useNotifications} from 'react-native-notificated';
 
 export const FundingScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
   const {notify} = useNotifications();
+  const {showLoading, hideLoading} = useLoading();
   const token = useSelector((state: RootState) => state.token.key);
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const location = useSelector((state: RootState) => state.location);
   const [fundingPost, setFundingPost] = useState<any>(null);
   const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<any>(null);
   const [visible, setVisible] = useState(false);
@@ -47,10 +48,10 @@ export const FundingScreen = ({navigation}: any) => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    setIsLoading(true);
 
     const getFundingPost = async () => {
       if (token) {
+        showLoading();
         const response: any = await getOrganizationPost(token.toString());
         if (response.status === 200) {
           dispatch(clearFundingPosts());
@@ -65,8 +66,8 @@ export const FundingScreen = ({navigation}: any) => {
             },
           });
         }
+        hideLoading();
       }
-      setIsLoading(false);
       setRefreshing(false);
     };
 
@@ -76,6 +77,7 @@ export const FundingScreen = ({navigation}: any) => {
   useEffect(() => {
     const getFundingPost = async () => {
       if (token) {
+        showLoading();
         const response: any = await getOrganizationPost(token.toString());
         if (response.status === 200) {
           dispatch(clearFundingPosts());
@@ -90,15 +92,12 @@ export const FundingScreen = ({navigation}: any) => {
             },
           });
         }
+        hideLoading();
       }
-      setCurrentPage(0);
-      setIsLoading(false);
       setRefreshing(false);
     };
     const fetchData = async () => {
-      setIsLoading(true);
       getFundingPost();
-      setIsLoading(false);
     };
     fetchData();
   }, [dispatch, notify, token]);

@@ -17,10 +17,10 @@ import {useSelector} from 'react-redux';
 const PersonalPage = ({navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const [index, setIndex] = useState(0);
-  const [routes, setRoutes] = useState([
+  const routes = [
     {key: 'first', title: 'Bài viết'},
-    {key: 'second', title: 'Sự kiện'},
-  ]);
+    {key: 'second', title: 'Hội nhóm'},
+  ];
   const [isEditVisible, setIsEditVisible] = useState(false);
   const accessToken = useSelector((state: RootState) => state.token.key);
 

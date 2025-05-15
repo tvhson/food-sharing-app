@@ -33,4 +33,5 @@ export enum Route {
   EditProfile = 'EditProfile',
   CreateGroup = 'CreateGroup',
   GroupList = 'GroupList',
+  GroupHomeScreen = 'GroupHomeScreen',
 }
