@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-native/no-inline-styles */
 
 import {Avatar, Button} from '@rneui/themed';
@@ -251,7 +252,6 @@ const ProfileScreen = ({navigation, route}: any) => {
               color: 'black',
             }}
             onPress={() => {
-              console.log('navigate');
               navigation.navigate(Route.GroupList);
             }}
           />

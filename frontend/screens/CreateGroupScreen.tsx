@@ -10,10 +10,14 @@ import {
   View,
 } from 'react-native';
 
+import AddPeopleModal from '../components/ui/AddPeopleModal';
 import Colors from '../global/Color';
+import {DatePickerInput} from 'react-native-paper-dates';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import UploadPhoto from '../components/ui/UploadPhoto';
+import {UserInfo} from '../redux/UserReducer';
 import {createNotifications} from 'react-native-notificated';
+import {exampleData} from '../components/data/ExamplePeopleData';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
 import {uploadPhoto} from '../api/UploadPhotoApi';
@@ -30,10 +34,13 @@ const CreateGroupScreen = ({route, navigation}: any) => {
   const accessToken = route.params.accessToken;
   const [groupName, setGroupName] = useState('');
   const [description, setDescription] = useState('');
-
+  const [linkWebsites, setLinkWebsites] = useState('');
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
-
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [isAddPeopleModalVisible, setIsAddPeopleModalVisible] = useState(false);
+  const [selectedPeople, setSelectedPeople] = useState<Partial<UserInfo>[]>([]);
   const postImage = async (newImages: any) => {
     console.log('newImages', newImages);
 
@@ -142,9 +149,93 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           value={description}
           onChangeText={setDescription}
         />
-
+        <View style={{marginHorizontal: 10, marginTop: 20}}>
+          <View
+            style={{
+              width: '100%',
+              alignItems: 'center',
+            }}>
+            <DatePickerInput
+              locale="vi"
+              label="Ngày bắt đầu chiến dịch"
+              saveLabel="Lưu"
+              value={startDate}
+              onChange={(date: Date | undefined) =>
+                setStartDate(date || new Date())
+              }
+              inputMode="start"
+              style={{
+                backgroundColor: '#eff2ff',
+                color: 'black',
+                maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
+              }}
+              mode="outlined"
+              outlineStyle={{
+                borderColor: Colors.greenPrimary,
+                borderRadius: 8,
+                borderWidth: 2,
+              }}
+            />
+          </View>
+        </View>
+        <View style={{marginHorizontal: 10, marginTop: 20}}>
+          <View
+            style={{
+              width: '100%',
+              alignItems: 'center',
+            }}>
+            <DatePickerInput
+              locale="vi"
+              label="Ngày kết thúc chiến dịch"
+              saveLabel="Lưu"
+              value={endDate}
+              onChange={(date: Date | undefined) =>
+                setEndDate(date || new Date())
+              }
+              inputMode="start"
+              style={{
+                backgroundColor: '#eff2ff',
+                color: 'black',
+                maxWidth: '95%',
+                fontFamily: getFontFamily('regular'),
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
+              }}
+              mode="outlined"
+              outlineStyle={{
+                borderColor: Colors.greenPrimary,
+                borderRadius: 8,
+                borderWidth: 2,
+              }}
+            />
+          </View>
+        </View>
+        <TextInput
+          placeholder="Link website của chiến dịch"
+          placeholderTextColor={'#706d6d'}
+          style={{
+            fontSize: 16,
+            padding: 10,
+            backgroundColor: '#eff2ff',
+            borderRadius: 8,
+            width: '90%',
+            color: 'black',
+            borderWidth: 2,
+            marginTop: 20,
+            borderColor: Colors.greenPrimary,
+          }}
+          value={linkWebsites}
+          onChangeText={setLinkWebsites}
+        />
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={() => {
+            setIsAddPeopleModalVisible(true);
+          }}
           style={{
             padding: 10,
             paddingVertical: 13,
@@ -263,6 +354,13 @@ const CreateGroupScreen = ({route, navigation}: any) => {
 
         <View style={{height: 30}} />
       </View>
+      <AddPeopleModal
+        isVisible={isAddPeopleModalVisible}
+        onClose={() => setIsAddPeopleModalVisible(false)}
+        listPeople={exampleData}
+        selectedPeople={selectedPeople}
+        setSelectedPeople={setSelectedPeople}
+      />
     </ScrollView>
   );
 };
