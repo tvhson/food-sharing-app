@@ -144,8 +144,6 @@ const ListPost = (props: ListPostProps) => {
         }
         contentContainerStyle={{
           flexGrow: 1,
-          minHeight: '100%', // 👈 Key line: Chiếm toàn bộ chiều cao của View cha
-          flex: 1,
         }}
         renderItem={({item}) => (
           <View

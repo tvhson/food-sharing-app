@@ -1,6 +1,4 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 
@@ -13,6 +11,8 @@ import {UserInfo} from '../redux/UserReducer';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
 import {useSelector} from 'react-redux';
+
+/* eslint-disable @typescript-eslint/no-shadow */
 
 const PersonalPage = ({navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
