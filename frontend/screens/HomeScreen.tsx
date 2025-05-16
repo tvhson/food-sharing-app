@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
 import {Icon, SearchBar} from '@rneui/themed';
 /* eslint-disable @typescript-eslint/no-shadow */
@@ -6,7 +7,7 @@ import React, {useEffect, useState} from 'react';
 import {
   SharingPost,
   clearSharingPosts,
-  pushSharingPost,
+  setSharingPost,
 } from '../redux/SharingPostReducer';
 import {calculateDistance, getFoodTypeKey} from '../utils/helper';
 import {useDispatch, useSelector} from 'react-redux';
@@ -27,6 +28,7 @@ import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
 import {getPosts} from '../api/PostApi';
 import {scale} from '../utils/scale';
+import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();
 
@@ -36,6 +38,7 @@ const HomeScreen = ({navigation}: any) => {
   const recommendedPost = useSelector(
     (state: RootState) => state.sharingPost.HomePage,
   );
+  const {showLoading, hideLoading} = useLoading();
   const dispatch = useDispatch();
   const [recommendPost, setRecommendPost] =
     useState<SharingPost[]>(recommendedPost);
@@ -69,14 +72,16 @@ const HomeScreen = ({navigation}: any) => {
       if (accessToken) {
         const type = foodType === null ? 'ALL' : getFoodTypeKey(foodType);
         if (!type) return;
+        showLoading();
         const response: any = await getPosts(accessToken.toString(), type);
         if (response.status === 200) {
           dispatch(clearSharingPosts());
           AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
           setRecommendPost(response.data);
-          response.data.forEach((post: any) => dispatch(pushSharingPost(post)));
+          dispatch(setSharingPost(response.data));
+          hideLoading();
         } else {
-          console.log(response);
+          hideLoading();
           notify('error', {
             params: {
               description: 'Không thể tải dữ liệu mới',
@@ -100,6 +105,7 @@ const HomeScreen = ({navigation}: any) => {
         if (response.status === 200) {
           AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
           setRecommendPost(response.data);
+          dispatch(setSharingPost(response.data));
         } else {
           console.log(response);
           notify('error', {
@@ -115,7 +121,7 @@ const HomeScreen = ({navigation}: any) => {
       await getRecommendPost();
     };
     fetchData();
-  }, [accessToken, notify, recommendedPost, foodType]);
+  }, [foodType]);
 
   useEffect(() => {
     const applyFilter = () => {
@@ -149,7 +155,7 @@ const HomeScreen = ({navigation}: any) => {
     if (recommendPost) {
       applyFilter();
     }
-  }, [location, recommendPost, search, sortingMethod]);
+  }, [search, sortingMethod, recommendedPost]);
 
   return (
     <View

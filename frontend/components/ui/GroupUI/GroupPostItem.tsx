@@ -139,12 +139,6 @@ const GroupPostItem = (props: GroupPostItemProps) => {
     setCommentPostId(item.id.toString());
   };
 
-  const handleGoToDetail = () => {
-    navigation.navigate(Route.GroupPostDetail, {
-      item,
-    });
-  };
-
   return (
     <View
       style={{
@@ -315,9 +309,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
           leadingIcon="alert-octagon"
         />
       </Menu>
-      <TouchableOpacity
-        style={{flexDirection: 'row'}}
-        onPress={handleGoToDetail}>
+      <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() =>
             navigation.navigate('PersonalPageOfOther', {id: item.createdById})
@@ -376,7 +368,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
             color={Colors.grayPrimary}
           />
         </TouchableOpacity>
-      </TouchableOpacity>
+      </View>
       <View>
         <View
           style={{

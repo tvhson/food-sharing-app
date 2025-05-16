@@ -43,9 +43,16 @@ const SharingPostSlice = createSlice({
     ) => {
       state.HomePage.push(action.payload);
     },
+    setSharingPost: (
+      state: SharingPosts,
+      action: PayloadAction<SharingPost[]>,
+    ) => {
+      state.HomePage = action.payload;
+    },
     pushMyPost: (state: SharingPosts, action: PayloadAction<SharingPost>) => {
       state.MyPosts.push(action.payload);
     },
+
     setHomePage: (
       state: SharingPosts,
       action: PayloadAction<SharingPost[]>,
@@ -130,5 +137,6 @@ export const {
   clearMyPosts,
   likePostReducer,
   receivedPostReducer,
+  setSharingPost,
 } = SharingPostSlice.actions;
 export default SharingPostSlice.reducer;

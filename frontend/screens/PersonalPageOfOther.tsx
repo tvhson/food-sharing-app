@@ -1,8 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 
@@ -203,7 +208,7 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {renderHeader(otherInfo)}
       <TabView
         navigationState={{index, routes}}
@@ -232,7 +237,7 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
         onIndexChange={setIndex}
         renderTabBar={renderTabBar}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
