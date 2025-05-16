@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 
 import Colors from '../../global/Color';
-import {Icon} from 'react-native-paper';
 import React from 'react';
 import {RootState} from '../../redux/Store';
 import {Route} from '../../constants/route';
@@ -56,12 +55,6 @@ const OrganizationPost2 = (props: any) => {
       onPress={handleNavigateToDetail}
       style={styles.container}
       activeOpacity={0.8}>
-      <TouchableOpacity style={styles.btnFloat}>
-        <Icon source={'dots-horizontal'} size={30} color={Colors.grayPrimary} />
-      </TouchableOpacity>
-      {/* <TouchableOpacity style={[styles.btnFloat, {right: 10}]}>
-        <Icon source={'close'} size={25} color={Colors.grayPrimary} />
-      </TouchableOpacity> */}
       <View>
         <Image
           source={{

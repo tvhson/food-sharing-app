@@ -6,6 +6,7 @@ import {
   Portal,
   RadioButton,
 } from 'react-native-paper';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Dimensions,
   Image,
@@ -16,32 +17,31 @@ import {
 } from 'react-native';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../../../global/Color';
+import {IGroupPost} from '../../../global/types';
 import ImageSwiper from '../ImageSwiper';
 import {RootState} from '../../../redux/Store';
+import {Route} from '../../../constants/route';
 import {getFontFamily} from '../../../utils/fonts';
 import {getInfoUserById} from '../../../api/AccountsApi';
-import {useDispatch} from 'react-redux';
-import {useSelector} from 'react-redux';
+import {timeAgo} from '../../../utils/helper';
+import {useNavigation} from '@react-navigation/native';
 
-const PostRenderItem2 = (props: any) => {
-  const {
-    item,
-    setCommentPostId,
-    setShowComment,
-    navigation,
-    distance,
-    location,
-    setDetailPost,
-  } = props;
+interface GroupPostItemProps {
+  item: IGroupPost;
+  setCommentPostId: (id: string) => void;
+  setShowComment: (show: boolean) => void;
+}
+
+const GroupPostItem = (props: GroupPostItemProps) => {
+  const {item, setCommentPostId, setShowComment} = props;
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const accessToken = useSelector((state: RootState) => state.token.key);
-  const liked = useSelector(
-    (state: RootState) =>
-      state.sharingPost.HomePage.find(post => post.id === item.id)?.isLiked,
-  );
+  const navigation: any = useNavigation();
+
   const screenWidth = Dimensions.get('window').width;
   const [visible, setVisible] = useState<boolean>(false);
   const [visibleDialogDelete, setVisibleDialogDelete] =
@@ -56,7 +56,6 @@ const PostRenderItem2 = (props: any) => {
   const [createPostUser, setCreatePostUser] = useState<any>();
 
   const createdDate = timeAgo(item.createdDate);
-  const expiredString = calculateExpiredDate(new Date(item.expiredDate));
 
   const openMenu = () => {
     setReason('Spam or Misleading Information');
@@ -137,15 +136,12 @@ const PostRenderItem2 = (props: any) => {
 
   const handleShowComment = () => {
     setShowComment(true);
-    setCommentPostId(item.id);
+    setCommentPostId(item.id.toString());
   };
+
   const handleGoToDetail = () => {
-    navigation.navigate('PostDetail2', {
+    navigation.navigate(Route.GroupPostDetail, {
       item,
-      location,
-      createdDate,
-      distance,
-      expiredString,
     });
   };
 
@@ -291,11 +287,11 @@ const PostRenderItem2 = (props: any) => {
             <Menu.Item
               onPress={() => {
                 setVisible(false);
-                navigation.navigate('EditPost', {
-                  location: location,
-                  accessToken: accessToken,
-                  item: item,
-                });
+                // navigation.navigate('EditPost', {
+                //   location: location,
+                //   accessToken: accessToken,
+                //   item: item,
+                // });
               }}
               title="Sửa bài viết"
               leadingIcon="pencil"
@@ -347,7 +343,7 @@ const PostRenderItem2 = (props: any) => {
           </Text>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
-              source={require('../../assets/images/ion_earth.png')}
+              source={require('../../../assets/images/ion_earth.png')}
               style={{width: 20, height: 20}}
             />
             <Text
@@ -388,171 +384,42 @@ const PostRenderItem2 = (props: any) => {
             alignItems: 'center',
             marginTop: 10,
           }}>
-          <Image
-            source={require('../../assets/images/foodIcon.png')}
-            style={{width: 25, height: 25}}
-          />
           <View style={{flex: 1}}>
             <Text
               style={{
-                fontSize: 24,
-                fontFamily: getFontFamily('bold'),
-                color: Colors.text,
-                marginLeft: 16,
-              }}>
-              {item.title}
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: 10,
-          }}>
-          <Image
-            source={require('../../assets/images/distance.png')}
-            style={{width: 25, height: 25}}
-          />
-          <View style={{flex: 1}}>
-            <Text
-              style={{
-                fontSize: 16,
+                fontSize: 20,
                 fontFamily: getFontFamily('regular'),
                 color: Colors.text,
                 marginLeft: 16,
               }}>
-              Cách bạn{' '}
-              {distance < 0.1 ? `${distance * 1000}m` : `${distance}km`}
+              {item.description}
             </Text>
           </View>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: 10,
-          }}>
-          <Image
-            source={require('../../assets/images/clock.png')}
-            style={{width: 25, height: 25}}
-          />
-          <View style={{flex: 1}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-                color: expiredString === 'Hết hạn' ? 'red' : Colors.text,
-                marginLeft: 16,
-              }}>
-              {expiredString === 'Hết hạn'
-                ? 'Hết hạn'
-                : `Hết hạn sau ${expiredString}`}
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: 10,
-          }}>
-          <Image
-            source={require('../../assets/images/part.png')}
-            style={{width: 25, height: 25}}
-          />
-          <View style={{flex: 1}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-                color: item.portion === 0 ? 'red' : Colors.text,
-                marginLeft: 16,
-              }}>
-              {item.portion > 0 ? `Còn ${item.portion} phần` : 'Hết phần'}
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: 10,
-          }}>
-          <Image
-            source={require('../../assets/images/scales.png')}
-            style={{width: 25, height: 25}}
-          />
-          <View style={{flex: 1}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-                color: Colors.text,
-                marginLeft: 16,
-              }}>
-              {item.weight} kg
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: 10,
-          }}>
-          <Image
-            source={require('../../assets/images/pickUp.png')}
-            style={{width: 25, height: 25}}
-          />
-          <View style={{flex: 1}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-                color:
-                  new Date(item.pickUpEndDate) < new Date()
-                    ? 'red'
-                    : Colors.text,
-                marginLeft: 16,
-              }}>
-              Lấy từ ngày {new Date(item.pickUpStartDate).toLocaleDateString()}{' '}
-              đến ngày {new Date(item.pickUpEndDate).toLocaleDateString()}
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{
-            width: screenWidth * 0.85,
-            height: screenWidth,
-            borderRadius: 20,
-            marginTop: 10,
-            overflow: 'hidden',
-            alignSelf: 'center',
-            pointerEvents: 'box-none',
-          }}>
-          <ImageSwiper
-            images={item.images}
-            onPressImage={() => {
-              const detailPost = {
-                item,
-                user:
-                  item.createdById !== userInfo.id ? createPostUser : userInfo,
-                distance,
-              };
 
-              setDetailPost(detailPost);
-            }}
-          />
-        </View>
+        {item.images && item.images.length > 0 && (
+          <View
+            style={{
+              width: screenWidth * 0.85,
+              height: screenWidth,
+              borderRadius: 20,
+              marginTop: 10,
+              overflow: 'hidden',
+              alignSelf: 'center',
+              pointerEvents: 'box-none',
+            }}>
+            <ImageSwiper images={item.images} />
+          </View>
+        )}
+
         <View
           style={{flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
           <TouchableOpacity onPress={handleLiked}>
             <Image
               source={
-                liked
-                  ? require('../../assets/images/liked.png')
-                  : require('../../assets/images/like.png')
+                item.isLiked
+                  ? require('../../../assets/images/liked.png')
+                  : require('../../../assets/images/like.png')
               }
               style={{width: 50, height: 50}}
             />
@@ -561,13 +428,13 @@ const PostRenderItem2 = (props: any) => {
             style={{marginLeft: 10}}
             onPress={handleShowComment}>
             <Image
-              source={require('../../assets/images/comment.png')}
+              source={require('../../../assets/images/comment.png')}
               style={{width: 50, height: 50}}
             />
           </TouchableOpacity>
           <TouchableOpacity style={{marginLeft: 10}}>
             <Image
-              source={require('../../assets/images/share.png')}
+              source={require('../../../assets/images/share.png')}
               style={{width: 50, height: 50}}
             />
           </TouchableOpacity>
@@ -578,7 +445,7 @@ const PostRenderItem2 = (props: any) => {
               color: Colors.black,
               fontSize: 14,
             }}>
-            {liked
+            {item.isLiked
               ? item.likeCount === 1
                 ? 'Bạn'
                 : `Bạn và ${item.likeCount - 1} người khác`
@@ -590,4 +457,4 @@ const PostRenderItem2 = (props: any) => {
   );
 };
 
-export default PostRenderItem2;
+export default GroupPostItem;

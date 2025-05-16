@@ -15,7 +15,10 @@ import EditFundingScreen from '../screens/EditFundingScreen';
 import EditPostScreen from '../screens/EditPostScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import ExchangeGiftScreen from '../screens/ExchangeGiftScreen';
+import GroupCreatePostScreen from '../screens/Group/GroupCreatePostScreen';
+import GroupEditPostScreen from '../screens/Group/GroupEditPostScreen';
 import GroupHomeScreen from '../screens/Group/GroupHomeScreen';
+import GroupPostDetailScreen from '../screens/Group/GroupPostDetailScreen';
 import HistoryExchangeGiftScreen from '../screens/HistoryExchangeGiftScreen';
 import LandingScreen from '../screens/LandingScreen';
 import ListGroupScreen from '../screens/ListGroupScreen';
@@ -203,6 +206,18 @@ const Router = () => {
         <Stack.Screen
           name={Route.GroupHomeScreen}
           component={GroupHomeScreen}
+        />
+        <Stack.Screen
+          name={Route.GroupPostDetail}
+          component={GroupPostDetailScreen}
+        />
+        <Stack.Screen
+          name={Route.GroupCreatePost}
+          component={GroupCreatePostScreen}
+        />
+        <Stack.Screen
+          name={Route.GroupEditPost}
+          component={GroupEditPostScreen}
         />
         <Stack.Screen
           name={Route.ZegoUIKitPrebuiltCallWaitingScreen}

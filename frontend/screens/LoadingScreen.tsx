@@ -78,7 +78,7 @@ const LoadingScreen = ({navigation, route}: any) => {
       .then((data: any) => {
         console.log(data);
         ZegoUIKitPrebuiltCallService.init(
-          ZEGO_APP_ID,
+          parseInt(ZEGO_APP_ID || '0', 10),
           ZEGO_APP_SIGN,
           String(userInfo.id),
           userInfo.name,
