@@ -14,7 +14,7 @@ import {
   timeAgo,
 } from '../../../utils/helper';
 
-import {FlatList} from 'react-native-gesture-handler';
+import {FlatList} from 'react-native';
 import {RootState} from '../../../redux/Store';
 import {getFontFamily} from '../../../utils/fonts';
 import {getOrganizationPostByUserId} from '../../../api/OrganizationPostApi';
@@ -142,9 +142,7 @@ const ListPost = (props: ListPostProps) => {
             </Text>
           </View>
         }
-        contentContainerStyle={{
-          flexGrow: 1,
-        }}
+        contentContainerStyle={{flexGrow: 1}}
         renderItem={({item}) => (
           <View
             style={{

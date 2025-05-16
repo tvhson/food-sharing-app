@@ -1,4 +1,11 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 
@@ -124,7 +131,7 @@ const PersonalPage = ({navigation}: any) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <EditProfileScreen
         isVisible={isEditVisible}
         setVisible={setIsEditVisible}
@@ -132,6 +139,7 @@ const PersonalPage = ({navigation}: any) => {
         token={accessToken}
       />
       {renderHeader(userInfo)}
+
       <TabView
         navigationState={{index, routes}}
         renderScene={({route}) => {
@@ -159,7 +167,7 @@ const PersonalPage = ({navigation}: any) => {
         onIndexChange={setIndex}
         renderTabBar={renderTabBar}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
