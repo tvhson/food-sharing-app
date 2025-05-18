@@ -17,6 +17,7 @@ public class OrganizationpostsMapper {
                 .locationName(organizationpostsDto.getLocationName())
                 .longitude(organizationpostsDto.getLongitude())
                 .latitude(organizationpostsDto.getLatitude())
+                .groupId(organizationpostsDto.getGroupId())
                 .build();
     }
 
@@ -33,6 +34,7 @@ public class OrganizationpostsMapper {
                 .locationName(organizationposts.getLocationName())
                 .longitude(organizationposts.getLongitude())
                 .latitude(organizationposts.getLatitude())
+                .groupId(organizationposts.getGroupId())
                 .build();
     }
 }

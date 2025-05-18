@@ -53,8 +53,8 @@ public class OrganizationpostsController {
     }
 
     @GetMapping("/recommended")
-    ResponseEntity<List<OrganizationpostsDetail>> getRecommendationOrganizationposts(@RequestHeader Long userId) {
-        return ResponseEntity.ok(organizationpostsService.getRecommendationOrganizationposts(userId));
+    ResponseEntity<List<OrganizationpostsDetail>> getRecommendationOrganizationposts(@RequestHeader Long userId, @RequestParam Long groupId) {
+        return ResponseEntity.ok(organizationpostsService.getRecommendationOrganizationposts(userId, groupId));
     }
 
     @PostMapping("/attend/{organizationpostId}")

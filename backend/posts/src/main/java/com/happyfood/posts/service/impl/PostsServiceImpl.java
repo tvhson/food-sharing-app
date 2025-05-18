@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostsServiceImpl implements IPostsService {
     private final PostsRepository postsRepository;
+
     @Override
     public PostsDto createPost(Long userId, PostsDto postsDto) {
         Posts posts = PostsMapper.mapToPosts(postsDto);
@@ -59,6 +62,7 @@ public class PostsServiceImpl implements IPostsService {
         posts.setLongitude(postsDto.getLongitude());
         posts.setReceiverId(postsDto.getReceiverId());
         posts.setPortion(postsDto.getPortion());
+        posts.setType(postsDto.getType());
         if (postsDto.getTags() != null && !postsDto.getTags().isEmpty()) {
             posts.setTags(String.join("-", postsDto.getTags()));
         }
@@ -87,27 +91,29 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public List<PostsDto> getRecommendedPosts(Long userId) {
+    public List<PostsDto> getRecommendedPosts(Long userId, String type, String latitude, String longitude, Long distance) {
         List<Posts> posts = postsRepository.findAll();
 
+        LocalDate localDate = LocalDate.now();
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
         for (Posts post : posts) {
-            if (post.getExpiredDate() != null && post.getExpiredDate().before(new Date())) {
+            if (post.getExpiredDate() != null && post.getExpiredDate().before(date)) {
                 post.setStatus("NOT_AVAILABLE");
                 postsRepository.save(post);
-            } else if (post.getPickUpEndDate() != null && post.getPickUpEndDate().before(new Date())) {
+            } else if (post.getPickUpEndDate() != null && post.getPickUpEndDate().before(date)) {
                 post.setStatus("NOT_AVAILABLE");
                 postsRepository.save(post);
             }
         }
 
-//        double latitude = Double.parseDouble(location.getLatitude());
-//        double longitude = Double.parseDouble(location.getLongitude());
 
         List<PostsDto> recommendedPosts = new ArrayList<>(posts.stream()
-                .filter(post -> !post.isDeleted())
-                .filter(post -> !post.getStatus().equals("NOT_AVAILABLE"))
-                .map(post -> convertToResponse(post, userId))
-                .filter(postsDto -> !postsDto.getIsReceived())
+                                                               .filter(post -> type == null || type.equals("ALL") || (post.getType() != null && post.getType().equals(type)))
+                                                               .filter(post -> !post.isDeleted())
+                                                               .filter(post -> !post.getStatus().equals("NOT_AVAILABLE"))
+                                                               .map(post -> convertToResponse(post, userId))
+                                                               .filter(postsDto -> !postsDto.getIsReceived())
 //                .filter(post -> post.getReceiverId() == null)
 //                .filter(post -> post.getLatitude() != null)
 //                .filter(post -> post.getLongitude() != null)
@@ -118,7 +124,23 @@ public class PostsServiceImpl implements IPostsService {
 //                    post.setDistance(distance);
 //                    return distance < 25;
 //                })
-                .toList());
+                                                               .toList());
+
+        if (distance != null) {
+            double lat = Double.parseDouble(latitude);
+            double longt = Double.parseDouble(longitude);
+            recommendedPosts = recommendedPosts.stream()
+                                               .filter(postsDto -> {
+                                                   double postLatitude = Double.parseDouble(postsDto.getLatitude());
+                                                   double postLongitude = Double.parseDouble(postsDto.getLongitude());
+                                                   double distanceBetween = Math.sqrt(Math.pow(lat - postLatitude, 2) + Math.pow(longt - postLongitude, 2)) * 1.60934;
+                                                   postsDto.setDistance(distanceBetween);
+                                                   return distanceBetween < distance;
+                                               })
+                                               .toList();
+        }
+
+
         Collections.reverse(recommendedPosts);
         return recommendedPosts;
     }
@@ -128,9 +150,9 @@ public class PostsServiceImpl implements IPostsService {
         List<Posts> posts = postsRepository.findAllByCreatedById(userId);
         Collections.reverse(posts);
         return posts.stream()
-                .filter(post -> !post.isDeleted())
-                .map(post -> convertToResponse(post, userId))
-                .toList();
+                    .filter(post -> !post.isDeleted())
+                    .map(post -> convertToResponse(post, userId))
+                    .toList();
     }
 
     @Override
@@ -174,9 +196,9 @@ public class PostsServiceImpl implements IPostsService {
     public NumberPostsReceivedDto getNumberPostsReceived(Long userId) {
         List<Posts> posts = postsRepository.findAll();
         long numberPostsReceived = posts.stream()
-                .filter(post -> post.getUserIdReceived() != null && !post.getUserIdReceived().isEmpty())
-                .filter(post -> Arrays.stream(post.getUserIdReceived().split("-")).anyMatch(s -> s.equals(userId.toString())))
-                .count();
+                                        .filter(post -> post.getUserIdReceived() != null && !post.getUserIdReceived().isEmpty())
+                                        .filter(post -> Arrays.stream(post.getUserIdReceived().split("-")).anyMatch(s -> s.equals(userId.toString())))
+                                        .count();
         return NumberPostsReceivedDto.builder().numberPostsReceived(numberPostsReceived).build();
     }
 

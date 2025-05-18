@@ -20,4 +20,5 @@ public class CommentsDto {
     private Date createdDate;
     private Boolean isLove;
     private int loveCount;
+    private String imageUrl;
 }

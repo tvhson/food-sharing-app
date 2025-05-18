@@ -47,9 +47,9 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
     }
 
     @Override
-    public List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId) {
+    public List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId, Long groupId) {
         List<OrganizationpostsDetail> organizationpostsList = new ArrayList<>();
-        List<Organizationposts> organizationposts = organizationpostsRepository.findAll();
+        List<Organizationposts> organizationposts = organizationpostsRepository.findByGroupId(groupId);
 
 //        double latitude = Double.parseDouble(location.getLatitude());
 //        double longitude = Double.parseDouble(location.getLongitude());

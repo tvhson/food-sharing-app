@@ -29,6 +29,7 @@ public class Organizationposts {
     private String locationName;
     private String latitude;
     private String longitude;
+    private Long groupId;
 
     @OneToMany(mappedBy = "organizationPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<AttendeeId> attendees;

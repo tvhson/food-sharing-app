@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IOrganizationpostsService {
     OrganizationpostsDetail getOrganizationpostsById(Long id);
-    List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId);
+    List<OrganizationpostsDetail> getRecommendationOrganizationposts(Long userId, Long groupId);
     List<OrganizationpostsDetail> getOrganizationpostsByUserId(Long userId);
     OrganizationpostsDetail createOrganizationposts(Long userId, OrganizationpostsDto organizationpostsDto);
     OrganizationpostsDetail updateOrganizationposts(Long id, Long userId, OrganizationpostsDto organizationpostsDto);

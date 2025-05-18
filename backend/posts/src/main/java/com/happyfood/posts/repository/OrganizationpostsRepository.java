@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface OrganizationpostsRepository extends JpaRepository<Organizationposts, Long> {
     List<Organizationposts> findByUserId(Long userId);
+    List<Organizationposts> findByGroupId(Long groupId);
 }

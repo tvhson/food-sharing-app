@@ -88,4 +88,9 @@ public class AccountsController {
         iAccountsService.changeRole(userId, newRole);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<AccountsDto> getAccountByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(iAccountsService.getAccountByEmail(email));
+    }
 }

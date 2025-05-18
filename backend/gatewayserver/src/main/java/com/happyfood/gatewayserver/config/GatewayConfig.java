@@ -23,7 +23,7 @@ public class GatewayConfig {
                                                 .path("/accounts/**", "/accounts-details/**", "/auth/**", "/media/**", "/loyalty/**")
                                                 .filters(f -> f.filter(filter))
                                                 .uri("http://accounts:8080"))
-                                .route("POSTS", r -> r.path("/posts/**", "/posts-details/**", "/organizationposts/**")
+                                .route("POSTS", r -> r.path("/posts/**", "/posts-details/**", "/organizationposts/**", "/groups/**", "/todos/**", "/statements/**")
                                                 .filters(f -> f.filter(filter))
                                                 .uri("http://posts:8090"))
                                 // .route("MEDIA", r -> r.path("/media/**")

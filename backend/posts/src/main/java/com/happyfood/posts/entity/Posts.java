@@ -40,6 +40,7 @@ public class Posts {
     private String tags;
     private String userIdLikes;
     private String userIdReceived;
+    private String type;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comments> comments;

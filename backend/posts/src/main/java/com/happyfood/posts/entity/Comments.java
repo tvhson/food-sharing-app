@@ -23,6 +23,7 @@ public class Comments {
     private Date createdDate;
     private String userIdLikes;
     private Long userId;
+    private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "post_id")

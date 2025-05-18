@@ -24,4 +24,5 @@ public class OrganizationpostsDto {
     private boolean isAttended;
     private Date createdDate;
     private Date startDate;
+    private Long groupId;
 }

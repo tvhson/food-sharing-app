@@ -11,7 +11,7 @@ public interface IPostsService {
     PostsDto updatePostById(Long userId, PostsDto postsDto, Long postId);
     void deletePostById(Long userId, Long postId);
     PostsDto getPostById(Long userId, Long postId);
-    List<PostsDto> getRecommendedPosts(Long userId);
+    List<PostsDto> getRecommendedPosts(Long userId, String type, String latitude, String longitude, Long distance);
     List<PostsDto> getPostsOfUser(Long userId);
     void toggleLikePost(Long userId, Long postId);
     void confirmReceivedPost(Long userId, Long postId);

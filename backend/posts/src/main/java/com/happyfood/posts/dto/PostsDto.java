@@ -36,4 +36,5 @@ public class PostsDto {
     private Boolean isLiked;
     private Boolean isReceived;
     private int likeCount;
+    private String type;
 }

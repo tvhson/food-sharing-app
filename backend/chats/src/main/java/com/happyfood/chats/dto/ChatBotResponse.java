@@ -18,5 +18,6 @@ public class ChatBotResponse {
     public static class Choice {
         private int index;
         private ChatBotMessage message;
+        private String finish_reason;
     }
 }

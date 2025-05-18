@@ -13,4 +13,5 @@ public interface IAccountsService {
     AccountsDto banAccount(Long accountId, Long days);
     void changePassword(Long accountId,String oldPassword, String newPassword);
     void changeRole(Long accountId, String role);
+    AccountsDto getAccountByEmail(String email);
 }

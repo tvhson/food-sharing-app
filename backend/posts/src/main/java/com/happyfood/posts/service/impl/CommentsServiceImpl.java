@@ -75,6 +75,7 @@ public class CommentsServiceImpl implements ICommentsService {
             throw new CustomException("Bạn không có quyền chỉnh sửa bình luận này", HttpStatus.FORBIDDEN);
         }
         comments.setContent(commentsDto.getContent());
+        comments.setImageUrl(commentsDto.getImageUrl());
 
         return convertToResponse(commentsRepository.save(comments), userId);
     }

@@ -12,18 +12,14 @@ import java.util.Date;
 @Builder
 
 @Entity
-@Table(name = "chat_messages")
-public class ChatMessages {
+@Table(name = "chat_bot_history")
+public class ChatBotHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long chatRoomId;
-    private Long senderId;
-    private Long recipientId;
-    private String senderName;
-    private String recipientName;
+    private Long userId;
+    private String role;
+    @Column(columnDefinition = "TEXT")
     private String content;
-    private String imageUrl;
-    private Date timestamp;
-    private String status;
+    private Date createdDate;
 }

@@ -23,35 +23,48 @@ public class PostsController {
     ResponseEntity<PostsDto> createPost(@RequestHeader Long userId, @RequestBody PostsDto postsDto) {
         return ResponseEntity.ok(postsService.createPost(userId, postsDto));
     }
+
     @PutMapping("/{postId}")
     ResponseEntity<PostsDto> updatePostById(@RequestHeader Long userId, @RequestBody PostsDto postsDto, @PathVariable Long postId) {
         return ResponseEntity.ok(postsService.updatePostById(userId, postsDto, postId));
     }
+
     @DeleteMapping("/{postId}")
     ResponseEntity<?> deletePostById(@RequestHeader Long userId, @PathVariable Long postId) {
         postsService.deletePostById(userId, postId);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/get/{postId}")
     ResponseEntity<PostsDto> getPostById(@RequestHeader Long userId, @PathVariable Long postId) {
         return ResponseEntity.ok(postsService.getPostById(userId, postId));
     }
+
     @GetMapping("/recommended")
-    ResponseEntity<List<PostsDto>> getRecommendedPosts(@RequestHeader Long userId) {
-        return ResponseEntity.ok(postsService.getRecommendedPosts(userId));
+    ResponseEntity<List<PostsDto>> getRecommendedPosts(@RequestHeader Long userId,
+                                                       @RequestParam(required = false) String type,
+                                                       @RequestParam(required = false) String latitude,
+                                                       @RequestParam(required = false) String longitude,
+                                                       @RequestParam(required = false) Long distance
+                                                       ) {
+        return ResponseEntity.ok(postsService.getRecommendedPosts(userId, type, latitude, longitude, distance));
     }
+
     @GetMapping("/user")
     ResponseEntity<List<PostsDto>> getMyPosts(@RequestHeader Long userId) {
         return ResponseEntity.ok(postsService.getPostsOfUser(userId));
     }
+
     @GetMapping("/user/{userId}")
     ResponseEntity<List<PostsDto>> getPostsOfUser(@PathVariable Long userId) {
         return ResponseEntity.ok(postsService.getPostsOfUser(userId));
     }
+
     @GetMapping("/number-posts-received/{userId}")
     ResponseEntity<NumberPostsReceivedDto> getNumberPostsReceived(@PathVariable Long userId) {
         return ResponseEntity.ok(postsService.getNumberPostsReceived(userId));
     }
+
     @PostMapping("/confirm-received")
     ResponseEntity<?> confirmReceivedPost(@RequestParam Long userId, @RequestParam Long postId) {
         postsService.confirmReceivedPost(userId, postId);

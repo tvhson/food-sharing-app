@@ -134,4 +134,11 @@ public class AccountsServiceImpl implements IAccountsService {
         accounts.setRole(role);
         accountsRepository.save(accounts);
     }
+
+    @Override
+    public AccountsDto getAccountByEmail(String email) {
+        Accounts accounts = accountsRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND));
+        return AccountsMapper.mapToAccountsDto(accounts);
+    }
 }

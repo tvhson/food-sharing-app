@@ -1,7 +1,9 @@
 package com.happyfood.chats.controller;
 
+import com.happyfood.chats.dto.ChatBotDto;
 import com.happyfood.chats.entity.ChatMessages;
 import com.happyfood.chats.entity.ChatRooms;
+import com.happyfood.chats.service.IChatBotService;
 import com.happyfood.chats.service.IChatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequestMapping("/chats")
 public class ChatsController {
     private final IChatsService chatsService;
+    private final IChatBotService chatBotService;
 
     @MessageMapping("/message")
     public void processMessage(@Payload ChatMessages chatMessage) {
@@ -40,5 +43,15 @@ public class ChatsController {
     @PostMapping("/rooms/{chatId}")
     public ResponseEntity<ChatRooms> updateChatRoom(@RequestHeader Long userId, @PathVariable Long chatId, @RequestParam String status) {
         return ResponseEntity.ok(chatsService.updateChatRoom(userId, chatId, status));
+    }
+
+    @PostMapping("/chatbot")
+    public ResponseEntity<ChatBotDto> chat(@RequestHeader Long userId, @RequestBody ChatBotDto chatMessage) {
+        return ResponseEntity.ok(chatBotService.chat(chatMessage.getContent(), userId));
+    }
+
+    @GetMapping("/chatbot/history")
+    public ResponseEntity<List<ChatBotDto>> getChatHistory(@RequestHeader Long userId) {
+        return ResponseEntity.ok(chatBotService.getHistory(userId));
     }
 }

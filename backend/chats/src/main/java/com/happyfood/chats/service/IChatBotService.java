@@ -1,8 +1,11 @@
 package com.happyfood.chats.service;
 
-import com.happyfood.chats.dto.ChatBotRequest;
-import com.happyfood.chats.dto.ChatBotResponse;
+import com.happyfood.chats.dto.ChatBotDto;
+import com.happyfood.chats.dto.ChatBotMessage;
+
+import java.util.List;
 
 public interface IChatBotService {
-    ChatBotResponse chat(String content);
+    ChatBotDto chat(String content, Long userId);
+    List<ChatBotDto> getHistory(Long userId);
 }
