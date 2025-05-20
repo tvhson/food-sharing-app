@@ -14,22 +14,108 @@ import EditProfileScreen from './EditProfileScreen';
 import ListPost from '../components/ui/PersonalPageUI/ListPost';
 import {RootState} from '../redux/Store';
 import {TabView} from 'react-native-tab-view';
-import {UserInfo} from '../redux/UserReducer';
+import {saveUser, UserInfo} from '../redux/UserReducer';
 import {getFontFamily} from '../utils/fonts';
 import screenWidth from '../global/Constant';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import UploadPhoto from '../components/ui/UploadPhoto';
+import {createNotifications} from 'react-native-notificated';
+import {uploadPhoto} from '../api/UploadPhotoApi';
+import {updateUser} from '../api/AccountsApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /* eslint-disable @typescript-eslint/no-shadow */
 
+const {useNotifications} = createNotifications();
+
 const PersonalPage = ({navigation}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
+  const {notify} = useNotifications();
   const [index, setIndex] = useState(0);
   const routes = [
     {key: 'first', title: 'Bài viết'},
     {key: 'second', title: 'Hội nhóm'},
   ];
+  const dispatch = useDispatch();
   const [isEditVisible, setIsEditVisible] = useState(false);
+  const [isUploadVisible, setIsUploadVisible] = useState(false);
+  const [imageUrl, setImageUrl] = useState(userInfo.imageUrl);
   const accessToken = useSelector((state: RootState) => state.token.key);
+
+  const postImage = (image: any) => {
+    const dataForm = new FormData();
+    dataForm.append('file', {
+      uri: image.path,
+      name: image.filename || 'image.jpeg',
+      type: image.mime || 'image/jpeg',
+    });
+    uploadPhoto(dataForm, accessToken).then((response: any) => {
+      if (response.status === 200) {
+        const imageUrlString = response.data[0];
+        setImageUrl(imageUrlString);
+        updateUser(
+          {
+            imageUrl: response.data[0],
+            email: userInfo.email,
+            name: userInfo.name,
+            bannedDate: userInfo.bannedDate,
+            birthDate: userInfo.birthDate,
+            description: userInfo.description,
+            phone: userInfo.phone,
+            status: userInfo.status,
+            latitude: userInfo.latitude,
+            longitude: userInfo.longitude,
+            locationName: userInfo.locationName,
+          },
+          accessToken,
+        )
+          .then((response2: any) => {
+            //console.log(response2);
+            if (response2.status === 200) {
+              AsyncStorage.setItem('userInfo', JSON.stringify(response2.data));
+              const userInfo2: any = response2.data;
+              dispatch(saveUser(userInfo2));
+              notify('success', {
+                params: {
+                  description: 'Cập nhật ảnh đại diện thành công.',
+                  title: 'Thành công',
+                  style: {
+                    multiline: 100,
+                  },
+                },
+              });
+            } else {
+              notify('error', {
+                params: {
+                  description: 'Cập nhật ảnh đại diện thất bại.',
+                  title: 'Lỗi',
+                  style: {
+                    multiline: 100,
+                  },
+                },
+              });
+            }
+          })
+          .catch((error: any) => {
+            notify('error', {
+              params: {
+                description: error.message,
+                title: 'Error',
+                style: {multiline: 100},
+              },
+            });
+          });
+        return response.data;
+      } else {
+        notify('error', {
+          params: {
+            description: 'Cập nhật ảnh đại diện thất bại.',
+            title: 'Lỗi',
+          },
+        });
+      }
+    });
+  };
 
   const renderHeader = (userInfo: UserInfo) => {
     return (
@@ -39,14 +125,16 @@ const PersonalPage = ({navigation}: any) => {
             <View style={styles.avaContainer}>
               <Image
                 source={
-                  userInfo.imageUrl
-                    ? {uri: userInfo.imageUrl}
+                  imageUrl
+                    ? {uri: imageUrl}
                     : require('../assets/images/user.png')
                 }
                 style={{width: 66, height: 66, borderRadius: 33}}
               />
 
-              <TouchableOpacity style={styles.floatBtnChangeAva}>
+              <TouchableOpacity
+                style={styles.floatBtnChangeAva}
+                onPress={() => setIsUploadVisible(true)}>
                 <Image
                   source={require('../assets/images/camera.png')}
                   style={{
@@ -137,6 +225,14 @@ const PersonalPage = ({navigation}: any) => {
         setVisible={setIsEditVisible}
         userInfo={userInfo}
         token={accessToken}
+      />
+      <UploadPhoto
+        isVisible={isUploadVisible}
+        setVisible={setIsUploadVisible}
+        isCircle={true}
+        postImage={postImage}
+        title="Thay đổi ảnh đại diện"
+        subtitle="Chọn ảnh từ thư viện hoặc chụp ảnh mới"
       />
       {renderHeader(userInfo)}
 

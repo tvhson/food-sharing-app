@@ -102,6 +102,9 @@ const ProfileScreen = ({navigation, route}: any) => {
                 params: {
                   description: 'Cập nhật ảnh đại diện thành công.',
                   title: 'Thành công',
+                  style: {
+                    multiline: 100,
+                  },
                 },
               });
             } else {
@@ -109,6 +112,9 @@ const ProfileScreen = ({navigation, route}: any) => {
                 params: {
                   description: 'Cập nhật ảnh đại diện thất bại.',
                   title: 'Lỗi',
+                  style: {
+                    multiline: 100,
+                  },
                 },
               });
             }
