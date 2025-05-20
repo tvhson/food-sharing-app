@@ -230,6 +230,11 @@ const CreatePostScreen = ({route, navigation}: any) => {
 
                   hideLoading();
                   navigation.navigate('Home');
+                } else {
+                  notify('error', {
+                    params: {description: response2.data, title: 'Lỗi'},
+                  });
+                  hideLoading();
                 }
               })
               .catch((error: any) => {

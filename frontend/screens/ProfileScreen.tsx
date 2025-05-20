@@ -2,8 +2,8 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import {Avatar, Button} from '@rneui/themed';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {Accessory} from '@rneui/base';
@@ -149,6 +149,18 @@ const ProfileScreen = ({navigation, route}: any) => {
         title="Thay đổi ảnh đại diện"
         subtitle="Chọn ảnh từ thư viện hoặc chụp ảnh mới"
       />
+      <TouchableOpacity
+        onPress={() => navigation.navigate(Route.Support)}
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+        }}>
+        <Image
+          source={require('../assets/images/support.png')}
+          style={{width: 40, height: 40}}
+        />
+      </TouchableOpacity>
 
       <View
         style={{

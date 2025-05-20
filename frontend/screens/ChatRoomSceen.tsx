@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {Avatar, IconButton} from 'react-native-paper';
 import {
   Bubble,
@@ -8,8 +7,6 @@ import {
   Send,
 } from 'react-native-gifted-chat';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   connectMessage,

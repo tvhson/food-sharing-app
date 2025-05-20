@@ -39,6 +39,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ReportDetailScreen from '../screens/ReportDetailScreen';
 import ReportScreen from '../screens/ReportScreen';
 import {Route} from '../constants/route';
+import SupportScreen from '../screens/Support/SupportScreen';
 import VerifyScreen from '../screens/VerifyScreen';
 import WebViewScreen from '../screens/WebViewScreen';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -223,6 +224,7 @@ const Router = () => {
           name={Route.ZegoUIKitPrebuiltCallInCallScreen}
           component={ZegoUIKitPrebuiltCallInCallScreen}
         />
+        <Stack.Screen name={Route.Support} component={SupportScreen} />
       </Stack.Navigator>
       <EditProfileScreen />
     </>

@@ -9,5 +9,8 @@ module.exports = {
         endOfLine: 'auto', // Allow different OS line endings
       },
     ],
+    '@typescript-eslint/no-unused-vars': 'off',
+    'react-native/no-inline-styles': 'off',
+    'react-hooks/exhaustive-deps': 'off',
   },
 };
