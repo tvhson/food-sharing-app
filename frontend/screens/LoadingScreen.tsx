@@ -258,7 +258,9 @@ const LoadingScreen = ({navigation, route}: any) => {
     };
     const saveRecommendPost = async () => {
       try {
-        const response: any = await getPosts(token.toString(), 'ALL');
+        const response: any = await getPosts(token.toString(), {
+          type: 'ALL',
+        });
         if (response.status === 200) {
           const data = response.data;
           dispatch(clearSharingPosts());

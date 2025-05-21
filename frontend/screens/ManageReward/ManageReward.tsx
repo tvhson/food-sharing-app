@@ -1,5 +1,4 @@
 import {Button, Icon} from 'react-native-paper';
-/* eslint-disable react-native/no-inline-styles */
 import {
   FlatList,
   Image,

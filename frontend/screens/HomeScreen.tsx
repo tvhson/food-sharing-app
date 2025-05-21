@@ -73,7 +73,12 @@ const HomeScreen = ({navigation}: any) => {
         const type = foodType === null ? 'ALL' : getFoodTypeKey(foodType);
         if (!type) return;
         showLoading();
-        const response: any = await getPosts(accessToken.toString(), type);
+        const response: any = await getPosts(accessToken.toString(), {
+          type,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          distance: 1000,
+        });
         if (response.status === 200) {
           dispatch(clearSharingPosts());
           AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
@@ -101,7 +106,12 @@ const HomeScreen = ({navigation}: any) => {
       if (accessToken) {
         const type = foodType === null ? 'ALL' : getFoodTypeKey(foodType);
         if (!type) return;
-        const response: any = await getPosts(accessToken.toString(), type);
+        const response: any = await getPosts(accessToken.toString(), {
+          type,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          distance: 1000,
+        });
         if (response.status === 200) {
           AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
           setRecommendPost(response.data);

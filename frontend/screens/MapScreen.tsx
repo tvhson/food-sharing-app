@@ -1,53 +1,55 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import {Checkbox, Icon, Menu} from 'react-native-paper';
 import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
+import {Checkbox, Icon, Menu} from 'react-native-paper';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-/* eslint-disable react/self-closing-comp */
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {moderateScale, scale, verticalScale} from '../utils/scale';
-
-import Colors from '../global/Color';
-import {CustomMarker} from '../components/ui/CustomMarker';
-import {RootState} from '../redux/Store';
-import {calculateDistance} from '../utils/helper';
 import {createNotifications} from 'react-native-notificated';
-import {getFontFamily} from '../utils/fonts';
 import {useSelector} from 'react-redux';
-
-const dummyLocations = [
-  {id: 1, title: 'Place A', latitude: 37.42199, longitude: -122.08},
-  {id: 2, title: 'Place B', latitude: 34, longitude: -123},
-  {id: 3, title: 'Place C', latitude: 35, longitude: -121},
-];
+import {CustomMarker} from '../components/ui/CustomMarker';
+import Colors from '../global/Color';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {calculateDistance} from '../utils/helper';
+import {SharingPost} from '../redux/SharingPostReducer';
+import {getPosts} from '../api/PostApi';
 
 const listFilter = [
-  {id: 1, title: 'Khoảng cách < 2km', value: '<2'},
-  {id: 2, title: 'Khoảng cách từ 2 đến 5km', value: '2-5'},
-  {id: 3, title: 'Khoảng cách > 5km', value: '>5'},
+  {id: 1, title: 'Trong vòng 2km', value: 2},
+  {id: 2, title: 'Trong vòng 5km', value: 5},
+  {id: 3, title: 'Trong vòng 10km', value: 10},
   {id: 4, title: 'Tất cả', value: 'all'},
 ];
 const {useNotifications} = createNotifications();
 
 const MapScreen = ({navigation}: any) => {
-  const location = useSelector((state: RootState) => state.location);
+  const location = useSelector((state: RootState) => state.location) || {
+    latitude: useSelector((state: RootState) => state.userInfo.latitude),
+    longitude: useSelector((state: RootState) => state.userInfo.longitude),
+  };
+
+  const accessToken = useSelector((state: RootState) => state.token.key);
+
   const {notify} = useNotifications();
   const markerRef = useRef<any>(null);
 
-  const [filter, setFilter] = useState<string>();
+  const [filter, setFilter] = useState<number>();
   const [visible, setVisible] = useState(false);
+  const [filteredMarkers, setFilteredMarkers] = useState<SharingPost[]>([]);
 
-  const filteredMarkers = useMemo(() => {
-    return dummyLocations.filter(place => {
-      const distance = calculateDistance(place, location);
-      if (filter === '<2') return distance < 2;
-      if (filter === '2-5') return distance >= 2 && distance <= 5;
-      if (filter === '>5') return distance > 5;
-      return true;
-    });
-  }, [filter, location]);
   const mapRef = useRef<MapView>(null);
+
+  const getData = async () => {
+    const response: any = await getPosts(accessToken.toString(), {
+      type: 'ALL',
+      latitude: location.latitude,
+      longitude: location.longitude,
+      distance: filter,
+    });
+    if (response.status === 200) {
+      setFilteredMarkers(response.data);
+    }
+  };
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -120,7 +122,11 @@ const MapScreen = ({navigation}: any) => {
             <Menu.Item
               key={item.id}
               onPress={() => {
-                setFilter(item.value);
+                if (typeof item.value === 'number') {
+                  setFilter(item.value);
+                } else {
+                  setFilter(100000);
+                }
                 setVisible(false);
               }}
               title={

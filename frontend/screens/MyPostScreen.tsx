@@ -85,7 +85,12 @@ const MyPostScreen = ({navigation, route}: any) => {
       if (myPostReducer) {
         setMyPost(myPostReducer);
       } else if (accessToken) {
-        getPosts(accessToken.toString()).then((response: any) => {
+        getPosts(accessToken.toString(), {
+          type: 'ALL',
+          latitude: location.latitude,
+          longitude: location.longitude,
+          distance: 1000,
+        }).then((response: any) => {
           if (response.status === 200) {
             AsyncStorage.setItem(
               'recommendPost',

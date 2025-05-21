@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import LottieView from 'lottie-react-native';
 import React, {useEffect} from 'react';
 

@@ -1,6 +1,5 @@
 import {Checkbox, Searchbar} from 'react-native-paper';
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {FlatList, Image, StyleSheet, Text, View} from 'react-native';
 import React, {useState} from 'react';
 

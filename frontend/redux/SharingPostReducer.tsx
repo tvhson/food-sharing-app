@@ -6,6 +6,7 @@ export interface SharingPost {
   description: string;
   images: Array<string>;
   note: string;
+  weight: number;
   expiredDate: Date;
   pickUpStartDate: Date;
   pickUpEndDate: Date;
@@ -14,7 +15,7 @@ export interface SharingPost {
   latitude: number;
   longitude: number;
   createdById: number;
-  receiverId: number;
+  receiverId: number | null;
   createdDate: Date;
   portion: number;
   tags: Array<string>;

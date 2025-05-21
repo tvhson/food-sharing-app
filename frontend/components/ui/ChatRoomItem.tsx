@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 import Colors from '../../global/Color';
-/* eslint-disable react-native/no-inline-styles */
+
 import React from 'react';
 import {RootState} from '../../redux/Store';
 import {Route} from '../../constants/route';

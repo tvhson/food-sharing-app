@@ -1,7 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
-if (__DEV__) {
-  require('./ReactotronConfig');
-}
 import * as React from 'react';
 import {
   NavigationContainer,

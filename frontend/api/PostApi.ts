@@ -1,14 +1,20 @@
 import ApiManager from './ApiManager';
-export const getPosts = async (token: any, type: string) => {
+
+export interface IGetPostsParams {
+  type: string;
+  latitude?: number;
+  longitude?: number;
+  distance?: number;
+}
+
+export const getPosts = async (token: string, params: IGetPostsParams) => {
   try {
     const response = await ApiManager('posts/recommended', {
       method: 'GET',
       headers: {
         Authorization: token,
       },
-      params: {
-        type: type,
-      },
+      params: params,
     });
     return response;
   } catch (error) {
