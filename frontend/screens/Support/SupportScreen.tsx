@@ -31,7 +31,7 @@ const SupportScreen = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    getHistoryChat(accessToken, userInfo.id).then(response => {
+    getHistoryChat(accessToken).then(response => {
       setMessages(
         response.map((message, index) => convertMessage(message, index)),
       );
@@ -63,11 +63,7 @@ const SupportScreen = () => {
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, newMessage),
       );
-      const response = await sendMessage(
-        message.text,
-        accessToken,
-        userInfo.id,
-      );
+      const response = await sendMessage(message.text, accessToken);
       console.log('newMessage', newMessage);
 
       setMessages(previousMessages =>
