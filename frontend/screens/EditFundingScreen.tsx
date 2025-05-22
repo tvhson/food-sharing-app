@@ -250,6 +250,7 @@ const EditFundingScreen = ({navigation, route}: any) => {
 
       <GooglePlacesAutocomplete
         ref={autocompleteRef}
+        debounce={500}
         fetchDetails={true}
         placeholder="Enter your organization address"
         onPress={(data, details = null) => {

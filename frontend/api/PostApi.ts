@@ -118,7 +118,23 @@ export const likePost = async (postId: any, token: any) => {
   }
 };
 
-export const getCommentByPostId = async (postId: any, token: any) => {
+export interface IComment {
+  id: number;
+  avatar: string;
+  content: string;
+  createdDate: string;
+  imageUrl: string | null;
+  isLove: boolean;
+  loveCount: number;
+  postId: number;
+  userId: number;
+  userName: string;
+}
+
+export const getCommentByPostId = async (
+  postId: any,
+  token: any,
+): Promise<IComment[]> => {
   try {
     const response = await ApiManager(`posts/${postId}/comments`, {
       method: 'GET',
@@ -126,16 +142,21 @@ export const getCommentByPostId = async (postId: any, token: any) => {
         Authorization: token,
       },
     });
-    return response;
+    return response.data;
   } catch (error) {
-    return error;
+    throw error;
   }
 };
 
+export interface ICreateCommentToPost {
+  content: string;
+  imageUrl: string | null;
+}
+
 export const createCommentToPost = async (
-  postId: any,
-  data: any,
-  token: any,
+  postId: number,
+  data: ICreateCommentToPost,
+  token: string,
 ) => {
   try {
     const response = await ApiManager(`posts/${postId}/comments`, {
@@ -147,7 +168,7 @@ export const createCommentToPost = async (
     });
     return response;
   } catch (error) {
-    return error;
+    throw error;
   }
 };
 

@@ -313,6 +313,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           />
         </TouchableOpacity>
         <GooglePlacesAutocomplete
+          debounce={500}
           ref={autocompleteRef}
           fetchDetails={true}
           placeholder="Địa chỉ nhận"

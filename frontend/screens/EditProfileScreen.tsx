@@ -279,6 +279,7 @@ function EditProfileScreen(props: any) {
             </Text>
             <GooglePlacesAutocomplete
               ref={autocompleteRef}
+              debounce={500}
               fetchDetails={true}
               placeholder={'Nhập địa chỉ của bạn'}
               onPress={(data, details = null) => {

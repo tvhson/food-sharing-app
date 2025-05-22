@@ -63,14 +63,14 @@ export const createGroup = async (
   request: ICreateGroupRequest,
 ): Promise<IGetGroupResponse> => {
   try {
-    const response: IGetGroupResponse = await ApiManager(`groups/create`, {
+    const response = await ApiManager(`groups/create`, {
       method: 'POST',
       headers: {
         Authorization: token,
       },
       data: request,
     });
-    return response;
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -82,14 +82,14 @@ export const editGroup = async (
   request: ICreateGroupRequest,
 ): Promise<IGetGroupResponse> => {
   try {
-    const response: IGetGroupResponse = await ApiManager(`groups/${groupId}`, {
+    const response = await ApiManager(`groups/${groupId}`, {
       method: 'PUT',
       headers: {
         Authorization: token,
       },
       data: request,
     });
-    return response;
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -112,16 +112,13 @@ export const getMyGroup = async (
   token: string,
 ): Promise<IGetGroupResponse[]> => {
   try {
-    const response: IGetGroupResponse[] = await ApiManager(
-      `groups/get-my-groups`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`groups/get-my-groups`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -140,16 +137,13 @@ export const getGroupTodo = async (
   groupId: number,
 ): Promise<IGetGroupTodoResponse[]> => {
   try {
-    const response: IGetGroupTodoResponse[] = await ApiManager(
-      `todos/${groupId}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`todos/${groupId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -166,17 +160,14 @@ export const createGroupTodo = async (
   request: ICreateGroupTodoRequest,
 ): Promise<IGetGroupTodoResponse> => {
   try {
-    const response: IGetGroupTodoResponse = await ApiManager(
-      `todos/${groupId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: token,
-        },
-        data: request,
+    const response = await ApiManager(`todos/${groupId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+      data: request,
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -201,17 +192,14 @@ export const updateGroupTodo = async (
   request: ICreateGroupTodoRequest,
 ): Promise<IGetGroupTodoResponse> => {
   try {
-    const response: IGetGroupTodoResponse = await ApiManager(
-      `todos/${todoId}`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: token,
-        },
-        data: request,
+    const response = await ApiManager(`todos/${todoId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+      data: request,
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -233,16 +221,13 @@ export const getGroupStatement = async (
   groupId: number,
 ): Promise<IGetGroupStatementResponse[]> => {
   try {
-    const response: IGetGroupStatementResponse[] = await ApiManager(
-      `statements/${groupId}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`statements/${groupId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -260,17 +245,14 @@ export const createGroupStatement = async (
   request: ICreateGroupStatementRequest,
 ): Promise<IGetGroupStatementResponse> => {
   try {
-    const response: IGetGroupStatementResponse = await ApiManager(
-      `statements/${groupId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: token,
-        },
-        data: request,
+    const response = await ApiManager(`statements/${groupId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+      data: request,
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -282,17 +264,14 @@ export const editGroupStatement = async (
   request: ICreateGroupStatementRequest,
 ): Promise<IGetGroupStatementResponse> => {
   try {
-    const response: IGetGroupStatementResponse = await ApiManager(
-      `statements/${statementId}`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: token,
-        },
-        data: request,
+    const response = await ApiManager(`statements/${statementId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+      data: request,
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -337,16 +316,13 @@ export const kickUser = async (
   userId: number,
 ): Promise<IGetGroupResponse> => {
   try {
-    const response: IGetGroupResponse = await ApiManager(
-      `groups/kick/${groupId}/${userId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`groups/kick/${groupId}/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -358,16 +334,13 @@ export const acceptInvite = async (
   userId: number,
 ): Promise<IGetGroupResponse> => {
   try {
-    const response: IGetGroupResponse = await ApiManager(
-      `groups/accept/${groupId}/${userId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`groups/accept/${groupId}/${userId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -379,16 +352,13 @@ export const rejectInvite = async (
   userId: number,
 ): Promise<IGetGroupResponse> => {
   try {
-    const response: IGetGroupResponse = await ApiManager(
-      `groups/reject/${groupId}/${userId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`groups/reject/${groupId}/${userId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -400,16 +370,13 @@ export const joinGroup = async (
   userId: number,
 ): Promise<IGetGroupResponse> => {
   try {
-    const response: IGetGroupResponse = await ApiManager(
-      `groups/join/${groupId}/${userId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`groups/join/${groupId}/${userId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -421,16 +388,13 @@ export const leaveGroup = async (
   userId: number,
 ): Promise<IGetGroupResponse> => {
   try {
-    const response: IGetGroupResponse = await ApiManager(
-      `groups/leave/${groupId}/${userId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`groups/leave/${groupId}/${userId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }

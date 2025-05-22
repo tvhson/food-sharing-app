@@ -43,18 +43,13 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   const item = route.params.item;
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const [roomId, setRoomId] = useState(item.id ? item.id : null);
-  const [infoOther, setInfoOther] = useState<any>(null);
-  const [text, setText] = useState('');
+
   const {showLoading, hideLoading} = useLoading();
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
-  const [imagePath, setImagePath] = useState('');
 
   const postImage = async (image: any) => {
     setImageUpload(image);
-    if (image.path) {
-      setImagePath(image.path);
-    }
   };
 
   const recipientProfilePic =
@@ -155,7 +150,23 @@ const ChatRoomScreen = ({navigation, route}: any) => {
 
   const onSend = useCallback(
     async (newMessage: IMessage[]) => {
-      const imageUrl = await handleUploadImage();
+      showLoading();
+      let imageUrl = null;
+      const dataForm = new FormData();
+      if (imageUpload) {
+        dataForm.append('file', {
+          uri: imageUpload.path,
+          name: imageUpload.filename || 'image.jpeg',
+          type: imageUpload.mime || 'image/jpeg',
+        });
+      }
+      const response: any = await uploadPhoto(dataForm, accessToken);
+      if (response?.status === 200) {
+        imageUrl = response?.data[0];
+      } else {
+        console.log(response);
+        hideLoading();
+      }
       const message = {
         senderId: userInfo.id,
         recipientId:
@@ -167,14 +178,19 @@ const ChatRoomScreen = ({navigation, route}: any) => {
         imageUrl: imageUrl,
       };
       sendMessage(message);
-      setMessages((previousMessages: IMessage[]) =>
-        GiftedChat.append(previousMessages, newMessage),
-      );
+      setMessages((previousMessages: IMessage[]) => {
+        const updatedNewMessages = newMessage.map(msg => ({
+          ...msg,
+          image: imageUrl,
+        }));
+        return GiftedChat.append(previousMessages, updatedNewMessages);
+      });
+      hideLoading();
       if (roomId === null) {
         await getRoomChats(accessToken)
-          .then((response: any) => {
-            if (response.status === 200) {
-              const roomChats = response.data;
+          .then((response2: any) => {
+            if (response2.status === 200) {
+              const roomChats = response2.data;
               const roomChat = roomChats.find(
                 (room: any) =>
                   room.senderId === item.senderId &&
@@ -200,8 +216,8 @@ const ChatRoomScreen = ({navigation, route}: any) => {
                     senderId: userInfo.id,
                   },
                   accessToken,
-                ).then((response2: any) => {
-                  console.log(response2);
+                ).then((response3: any) => {
+                  console.log(response3);
                 });
               }
             }
@@ -248,6 +264,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   );
 
   const handleUploadImage = async () => {
+    let imageUrl = null;
     const dataForm = new FormData();
     if (imageUpload) {
       dataForm.append('file', {
@@ -259,13 +276,12 @@ const ChatRoomScreen = ({navigation, route}: any) => {
 
     uploadPhoto(dataForm, accessToken).then((response: any) => {
       if (response?.status === 200) {
-        console.log(response.data);
-        return response?.data[0];
+        imageUrl = response?.data[0];
       } else {
         console.log(response);
       }
     });
-    return null;
+    return imageUrl;
   };
 
   return (
@@ -440,7 +456,6 @@ const ChatRoomScreen = ({navigation, route}: any) => {
           />
         )}
         textInputProps={styles.composer}
-        onInputTextChanged={setText}
         alwaysShowSend
         keyboardShouldPersistTaps={'handled'}
         placeholder="Nhập tin nhắn..."

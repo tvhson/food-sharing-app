@@ -153,7 +153,7 @@ export const FundingScreen = ({navigation}: any) => {
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View style={{flex: 1}}>
           <SearchBar
-            placeholder="Tìm chiến dịch, sự kiện chia sẻ bằng tên"
+            placeholder="Tìm nhóm"
             containerStyle={{
               backgroundColor: 'transparent',
               borderColor: 'transparent',

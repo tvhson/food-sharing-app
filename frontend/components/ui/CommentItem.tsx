@@ -1,3 +1,4 @@
+import {IComment, likeComment} from '../../api/PostApi';
 import {
   Image,
   StyleSheet,
@@ -7,14 +8,18 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {getFontFamily} from '../../utils/fonts';
+
 import Colors from '../../global/Color';
-import {timeAgo} from '../../utils/helper';
-import {likeComment} from '../../api/PostApi';
 import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
+import {timeAgo} from '../../utils/helper';
 import {useSelector} from 'react-redux';
 
-const CommentItem = (props: any) => {
+interface ICommentItemProps {
+  comment: IComment;
+}
+
+const CommentItem = (props: ICommentItemProps) => {
   const {comment} = props;
   const accessToken = useSelector((state: RootState) => state.token.key);
   const [isLiked, setIsLiked] = useState(comment.isLove || false);
@@ -47,7 +52,10 @@ const CommentItem = (props: any) => {
             <Text style={styles.textTime}>{timeAgo(comment.createdDate)}</Text>
           </View>
 
-          <Text>{comment.content}</Text>
+          {comment.content && <Text>{comment.content}</Text>}
+          {comment.imageUrl && (
+            <Image source={{uri: comment.imageUrl}} style={styles.image} />
+          )}
         </View>
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={handleLikeComment}>
@@ -117,5 +125,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: getFontFamily('regular'),
     color: Colors.darkGray,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
   },
 });

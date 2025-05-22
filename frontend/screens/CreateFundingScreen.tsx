@@ -233,6 +233,7 @@ const CreateFundingScreen = ({navigation}: any) => {
 
       <GooglePlacesAutocomplete
         ref={autocompleteRef}
+        debounce={500}
         fetchDetails={true}
         placeholder="Địa điểm diễn ra"
         onPress={(data, details = null) => {

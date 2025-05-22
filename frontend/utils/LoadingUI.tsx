@@ -1,7 +1,8 @@
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+
+import Colors from '../global/Color';
 // LoadingScreen.js
 import React from 'react';
-import {View, ActivityIndicator, StyleSheet} from 'react-native';
-import Colors from '../global/Color';
 
 const LoadingUI = ({visible}: any) => {
   if (!visible) {
@@ -25,6 +26,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    zIndex: 1000,
   },
 });
 

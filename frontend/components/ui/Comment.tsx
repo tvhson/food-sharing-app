@@ -1,5 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -8,26 +9,38 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  IComment,
+  createCommentToPost,
+  getCommentByPostId,
+} from '../../api/PostApi';
 import React, {useEffect, useState} from 'react';
-import Modal from 'react-native-modal';
+
 import Colors from '../../global/Color';
-import {getFontFamily} from '../../utils/fonts';
 import CommentItem from './CommentItem';
+import {Icon} from 'react-native-paper';
+import Modal from 'react-native-modal';
 import {RootState} from '../../redux/Store';
-import {useSelector} from 'react-redux';
-import {createCommentToPost, getCommentByPostId} from '../../api/PostApi';
-import {useNotifications} from 'react-native-notificated';
+import UploadPhoto from './UploadPhoto';
+import {getFontFamily} from '../../utils/fonts';
+import {scale} from '../../utils/scale';
+import {uploadPhoto} from '../../api/UploadPhotoApi';
 import {useLoading} from '../../utils/LoadingContext';
+import {useNotifications} from 'react-native-notificated';
+import {useSelector} from 'react-redux';
 
 const Comment = (props: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
-  const {showLoading, hideLoading} = useLoading();
+
   const {commentPostId} = props;
   const {isVisible, setVisible} = props;
-  const [commentList, setCommentList] = useState([]);
+  const [commentList, setCommentList] = useState<IComment[]>([]);
   const [comment, setComment] = useState('');
   const {notify} = useNotifications();
+  const [isUploadVisible, setIsUploadVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const [imageUpload, setImageUpload] = useState<any>(null);
   useEffect(() => {
     const getCommentList = async () => {
       // get comment list
@@ -35,37 +48,78 @@ const Comment = (props: any) => {
         if (commentPostId === 0) {
           return;
         }
+        setIsLoading(true);
         // get comment list
-        getCommentByPostId(commentPostId, accessToken).then((response: any) => {
-          if (response.status === 200) {
-            setCommentList(response.data);
-          }
-        });
+        getCommentByPostId(commentPostId, accessToken)
+          .then(response => {
+            setCommentList(response);
+            setIsLoading(false);
+          })
+          .catch(error => {
+            setIsLoading(false);
+            console.log(error);
+            notify('error', {
+              params: {
+                description: 'Không thể lấy data',
+                title: 'Lỗi',
+                style: {
+                  multiline: 100,
+                },
+              },
+            });
+          });
       }
     };
     getCommentList();
   }, [accessToken, commentPostId, notify, isVisible]);
 
+  const postImage = async (newImages: any) => {
+    // Ensure newImages is always an array
+
+    setImageUpload(newImages);
+  };
+
   const handleCreateComment = async () => {
-    showLoading();
+    setIsLoading(true);
+    let imageUrl = null;
+    if (imageUpload) {
+      const dataForm = new FormData();
+      dataForm.append('file', {
+        uri: imageUpload.path,
+        name: imageUpload.filename || 'image.jpeg',
+        type: imageUpload.mime || 'image/jpeg',
+      });
+      const response: any = await uploadPhoto(dataForm, accessToken);
+      if (response.status === 200) {
+        imageUrl = response.data[0];
+      }
+    }
     const response: any = await createCommentToPost(
       commentPostId,
-      {content: comment},
+      {content: comment, imageUrl: imageUrl},
       accessToken,
     );
     if (response.status === 200) {
       setComment('');
-      getCommentByPostId(commentPostId, accessToken).then((response2: any) => {
-        if (response2.status === 200) {
-          setCommentList(response2.data);
-        }
-      });
+      setImageUpload(null);
+      getCommentByPostId(commentPostId, accessToken)
+        .then(response2 => {
+          setCommentList(response2);
+        })
+        .catch(error => {
+          console.log(error);
+          setIsLoading(false);
+          notify('error', {
+            params: {description: 'Không thể lấy data', title: 'Lỗi'},
+          });
+        });
     } else {
       notify('error', {
         params: {description: 'Không thể tạo comment', title: 'Lỗi'},
       });
+      setIsLoading(false);
     }
-    hideLoading();
+    setIsLoading(false);
   };
 
   return (
@@ -73,8 +127,14 @@ const Comment = (props: any) => {
       style={styles.modal}
       hideModalContentWhileAnimating={true}
       avoidKeyboard={true}
-      onBackButtonPress={() => setVisible(false)}
-      onBackdropPress={() => setVisible(false)}
+      onBackButtonPress={() => {
+        setVisible(false);
+        setImageUpload(null);
+      }}
+      onBackdropPress={() => {
+        setVisible(false);
+        setImageUpload(null);
+      }}
       isVisible={isVisible}
       animationIn={'slideInUp'}
       animationOut={'slideOutDown'}
@@ -82,9 +142,25 @@ const Comment = (props: any) => {
       backdropTransitionInTiming={500}
       backdropTransitionOutTiming={500}
       swipeDirection={['down', 'left', 'right']}
-      onSwipeComplete={() => setVisible(false)}
+      onSwipeComplete={() => {
+        setVisible(false);
+        setImageUpload(null);
+      }}
       propagateSwipe={true}>
       <View style={styles.modalContent}>
+        {isLoading && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color={Colors.gray} />
+          </View>
+        )}
+        <UploadPhoto
+          isVisible={isUploadVisible}
+          setVisible={setIsUploadVisible}
+          height={300}
+          width={350}
+          isCircle={false}
+          postImage={postImage}
+        />
         <View style={styles.barIcon} />
         <View style={{alignItems: 'center'}}>
           <Text style={styles.panelTitle}>Bình luận</Text>
@@ -102,32 +178,70 @@ const Comment = (props: any) => {
             position: 'absolute',
             bottom: 0,
             width: '100%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 10,
-            flexDirection: 'row',
-            borderTopWidth: 1,
-            borderTopColor: Colors.gray,
-            backgroundColor: Colors.white,
           }}>
-          <TextInput
-            multiline
-            placeholder="Viết bình luận"
-            value={comment}
-            onChangeText={setComment}
+          {imageUpload && (
+            <View style={{padding: 10}}>
+              <TouchableOpacity
+                onPress={() => setImageUpload(null)}
+                style={{
+                  position: 'absolute',
+                  top: scale(14),
+                  left: scale(56),
+                  zIndex: 10,
+                  backgroundColor: Colors.white,
+                  borderRadius: scale(100),
+                  padding: scale(2),
+                }}>
+                <Icon source="close" size={14} color={Colors.black} />
+              </TouchableOpacity>
+              <Image
+                source={{uri: imageUpload.path}}
+                style={{
+                  width: scale(70),
+                  height: scale(70),
+                  borderRadius: scale(10),
+                  borderWidth: 1,
+                  borderColor: Colors.gray,
+                }}
+              />
+            </View>
+          )}
+          <View
             style={{
-              backgroundColor: Colors.background,
-              borderRadius: 20,
+              flexDirection: 'row',
               padding: 10,
-              flex: 1,
-            }}
-          />
-          <TouchableOpacity onPress={handleCreateComment} disabled={!comment}>
-            <Image
-              source={require('../../assets/images/send.png')}
-              style={{width: 30, height: 30}}
+              borderTopWidth: 1,
+              borderTopColor: Colors.gray,
+              backgroundColor: Colors.white,
+            }}>
+            <TouchableOpacity
+              onPress={() => setIsUploadVisible(true)}
+              style={{marginTop: 12}}>
+              <Icon source="camera" size={24} color={Colors.greenPrimary} />
+            </TouchableOpacity>
+            <TextInput
+              multiline
+              placeholder="Viết bình luận"
+              value={comment}
+              onChangeText={setComment}
+              style={{
+                backgroundColor: Colors.background,
+                borderRadius: 20,
+                padding: 10,
+                flex: 1,
+                marginHorizontal: 10,
+              }}
             />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleCreateComment}
+              disabled={!comment && !imageUpload}
+              style={{marginTop: 12}}>
+              <Image
+                source={require('../../assets/images/send.png')}
+                style={{width: 30, height: 30}}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -139,6 +253,17 @@ export default Comment;
 const styles = StyleSheet.create({
   modal: {
     margin: 0,
+  },
+  loading: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    zIndex: 1000,
   },
   modalContent: {
     flex: 1,

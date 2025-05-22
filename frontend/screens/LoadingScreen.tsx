@@ -292,40 +292,7 @@ const LoadingScreen = ({navigation, route}: any) => {
         console.log(error);
       }
     };
-    const saveOrganizationPost = async () => {
-      try {
-        const response: any = await getOrganizationPost(token.toString());
-        if (response.status === 200) {
-          const data = response.data;
-          dispatch(clearFundingPosts());
-          for (const fundingPost of data) {
-            dispatch(pushFundingPost(fundingPost));
-          }
-        } else {
-          console.log(response);
-          throw new Error(response);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const saveMyOrganizationPost = async () => {
-      try {
-        const response: any = await getOrganizationPostOfUser(token.toString());
-        if (response.status === 200) {
-          const data = response.data;
-          dispatch(clearMyFundingPosts());
-          for (const fundingPost of data) {
-            dispatch(pushMyFundingPost(fundingPost));
-          }
-        } else {
-          console.log(response);
-          throw new Error(response);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+
     const saveNotification = async () => {
       try {
         const response: any = await getNotifications(token.toString());
@@ -370,8 +337,6 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveInfo(),
           saveRecommendPost(),
           saveMyPost(),
-          saveOrganizationPost(),
-          saveMyOrganizationPost(),
           saveNotification(),
           sendData(),
           getPoint(),

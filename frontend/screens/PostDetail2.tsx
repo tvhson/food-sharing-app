@@ -214,7 +214,7 @@ const PostDetail2 = ({route, navigation}: any) => {
   const handleCreateComment = async () => {
     const response: any = await createCommentToPost(
       item.id,
-      {content: comment},
+      {content: comment, imageUrl: null},
       accessToken,
     );
     if (response.status === 200) {
