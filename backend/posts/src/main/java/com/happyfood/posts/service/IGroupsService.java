@@ -24,10 +24,10 @@ public interface IGroupsService {
     StatementsDto updateStatement(Long statementId, StatementsDto statementsDto);
     void deleteStatement(Long statementId);
 
-    void inviteUserToGroup(Long groupId, Long userId);
-    void removeUserFromGroup(Long groupId, Long userId);
-    void acceptGroupInvitation(Long groupId, Long userId);
-    void rejectGroupInvitation(Long groupId, Long userId);
-    void joinGroup(Long groupId, Long userId);
-    void leaveGroup(Long groupId, Long userId);
+    GroupsDto inviteUserToGroup(Long groupId, Long userId);
+    GroupsDto removeUserFromGroup(Long groupId, Long userId);
+    GroupsDto acceptGroupInvitation(Long groupId, Long userId);
+    GroupsDto rejectGroupInvitation(Long groupId, Long userId);
+    GroupsDto joinGroup(Long groupId, Long userId);
+    GroupsDto leaveGroup(Long groupId, Long userId);
 }

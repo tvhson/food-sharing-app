@@ -85,10 +85,6 @@ public class ChatBotService implements IChatBotService {
                                                     .role(ChatBotRole.USER.getValue())
                                                     .build());
 
-        ChatBotMessage chatBotMessage = new ChatBotMessage();
-        chatBotMessage.setRole(ChatBotRole.ASSISTANT.getValue());
-        chatBotMessage.setContent(response.getChoices().get(0).getMessage().getContent());
-
         chatBotHistoryRepository.save(ChatBotHistory.builder()
                                                     .userId(userId)
                                                     .content(response.getChoices().get(0).getMessage().getContent())
@@ -109,6 +105,23 @@ public class ChatBotService implements IChatBotService {
     public List<ChatBotDto> getHistory(Long userId) {
         List<ChatBotHistory> chatBotHistories = chatBotHistoryRepository.findByUserId(userId);
         List<ChatBotDto> chatMessages = new ArrayList<>();
+
+        String helloMessage = "## 👋 Chào bạn, tôi là trợ lý ảo của HappyFood. Tôi có thể giúp gì cho bạn hôm nay?";
+        chatMessages.add(ChatBotDto.builder()
+                                   .content(helloMessage)
+                                   .role(ChatBotRole.ASSISTANT.getValue())
+                                   .build());
+
+        String beginningMessage = "## ❓ Bạn muốn hỏi về\n\n"
+                                  + "- [➡️ Chính sách đổi điểm thưởng](#)\n"
+                                  + "- [➡️ Chính sách khiếu nại](#)\n"
+                                  + "- [➡️ Cách giao nhận thức ăn](#)\n"
+                                  + "- [❔ Câu hỏi thường gặp](#)";
+        chatMessages.add(ChatBotDto.builder()
+                                   .content(beginningMessage)
+                                   .role(ChatBotRole.ASSISTANT.getValue())
+                                   .build());
+
         for (ChatBotHistory chatBotHistory : chatBotHistories) {
             chatMessages.add(ChatBotDto.builder()
                                        .content(chatBotHistory.getContent())

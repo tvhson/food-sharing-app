@@ -55,6 +55,8 @@ public class GroupsServiceImpl implements IGroupsService {
         if (groupsDto.getMembers() != null && !groupsDto.getMembers().isEmpty()) {
             groups.setMemberIds(String.join("-", groupsDto.getMembers().stream().map(AccountsDto::getId).map(String::valueOf).toList()));
         }
+
+        groups.setMemberIds(userId.toString());
         groups.setCreatedDate(new Date());
         groups.setAuthorId(userId);
         return convertToResponse(groupsRepository.save(groups), userId);
@@ -70,6 +72,9 @@ public class GroupsServiceImpl implements IGroupsService {
         groups.setImageUrl(groupsDto.getImageUrl());
         groups.setStartDate(groupsDto.getStartDate());
         groups.setEndDate(groupsDto.getEndDate());
+        groups.setLocationName(groupsDto.getLocationName());
+        groups.setLatitude(groupsDto.getLatitude());
+        groups.setLongitude(groupsDto.getLongitude());
 
         return convertToResponse(groupsRepository.save(groups), userId);
     }
@@ -165,7 +170,7 @@ public class GroupsServiceImpl implements IGroupsService {
     }
 
     @Override
-    public void inviteUserToGroup(Long groupId, Long userId) {
+    public GroupsDto inviteUserToGroup(Long groupId, Long userId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
         if (groups.getMemberIds() != null && !groups.getMemberIds().isEmpty()) {
             List<String> memberIds = Arrays.asList(groups.getMemberIds().split("-"));
@@ -194,11 +199,11 @@ public class GroupsServiceImpl implements IGroupsService {
                                                            .senderId(groups.getAuthorId())
                                                            .build());
 
-        groupsRepository.save(groups);
+        return convertToResponse(groupsRepository.save(groups), userId);
     }
 
     @Override
-    public void removeUserFromGroup(Long groupId, Long userId) {
+    public GroupsDto removeUserFromGroup(Long groupId, Long userId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
         if (groups.getMemberIds() != null && !groups.getMemberIds().isEmpty()) {
             List<String> memberIds = Arrays.asList(groups.getMemberIds().split("-"));
@@ -220,11 +225,11 @@ public class GroupsServiceImpl implements IGroupsService {
                                                            .userId(userId)
                                                            .senderId(groups.getAuthorId())
                                                            .build());
-        groupsRepository.save(groups);
+        return convertToResponse(groupsRepository.save(groups), userId);
     }
 
     @Override
-    public void acceptGroupInvitation(Long groupId, Long userId) {
+    public GroupsDto acceptGroupInvitation(Long groupId, Long userId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
         if (groups.getMemberIds() != null && !groups.getMemberIds().isEmpty()) {
             List<String> memberIds = Arrays.asList(groups.getMemberIds().split("-"));
@@ -240,21 +245,21 @@ public class GroupsServiceImpl implements IGroupsService {
             List<String> requestIds = Arrays.asList(groups.getRequestIds().split("-"));
             groups.setRequestIds(String.join("-", requestIds.stream().filter(requestId -> !requestId.equals(String.valueOf(userId))).toList()));
         }
-        groupsRepository.save(groups);
+        return convertToResponse(groupsRepository.save(groups), userId);
     }
 
     @Override
-    public void rejectGroupInvitation(Long groupId, Long userId) {
+    public GroupsDto rejectGroupInvitation(Long groupId, Long userId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
         if (groups.getRequestIds() != null && !groups.getRequestIds().isEmpty()) {
             List<String> requestIds = Arrays.asList(groups.getRequestIds().split("-"));
             groups.setRequestIds(String.join("-", requestIds.stream().filter(requestId -> !requestId.equals(String.valueOf(userId))).toList()));
         }
-        groupsRepository.save(groups);
+        return convertToResponse(groupsRepository.save(groups), userId);
     }
 
     @Override
-    public void joinGroup(Long groupId, Long userId) {
+    public GroupsDto joinGroup(Long groupId, Long userId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
         if (groups.getMemberIds() != null && !groups.getMemberIds().isEmpty()) {
             List<String> memberIds = Arrays.asList(groups.getMemberIds().split("-"));
@@ -271,11 +276,12 @@ public class GroupsServiceImpl implements IGroupsService {
         } else {
             groups.setRequestIds(userId.toString());
         }
-        groupsRepository.save(groups);
+
+        return convertToResponse(groupsRepository.save(groups), userId);
     }
 
     @Override
-    public void leaveGroup(Long groupId, Long userId) {
+    public GroupsDto leaveGroup(Long groupId, Long userId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
         if (groups.getMemberIds() != null && !groups.getMemberIds().isEmpty()) {
             List<String> memberIds = Arrays.asList(groups.getMemberIds().split("-"));
@@ -297,13 +303,15 @@ public class GroupsServiceImpl implements IGroupsService {
                                                            .userId(userId)
                                                            .senderId(groups.getAuthorId())
                                                            .build());
-        groupsRepository.save(groups);
+
+        return convertToResponse(groupsRepository.save(groups), userId);
     }
 
     private GroupsDto convertToResponse(Groups groups, Long userId) {
         GroupsDto groupsDto = GroupsMapper.mapToGroupsDto(groups);
         AccountsDto author = accountsAdapter.getAccount(groups.getAuthorId());
         groupsDto.setAuthor(author);
+        groupsDto.setJoined("NOT_JOINED");
 
         List<AccountsDto> requests = new ArrayList<>();
 
@@ -327,13 +335,12 @@ public class GroupsServiceImpl implements IGroupsService {
         // set is joined
         if (groups.getMemberIds() != null && !groups.getMemberIds().isEmpty()) {
             List<String> memberIds = Arrays.asList(groups.getMemberIds().split("-"));
-            groupsDto.setJoined(memberIds.contains(String.valueOf(userId)));
-        } else {
-            groupsDto.setJoined(false);
+            groupsDto.setJoined(memberIds.contains(String.valueOf(userId)) ? "JOINED" : groupsDto.getJoined());
         }
 
-        if (groups.getAuthorId().equals(userId)) {
-            groupsDto.setJoined(true);
+        if (groups.getRequestIds() != null && !groups.getRequestIds().isEmpty()) {
+            List<String> requestIds = Arrays.asList(groups.getRequestIds().split("-"));
+            groupsDto.setJoined(requestIds.contains(String.valueOf(userId)) ? "REQUESTED" : groupsDto.getJoined());
         }
 
         return groupsDto;

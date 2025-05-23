@@ -42,37 +42,31 @@ public class GroupsController {
 
     @PostMapping("/invite/{groupId}/{userId}")
     ResponseEntity<?> inviteUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) {
-        groupsService.inviteUserToGroup(groupId, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(groupsService.inviteUserToGroup(groupId, userId));
     }
 
     @PostMapping("/accept/{groupId}/{userId}")
     ResponseEntity<?> acceptGroupInvitation(@PathVariable Long groupId, @PathVariable Long userId) {
-        groupsService.acceptGroupInvitation(groupId, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(groupsService.acceptGroupInvitation(groupId, userId));
     }
 
     @PostMapping("/reject/{groupId}/{userId}")
     ResponseEntity<?> rejectGroupInvitation(@PathVariable Long groupId, @PathVariable Long userId) {
-        groupsService.rejectGroupInvitation(groupId, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(groupsService.rejectGroupInvitation(groupId, userId));
     }
 
     @PostMapping("/remove/{groupId}/{userId}")
     ResponseEntity<?> removeUserFromGroup(@PathVariable Long groupId, @PathVariable Long userId) {
-        groupsService.removeUserFromGroup(groupId, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(groupsService.removeUserFromGroup(groupId, userId));
     }
 
     @PostMapping("/join/{groupId}/{userId}")
     ResponseEntity<?> joinGroup(@PathVariable Long groupId, @PathVariable Long userId) {
-        groupsService.joinGroup(groupId, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(groupsService.joinGroup(groupId, userId));
     }
 
     @PostMapping("/leave/{groupId}/{userId}")
     ResponseEntity<?> leaveGroup(@PathVariable Long groupId, @PathVariable Long userId) {
-        groupsService.leaveGroup(groupId, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(groupsService.leaveGroup(groupId, userId));
     }
 }

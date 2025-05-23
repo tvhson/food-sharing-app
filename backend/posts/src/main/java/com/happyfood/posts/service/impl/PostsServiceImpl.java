@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PostsServiceImpl implements IPostsService {
+    private static final double EARTH_RADIUS_KM = 6371.0;
     private final PostsRepository postsRepository;
 
     @Override
@@ -108,23 +109,12 @@ public class PostsServiceImpl implements IPostsService {
         }
 
 
-        List<PostsDto> recommendedPosts = new ArrayList<>(posts.stream()
-                                                               .filter(post -> type == null || type.equals("ALL") || (post.getType() != null && post.getType().equals(type)))
-                                                               .filter(post -> !post.isDeleted())
-                                                               .filter(post -> !post.getStatus().equals("NOT_AVAILABLE"))
-                                                               .map(post -> convertToResponse(post, userId))
-                                                               .filter(postsDto -> !postsDto.getIsReceived())
-//                .filter(post -> post.getReceiverId() == null)
-//                .filter(post -> post.getLatitude() != null)
-//                .filter(post -> post.getLongitude() != null)
-//                .filter(post -> {
-//                    double postLatitude = Double.parseDouble(post.getLatitude());
-//                    double postLongitude = Double.parseDouble(post.getLongitude());
-//                    double distance = Math.sqrt(Math.pow(latitude - postLatitude, 2) + Math.pow(longitude - postLongitude, 2)) * 1.60934;
-//                    post.setDistance(distance);
-//                    return distance < 25;
-//                })
-                                                               .toList());
+        List<PostsDto> recommendedPosts = posts.stream()
+                                               .filter(post -> type == null || type.equals("ALL") || (post.getType() != null && post.getType().equals(type)))
+                                               .filter(post -> !post.isDeleted())
+                                               .filter(post -> !post.getStatus().equals("NOT_AVAILABLE"))
+                                               .map(post -> convertToResponse(post, userId))
+                                               .filter(postsDto -> !postsDto.getIsReceived()).collect(Collectors.toList());
 
         if (distance != null) {
             double lat = Double.parseDouble(latitude);
@@ -133,13 +123,12 @@ public class PostsServiceImpl implements IPostsService {
                                                .filter(postsDto -> {
                                                    double postLatitude = Double.parseDouble(postsDto.getLatitude());
                                                    double postLongitude = Double.parseDouble(postsDto.getLongitude());
-                                                   double distanceBetween = Math.sqrt(Math.pow(lat - postLatitude, 2) + Math.pow(longt - postLongitude, 2)) * 1.60934;
+                                                   double distanceBetween = calculateDistanceKm(lat, longt, postLatitude, postLongitude);
                                                    postsDto.setDistance(distanceBetween);
                                                    return distanceBetween < distance;
                                                })
-                                               .toList();
+                                               .collect(Collectors.toList());
         }
-
 
         Collections.reverse(recommendedPosts);
         return recommendedPosts;
@@ -211,5 +200,18 @@ public class PostsServiceImpl implements IPostsService {
             postsDto.setIsReceived(Arrays.stream(posts.getUserIdReceived().split("-")).anyMatch(s -> s.equals(userId.toString())));
         }
         return postsDto;
+    }
+
+    public double calculateDistanceKm(double lat1, double lon1, double lat2, double lon2) {
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                   + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                     * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS_KM * c;
     }
 }

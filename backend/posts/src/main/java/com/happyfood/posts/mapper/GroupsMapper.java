@@ -14,6 +14,9 @@ public class GroupsMapper {
                 .createdDate(groups.getCreatedDate())
                 .startDate(groups.getStartDate())
                 .endDate(groups.getEndDate())
+                .locationName(groups.getLocationName())
+                .latitude(groups.getLatitude())
+                .longitude(groups.getLongitude())
                 .build();
     }
     public static Groups mapToGroups(GroupsDto groupsDto) {
@@ -26,6 +29,9 @@ public class GroupsMapper {
                 .createdDate(groupsDto.getCreatedDate())
                 .startDate(groupsDto.getStartDate())
                 .endDate(groupsDto.getEndDate())
+                .locationName(groupsDto.getLocationName())
+                .latitude(groupsDto.getLatitude())
+                .longitude(groupsDto.getLongitude())
                 .build();
     }
 }

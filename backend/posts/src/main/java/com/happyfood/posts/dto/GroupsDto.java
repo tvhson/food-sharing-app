@@ -18,9 +18,12 @@ public class GroupsDto {
     private List<AccountsDto> requests;
     private String joinType;
     private String imageUrl;
-    private boolean isJoined;
+    private String joined;
     private AccountsDto author;
     private Date createdDate;
     private Date startDate;
     private Date endDate;
+    private String locationName;
+    private Double latitude;
+    private Double longitude;
 }

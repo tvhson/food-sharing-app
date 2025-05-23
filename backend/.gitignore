@@ -8,3 +8,5 @@
 
 # media application.yaml
 /media/src/main/resources/application.yaml
+
+/chats/src/main/resources/application.yaml

@@ -27,4 +27,7 @@ public class Groups {
     private Date createdDate;
     private Date startDate;
     private Date endDate;
+    private String locationName;
+    private Double latitude;
+    private Double longitude;
 }
