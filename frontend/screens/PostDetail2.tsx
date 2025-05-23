@@ -9,15 +9,17 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
 import {
+  IComment,
   createCommentToPost,
   getCommentByPostId,
   getPostById,
   likePost,
 } from '../api/PostApi';
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-native/no-inline-styles */
+import React, {useEffect, useRef, useState} from 'react';
+import {notify, useNotifications} from 'react-native-notificated';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../global/Color';
@@ -26,13 +28,16 @@ import Header from '../components/ui/Header';
 import {Icon} from 'react-native-paper';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import {RootState} from '../redux/Store';
+import UploadPhoto from '../components/ui/UploadPhoto';
 import {createNotification} from '../api/NotificationApi';
 import {getFontFamily} from '../utils/fonts';
 import {getInfoUserById} from '../api/AccountsApi';
 import {getRoomChats} from '../api/ChatApi';
 import {likePostReducer} from '../redux/SharingPostReducer';
+import {scale} from '../utils/scale';
 import screenWidth from '../global/Constant';
-import {useNotifications} from 'react-native-notificated';
+import {uploadPhoto} from '../api/UploadPhotoApi';
+import {useLoading} from '../utils/LoadingContext';
 
 const PostDetail2 = ({route, navigation}: any) => {
   const [roomChat, setRoomChat] = useState<any>(null);
@@ -52,13 +57,17 @@ const PostDetail2 = ({route, navigation}: any) => {
   };
   const [liked, setLiked] = React.useState(item.isLiked);
   const [likeCount, setLikeCount] = React.useState(item.likeCount);
-  const [commentList, setCommentList] = useState([]);
+  const [commentList, setCommentList] = useState<IComment[]>([]);
   const [comment, setComment] = useState('');
+  const [isUploadVisible, setIsUploadVisible] = useState(false);
+  const [imageUpload, setImageUpload] = useState<any>(null);
+
   const createdDate = route.params.createdDate;
-  const distance = route.params.distance;
+
   const expiredString = route.params.expiredString;
   const {notify} = useNotifications();
   const dispatch = useDispatch();
+  const {showLoading, hideLoading} = useLoading();
 
   useEffect(() => {
     const getInfoUserCreatePost = async () => {
@@ -97,20 +106,33 @@ const PostDetail2 = ({route, navigation}: any) => {
       // get comment list
       if (accessToken) {
         // get comment list
-        getCommentByPostId(item.id, accessToken).then((response: any) => {
-          if (response.status === 200) {
-            setCommentList(response.data);
-          } else {
+        getCommentByPostId(item.id, accessToken)
+          .then((response: any) => {
+            setCommentList(response);
+          })
+          .catch((error: any) => {
+            console.log(error);
             notify('error', {
-              params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+              params: {
+                description: 'Không thể lấy danh sách comment',
+                title: 'Lỗi',
+                style: {
+                  multiline: 100,
+                },
+              },
             });
-          }
-        });
+          });
       }
     };
     getCommentList();
     getInfoUserCreatePost();
   }, [accessToken, item.createdById, item.id, notify, userInfo.id]);
+
+  const postImage = async (newImages: any) => {
+    // Ensure newImages is always an array
+
+    setImageUpload(newImages);
+  };
 
   const getPostData = async () => {
     const response: any = await getPostById(item.id, accessToken);
@@ -129,15 +151,22 @@ const PostDetail2 = ({route, navigation}: any) => {
     // get comment list
     if (accessToken) {
       // get comment list
-      getCommentByPostId(item.id, accessToken).then((response: any) => {
-        if (response.status === 200) {
-          setCommentList(response.data);
-        } else {
+      getCommentByPostId(item.id, accessToken)
+        .then((response: any) => {
+          setCommentList(response);
+        })
+        .catch((error: any) => {
+          console.log(error);
           notify('error', {
-            params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+            params: {
+              description: 'Không thể lấy danh sách comment',
+              title: 'Lỗi',
+              style: {
+                multiline: 100,
+              },
+            },
           });
-        }
-      });
+        });
     }
   };
 
@@ -191,19 +220,17 @@ const PostDetail2 = ({route, navigation}: any) => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
+    showLoading();
     await getPostData();
     await getCommentList();
 
     setRefreshing(false);
+    hideLoading();
   };
 
   const handleShowComment = () => {
     //focust input comment
     commentInputRef.current?.focus();
-  };
-
-  const handleTagPress = (tag: string) => {
-    console.log(`Tag ${tag} clicked`);
   };
 
   const handleDirection = () => {
@@ -212,23 +239,56 @@ const PostDetail2 = ({route, navigation}: any) => {
   };
 
   const handleCreateComment = async () => {
+    showLoading();
+    let imageUrl = null;
+    if (imageUpload) {
+      const dataForm = new FormData();
+      dataForm.append('file', {
+        uri: imageUpload.path,
+        name: imageUpload.filename || 'image.jpeg',
+        type: imageUpload.mime || 'image/jpeg',
+      });
+      const response: any = await uploadPhoto(dataForm, accessToken);
+      if (response.status === 200) {
+        imageUrl = response.data[0];
+      }
+    }
     const response: any = await createCommentToPost(
       item.id,
-      {content: comment, imageUrl: null},
+      {content: comment, imageUrl: imageUrl},
       accessToken,
     );
     if (response.status === 200) {
       setComment('');
-      getCommentByPostId(item.id, accessToken).then((response: any) => {
-        if (response.status === 200) {
-          setCommentList(response.data);
-        }
-      });
+      setImageUpload(null);
+      getCommentByPostId(item.id, accessToken)
+        .then((response: any) => {
+          setCommentList(response);
+        })
+        .catch((error: any) => {
+          console.log(error);
+          notify('error', {
+            params: {
+              description: 'Không thể lấy danh sách comment',
+              title: 'Lỗi',
+              style: {
+                multiline: 100,
+              },
+            },
+          });
+        });
     } else {
       notify('error', {
-        params: {description: 'Không thể tạo comment', title: 'Lỗi'},
+        params: {
+          description: 'Không thể tạo comment',
+          title: 'Lỗi',
+          style: {
+            multiline: 100,
+          },
+        },
       });
     }
+    hideLoading();
   };
 
   const handleGoToMessage = () => {
@@ -246,36 +306,6 @@ const PostDetail2 = ({route, navigation}: any) => {
         },
       });
     }
-  };
-
-  const tags = [
-    'Sản phẩm động vật',
-    'Rau củ',
-    'Trái cây',
-    'Đồ uống',
-    'Ngũ cốc',
-    'Sản phẩm từ sữa',
-    'Gia vị',
-    'Hải sản',
-    'Sản phẩm từ lò nướng',
-    'Thực phẩm chế biến',
-    'Các loại hạt',
-    'Đậu',
-    'Sản phẩm chay',
-    'Thức ăn nhanh',
-    'Đồ ăn vặt',
-    'Thực phẩm đông lạnh',
-  ];
-
-  const renderTags = () => {
-    return tags.map((tag, index) => (
-      <TouchableOpacity
-        key={index}
-        style={styles.tagButton}
-        onPress={() => handleTagPress(tag)}>
-        <Text style={styles.tagText}>#{tag}</Text>
-      </TouchableOpacity>
-    ));
   };
 
   const renderHeader = () => {
@@ -406,7 +436,9 @@ const PostDetail2 = ({route, navigation}: any) => {
                     marginLeft: 16,
                   }}>
                   Cách bạn{' '}
-                  {distance < 0.1 ? `${distance * 1000}m` : `${distance}km`}
+                  {item.distance < 0.1
+                    ? `${(item.distance * 1000).toFixed(2)}m`
+                    : `${item.distance.toFixed(2)}km`}
                 </Text>
               </View>
             </View>
@@ -603,9 +635,17 @@ const PostDetail2 = ({route, navigation}: any) => {
   return (
     <View style={styles.container}>
       <Header title="Chi tiết bài viết" navigation={navigation} />
+      <UploadPhoto
+        isVisible={isUploadVisible}
+        setVisible={setIsUploadVisible}
+        height={300}
+        width={350}
+        isCircle={false}
+        postImage={postImage}
+      />
       <FlatList
         ListHeaderComponent={renderHeader}
-        ListFooterComponent={<View style={{height: 70}} />}
+        // ListFooterComponent={<View style={{height: 70}} />}
         data={commentList}
         renderItem={({item}) => <CommentItem comment={item} />}
         keyExtractor={(item: any) => item.id.toString()}
@@ -615,30 +655,67 @@ const PostDetail2 = ({route, navigation}: any) => {
       <View
         style={{
           position: 'absolute',
-          bottom: 0,
+          bottom: scale(60),
           width: '100%',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 10,
+        }}>
+        {imageUpload && (
+          <View style={{padding: 10}}>
+            <TouchableOpacity
+              onPress={() => setImageUpload(null)}
+              style={{
+                position: 'absolute',
+                top: scale(14),
+                left: scale(56),
+                zIndex: 10,
+                backgroundColor: Colors.white,
+                borderRadius: scale(100),
+                padding: scale(2),
+              }}>
+              <Icon source="close" size={14} color={Colors.black} />
+            </TouchableOpacity>
+            <Image
+              source={{uri: imageUpload.path}}
+              style={{
+                width: scale(70),
+                height: scale(70),
+                borderRadius: scale(10),
+                borderWidth: 1,
+                borderColor: Colors.gray,
+              }}
+            />
+          </View>
+        )}
+      </View>
+      <View
+        style={{
           flexDirection: 'row',
+          padding: 10,
           borderTopWidth: 1,
           borderTopColor: Colors.gray,
           backgroundColor: Colors.white,
         }}>
+        <TouchableOpacity
+          onPress={() => setIsUploadVisible(true)}
+          style={{marginTop: 12}}>
+          <Icon source="camera" size={24} color={Colors.greenPrimary} />
+        </TouchableOpacity>
         <TextInput
-          ref={commentInputRef}
           multiline
           placeholder="Viết bình luận"
+          value={comment}
+          onChangeText={setComment}
           style={{
             backgroundColor: Colors.background,
             borderRadius: 20,
             padding: 10,
             flex: 1,
+            marginHorizontal: 10,
           }}
-          value={comment}
-          onChangeText={setComment}
         />
-        <TouchableOpacity onPress={handleCreateComment} disabled={!comment}>
+        <TouchableOpacity
+          onPress={handleCreateComment}
+          disabled={!comment && !imageUpload}
+          style={{marginTop: 12}}>
           <Image
             source={require('../assets/images/send.png')}
             style={{width: 30, height: 30}}

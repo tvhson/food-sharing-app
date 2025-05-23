@@ -25,7 +25,6 @@ import UploadPhoto from './UploadPhoto';
 import {getFontFamily} from '../../utils/fonts';
 import {scale} from '../../utils/scale';
 import {uploadPhoto} from '../../api/UploadPhotoApi';
-import {useLoading} from '../../utils/LoadingContext';
 import {useNotifications} from 'react-native-notificated';
 import {useSelector} from 'react-redux';
 

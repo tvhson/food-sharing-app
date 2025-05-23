@@ -1,4 +1,5 @@
 import ApiManager from './ApiManager';
+import {UserInfo} from '../redux/UserReducer';
 
 export const getInfoUser = async (token: any) => {
   try {
@@ -70,5 +71,22 @@ export const changeRoleById = async (id: any, role: any, token: any) => {
     return response;
   } catch (error) {
     return error;
+  }
+};
+
+export const getInfoUserByEmail = async (
+  email: string,
+  token: string,
+): Promise<UserInfo> => {
+  try {
+    const response = await ApiManager(`accounts/email/${email}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
   }
 };

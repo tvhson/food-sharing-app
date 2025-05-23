@@ -34,7 +34,6 @@ const PostRenderItem2 = (props: any) => {
     setCommentPostId,
     setShowComment,
     navigation,
-    distance,
     location,
     setDetailPost,
   } = props;
@@ -147,7 +146,6 @@ const PostRenderItem2 = (props: any) => {
       item,
       location,
       createdDate,
-      distance,
       expiredString,
     });
   };
@@ -426,7 +424,9 @@ const PostRenderItem2 = (props: any) => {
                 marginLeft: 16,
               }}>
               Cách bạn{' '}
-              {distance < 0.1 ? `${distance * 1000}m` : `${distance}km`}
+              {item?.distance < 0.1
+                ? `${(item?.distance * 1000).toFixed(2)}m`
+                : `${item?.distance.toFixed(2)}km`}
             </Text>
           </View>
         </View>
@@ -541,7 +541,7 @@ const PostRenderItem2 = (props: any) => {
                 item,
                 user:
                   item.createdById !== userInfo.id ? createPostUser : userInfo,
-                distance,
+                distance: item.distance,
               };
 
               setDetailPost(detailPost);

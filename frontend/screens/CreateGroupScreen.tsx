@@ -1,30 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {Button, Icon} from '@rneui/themed';
-/* eslint-disable react-native/no-inline-styles */
-import React, {useRef, useState} from 'react';
+import {ICreateGroupRequest, createGroup, inviteUser} from '../api/GroupApi';
 import {
+  Image,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import React, {useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import AddPeopleModal from '../components/ui/AddPeopleModal';
 import Colors from '../global/Color';
 import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import ImageSwiper from '../components/ui/ImageSwiper';
 import {MAP_API_KEY} from '@env';
+import {RadioButton} from 'react-native-paper';
 import {RootState} from '../redux/Store';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {UserInfo} from '../redux/UserReducer';
 import axios from 'axios';
 import {createNotifications} from 'react-native-notificated';
-import {exampleData} from '../components/data/ExamplePeopleData';
 import {getFontFamily} from '../utils/fonts';
-import screenWidth from '../global/Constant';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useLoading} from '../utils/LoadingContext';
 
@@ -36,16 +34,16 @@ const CreateGroupScreen = ({route, navigation}: any) => {
   const {notify} = useNotifications();
   const location = useSelector((state: RootState) => state.location);
 
-  const accessToken = route.params.accessToken;
+  const accessToken = useSelector((state: RootState) => state.token.key);
   const [groupName, setGroupName] = useState('');
   const [description, setDescription] = useState('');
-  const [linkWebsites, setLinkWebsites] = useState('');
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
   const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [isAddPeopleModalVisible, setIsAddPeopleModalVisible] = useState(false);
   const [selectedPeople, setSelectedPeople] = useState<Partial<UserInfo>[]>([]);
+  const [joinType, setJoinType] = useState<'public' | 'private'>('public');
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
@@ -54,16 +52,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
 
   const autocompleteRef = useRef<any | null>(null);
   const postImage = async (newImages: any) => {
-    console.log('newImages', newImages);
-
-    // Ensure newImages is always an array
-    const imagesArray = Array.isArray(newImages) ? newImages : [newImages];
-
-    setImageUpload((prevImages: any) => {
-      return prevImages && prevImages.length > 0
-        ? [...prevImages, ...imagesArray]
-        : imagesArray;
-    });
+    setImageUpload(newImages);
   };
 
   const getLocationName = async (
@@ -103,40 +92,110 @@ const CreateGroupScreen = ({route, navigation}: any) => {
     }
   };
 
-  const handleCreatePost = () => {
+  const validateForm = () => {
+    if (groupName === '') {
+      notify('error', {
+        params: {
+          description: 'Tên nhóm là bắt buộc.',
+          title: 'Lỗi',
+          style: {multiline: 100},
+        },
+      });
+      return false;
+    }
+    if (description === '') {
+      notify('error', {
+        params: {
+          description: 'Giới thiệu về nhóm là bắt buộc.',
+          title: 'Lỗi',
+          style: {multiline: 100},
+        },
+      });
+      return false;
+    }
+
+    if (startDate === null) {
+      notify('error', {
+        params: {description: 'Ngày bắt đầu là bắt buộc.', title: 'Lỗi'},
+      });
+      return false;
+    }
+
+    if (locationName === '') {
+      notify('error', {
+        params: {description: 'Địa chỉ diễn ra là bắt buộc.', title: 'Lỗi'},
+      });
+      return false;
+    }
     if (imageUpload === null) {
       notify('error', {
         params: {description: 'Ảnh là bắt buộc.', title: 'Lỗi'},
       });
+      return false;
+    }
+    return true;
+  };
+
+  const handleCreatePost = async () => {
+    if (!validateForm()) {
       return;
     }
 
+    let imageUrl = null;
+
     const dataForm = new FormData();
-    if (imageUpload && imageUpload.length > 0) {
-      if (Array.isArray(imageUpload)) {
-        imageUpload.forEach(image => {
-          dataForm.append('file', {
-            uri: image.path,
-            name: image.filename || 'image.jpeg',
-            type: image.mime || 'image/jpeg',
-          });
-        });
-      } else {
-        dataForm.append('file', {
-          uri: imageUpload.path,
-          name: imageUpload.filename || 'image.jpeg',
-          type: imageUpload.mime || 'image/jpeg',
-        });
-      }
+    if (imageUpload) {
+      dataForm.append('file', {
+        uri: imageUpload.path,
+        name: imageUpload.filename || 'image.jpeg',
+        type: imageUpload.mime || 'image/jpeg',
+      });
+
       showLoading();
-      uploadPhoto(dataForm, accessToken)
-        .then((response: any) => {})
-        .catch((error: any) => {
-          notify('error', {
-            params: {description: error.message, title: 'Lỗi'},
-          });
-          hideLoading();
+      const imageResponse: any = await uploadPhoto(dataForm, accessToken);
+
+      if (imageResponse?.status === 200) {
+        imageUrl = imageResponse?.data[0];
+      } else {
+        notify('error', {
+          params: {description: 'Không thể tải ảnh.', title: 'Lỗi'},
         });
+        hideLoading();
+        return;
+      }
+
+      const group: ICreateGroupRequest = {
+        name: groupName,
+        description: description,
+        joinType: joinType,
+        imageUrl: imageUrl,
+        startDate: startDate.toISOString(),
+        endDate: endDate?.toISOString() || '',
+        locationName: locationName,
+        latitude: latitude,
+        longitude: longitude,
+      };
+      await createGroup(accessToken, group)
+        .then(response => {
+          selectedPeople.forEach(async person => {
+            await inviteUser(accessToken, response.id, person.id || -1);
+          });
+          navigation.goBack();
+        })
+        .catch(error => {
+          console.log(error);
+          notify('error', {
+            params: {
+              description: 'Không thể tạo nhóm.',
+              title: 'Lỗi',
+              style: {
+                multiline: 100,
+              },
+            },
+          });
+        });
+
+      hideLoading();
     }
   };
 
@@ -157,7 +216,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           width={350}
           isCircle={false}
           postImage={postImage}
-          isMultiple={true}
         />
         <TextInput
           placeholder="Tên nhóm (bắt buộc)"
@@ -198,6 +256,33 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           value={description}
           onChangeText={setDescription}
         />
+
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 20,
+            width: '90%',
+          }}>
+          {['public', 'private'].map(type => (
+            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+              <RadioButton
+                color={Colors.greenPrimary}
+                key={type}
+                value={type}
+                status={joinType === type ? 'checked' : 'unchecked'}
+                onPress={() => setJoinType(type as 'public' | 'private')}
+              />
+              <Text
+                style={{
+                  fontFamily: getFontFamily('regular'),
+                  fontSize: 16,
+                  color: Colors.text,
+                }}>
+                {type === 'public' ? 'Công khai' : 'Riêng tư'}
+              </Text>
+            </View>
+          ))}
+        </View>
         <View style={{marginHorizontal: 10, marginTop: 20}}>
           <View
             style={{
@@ -264,23 +349,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             />
           </View>
         </View>
-        <TextInput
-          placeholder="Link website của chiến dịch (tùy chọn)"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-          }}
-          value={linkWebsites}
-          onChangeText={setLinkWebsites}
-        />
+
         <TouchableOpacity
           onPress={() => {
             setIsAddPeopleModalVisible(true);
@@ -316,7 +385,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           debounce={500}
           ref={autocompleteRef}
           fetchDetails={true}
-          placeholder="Địa chỉ nhận"
+          placeholder="Địa chỉ diễn ra"
           onPress={(data, details = null) => {
             setLocationName(data.description);
             setLatitude(details?.geometry.location.lat || 0);
@@ -372,21 +441,37 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             alignItems: 'center',
             backgroundColor: '#eff2ff',
           }}>
-          {imageUpload && imageUpload.length > 0 ? (
+          {imageUpload ? (
             <>
-              <ImageSwiper
-                style={{width: screenWidth * 0.9, height: 300}}
-                images={imageUpload}
-                isCreatePost={true}
-                setImageUpload={setImageUpload}
-                setIsUploadVisible={setIsUploadVisible}
-                isUploadVisible={isUploadVisible}
-              />
+              <View style={{position: 'relative', width: 350, height: 300}}>
+                <Image
+                  source={{uri: imageUpload.path}}
+                  style={{width: '100%', height: '100%'}}
+                />
+                <TouchableOpacity
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    alignContent: 'center',
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    backgroundColor: 'black',
+                    zIndex: 1,
+                  }}
+                  onPress={() => {
+                    setImageUpload(null);
+                  }}>
+                  <Icon name="close" type="ionicon" size={20} color="white" />
+                </TouchableOpacity>
+              </View>
             </>
           ) : (
             <>
               <TouchableOpacity
-                style={{marginTop: 20}}
                 onPress={() => {
                   setIsUploadVisible(!isUploadVisible);
                 }}>
@@ -395,16 +480,12 @@ const CreateGroupScreen = ({route, navigation}: any) => {
                   type="ionicon"
                   size={60}
                   color={Colors.greenPrimary}
+                  style={{marginTop: 20}}
                 />
               </TouchableOpacity>
 
-              <Text
-                style={{
-                  color: Colors.greenPrimary,
-                  fontSize: 18,
-                  fontFamily: getFontFamily('regular'),
-                }}>
-                Thêm ảnh (bắt buộc)
+              <Text style={{color: Colors.greenPrimary, fontSize: 18}}>
+                Thêm ảnh
               </Text>
             </>
           )}
@@ -427,7 +508,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
       <AddPeopleModal
         isVisible={isAddPeopleModalVisible}
         onClose={() => setIsAddPeopleModalVisible(false)}
-        listPeople={exampleData}
         selectedPeople={selectedPeople}
         setSelectedPeople={setSelectedPeople}
       />

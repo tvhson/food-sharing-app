@@ -12,6 +12,7 @@ import React, {useState} from 'react';
 import Colors from '../../global/Color';
 import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
+import {scale} from '../../utils/scale';
 import {timeAgo} from '../../utils/helper';
 import {useSelector} from 'react-redux';
 
@@ -127,8 +128,8 @@ const styles = StyleSheet.create({
     color: Colors.darkGray,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: scale(200),
+    height: scale(200),
     borderRadius: 10,
   },
 });

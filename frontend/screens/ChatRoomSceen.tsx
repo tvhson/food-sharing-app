@@ -1,4 +1,4 @@
-import {Avatar, IconButton} from 'react-native-paper';
+import {Avatar, Icon, IconButton} from 'react-native-paper';
 import {
   Bubble,
   GiftedChat,
@@ -29,6 +29,7 @@ import dayjs from 'dayjs';
 import dayvi from 'dayjs/locale/vi';
 import {getFontFamily} from '../utils/fonts';
 import {readAllMessageOfRoomChatId} from '../redux/ChatRoomReducer';
+import {scale} from '../utils/scale';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useFocusEffect} from '@react-navigation/native';
 import {useLoading} from '../utils/LoadingContext';
@@ -178,6 +179,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
         imageUrl: imageUrl,
       };
       sendMessage(message);
+      setImageUpload(null);
       setMessages((previousMessages: IMessage[]) => {
         const updatedNewMessages = newMessage.map(msg => ({
           ...msg,
@@ -378,6 +380,42 @@ const ChatRoomScreen = ({navigation, route}: any) => {
           />
         </View>
       </View>
+
+      <View
+        style={{
+          position: 'absolute',
+          bottom: scale(45),
+          width: '100%',
+        }}>
+        {imageUpload && (
+          <View style={{padding: 10}}>
+            <TouchableOpacity
+              onPress={() => setImageUpload(null)}
+              style={{
+                position: 'absolute',
+                top: scale(14),
+                left: scale(56),
+                zIndex: 10,
+                backgroundColor: Colors.white,
+                borderRadius: scale(100),
+                padding: scale(2),
+              }}>
+              <Icon source="close" size={14} color={Colors.black} />
+            </TouchableOpacity>
+            <Image
+              source={{uri: imageUpload.path}}
+              style={{
+                width: scale(70),
+                height: scale(70),
+                borderRadius: scale(10),
+                borderWidth: 1,
+                borderColor: Colors.gray,
+              }}
+            />
+          </View>
+        )}
+      </View>
+
       <GiftedChat
         messages={messages}
         locale={dayvi}

@@ -1,36 +1,47 @@
 import {Checkbox, Searchbar} from 'react-native-paper';
-
 import {FlatList, Image, StyleSheet, Text, View} from 'react-native';
 import React, {useState} from 'react';
 
 import Colors from '../../global/Color';
 import ReactNativeModal from 'react-native-modal';
+import {RootState} from '../../redux/Store';
 import {UserInfo} from '../../redux/UserReducer';
 import {getFontFamily} from '../../utils/fonts';
+import {getInfoUserByEmail} from '../../api/AccountsApi';
+import {useSelector} from 'react-redux';
 
 const AddPeopleModal = ({
   isVisible,
   onClose,
-  listPeople,
   selectedPeople,
   setSelectedPeople,
 }: {
   isVisible: boolean;
   onClose: () => void;
-  listPeople: Partial<UserInfo>[];
   selectedPeople: Partial<UserInfo>[];
   setSelectedPeople: (people: Partial<UserInfo>[]) => void;
 }) => {
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const {email: userEmail} = useSelector((state: RootState) => state.userInfo);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredList, setFilteredList] =
     useState<Partial<UserInfo>[]>(selectedPeople);
 
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
   const handleSearch = (query: string) => {
-    setFilteredList(
-      listPeople.filter(person =>
-        person.email?.toLowerCase().includes(query.toLowerCase()),
-      ),
-    );
+    if (validateEmail(query) && query !== userEmail) {
+      getInfoUserByEmail(query, accessToken)
+        .then(response => {
+          setFilteredList([...filteredList, response]);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
   };
 
   const renderItem = ({item}: {item: Partial<UserInfo>}) => {

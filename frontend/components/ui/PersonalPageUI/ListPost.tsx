@@ -103,7 +103,6 @@ const ListPost = (props: ListPostProps) => {
         location,
         createdDate: timeAgo(item.createdDate),
         expiredString: calculateExpiredDate(new Date(item.expiredDate)),
-        distance: calculateDistance(item, location),
       });
     } else {
       navigation.navigate('OrganizationPostDetail2', {

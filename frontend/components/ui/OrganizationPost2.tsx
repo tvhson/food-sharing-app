@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
   Dimensions,
   Image,
@@ -7,46 +6,45 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {IGetGroupResponse, joinGroup} from '../../api/GroupApi';
+import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../../global/Color';
 import React from 'react';
 import {RootState} from '../../redux/Store';
 import {Route} from '../../constants/route';
-import {attendOrganizationPost} from '../../api/OrganizationPostApi';
+import {addGroup} from '../../redux/GroupReducer';
 import {getFontFamily} from '../../utils/fonts';
-import {useSelector} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
-const OrganizationPost2 = (props: any) => {
+
+interface IOrganizationPost2Props {
+  item: IGetGroupResponse;
+}
+
+const OrganizationPost2 = (props: IOrganizationPost2Props) => {
   const token = useSelector((state: RootState) => state.token.key);
-  const {navigation, item} = props;
-  const [isJoin, setIsJoin] = React.useState(item.organizationposts.attended);
-  const [peopleAttended, setPeopleAttended] = React.useState(
-    item.organizationposts.peopleAttended,
-  );
+  const user = useSelector((state: RootState) => state.userInfo);
+  const dispatch = useDispatch();
+  const navigation: any = useNavigation();
+
+  const {item} = props;
 
   const handleAttend = async () => {
-    setIsJoin(!isJoin);
-    setPeopleAttended(
-      (prev: any) => (prev ? prev - 1 : prev + 1), // Adjust count dynamically
-    );
-    const response: any = await attendOrganizationPost(
-      item.organizationposts.id,
-      token,
-    );
-    if (response.status !== 200) {
-      setIsJoin(!isJoin);
-      setPeopleAttended(
-        (prev: any) => (prev ? prev - 1 : prev + 1), // Adjust count dynamically
-      );
+    if (item.joined === 'JOINED') {
+      navigation.navigate(Route.GroupHomeScreen, {
+        item,
+      });
+      return;
     }
+    await joinGroup(token, item.id, user.id).then(response => {
+      dispatch(addGroup(response));
+    });
   };
   const handleNavigateToDetail = () => {
     navigation.navigate(Route.OrganizationPostDetail2, {
       item,
-      isJoin,
-      peopleAttended,
-      handleAttend,
     });
   };
 
@@ -58,21 +56,23 @@ const OrganizationPost2 = (props: any) => {
       <View>
         <Image
           source={{
-            uri: item.organizationposts.imageUrl,
+            uri: item.imageUrl,
           }}
           style={styles.img}
         />
         <View style={styles.itemContainer}>
           <Text style={styles.textTime}>
-            Diễn ra vào{' '}
-            {new Date(item.organizationposts.startDate).toLocaleString()}
+            Diễn ra vào {new Date(item.startDate).toLocaleDateString()}
           </Text>
-          <Text style={styles.textTitle}>{item.organizationposts.title}</Text>
-          <Text style={styles.textTime}>
-            Địa điểm: {item.organizationposts.locationName}
-          </Text>
+          {item.endDate && (
+            <Text style={styles.textTime}>
+              Kết thúc vào {new Date(item.endDate).toLocaleDateString()}
+            </Text>
+          )}
+          <Text style={styles.textTitle}>{item.name}</Text>
+          <Text style={styles.textTime}>Địa điểm: {item.locationName}</Text>
           <Text style={styles.textLocation}>
-            {peopleAttended} người tham gia
+            {item.members.length} thành viên
           </Text>
         </View>
         <View
@@ -86,13 +86,17 @@ const OrganizationPost2 = (props: any) => {
             style={[
               styles.btnJoin,
               {
-                backgroundColor: isJoin ? Colors.greenLight : Colors.background,
+                backgroundColor:
+                  item.joined === 'JOINED'
+                    ? Colors.greenLight
+                    : Colors.background,
               },
             ]}
+            disabled={item.joined === 'JOINED' || item.joined === 'REQUESTED'}
             onPress={handleAttend}>
             <Image
               source={
-                isJoin
+                item.joined === 'JOINED'
                   ? require('../../assets/images/star-green.png')
                   : require('../../assets/images/star-black.png')
               }
@@ -102,18 +106,25 @@ const OrganizationPost2 = (props: any) => {
               style={[
                 styles.textBtn,
                 {
-                  color: isJoin ? Colors.greenPrimary : Colors.black,
+                  color:
+                    item.joined === 'JOINED'
+                      ? Colors.greenPrimary
+                      : Colors.black,
                 },
               ]}>
-              {isJoin ? 'Đã tham gia' : 'Tham gia'}
+              {item.joined === 'JOINED'
+                ? 'Truy cập nhóm'
+                : item.joined === 'REQUESTED'
+                ? 'Đang chờ'
+                : 'Tham gia'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={{marginLeft: 10}}>
+          {/* <TouchableOpacity style={{marginLeft: 10}}>
             <Image
               source={require('../../assets/images/share.png')}
               style={{width: 50, height: 50}}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </TouchableOpacity>

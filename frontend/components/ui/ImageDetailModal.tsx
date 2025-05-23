@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
   FlatList,
   Image,
@@ -77,7 +76,7 @@ const ImageDetailModal = (props: {
         {/* Pagination Dots */}
         {item?.images?.length > 1 && (
           <View style={styles.pagination}>
-            {item?.images.map((_, index) => (
+            {item?.images.map((_: any, index: number) => (
               <View
                 key={index}
                 style={[
@@ -164,8 +163,8 @@ const ImageDetailModal = (props: {
               {' '}
               Cách bạn{' '}
               {item?.distance < 0.1
-                ? `${item?.distance * 1000}m`
-                : `${item?.distance}km`}
+                ? `${(item?.distance * 1000).toFixed(2)}m`
+                : `${item?.distance.toFixed(2)}km`}
             </Text>
           </View>
         </View>

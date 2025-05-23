@@ -1,15 +1,16 @@
-import {configureStore} from '@reduxjs/toolkit';
-import UserReducer from './UserReducer';
+import AccountsReducer from './AccountsReducer';
+import ChatRoomReducer from './ChatRoomReducer';
+import CommentReducer from './CommentReducer';
+import GroupReducer from './GroupReducer';
 import LoadingReducer from './LoadingReducer';
-import TokenReducer from './TokenReducer';
-import SharingPostReducer from './SharingPostReducer';
-import OrganizationPostReducer from './OrganizationPostReducer';
 import LocationReducer from './LocationReducer';
 import NotificationReducer from './NotificationReducer';
-import ChatRoomReducer from './ChatRoomReducer';
+import OrganizationPostReducer from './OrganizationPostReducer';
 import ReportReducer from './ReportReducer';
-import AccountsReducer from './AccountsReducer';
-import CommentReducer from './CommentReducer';
+import SharingPostReducer from './SharingPostReducer';
+import TokenReducer from './TokenReducer';
+import UserReducer from './UserReducer';
+import {configureStore} from '@reduxjs/toolkit';
 export const Store = configureStore({
   reducer: {
     userInfo: UserReducer,
@@ -23,6 +24,7 @@ export const Store = configureStore({
     report: ReportReducer,
     account: AccountsReducer,
     comment: CommentReducer,
+    group: GroupReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

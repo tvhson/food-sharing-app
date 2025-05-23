@@ -1,15 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
 import {Icon, SearchBar} from '@rneui/themed';
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
   SharingPost,
   clearSharingPosts,
   setSharingPost,
 } from '../redux/SharingPostReducer';
-import {calculateDistance, getFoodTypeKey} from '../utils/helper';
 import {useDispatch, useSelector} from 'react-redux';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,9 +22,12 @@ import {Text} from 'react-native';
 import {createNotifications} from 'react-native-notificated';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
+import {getFoodTypeKey} from '../utils/helper';
 import {getPosts} from '../api/PostApi';
 import {scale} from '../utils/scale';
 import {useLoading} from '../utils/LoadingContext';
+
+/* eslint-disable @typescript-eslint/no-shadow */
 
 const {useNotifications} = createNotifications();
 
@@ -268,7 +267,6 @@ const HomeScreen = ({navigation}: any) => {
             item={item}
             navigation={navigation}
             location={location}
-            distance={calculateDistance(item, location)}
             setShowComment={setShowComment}
             setCommentPostId={setCommentPostId}
             setDetailPost={(item: any) => {

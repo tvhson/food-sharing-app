@@ -23,6 +23,7 @@ export interface SharingPost {
   likeCount: number;
   isReceived: boolean;
   type: string;
+  distance: number;
 }
 
 export interface SharingPosts {

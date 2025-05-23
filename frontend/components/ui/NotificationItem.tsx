@@ -1,12 +1,5 @@
 import {Image, Text, TouchableWithoutFeedback, View} from 'react-native';
-/* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {
-  calculateDistance,
-  calculateExpiredDate,
-  timeAgo,
-} from '../../utils/helper';
-import {confirmReceiveFood, updatePost} from '../../api/PostApi';
+import {calculateExpiredDate, timeAgo} from '../../utils/helper';
 import {
   createNotification,
   updateNotification,
@@ -15,8 +8,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {Button} from '@rneui/themed';
 import Colors from '../../global/Color';
+import React from 'react';
 import {RootState} from '../../redux/Store';
 import {Route} from '../../constants/route';
+import {confirmReceiveFood} from '../../api/PostApi';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
 
 const NotificationItem = ({
@@ -58,7 +53,6 @@ const NotificationItem = ({
           location,
           createdDate: timeAgo(postDetail.createdDate),
           expiredString: calculateExpiredDate(new Date(postDetail.expiredDate)),
-          distance: calculateDistance(postDetail, location),
         });
       };
     }

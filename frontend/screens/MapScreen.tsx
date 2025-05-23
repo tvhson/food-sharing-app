@@ -1,18 +1,18 @@
+import {Checkbox, Icon, Menu} from 'react-native-paper';
 /* eslint-disable react-hooks/rules-of-hooks */
 import MapView, {LatLng, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import {Checkbox, Icon, Menu} from 'react-native-paper';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {moderateScale, scale, verticalScale} from '../utils/scale';
-import {createNotifications} from 'react-native-notificated';
-import {useSelector} from 'react-redux';
-import {CustomMarker} from '../components/ui/CustomMarker';
+
 import Colors from '../global/Color';
+import {CustomMarker} from '../components/ui/CustomMarker';
 import {RootState} from '../redux/Store';
-import {getFontFamily} from '../utils/fonts';
-import {calculateDistance} from '../utils/helper';
 import {SharingPost} from '../redux/SharingPostReducer';
+import {createNotifications} from 'react-native-notificated';
+import {getFontFamily} from '../utils/fonts';
 import {getPosts} from '../api/PostApi';
+import {useSelector} from 'react-redux';
 
 const listFilter = [
   {id: 1, title: 'Trong vòng 2km', value: 2},

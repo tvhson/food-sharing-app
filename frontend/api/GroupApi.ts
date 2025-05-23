@@ -10,6 +10,9 @@ export interface IGetGroupResponse {
     id: number;
     name: string;
     imageUrl: string;
+    locationName: string | null;
+    latitude: number | null;
+    longitude: number | null;
   };
   createdDate: string;
   startDate: string;
@@ -17,30 +20,28 @@ export interface IGetGroupResponse {
   locationName: string;
   latitude: number;
   longitude: number;
-  members?: {
+  members: {
     id: number;
     name: string;
     imageUrl: string;
   }[];
-  requests?: {
+  requests: {
     id: number;
     name: string;
     imageUrl: string;
   }[];
+  joined: 'JOINED' | 'REQUESTED' | 'NOT_JOINED';
 }
 
 export const getGroup = async (token: string): Promise<IGetGroupResponse[]> => {
   try {
-    const response: IGetGroupResponse[] = await ApiManager(
-      `groups/recommended`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: token,
-        },
+    const response = await ApiManager(`groups/recommended`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
       },
-    );
-    return response;
+    });
+    return response.data;
   } catch (error) {
     throw error;
   }

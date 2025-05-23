@@ -142,18 +142,6 @@ const MyPostScreen = ({navigation, route}: any) => {
     applyFilter();
   }, [location, myPost, search, sortingMethod]);
 
-  const calculateDistance = (item: any) => {
-    if (location && location.latitude && location.longitude) {
-      return (
-        getDistance(
-          {latitude: item.latitude, longitude: item.longitude},
-          {latitude: location.latitude, longitude: location.longitude},
-        ) / 1000
-      );
-    }
-    return 0;
-  };
-
   return (
     <View
       style={{
@@ -199,7 +187,6 @@ const MyPostScreen = ({navigation, route}: any) => {
             item={item}
             navigation={navigation}
             location={location}
-            distance={calculateDistance(item)}
           />
         )}
         ListEmptyComponent={

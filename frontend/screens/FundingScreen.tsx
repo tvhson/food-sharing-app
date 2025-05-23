@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {IGetGroupResponse, getGroup} from '../api/GroupApi';
 import {Icon, SearchBar} from '@rneui/themed';
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-native/no-inline-styles */
@@ -29,104 +30,82 @@ import {getOrganizationPost} from '../api/OrganizationPostApi';
 import {moderateScale} from 'react-native-size-matters';
 import {scale} from '../utils/scale';
 import screenWidth from '../global/Constant';
+import {setGroup} from '../redux/GroupReducer';
+import {useFocusEffect} from '@react-navigation/native';
 import {useLoading} from '../utils/LoadingContext';
 import {useNotifications} from 'react-native-notificated';
 
 export const FundingScreen = ({navigation}: any) => {
-  const dispatch = useDispatch();
   const {notify} = useNotifications();
+  const dispatch = useDispatch();
   const {showLoading, hideLoading} = useLoading();
+  const groups = useSelector((state: RootState) => state.group.groups);
   const token = useSelector((state: RootState) => state.token.key);
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const location = useSelector((state: RootState) => state.location);
-  const [fundingPost, setFundingPost] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const [filterPosts, setFilterPosts] = useState<any>(null);
+  const [filterPosts, setFilterPosts] = useState<IGetGroupResponse[]>([]);
   const [visible, setVisible] = useState(false);
   const [sortingMethod, setSortingMethod] = useState('');
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-
-    const getFundingPost = async () => {
-      if (token) {
-        showLoading();
-        const response: any = await getOrganizationPost(token.toString());
-        if (response.status === 200) {
-          dispatch(clearFundingPosts());
-          setFundingPost(response.data);
-          response.data.forEach((post: any) => dispatch(pushFundingPost(post)));
-        } else {
-          console.log(response);
-          notify('error', {
-            params: {
-              description: 'Không thể tải dữ liệu mới',
-              title: 'Lỗi',
-            },
-          });
-        }
+  const getFundingGroup = async () => {
+    showLoading();
+    await getGroup(token.toString())
+      .then(response => {
+        dispatch(setGroup(response));
+      })
+      .catch(error => {
+        console.log(error);
+        notify('error', {
+          params: {
+            description: 'Không thể tải dữ liệu mới',
+            title: 'Lỗi',
+          },
+        });
+      })
+      .finally(() => {
         hideLoading();
-      }
-      setRefreshing(false);
-    };
-
-    getFundingPost();
+      });
   };
 
-  useEffect(() => {
-    const getFundingPost = async () => {
-      if (token) {
-        showLoading();
-        const response: any = await getOrganizationPost(token.toString());
-        if (response.status === 200) {
-          dispatch(clearFundingPosts());
-          setFundingPost(response.data);
-          response.data.forEach((post: any) => dispatch(pushFundingPost(post)));
-        } else {
-          console.log(response);
-          notify('error', {
-            params: {
-              description: 'Không thể tải dữ liệu mới',
-              title: 'Lỗi',
-            },
-          });
-        }
-        hideLoading();
-      }
-      setRefreshing(false);
-    };
-    const fetchData = async () => {
-      getFundingPost();
-    };
-    fetchData();
-  }, [dispatch, notify, token]);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    getFundingGroup();
+    setRefreshing(false);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getFundingGroup();
+    }, []),
+  );
 
   useEffect(() => {
     const applyFilter = () => {
       try {
-        let filtered = fundingPost;
+        let filtered = groups;
         if (search) {
           console.log(filtered);
-          filtered = filtered.filter((post: any) =>
-            post?.organizationposts?.title
-              ?.toLowerCase()
-              .includes(search.toLowerCase()),
+          filtered = filtered.filter(
+            post =>
+              post.name?.toLowerCase().includes(search.toLowerCase()) ||
+              post.description?.toLowerCase().includes(search.toLowerCase()),
           );
         }
         if (sortingMethod === 'distance') {
-          filtered = filtered.sort((a: any, b: any) => {
+          filtered = filtered.sort((a, b) => {
             const distanceA = getDistance(
               {
-                latitude: a.organizationposts.latitude,
-                longitude: a.organizationposts.longitude,
+                latitude: a.latitude,
+                longitude: a.longitude,
               },
               location,
             );
             const distanceB = getDistance(
               {
-                latitude: b.organizationposts.latitude,
-                longitude: b.organizationposts.longitude,
+                latitude: b.latitude,
+                longitude: b.longitude,
               },
               location,
             );
@@ -139,10 +118,10 @@ export const FundingScreen = ({navigation}: any) => {
         console.error('Error filtering posts: ', error);
       }
     };
-    if (fundingPost) {
+    if (groups) {
       applyFilter();
     }
-  }, [search, sortingMethod, fundingPost, location]);
+  }, [search, sortingMethod, groups, location]);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -199,11 +178,9 @@ export const FundingScreen = ({navigation}: any) => {
       </View>
 
       <FlatList
-        data={filterPosts ?? fundingPost}
-        renderItem={({item}) => (
-          <OrganizationPost2 navigation={navigation} item={item} />
-        )}
-        keyExtractor={item => item.organizationposts.id.toString()}
+        data={filterPosts ?? groups}
+        renderItem={({item}) => <OrganizationPost2 item={item} />}
+        keyExtractor={item => item.id.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
