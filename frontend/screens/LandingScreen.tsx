@@ -2,7 +2,6 @@ import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useEffect} from 'react';
 
-/* eslint-disable react-native/no-inline-styles */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BootSplash from 'react-native-bootsplash';
 import {Button} from '@rneui/themed';

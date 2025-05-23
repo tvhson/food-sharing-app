@@ -33,7 +33,7 @@ const MapScreen = ({navigation}: any) => {
   const {notify} = useNotifications();
   const markerRef = useRef<any>(null);
 
-  const [filter, setFilter] = useState<number>();
+  const [filter, setFilter] = useState<number>(100000);
   const [visible, setVisible] = useState(false);
   const [filteredMarkers, setFilteredMarkers] = useState<SharingPost[]>([]);
 
@@ -50,6 +50,10 @@ const MapScreen = ({navigation}: any) => {
       setFilteredMarkers(response.data);
     }
   };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -154,16 +158,16 @@ const MapScreen = ({navigation}: any) => {
         provider={PROVIDER_GOOGLE} // remove if not using Google Maps
         style={styles.map}
         region={{
-          latitude: location.latitude,
-          longitude: location.longitude,
+          latitude: 10.79943,
+          longitude: 106.68822,
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
         }}>
         <Marker
           ref={markerRef}
           coordinate={{
-            latitude: location.latitude,
-            longitude: location.longitude,
+            latitude: 10.79943,
+            longitude: 106.68822,
           }}
           title="Vị trí của bạn"
         />

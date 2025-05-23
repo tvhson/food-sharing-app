@@ -27,8 +27,6 @@ import {getPosts} from '../api/PostApi';
 import {scale} from '../utils/scale';
 import {useLoading} from '../utils/LoadingContext';
 
-/* eslint-disable @typescript-eslint/no-shadow */
-
 const {useNotifications} = createNotifications();
 
 const HomeScreen = ({navigation}: any) => {
@@ -256,7 +254,7 @@ const HomeScreen = ({navigation}: any) => {
       </View>
       <FlatList
         style={{marginHorizontal: 8}}
-        data={filterPosts ?? recommendPost} // Fallback if `filterPosts` is empty
+        data={filterPosts ?? recommendPost}
         keyExtractor={item => item.id}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

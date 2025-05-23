@@ -1,8 +1,9 @@
+/* eslint-disable react/no-unstable-nested-components */
 import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 
 import {Image, PermissionsAndroid, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {UserInfo, saveUser} from '../redux/UserReducer';
 import {ZEGO_APP_ID, ZEGO_APP_SIGN} from '@env';
 import {
@@ -16,12 +17,6 @@ import {
   setChatRooms,
 } from '../redux/ChatRoomReducer';
 import {
-  clearFundingPosts,
-  clearMyFundingPosts,
-  pushFundingPost,
-  pushMyFundingPost,
-} from '../redux/OrganizationPostReducer';
-import {
   clearMyPosts,
   clearSharingPosts,
   pushMyPost,
@@ -34,19 +29,12 @@ import {
   getNotifications,
 } from '../api/NotificationApi';
 import {getAllAccounts, getInfoUser} from '../api/AccountsApi';
-import {
-  getOrganizationPost,
-  getOrganizationPostOfUser,
-} from '../api/OrganizationPostApi';
 import {getPostOfUser, getPosts} from '../api/PostApi';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BootSplash from 'react-native-bootsplash';
 import Colors from '../global/Color';
 import GetLocation from 'react-native-get-location';
-/* eslint-disable no-labels */
-/* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable react-native/no-inline-styles */
 import LottieView from 'lottie-react-native';
 import {ZIMKit} from '@zegocloud/zimkit-rn';
 import ZegoUIKitPrebuiltCallService from '@zegocloud/zego-uikit-prebuilt-call-rn';
@@ -65,7 +53,6 @@ enableScreens();
 const LoadingScreen = ({navigation, route}: any) => {
   const token = route.params.token;
   const dispatch = useDispatch();
-  const [myId, setMyId] = useState(0);
 
   const onUserLogin = async (userInfo: UserInfo) => {
     ZIMKit.connectUser(
@@ -75,8 +62,7 @@ const LoadingScreen = ({navigation, route}: any) => {
       },
       '',
     )
-      .then((data: any) => {
-        console.log(data);
+      .then(() => {
         ZegoUIKitPrebuiltCallService.init(
           parseInt(ZEGO_APP_ID || '0', 10),
           ZEGO_APP_SIGN,
@@ -99,21 +85,19 @@ const LoadingScreen = ({navigation, route}: any) => {
               channelID: 'ZegoUIKit',
               channelName: 'ZegoUIKit',
             },
-            avatarBuilder: () => {
-              return (
-                <View style={{width: '100%', height: '100%'}}>
-                  <Image
-                    style={{width: '100%', height: '100%'}}
-                    resizeMode="cover"
-                    source={{
-                      uri: userInfo.imageUrl
-                        ? userInfo.imageUrl
-                        : 'https://i.imgur.com/2nCt3Sbl.jpg',
-                    }}
-                  />
-                </View>
-              );
-            },
+            avatarBuilder: () => (
+              <View style={{width: '100%', height: '100%'}}>
+                <Image
+                  style={{width: '100%', height: '100%'}}
+                  resizeMode="cover"
+                  source={{
+                    uri: userInfo.imageUrl
+                      ? userInfo.imageUrl
+                      : 'https://i.imgur.com/2nCt3Sbl.jpg',
+                  }}
+                />
+              </View>
+            ),
           },
         ).then(() => {
           ZegoUIKitPrebuiltCallService.requestSystemAlertWindow({
@@ -127,68 +111,59 @@ const LoadingScreen = ({navigation, route}: any) => {
       .catch((error: any) => {
         console.log(error);
       });
-    console.log('ZIMKit.connectUser');
   };
 
   useEffect(() => {
     dispatch(setToken(token));
     ZIMKit.init(parseInt(ZEGO_APP_ID || '0', 10), ZEGO_APP_SIGN);
+
     const checkPermissions = async () => {
       try {
-        const cameraGranted = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-        );
-        const audioGranted = await PermissionsAndroid.check(
+        const permissions = [
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-        );
-        const locationGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        );
-        if (!cameraGranted || !audioGranted || !locationGranted) {
-          const permissions = [
-            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-            PermissionsAndroid.PERMISSIONS.CAMERA,
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          ];
-          await PermissionsAndroid.requestMultiple(permissions);
-        }
+        ];
+        await PermissionsAndroid.requestMultiple(permissions);
       } catch (err: any) {
         console.log(err.toString());
       }
     };
 
     const getLocation = async () => {
-      GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 30000,
-        rationale: {
-          title: 'Location permission',
-          message: 'The app needs the permission to request your location.',
-          buttonPositive: 'Ok',
-        },
-      })
-        .then(newLocation => {
-          dispatch(setLocation(newLocation));
-          console.log(newLocation);
-        })
-        .catch(ex => {
-          console.log(ex);
+      try {
+        const newLocation = await GetLocation.getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout: 30000,
+          rationale: {
+            title: 'Location permission',
+            message: 'The app needs the permission to request your location.',
+            buttonPositive: 'Ok',
+          },
         });
+        dispatch(setLocation(newLocation));
+      } catch (ex) {
+        console.log(ex);
+      }
     };
+
     const saveInfo = async () => {
-      const saveNotification = (body: any) => {
+      let myId: number = 0;
+
+      const saveNotificationHandler = (body: any) => {
         dispatch(addNotification(body));
       };
-      const saveChatRoom = (body: any) => {
+
+      const saveChatRoomHandler = (body: any) => {
         dispatch(pushChatRoom(body));
         dispatch(calculateUnreadMessages(myId));
       };
+
       const saveReport = async () => {
         try {
           const response: any = await getReport(token.toString());
-          if (response.status === 200) {
-            const data = response.data;
-            dispatch(setReports(data));
+          if (response?.status === 200) {
+            dispatch(setReports(response?.data));
           } else {
             throw new Error(response);
           }
@@ -196,12 +171,12 @@ const LoadingScreen = ({navigation, route}: any) => {
           console.log(error);
         }
       };
+
       const saveAllAccounts = async () => {
         try {
           const response: any = await getAllAccounts(token);
-          if (response.status === 200) {
-            const data = response.data;
-            dispatch(setAccounts(data));
+          if (response?.status === 200) {
+            dispatch(setAccounts(response?.data));
           } else {
             throw new Error(response);
           }
@@ -209,12 +184,12 @@ const LoadingScreen = ({navigation, route}: any) => {
           console.log(error);
         }
       };
+
       const saveAllChatRoom = async () => {
         try {
           const response: any = await getRoomChats(token.toString());
-          if (response.status === 200) {
-            const data = response.data;
-            dispatch(setChatRooms({chatRooms: data, myId}));
+          if (response?.status === 200) {
+            dispatch(setChatRooms({chatRooms: response?.data, myId}));
           } else {
             throw new Error(response);
           }
@@ -222,71 +197,65 @@ const LoadingScreen = ({navigation, route}: any) => {
           console.log(error);
         }
       };
+
       try {
         const response: any = await getInfoUser(token);
-        if (response.status === 200) {
-          if (response.data.bannedDate !== null) {
-            await AsyncStorage.removeItem('token');
-            await AsyncStorage.removeItem('isLogin');
-            await AsyncStorage.removeItem('userInfo');
-            await AsyncStorage.removeItem('recommendPost');
+        if (response?.status === 200) {
+          const userInfo: UserInfo = response?.data;
+
+          if (userInfo.bannedDate !== null) {
+            await AsyncStorage.multiRemove([
+              'token',
+              'isLogin',
+              'userInfo',
+              'recommendPost',
+            ]);
             disconnectSocket();
             disconnectChat();
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'Landing'}],
-            });
+            navigation.reset({index: 0, routes: [{name: 'Landing'}]});
+            return;
           }
-          const userInfo: UserInfo = response.data;
+
+          myId = userInfo.id;
+
           onUserLogin(userInfo);
-          setMyId(userInfo.id);
           dispatch(saveUser(userInfo));
-          connectNotification(userInfo.id, saveNotification);
-          connectChat(userInfo.id, saveChatRoom);
+          connectNotification(userInfo.id, saveNotificationHandler);
+          connectChat(userInfo.id, saveChatRoomHandler);
           saveAllChatRoom();
-          if (response.data.role === 'ADMIN') {
-            saveReport();
-            saveAllAccounts();
+
+          if (userInfo.role === 'ADMIN') {
+            await saveReport();
+            await saveAllAccounts();
           }
         } else {
-          console.log(response);
           throw new Error(response);
         }
       } catch (error) {
         console.log(error);
       }
     };
+
     const saveRecommendPost = async () => {
       try {
-        const response: any = await getPosts(token.toString(), {
-          type: 'ALL',
-        });
-        if (response.status === 200) {
-          const data = response.data;
+        const response: any = await getPosts(token.toString(), {type: 'ALL'});
+        if (response?.status === 200) {
           dispatch(clearSharingPosts());
-          for (const sharingPost of data) {
-            dispatch(pushSharingPost(sharingPost));
-          }
-        } else {
-          console.log(response);
-          throw new Error(response);
+          response?.data.forEach((post: any) =>
+            dispatch(pushSharingPost(post)),
+          );
         }
       } catch (error) {
         console.log(error);
       }
     };
+
     const saveMyPost = async () => {
       try {
         const response: any = await getPostOfUser(token.toString());
-        if (response.status === 200) {
-          const data = response.data;
+        if (response?.status === 200) {
           dispatch(clearMyPosts());
-          for (const sharingPost of data) {
-            dispatch(pushMyPost(sharingPost));
-          }
-        } else {
-          console.log(response);
-          throw new Error(response);
+          response?.data.forEach((post: any) => dispatch(pushMyPost(post)));
         }
       } catch (error) {
         console.log(error);
@@ -296,35 +265,18 @@ const LoadingScreen = ({navigation, route}: any) => {
     const saveNotification = async () => {
       try {
         const response: any = await getNotifications(token.toString());
-        if (response.status === 200) {
-          const data = response.data;
-          dispatch(setNotifications(data));
+        if (response?.status === 200) {
+          dispatch(setNotifications(response?.data));
           dispatch(countNumberOfUnread());
-        } else {
-          console.log(response);
-          throw new Error(response);
         }
       } catch (error) {
         console.log(error);
       }
     };
-    const sendData = async () => {
-      try {
-        await analytics().logEvent('loadData', {
-          id: myId,
-          status: 'success',
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
+
     const getPoint = async () => {
       try {
-        const response: any = await getMyPoint(token.toString());
-        if (response.status === 200) {
-        } else {
-          throw new Error(response);
-        }
+        await getMyPoint(token.toString());
       } catch (error) {
         console.log(error);
       }
@@ -338,17 +290,10 @@ const LoadingScreen = ({navigation, route}: any) => {
           saveRecommendPost(),
           saveMyPost(),
           saveNotification(),
-          sendData(),
           getPoint(),
         ]);
-        setTimeout(
-          () =>
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'BottomTabNavigator'}],
-            }),
-          2000,
-        );
+
+        navigation.reset({index: 0, routes: [{name: 'BottomTabNavigator'}]});
         BootSplash.hide();
       } catch (error) {
         console.log(error);
@@ -357,7 +302,7 @@ const LoadingScreen = ({navigation, route}: any) => {
 
     checkPermissions();
     loadData();
-  }, [dispatch, myId, navigation, token]);
+  }, []);
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.background}}>
