@@ -31,7 +31,7 @@ import {useNavigation} from '@react-navigation/native';
 
 interface GroupPostItemProps {
   item: IGroupPost;
-  setCommentPostId: (id: string) => void;
+  setCommentPostId: (id: number) => void;
   setShowComment: (show: boolean) => void;
 }
 
@@ -53,9 +53,8 @@ const GroupPostItem = (props: GroupPostItemProps) => {
     'Spam or Misleading Information',
   );
   const [descriptionReason, setDescriptionReason] = useState<string>('');
-  const [createPostUser, setCreatePostUser] = useState<any>();
 
-  const createdDate = timeAgo(item.createdDate);
+  const createdDate = timeAgo(item.organizationposts.createdDate);
 
   const openMenu = () => {
     setReason('Spam or Misleading Information');
@@ -77,7 +76,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
   };
 
   const handleDeletePost = async () => {
-    if (accessToken && item.createdById === userInfo.id) {
+    if (accessToken && item.accounts.id === userInfo.id) {
       //   const response: any = await deletePost(item.id, accessToken);
       //   if (response.status === 200) {
       //     dispatch(deleteMyPost(item.id));
@@ -111,20 +110,6 @@ const GroupPostItem = (props: GroupPostItemProps) => {
       setVisibleDialogReport(false);
     }
   };
-  useEffect(() => {
-    const getInfoUserCreatePost = async () => {
-      // get info user create post
-      if (accessToken && item.createdById !== userInfo.id) {
-        // get info user create post
-        getInfoUserById(item.createdById, accessToken).then((response: any) => {
-          if (response.status === 200) {
-            setCreatePostUser(response.data);
-          }
-        });
-      }
-    };
-    getInfoUserCreatePost();
-  }, [accessToken, item.createdById, userInfo.id]);
 
   const handleLiked = async () => {
     // dispatch(likePostReducer(item.id));
@@ -136,7 +121,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
 
   const handleShowComment = () => {
     setShowComment(true);
-    setCommentPostId(item.id.toString());
+    setCommentPostId(item.organizationposts.id);
   };
 
   return (
@@ -276,7 +261,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
         onDismiss={closeMenu}
         anchor={anchor}
         contentStyle={{backgroundColor: 'white'}}>
-        {item.createdById === userInfo.id && (
+        {item.accounts.id === userInfo.id && (
           <>
             <Menu.Item
               onPress={() => {
@@ -312,12 +297,12 @@ const GroupPostItem = (props: GroupPostItemProps) => {
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('PersonalPageOfOther', {id: item.createdById})
+            navigation.navigate('PersonalPageOfOther', {id: item.accounts.id})
           }>
           <Image
             source={{
               uri:
-                createPostUser?.imageUrl ||
+                item.accounts.imageUrl ||
                 userInfo.imageUrl ||
                 'https://randomuser.me/api/portraits/men/36.jpg',
             }}
@@ -331,7 +316,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
               fontFamily: getFontFamily('semibold'),
               color: Colors.text,
             }}>
-            {createPostUser?.name || userInfo.name}
+            {item.accounts.name || userInfo.name}
           </Text>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
@@ -384,12 +369,12 @@ const GroupPostItem = (props: GroupPostItemProps) => {
                 color: Colors.text,
                 marginLeft: 16,
               }}>
-              {item.description}
+              {item.organizationposts.description}
             </Text>
           </View>
         </View>
 
-        {item.images && item.images.length > 0 && (
+        {item.organizationposts.imageUrl && (
           <View
             style={{
               width: screenWidth * 0.85,
@@ -400,7 +385,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
               alignSelf: 'center',
               pointerEvents: 'box-none',
             }}>
-            <ImageSwiper images={item.images} />
+            <ImageSwiper images={[item.organizationposts.imageUrl]} />
           </View>
         )}
 
@@ -409,7 +394,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
           <TouchableOpacity onPress={handleLiked}>
             <Image
               source={
-                item.isLiked
+                item.organizationposts.attended
                   ? require('../../../assets/images/liked.png')
                   : require('../../../assets/images/like.png')
               }
@@ -437,11 +422,13 @@ const GroupPostItem = (props: GroupPostItemProps) => {
               color: Colors.black,
               fontSize: 14,
             }}>
-            {item.isLiked
-              ? item.likeCount === 1
+            {item.organizationposts.attended
+              ? item.organizationposts.peopleAttended === 1
                 ? 'Bạn'
-                : `Bạn và ${item.likeCount - 1} người khác`
-              : `${item.likeCount} người`}
+                : `Bạn và ${
+                    item.organizationposts.peopleAttended - 1
+                  } người khác`
+              : `${item.organizationposts.peopleAttended} người`}
           </Text>
         </View>
       </View>

@@ -5,14 +5,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {
-  calculateDistance,
-  calculateExpiredDate,
-  timeAgo,
-} from '../../../utils/helper';
+import {calculateExpiredDate, timeAgo} from '../../../utils/helper';
 
 import {FlatList} from 'react-native';
 import {RootState} from '../../../redux/Store';
@@ -21,7 +15,9 @@ import {getOrganizationPostByUserId} from '../../../api/OrganizationPostApi';
 import {getPostOfOther} from '../../../api/PostApi';
 import screenWidth from '../../../global/Constant';
 import {useLoading} from '../../../utils/LoadingContext';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {setMyPosts} from '../../../redux/SharingPostReducer';
+import {getMyGroup} from '../../../api/GroupApi';
 
 interface ListPostProps {
   type: 'POST' | 'OPOST';
@@ -32,6 +28,7 @@ interface ListPostProps {
 const ListPost = (props: ListPostProps) => {
   const {type, otherId, navigation} = props;
   const {showLoading, hideLoading} = useLoading();
+  const dispatch = useDispatch();
 
   const [refreshing, setRefreshing] = useState(false);
   const accessToken = useSelector((state: RootState) => state.token.key);
@@ -45,17 +42,15 @@ const ListPost = (props: ListPostProps) => {
       const response: any = await getPostOfOther(otherId, accessToken);
       if (response.status === 200) {
         setPosts(response.data);
+        dispatch(setMyPosts(response.data));
       } else {
         console.log('error');
       }
       hideLoading();
     };
-    const getOrganizationsPost = async () => {
+    const getMyGroupData = async () => {
       showLoading();
-      const response: any = await getOrganizationPostByUserId(
-        otherId,
-        accessToken,
-      );
+      const response: any = await getMyGroup(accessToken);
       if (response.status === 200) {
         setPosts(response.data);
       } else {
@@ -67,7 +62,7 @@ const ListPost = (props: ListPostProps) => {
       if (type === 'POST') {
         await getPostCreate();
       } else {
-        await getOrganizationsPost();
+        await getMyGroupData();
       }
     };
     fetchData();

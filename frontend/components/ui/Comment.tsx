@@ -27,12 +27,17 @@ import {scale} from '../../utils/scale';
 import {uploadPhoto} from '../../api/UploadPhotoApi';
 import {useNotifications} from 'react-native-notificated';
 import {useSelector} from 'react-redux';
+import {getCommentByOrganizationPostId} from '../../api/OrganizationPostApi';
 
-const Comment = (props: any) => {
+const Comment = (props: {
+  isVisible: boolean;
+  setVisible: (visible: boolean) => void;
+  commentPostId: number;
+  type: 'POST' | 'GROUP_POST';
+}) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
 
-  const {commentPostId} = props;
-  const {isVisible, setVisible} = props;
+  const {isVisible, setVisible, commentPostId, type} = props;
   const [commentList, setCommentList] = useState<IComment[]>([]);
   const [comment, setComment] = useState('');
   const {notify} = useNotifications();
@@ -69,7 +74,37 @@ const Comment = (props: any) => {
           });
       }
     };
-    getCommentList();
+    const getCommentListGroup = async () => {
+      // get comment list
+      if (accessToken) {
+        if (commentPostId === 0) {
+          return;
+        }
+        setIsLoading(true);
+        getCommentByOrganizationPostId(commentPostId, accessToken)
+          .then(response => {
+            setCommentList(response);
+            setIsLoading(false);
+          })
+          .catch(error => {
+            setIsLoading(false);
+            notify('error', {
+              params: {
+                description: 'Không thể lấy data',
+                title: 'Lỗi',
+                style: {
+                  multiline: 100,
+                },
+              },
+            });
+          });
+      }
+    };
+    if (type === 'GROUP_POST') {
+      getCommentListGroup();
+    } else {
+      getCommentList();
+    }
   }, [accessToken, commentPostId, notify, isVisible]);
 
   const postImage = async (newImages: any) => {

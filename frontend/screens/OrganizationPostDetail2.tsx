@@ -13,7 +13,7 @@ import React, {useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../global/Color';
-import {Icon} from 'react-native-paper';
+import {Avatar, Icon} from 'react-native-paper';
 import {Linking} from 'react-native';
 import {RootState} from '../redux/Store';
 import {Route} from '../constants/route';
@@ -21,6 +21,7 @@ import {addGroup} from '../redux/GroupReducer';
 import {getFontFamily} from '../utils/fonts';
 import {useNavigation} from '@react-navigation/native';
 import {useNotifications} from 'react-native-notificated';
+import {scale} from '../utils/scale';
 
 const OrganizationPostDetail2 = (props: any) => {
   const navigation: any = useNavigation();
@@ -31,12 +32,10 @@ const OrganizationPostDetail2 = (props: any) => {
   const user = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
 
-  console.log(item);
-
   const handleAttend = async () => {
     if (item.joined === 'JOINED') {
       navigation.navigate(Route.GroupHomeScreen, {
-        item,
+        group: item,
       });
       return;
     }
@@ -62,9 +61,10 @@ const OrganizationPostDetail2 = (props: any) => {
   };
 
   const handlePressLocation = () => {
+    const encodedLocation = encodeURIComponent(item.locationName);
     //open google map
     Linking.openURL(
-      'https://www.google.com/maps/dir/?api=1&destination=84+Cách+Mạng+Tháng+8+Đà+Nẵng+Việt+Nam',
+      `https://www.google.com/maps/dir/?api=1&destination=${encodedLocation}`,
     );
   };
 
@@ -127,7 +127,7 @@ const OrganizationPostDetail2 = (props: any) => {
               <View
                 style={{
                   paddingBottom: 10,
-                  marginHorizontal: 20,
+                  paddingHorizontal: scale(20),
                   borderBottomColor: '#ccc',
                   borderBottomWidth: 0.8,
                 }}>
@@ -159,7 +159,7 @@ const OrganizationPostDetail2 = (props: any) => {
               <View
                 style={{
                   paddingVertical: 10,
-                  paddingHorizontal: 20,
+                  paddingHorizontal: scale(20),
                 }}>
                 <Text style={styles.textTitle2}>Giới thiệu nhóm</Text>
                 <Text style={styles.textNormal}>{item.description}</Text>
@@ -179,7 +179,31 @@ const OrganizationPostDetail2 = (props: any) => {
     );
   };
 
-  return <ScrollView style={styles.container}>{renderHeader()}</ScrollView>;
+  return (
+    <ScrollView style={styles.container}>
+      {renderHeader()}
+      <View style={{paddingHorizontal: scale(20)}}>
+        <Text style={styles.textTitle2}>Danh sách thành viên</Text>
+      </View>
+      <View style={{paddingHorizontal: scale(20)}}>
+        {item.members.map((member, index) => (
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Avatar.Image
+              size={60}
+              source={{uri: member.imageUrl}}
+              style={{marginRight: 10}}
+            />
+            <View style={{flex: 1}}>
+              <Text style={styles.textTitle2}>{member.name}</Text>
+              {index === 0 && (
+                <Text style={styles.textNormal}>Trưởng nhóm</Text>
+              )}
+            </View>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
 };
 
 export default OrganizationPostDetail2;
@@ -187,10 +211,13 @@ export default OrganizationPostDetail2;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.white,
   },
   topImg: {
     width: '100%',
-    height: 300,
+    height: scale(300),
+    borderBottomLeftRadius: scale(20),
+    borderBottomRightRadius: scale(20),
   },
   floatBtn: {
     position: 'absolute',

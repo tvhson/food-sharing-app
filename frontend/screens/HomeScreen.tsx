@@ -279,6 +279,7 @@ const HomeScreen = ({navigation}: any) => {
         isVisible={showComment}
         setVisible={setShowComment}
         commentPostId={commentPostId}
+        type="POST"
       />
       <ImageDetailModal
         isVisible={showDetailImage}

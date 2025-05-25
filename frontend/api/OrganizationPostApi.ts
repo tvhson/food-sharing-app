@@ -1,10 +1,15 @@
 import ApiManager from './ApiManager';
-export const getOrganizationPost = async (token: any) => {
+import {IComment} from './PostApi';
+
+export const getOrganizationPost = async (token: string, groupId: number) => {
   try {
     const response = await ApiManager('organizationposts/recommended', {
       method: 'GET',
       headers: {
         Authorization: token,
+      },
+      params: {
+        groupId,
       },
     });
     return response;
@@ -12,7 +17,8 @@ export const getOrganizationPost = async (token: any) => {
     return error;
   }
 };
-export const createOrganizationPost = async (data: any, token: any) => {
+
+export const createOrganizationPost = async (data: any, token: string) => {
   try {
     const result = await ApiManager('organizationposts', {
       method: 'POST',
@@ -98,19 +104,22 @@ export const attendOrganizationPost = async (postId: any, token: any) => {
 };
 
 export const getCommentByOrganizationPostId = async (
-  postId: any,
-  token: any,
-) => {
+  postId: number,
+  token: string,
+): Promise<IComment[]> => {
   try {
-    const response = await ApiManager(`organizationposts/${postId}/comments`, {
-      method: 'GET',
-      headers: {
-        Authorization: token,
+    const response: any = await ApiManager(
+      `organizationposts/${postId}/comments`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: token,
+        },
       },
-    });
-    return response;
+    );
+    return response.data;
   } catch (error) {
-    return error;
+    throw error;
   }
 };
 

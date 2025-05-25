@@ -3,7 +3,6 @@ import {moderateScale, scale, verticalScale} from '../../utils/scale';
 
 import Colors from '../../global/Color';
 import {Icon} from '@rneui/themed';
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {RootState} from '../../redux/Store';
 import {Route} from '../../constants/route';
@@ -20,7 +19,7 @@ const HeaderHome = (props: any) => {
     <View style={styles.container}>
       <Text style={styles.title}>Happy Food</Text>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             navigation.navigate(Route.GroupHomeScreen);
           }}>
@@ -32,7 +31,7 @@ const HeaderHome = (props: any) => {
               marginRight: scale(20),
             }}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => {
             navigation.navigate(Route.MapView);

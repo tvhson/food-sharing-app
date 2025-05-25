@@ -8,28 +8,21 @@ interface Account {
   latitude: number;
   longitude: number;
 }
-interface OrganizationPost {
+interface IOrganizationPost {
   id: number;
-  title: string;
   description: string;
-  peopleAttended: number;
   imageUrl: string;
   createdDate: Date;
-  linkWebsites: string;
-  userId: number;
-  locationName: string;
-  latitude: number;
-  longitude: number;
   attended: boolean;
-  startDate: Date;
+  peopleAttended: number;
 }
-interface FundingPost {
+interface IGroupPost {
   accounts: Account;
-  organizationposts: OrganizationPost;
+  organizationposts: IOrganizationPost;
 }
 interface FundingPosts {
-  HomePage: FundingPost[];
-  MyPosts: FundingPost[];
+  HomePage: IOrganizationPost[];
+  MyPosts: IOrganizationPost[];
 }
 const initialState: FundingPosts = {
   HomePage: [],
@@ -41,95 +34,40 @@ const FundingPostSlice = createSlice({
   reducers: {
     pushFundingPost: (
       state: FundingPosts,
-      action: PayloadAction<FundingPost>,
+      action: PayloadAction<IOrganizationPost>,
     ) => {
       state.HomePage.unshift(action.payload);
     },
     pushMyFundingPost: (
       state: FundingPosts,
-      action: PayloadAction<FundingPost>,
+      action: PayloadAction<IOrganizationPost>,
     ) => {
       state.MyPosts.unshift(action.payload);
     },
     addToTheEndOfFundingPost: (
       state: FundingPosts,
-      action: PayloadAction<FundingPost>,
+      action: PayloadAction<IOrganizationPost>,
     ) => {
       state.HomePage.push(action.payload);
     },
     setHomePageFundingPost: (
       state: FundingPosts,
-      action: PayloadAction<FundingPost[]>,
+      action: PayloadAction<IOrganizationPost[]>,
     ) => {
       state.HomePage = action.payload.slice().reverse();
     },
     setMyFundingPosts: (
       state: FundingPosts,
-      action: PayloadAction<FundingPost[]>,
+      action: PayloadAction<IOrganizationPost[]>,
     ) => {
       state.MyPosts = action.payload;
     },
-    updateMyFundingPost: (
-      state: FundingPosts,
-      action: PayloadAction<FundingPost>,
-    ) => {
-      state.MyPosts = state.MyPosts.map(post =>
-        post.organizationposts.id === action.payload.organizationposts.id
-          ? action.payload
-          : post,
-      );
-      state.HomePage = state.HomePage.map(post =>
-        post.organizationposts.id === action.payload.organizationposts.id
-          ? action.payload
-          : post,
-      );
-    },
-    deleteMyFundingPost: (
-      state: FundingPosts,
-      action: PayloadAction<number>,
-    ) => {
-      state.MyPosts = state.MyPosts.filter(
-        post => post.organizationposts.id !== action.payload,
-      );
-      state.HomePage = state.HomePage.filter(
-        post => post.organizationposts.id !== action.payload,
-      );
-    },
+
     clearFundingPosts: (state: FundingPosts) => {
       state.HomePage = [];
     },
     clearMyFundingPosts: (state: FundingPosts) => {
       state.MyPosts = [];
-    },
-    attendPost: (state: FundingPosts, action: PayloadAction<number>) => {
-      state.MyPosts = state.MyPosts.map(post =>
-        post.organizationposts.id === action.payload
-          ? {
-              ...post,
-              organizationposts: {
-                ...post.organizationposts,
-                attended: !post.organizationposts.attended,
-                peopleAttended: post.organizationposts.attended
-                  ? post.organizationposts.peopleAttended - 1
-                  : post.organizationposts.peopleAttended + 1,
-              },
-            }
-          : post,
-      );
-      state.HomePage = state.HomePage.map(post =>
-        post.organizationposts.id === action.payload
-          ? {
-              ...post,
-              organizationposts: {
-                ...post.organizationposts,
-                attended: !post.organizationposts.attended,
-                peopleAttended: post.organizationposts.attended
-                  ? post.organizationposts.peopleAttended - 1
-                  : post.organizationposts.peopleAttended + 1,
-              },
-            }
-          : post,
-      );
     },
   },
 });
@@ -138,11 +76,11 @@ export const {
   pushMyFundingPost,
   setHomePageFundingPost,
   setMyFundingPosts,
-  updateMyFundingPost,
-  deleteMyFundingPost,
   clearFundingPosts,
   clearMyFundingPosts,
   addToTheEndOfFundingPost,
-  attendPost,
 } = FundingPostSlice.actions;
+
+export type {FundingPosts, IOrganizationPost, Account};
+
 export default FundingPostSlice.reducer;

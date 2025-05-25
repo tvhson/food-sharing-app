@@ -1,107 +1,92 @@
-/* eslint-disable react/self-closing-comp */
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {useEffect, useState} from 'react';
 import {
-  Animated,
   FlatList,
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  RefreshControl,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Button, Icon} from 'react-native-paper';
-import {IGroup, IGroupPost} from '../../global/types';
-import React, {useState} from 'react';
+import {Icon} from 'react-native-paper';
 import {moderateScale, scale, verticalScale} from '../../utils/scale';
 
-import Colors from '../../global/Color';
-import GroupPostItem from '../../components/ui/GroupUI/GroupPostItem';
-import {RootState} from '../../redux/Store';
-import {Route} from '../../constants/route';
-import {getFontFamily} from '../../utils/fonts';
-import {screenHeight} from '../../global/Constant';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
-
-const groupInfo: IGroup = {
-  id: 1,
-  name: 'Group 1',
-  description: 'Description 1',
-  image: 'https://tvhson.s3.amazonaws.com/1746500437226_image.jpeg',
-  numberOfMembers: 100,
-  numberOfRequests: 10,
-  // joinType: 'public',
-  joinType: 'private',
-  isJoined: true,
-  createdById: 1,
-};
-
-const groupPosts: IGroupPost[] = [
-  {
-    id: 1,
-    description:
-      'Description 1asjkdfdfhkajsdhfkasjdfhkajs skadjfhaksdjf kasdjhf aksjdhf jkasdhfkajsdhf  ajdhfkawejj asdjfahsd kfae h ',
-    images: [],
-    createdDate: '2021-01-01',
-    updatedAt: '2021-01-01',
-    createdById: 1,
-    createdBy: {
-      id: 1,
-      name: 'User 1',
-      image: 'https://tvhson.s3.amazonaws.com/1746500437226_image.jpeg',
-    },
-    likeCount: 0,
-    isLiked: false,
-  },
-  {
-    id: 2,
-    description: 'Description 2',
-    images: [
-      'https://tvhson.s3.amazonaws.com/1746500437226_image.jpeg',
-      'https://tvhson.s3.amazonaws.com/1746500437226_image.jpeg',
-      'https://tvhson.s3.amazonaws.com/1746500437226_image.jpeg',
-    ],
-    createdDate: '2021-01-01',
-    updatedAt: '2021-01-01',
-    createdById: 1,
-    createdBy: {
-      id: 1,
-      name: 'User 1',
-      image: 'https://tvhson.s3.amazonaws.com/1746500437226_image.jpeg',
-    },
-    likeCount: 0,
-    isLiked: false,
-  },
-];
+import {IGetGroupResponse} from '../../api/GroupApi';
+import GroupPostItem from '../../components/ui/GroupUI/GroupPostItem';
+import {Route} from '../../constants/route';
+import Colors from '../../global/Color';
+import {screenHeight} from '../../global/Constant';
+import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
+import {ScrollView} from 'react-native';
+import {getOrganizationPost} from '../../api/OrganizationPostApi';
+import {IOrganizationPost} from '../../redux/OrganizationPostReducer';
+import {IGroupPost} from '../../global/types';
+import {useNotifications} from 'react-native-notificated';
+import Comment from '../../components/ui/Comment';
 
 const IMAGE_HEIGHT = screenHeight * 0.25;
 
 const GroupHomeScreen = ({route}: {route: any}) => {
   const navigation: any = useNavigation();
   const userInfo = useSelector((state: RootState) => state.userInfo);
-  //   const {group}: {group: IGroup} = route.params;
+  const accessToken = useSelector((state: RootState) => state.token.key);
+  const {group}: {group: IGetGroupResponse} = route.params;
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+  const [tab, setTab] = useState<'post' | 'todo' | 'statement'>('post');
+  const [refreshing, setRefreshing] = useState(false);
+  const [groupPosts, setGroupPosts] = useState<IGroupPost[]>([]);
+  const [commentPostId, setCommentPostId] = useState<number>(0);
+  const [showComment, setShowComment] = useState(false);
+  const {notify} = useNotifications();
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     setShowStickyHeader(offsetY > IMAGE_HEIGHT - 30);
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await getGroupPost();
+    setRefreshing(false);
+  };
+
+  const getGroupPost = async () => {
+    const response: any = await getOrganizationPost(accessToken, group.id);
+    if (response.status === 200) {
+      setGroupPosts(response.data);
+    } else {
+      notify('error', {
+        params: {
+          description: 'Không thể lấy data',
+          title: 'Lỗi',
+          style: {
+            multiline: 100,
+          },
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    getGroupPost();
+  }, []);
+
   const renderStickyHeader = () => (
     <View style={styles.stickyHeader}>
-      <Text style={styles.title}>{groupInfo.name}</Text>
+      <Text style={styles.title}>{group.name}</Text>
     </View>
   );
 
   const renderHeader = () => (
     <View
       style={{justifyContent: 'center', alignItems: 'center', width: '100%'}}>
-      <Image source={{uri: groupInfo.image}} style={styles.image} />
-      <Text style={styles.title}>{groupInfo.name}</Text>
+      <Image source={{uri: group.imageUrl}} style={styles.image} />
+      <Text style={styles.title}>{group.name}</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -118,9 +103,9 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           }}>
           <Icon source="account-group" size={18} color="black" />
           {'  '}
-          {groupInfo.numberOfMembers} thành viên
+          {group.members.length} thành viên
         </Text>
-        {groupInfo.joinType === 'private' && (
+        {group.joinType === 'private' && (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
@@ -130,9 +115,9 @@ const GroupHomeScreen = ({route}: {route: any}) => {
               }}>
               <Icon source="account-group" size={18} color="black" />
               {'  '}
-              {groupInfo.numberOfRequests} yêu cầu
+              {group.requests.length} yêu cầu
             </Text>
-            {userInfo.id === groupInfo.createdById && (
+            {userInfo.id === group.author.id && (
               <TouchableOpacity
                 style={{
                   marginLeft: scale(10),
@@ -167,13 +152,13 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           alignItems: 'center',
         }}>
         <Image
-          source={{uri: groupInfo.image}}
+          source={{uri: group.imageUrl}}
           style={{width: 30, height: 30, borderRadius: 100}}
         />
         <Text
           onPress={() => {
             navigation.navigate(Route.GroupEditPost, {
-              groupInfo,
+              group,
             });
           }}
           style={{
@@ -195,7 +180,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           style={{alignItems: 'center', justifyContent: 'center'}}
           onPress={() => {
             navigation.navigate(Route.GroupCreatePost, {
-              groupInfo,
+              group,
             });
           }}>
           <Icon source="image" size={20} color={Colors.greenPrimary} />
@@ -204,32 +189,62 @@ const GroupHomeScreen = ({route}: {route: any}) => {
     </View>
   );
 
-  return (
-    <View style={styles.container}>
-      {showStickyHeader && renderStickyHeader()}
+  const renderTab = () => (
+    <View style={styles.tabContainer}>
+      <TouchableOpacity style={styles.tabItem} onPress={() => setTab('post')}>
+        <Text style={styles.tabText}>Bài viết</Text>
+        {tab === 'post' && <View style={styles.tabIndicator} />}
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.tabItem} onPress={() => setTab('todo')}>
+        <Text style={styles.tabText}>Tiến độ</Text>
+        {tab === 'todo' && <View style={styles.tabIndicator} />}
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.tabItem}
+        onPress={() => setTab('statement')}>
+        <Text style={styles.tabText}>Sao kê</Text>
+        {tab === 'statement' && <View style={styles.tabIndicator} />}
+      </TouchableOpacity>
+    </View>
+  );
 
+  return (
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+      onScroll={handleScroll}>
+      {showStickyHeader && renderStickyHeader()}
       <TouchableOpacity
         style={styles.backButtonHeader}
         onPress={() => navigation.goBack()}>
         <Icon source="arrow-left" size={20} color="black" />
       </TouchableOpacity>
-      <FlatList
-        data={groupPosts}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        keyExtractor={item => item.id.toString()}
-        ListHeaderComponent={renderHeader}
-        renderItem={({item}) => (
-          <View style={styles.postItem}>
-            <GroupPostItem
-              item={item}
-              setCommentPostId={() => {}}
-              setShowComment={() => {}}
-            />
+      {renderHeader()}
+      {renderTab()}
+      {tab === 'post' &&
+        (groupPosts.length > 0 ? (
+          <View>
+            {groupPosts.map(post => (
+              <GroupPostItem
+                item={post}
+                setCommentPostId={setCommentPostId}
+                setShowComment={setShowComment}
+              />
+            ))}
           </View>
-        )}
+        ) : (
+          <Text>Không có bài viết</Text>
+        ))}
+      <Comment
+        isVisible={showComment}
+        setVisible={setShowComment}
+        commentPostId={commentPostId}
+        type="GROUP_POST"
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -278,5 +293,28 @@ const styles = StyleSheet.create({
     paddingVertical: scale(4),
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: scale(20),
+  },
+  tabItem: {
+    padding: scale(10),
+    position: 'relative',
+  },
+  tabText: {
+    fontSize: moderateScale(16),
+    fontFamily: getFontFamily('bold'),
+    color: Colors.black,
+  },
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: Colors.greenPrimary,
   },
 });

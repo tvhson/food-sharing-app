@@ -24,8 +24,6 @@ import {uploadPhoto} from '../api/UploadPhotoApi';
 import {updateUser} from '../api/AccountsApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-/* eslint-disable @typescript-eslint/no-shadow */
-
 const {useNotifications} = createNotifications();
 
 const PersonalPage = ({navigation}: any) => {
@@ -41,6 +39,7 @@ const PersonalPage = ({navigation}: any) => {
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUrl, setImageUrl] = useState(userInfo.imageUrl);
   const accessToken = useSelector((state: RootState) => state.token.key);
+  const myPosts = useSelector((state: RootState) => state.sharingPost.MyPosts);
 
   const postImage = (image: any) => {
     const dataForm = new FormData();
@@ -147,16 +146,13 @@ const PersonalPage = ({navigation}: any) => {
             <Text style={styles.textName}>{userInfo.name}</Text>
           </View>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.textNumberStat}>0</Text>
+            <Text style={styles.textNumberStat}>{myPosts.length}</Text>
             <Text style={styles.textSection1}>bài viết</Text>
           </View>
+
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <Text style={styles.textNumberStat}>0</Text>
-            <Text style={styles.textSection1}>đã nhận</Text>
-          </View>
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.textNumberStat}>0</Text>
-            <Text style={styles.textSection1}>sự kiện </Text>
+            <Text style={styles.textSection1}>Hội nhóm </Text>
           </View>
         </View>
         <TouchableOpacity
