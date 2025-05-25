@@ -17,6 +17,8 @@ import {
   sendMessage,
 } from '../api/ChatApi';
 import {useDispatch, useSelector} from 'react-redux';
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
 
 import {BackHandler} from 'react-native';
 import Colors from '../global/Color';
@@ -48,6 +50,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   const {showLoading, hideLoading} = useLoading();
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
+  const [text, setText] = useState('');
 
   const postImage = async (image: any) => {
     setImageUpload(image);
@@ -150,7 +153,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   ]);
 
   const onSend = useCallback(
-    async (newMessage: IMessage[]) => {
+    async (newMessage: IMessage[], imageUpload: any) => {
       showLoading();
       let imageUrl = null;
       const dataForm = new FormData();
@@ -179,7 +182,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
         imageUrl: imageUrl,
       };
       sendMessage(message);
-      setImageUpload(null);
+
       setMessages((previousMessages: IMessage[]) => {
         const updatedNewMessages = newMessage.map(msg => ({
           ...msg,
@@ -264,27 +267,6 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       return readAllMessages;
     }, [accessToken, dispatch, roomId]),
   );
-
-  const handleUploadImage = async () => {
-    let imageUrl = null;
-    const dataForm = new FormData();
-    if (imageUpload) {
-      dataForm.append('file', {
-        uri: imageUpload.path,
-        name: imageUpload.filename || 'image.jpeg',
-        type: imageUpload.mime || 'image/jpeg',
-      });
-    }
-
-    uploadPhoto(dataForm, accessToken).then((response: any) => {
-      if (response?.status === 200) {
-        imageUrl = response?.data[0];
-      } else {
-        console.log(response);
-      }
-    });
-    return imageUrl;
-  };
 
   return (
     <View style={{flex: 1, backgroundColor: Colors.white}}>
@@ -419,13 +401,16 @@ const ChatRoomScreen = ({navigation, route}: any) => {
       <GiftedChat
         messages={messages}
         locale={dayvi}
-        onSend={(newMessage: IMessage[]) => onSend(newMessage)}
         user={{
           _id: userInfo.id,
           name: userInfo.name,
           avatar: userInfo.imageUrl
             ? userInfo.imageUrl
             : 'https://randomuser.me/api/portraits/men/36.jpg',
+        }}
+        text={text}
+        onInputTextChanged={text => {
+          setText(text);
         }}
         renderSend={props => {
           return (
@@ -437,13 +422,33 @@ const ChatRoomScreen = ({navigation, route}: any) => {
                 justifyContent: 'center',
                 paddingHorizontal: 10,
               }}>
-              <Send {...props}>
-                <View style={{marginRight: 10, marginBottom: 10}}>
+              <Send {...props} disabled={!imageUpload && !props.text}>
+                <TouchableOpacity
+                  style={{marginRight: 10, marginBottom: 10}}
+                  onPress={() => {
+                    onSend(
+                      [
+                        {
+                          text: text,
+                          user: {
+                            _id: userInfo.id,
+                            name: userInfo.name,
+                            avatar: userInfo.imageUrl,
+                          },
+                          createdAt: new Date(),
+                          _id: uuidv4(),
+                        },
+                      ],
+                      imageUpload,
+                    );
+                    setText('');
+                    setImageUpload(null);
+                  }}>
                   <Image
                     source={require('../assets/images/send-message.png')}
                     style={{width: 30, height: 30}}
                   />
-                </View>
+                </TouchableOpacity>
               </Send>
             </View>
           );

@@ -6,7 +6,7 @@ import {
   Portal,
   RadioButton,
 } from 'react-native-paper';
-/* eslint-disable react-native/no-inline-styles */
+import React, {useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -15,18 +15,20 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {calculateExpiredDate, timeAgo} from '../../utils/helper';
-import {deleteMyPost, likePostReducer} from '../../redux/SharingPostReducer';
-import {deletePost, likePost, reportPost} from '../../api/PostApi';
 import {useDispatch, useSelector} from 'react-redux';
+import {deletePost, likePost, reportPost} from '../../api/PostApi';
+import {
+  deleteMyPost,
+  likePostReducer,
+  SharingPost,
+} from '../../redux/SharingPostReducer';
+import {calculateExpiredDate, timeAgo} from '../../utils/helper';
 
+import {notify} from 'react-native-notificated';
 import Colors from '../../global/Color';
-import ImageSwiper from './ImageSwiper';
 import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
-import {getInfoUserById} from '../../api/AccountsApi';
-import {notify} from 'react-native-notificated';
+import ImageSwiper from './ImageSwiper';
 
 const PostRenderItem2 = (props: any) => {
   const {
@@ -36,6 +38,13 @@ const PostRenderItem2 = (props: any) => {
     navigation,
     location,
     setDetailPost,
+  }: {
+    item: SharingPost;
+    setCommentPostId: any;
+    setShowComment: any;
+    navigation: any;
+    location: any;
+    setDetailPost: any;
   } = props;
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -55,7 +64,6 @@ const PostRenderItem2 = (props: any) => {
     'Spam or Misleading Information',
   );
   const [descriptionReason, setDescriptionReason] = useState<string>('');
-  const [createPostUser, setCreatePostUser] = useState<any>();
 
   const createdDate = timeAgo(item.createdDate);
   const expiredString = calculateExpiredDate(new Date(item.expiredDate));
@@ -80,7 +88,7 @@ const PostRenderItem2 = (props: any) => {
   };
 
   const handleDeletePost = async () => {
-    if (accessToken && item.createdById === userInfo.id) {
+    if (accessToken && item.author.id === userInfo.id) {
       const response: any = await deletePost(item.id, accessToken);
       if (response.status === 200) {
         dispatch(deleteMyPost(item.id));
@@ -99,7 +107,7 @@ const PostRenderItem2 = (props: any) => {
         note: '',
         type: 'POST',
         senderId: userInfo.id,
-        accusedId: item.createdById,
+        accusedId: item.author.id,
         senderName: userInfo.name,
       });
       if (response.status === 200) {
@@ -114,20 +122,6 @@ const PostRenderItem2 = (props: any) => {
       setVisibleDialogReport(false);
     }
   };
-  useEffect(() => {
-    const getInfoUserCreatePost = async () => {
-      // get info user create post
-      if (accessToken && item.createdById !== userInfo.id) {
-        // get info user create post
-        getInfoUserById(item.createdById, accessToken).then((response: any) => {
-          if (response.status === 200) {
-            setCreatePostUser(response.data);
-          }
-        });
-      }
-    };
-    getInfoUserCreatePost();
-  }, [accessToken, item.createdById, userInfo.id]);
 
   const handleLiked = async () => {
     dispatch(likePostReducer(item.id));
@@ -287,7 +281,7 @@ const PostRenderItem2 = (props: any) => {
         onDismiss={closeMenu}
         anchor={anchor}
         contentStyle={{backgroundColor: 'white'}}>
-        {item.createdById === userInfo.id && (
+        {item.author.id === userInfo.id && (
           <>
             <Menu.Item
               onPress={() => {
@@ -325,12 +319,12 @@ const PostRenderItem2 = (props: any) => {
         onPress={handleGoToDetail}>
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('PersonalPageOfOther', {id: item.createdById})
+            navigation.navigate('PersonalPageOfOther', {id: item.author.id})
           }>
           <Image
             source={{
               uri:
-                createPostUser?.imageUrl ||
+                item.author.imageUrl ||
                 userInfo.imageUrl ||
                 'https://randomuser.me/api/portraits/men/36.jpg',
             }}
@@ -344,7 +338,7 @@ const PostRenderItem2 = (props: any) => {
               fontFamily: getFontFamily('semibold'),
               color: Colors.text,
             }}>
-            {createPostUser?.name || userInfo.name}
+            {item.author.name || userInfo.name}
           </Text>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
@@ -539,8 +533,7 @@ const PostRenderItem2 = (props: any) => {
             onPressImage={() => {
               const detailPost = {
                 item,
-                user:
-                  item.createdById !== userInfo.id ? createPostUser : userInfo,
+                user: item.author.id !== userInfo.id ? item.author : userInfo,
                 distance: item.distance,
               };
 

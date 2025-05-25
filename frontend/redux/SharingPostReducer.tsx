@@ -14,7 +14,6 @@ export interface SharingPost {
   locationName: string;
   latitude: number;
   longitude: number;
-  createdById: number;
   receiverId: number | null;
   createdDate: Date;
   portion: number;
@@ -24,6 +23,14 @@ export interface SharingPost {
   isReceived: boolean;
   type: string;
   distance: number;
+  author: {
+    id: number;
+    name: string;
+    imageUrl: string;
+    locationName: string | null;
+    latitude: number | null;
+    longitude: number | null;
+  };
 }
 
 export interface SharingPosts {

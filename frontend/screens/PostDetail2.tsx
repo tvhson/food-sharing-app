@@ -33,7 +33,7 @@ import {createNotification} from '../api/NotificationApi';
 import {getFontFamily} from '../utils/fonts';
 import {getInfoUserById} from '../api/AccountsApi';
 import {getRoomChats} from '../api/ChatApi';
-import {likePostReducer} from '../redux/SharingPostReducer';
+import {likePostReducer, SharingPost} from '../redux/SharingPostReducer';
 import {scale} from '../utils/scale';
 import screenWidth from '../global/Constant';
 import {uploadPhoto} from '../api/UploadPhotoApi';
@@ -41,10 +41,9 @@ import {useLoading} from '../utils/LoadingContext';
 
 const PostDetail2 = ({route, navigation}: any) => {
   const [roomChat, setRoomChat] = useState<any>(null);
-  const [createPostUser, setCreatePostUser] = useState<any>(null);
   const accessToken = useSelector((state: RootState) => state.token.key);
   const commentInputRef = useRef<TextInput>(null);
-  const [item, setItem] = useState(route.params.item);
+  const [item, setItem] = useState<SharingPost>(route.params.item);
   const [refreshing, setRefreshing] = useState(false); // Add refreshing state
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const locationStart = {
@@ -71,37 +70,25 @@ const PostDetail2 = ({route, navigation}: any) => {
 
   useEffect(() => {
     const getInfoUserCreatePost = async () => {
-      if (accessToken && item.createdById !== userInfo.id) {
-        getInfoUserById(item.createdById, accessToken)
-          .then((response: any) => {
-            if (response.status === 200) {
-              setCreatePostUser(response.data);
-              getRoomChats(accessToken.toString())
-                .then((response2: any) => {
-                  if (response2.status === 200) {
-                    const roomChats = response2.data;
-                    const roomChatFind = roomChats.find(
-                      (room: any) =>
-                        (room.senderId === userInfo.id &&
-                          room.recipientId === response.data.id) ||
-                        (room.senderId === response.data.id &&
-                          room.recipientId === userInfo.id),
-                    );
-                    setRoomChat(roomChatFind);
-                  } else {
-                    console.log(response);
-                  }
-                })
-                .catch(error => {
-                  console.log(error);
-                });
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
+      if (accessToken && item.author.id !== userInfo.id) {
+        getRoomChats(accessToken.toString()).then((response2: any) => {
+          if (response2.status === 200) {
+            const roomChats = response2.data;
+            const roomChatFind = roomChats.find(
+              (room: any) =>
+                (room.senderId === userInfo.id &&
+                  room.recipientId === item.author.id) ||
+                (room.senderId === item.author.id &&
+                  room.recipientId === userInfo.id),
+            );
+            setRoomChat(roomChatFind);
+          } else {
+            console.log(response2);
+          }
+        });
       }
     };
+
     const getCommentList = async () => {
       // get comment list
       if (accessToken) {
@@ -126,7 +113,7 @@ const PostDetail2 = ({route, navigation}: any) => {
     };
     getCommentList();
     getInfoUserCreatePost();
-  }, [accessToken, item.createdById, item.id, notify, userInfo.id]);
+  }, [accessToken, item.author.id, item.id, notify, userInfo.id]);
 
   const postImage = async (newImages: any) => {
     // Ensure newImages is always an array
@@ -182,7 +169,7 @@ const PostDetail2 = ({route, navigation}: any) => {
               ' muốn bạn xác nhận rằng bạn đã đưa thức ăn cho họ',
             type: 'RECEIVED',
             linkId: item.id,
-            userId: createPostUser.id,
+            userId: item.author.id,
             senderId: userInfo.id,
           },
           accessToken,
@@ -298,11 +285,11 @@ const PostDetail2 = ({route, navigation}: any) => {
       navigation.navigate('ChatRoom', {
         item: {
           senderProfilePic: userInfo.imageUrl,
-          recipientProfilePic: createPostUser.imageUrl,
+          recipientProfilePic: item.author.imageUrl,
           senderId: userInfo.id,
-          recipientId: createPostUser.id,
+          recipientId: item.author.id,
           senderName: userInfo.name,
-          recipientName: createPostUser.name,
+          recipientName: item.author.name,
         },
       });
     }
@@ -321,7 +308,7 @@ const PostDetail2 = ({route, navigation}: any) => {
               <Image
                 source={{
                   uri:
-                    createPostUser?.avatar ||
+                    item.author.imageUrl ||
                     userInfo.imageUrl ||
                     'https://randomuser.me/api/portraits/men/36.jpg',
                 }}
@@ -335,7 +322,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                   fontFamily: getFontFamily('semibold'),
                   color: Colors.text,
                 }}>
-                {createPostUser?.name || userInfo.name}
+                {item.author.name || userInfo.name}
               </Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
@@ -365,7 +352,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                 right: 0,
                 flexDirection: 'row',
               }}>
-              {item.createdById !== userInfo.id && (
+              {item.author.id !== userInfo.id && (
                 <>
                   {!item.isReceived && (
                     <TouchableOpacity onPress={handleReceived}>
