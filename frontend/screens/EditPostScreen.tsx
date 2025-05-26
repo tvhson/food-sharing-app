@@ -475,7 +475,6 @@ const EditPostScreen = ({route, navigation}: any) => {
 
         <GooglePlacesAutocomplete
           ref={autocompleteRef}
-          debounce={500}
           fetchDetails={true}
           placeholder="Địa chỉ nhận"
           onPress={(data, details = null) => {

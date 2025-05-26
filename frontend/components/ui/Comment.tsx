@@ -15,6 +15,10 @@ import {
   getCommentByPostId,
 } from '../../api/PostApi';
 import React, {useEffect, useState} from 'react';
+import {
+  createCommentToOrganizationPost,
+  getCommentByOrganizationPostId,
+} from '../../api/OrganizationPostApi';
 
 import Colors from '../../global/Color';
 import CommentItem from './CommentItem';
@@ -27,7 +31,6 @@ import {scale} from '../../utils/scale';
 import {uploadPhoto} from '../../api/UploadPhotoApi';
 import {useNotifications} from 'react-native-notificated';
 import {useSelector} from 'react-redux';
-import {getCommentByOrganizationPostId} from '../../api/OrganizationPostApi';
 
 const Comment = (props: {
   isVisible: boolean;
@@ -128,32 +131,57 @@ const Comment = (props: {
         imageUrl = response.data[0];
       }
     }
-    const response: any = await createCommentToPost(
-      commentPostId,
-      {content: comment, imageUrl: imageUrl},
-      accessToken,
-    );
-    if (response.status === 200) {
-      setComment('');
-      setImageUpload(null);
-      getCommentByPostId(commentPostId, accessToken)
-        .then(response2 => {
-          setCommentList(response2);
-        })
-        .catch(error => {
-          console.log(error);
-          setIsLoading(false);
-          notify('error', {
-            params: {description: 'Không thể lấy data', title: 'Lỗi'},
+    let response: any = null;
+    if (type === 'POST') {
+      response = await createCommentToPost(
+        commentPostId,
+        {content: comment, imageUrl: imageUrl},
+        accessToken,
+      );
+
+      if (response.status === 200) {
+        setComment('');
+        setImageUpload(null);
+        getCommentByPostId(commentPostId, accessToken)
+          .then(response2 => {
+            setCommentList(response2);
+          })
+          .catch(error => {
+            console.log(error);
+            setIsLoading(false);
+            notify('error', {
+              params: {description: 'Không thể lấy data', title: 'Lỗi'},
+            });
           });
+      } else {
+        notify('error', {
+          params: {description: 'Không thể tạo comment', title: 'Lỗi'},
         });
+        setIsLoading(false);
+      }
     } else {
-      notify('error', {
-        params: {description: 'Không thể tạo comment', title: 'Lỗi'},
-      });
+      response = await createCommentToOrganizationPost(
+        commentPostId,
+        {content: comment, imageUrl: imageUrl},
+        accessToken,
+      );
+      if (response.status === 200) {
+        setComment('');
+        setImageUpload(null);
+        getCommentByOrganizationPostId(commentPostId, accessToken)
+          .then(response2 => {
+            setCommentList(response2);
+          })
+          .catch(error => {
+            console.log(error);
+            setIsLoading(false);
+            notify('error', {
+              params: {description: 'Không thể lấy data', title: 'Lỗi'},
+            });
+          });
+      }
       setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (

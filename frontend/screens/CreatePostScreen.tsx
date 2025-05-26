@@ -520,7 +520,6 @@ const CreatePostScreen = ({route, navigation}: any) => {
             setLatitude(details?.geometry.location.lat || 0);
             setLongitude(details?.geometry.location.lng || 0);
           }}
-          debounce={500}
           disableScroll={true}
           query={{
             key: MAP_API_KEY,

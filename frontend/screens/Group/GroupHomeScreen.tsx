@@ -1,4 +1,3 @@
-import React, {useEffect, useState} from 'react';
 import {
   FlatList,
   Image,
@@ -10,39 +9,48 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Icon} from 'react-native-paper';
+import {
+  IOrganizationPost,
+  setHomePageFundingPost,
+} from '../../redux/OrganizationPostReducer';
+import React, {useEffect, useState} from 'react';
 import {moderateScale, scale, verticalScale} from '../../utils/scale';
+import {useDispatch, useSelector} from 'react-redux';
 
-import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
-import {IGetGroupResponse} from '../../api/GroupApi';
-import GroupPostItem from '../../components/ui/GroupUI/GroupPostItem';
-import {Route} from '../../constants/route';
 import Colors from '../../global/Color';
-import {screenHeight} from '../../global/Constant';
-import {RootState} from '../../redux/Store';
-import {getFontFamily} from '../../utils/fonts';
-import {ScrollView} from 'react-native';
-import {getOrganizationPost} from '../../api/OrganizationPostApi';
-import {IOrganizationPost} from '../../redux/OrganizationPostReducer';
-import {IGroupPost} from '../../global/types';
-import {useNotifications} from 'react-native-notificated';
 import Comment from '../../components/ui/Comment';
+import GroupPostItem from '../../components/ui/GroupUI/GroupPostItem';
+import {IGetGroupResponse} from '../../api/GroupApi';
+import {IGroupPost} from '../../global/types';
+import {Icon} from 'react-native-paper';
+import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
+import {ScrollView} from 'react-native';
+import {getFontFamily} from '../../utils/fonts';
+import {getOrganizationPost} from '../../api/OrganizationPostApi';
+import {screenHeight} from '../../global/Constant';
+import {useLoading} from '../../utils/LoadingContext';
+import {useNavigation} from '@react-navigation/native';
+import {useNotifications} from 'react-native-notificated';
 
 const IMAGE_HEIGHT = screenHeight * 0.25;
 
 const GroupHomeScreen = ({route}: {route: any}) => {
+  const dispatch = useDispatch();
   const navigation: any = useNavigation();
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const accessToken = useSelector((state: RootState) => state.token.key);
+  const groupPosts = useSelector(
+    (state: RootState) => state.fundingPost.HomePage,
+  );
   const {group}: {group: IGetGroupResponse} = route.params;
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const [tab, setTab] = useState<'post' | 'todo' | 'statement'>('post');
   const [refreshing, setRefreshing] = useState(false);
-  const [groupPosts, setGroupPosts] = useState<IGroupPost[]>([]);
   const [commentPostId, setCommentPostId] = useState<number>(0);
   const [showComment, setShowComment] = useState(false);
   const {notify} = useNotifications();
+  const {showLoading, hideLoading} = useLoading();
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -55,10 +63,17 @@ const GroupHomeScreen = ({route}: {route: any}) => {
     setRefreshing(false);
   };
 
+  const handleGoToCreateGroupPost = () => {
+    navigation.navigate(Route.CreateFundingPost, {
+      group,
+    });
+  };
+
   const getGroupPost = async () => {
+    showLoading();
     const response: any = await getOrganizationPost(accessToken, group.id);
     if (response.status === 200) {
-      setGroupPosts(response.data);
+      dispatch(setHomePageFundingPost(response.data));
     } else {
       notify('error', {
         params: {
@@ -70,6 +85,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
         },
       });
     }
+    hideLoading();
   };
 
   useEffect(() => {
@@ -157,9 +173,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
         />
         <Text
           onPress={() => {
-            navigation.navigate(Route.GroupEditPost, {
-              group,
-            });
+            handleGoToCreateGroupPost();
           }}
           style={{
             flex: 1,
@@ -179,9 +193,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
         <TouchableOpacity
           style={{alignItems: 'center', justifyContent: 'center'}}
           onPress={() => {
-            navigation.navigate(Route.GroupCreatePost, {
-              group,
-            });
+            handleGoToCreateGroupPost();
           }}>
           <Icon source="image" size={20} color={Colors.greenPrimary} />
         </TouchableOpacity>
@@ -236,7 +248,9 @@ const GroupHomeScreen = ({route}: {route: any}) => {
             ))}
           </View>
         ) : (
-          <Text>Không có bài viết</Text>
+          <View style={{flex: 1, alignItems: 'center', marginTop: scale(40)}}>
+            <Text style={styles.title}>Không có bài viết</Text>
+          </View>
         ))}
       <Comment
         isVisible={showComment}

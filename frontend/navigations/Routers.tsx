@@ -111,7 +111,7 @@ const Router = () => {
           component={CreateFundingScreen}
           options={{
             headerShown: true,
-            headerTitle: 'Tạo chiến dịch',
+            headerTitle: 'Tạo bài viết',
             headerStyle: {backgroundColor: Colors.button},
             headerTitleStyle: {
               color: 'white',

@@ -90,6 +90,7 @@ const OrganizationPost2 = (props: IOrganizationPost2Props) => {
                   item.joined === 'JOINED'
                     ? Colors.greenLight
                     : Colors.background,
+                zIndex: 2,
               },
             ]}
             disabled={item.joined === 'JOINED' || item.joined === 'REQUESTED'}

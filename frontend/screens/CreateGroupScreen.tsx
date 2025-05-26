@@ -382,7 +382,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           />
         </TouchableOpacity>
         <GooglePlacesAutocomplete
-          debounce={500}
           ref={autocompleteRef}
           fetchDetails={true}
           placeholder="Địa chỉ diễn ra"
@@ -492,7 +491,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
         </View>
 
         <Button
-          title="Tạo bài viết"
+          title="Tạo nhóm"
           onPress={handleCreatePost}
           buttonStyle={{
             backgroundColor: Colors.greenPrimary,

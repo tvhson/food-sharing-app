@@ -4,9 +4,9 @@ interface Account {
   id: number;
   name: string;
   imageUrl: string;
-  locationName: string;
-  latitude: number;
-  longitude: number;
+  locationName: string | null;
+  latitude: string | null;
+  longitude: string | null;
 }
 interface IOrganizationPost {
   id: number;
@@ -21,64 +21,57 @@ interface IGroupPost {
   organizationposts: IOrganizationPost;
 }
 interface FundingPosts {
-  HomePage: IOrganizationPost[];
-  MyPosts: IOrganizationPost[];
+  HomePage: IGroupPost[];
 }
 const initialState: FundingPosts = {
   HomePage: [],
-  MyPosts: [],
 };
 const FundingPostSlice = createSlice({
   name: 'FundingPost',
   initialState,
   reducers: {
-    pushFundingPost: (
-      state: FundingPosts,
-      action: PayloadAction<IOrganizationPost>,
-    ) => {
-      state.HomePage.unshift(action.payload);
-    },
-    pushMyFundingPost: (
-      state: FundingPosts,
-      action: PayloadAction<IOrganizationPost>,
-    ) => {
-      state.MyPosts.unshift(action.payload);
-    },
-    addToTheEndOfFundingPost: (
-      state: FundingPosts,
-      action: PayloadAction<IOrganizationPost>,
-    ) => {
-      state.HomePage.push(action.payload);
-    },
     setHomePageFundingPost: (
       state: FundingPosts,
-      action: PayloadAction<IOrganizationPost[]>,
+      action: PayloadAction<IGroupPost[]>,
     ) => {
-      state.HomePage = action.payload.slice().reverse();
+      state.HomePage = action.payload;
     },
-    setMyFundingPosts: (
-      state: FundingPosts,
-      action: PayloadAction<IOrganizationPost[]>,
-    ) => {
-      state.MyPosts = action.payload;
-    },
-
     clearFundingPosts: (state: FundingPosts) => {
       state.HomePage = [];
     },
-    clearMyFundingPosts: (state: FundingPosts) => {
-      state.MyPosts = [];
+    setGroupPost: (state: FundingPosts, action: PayloadAction<IGroupPost>) => {
+      const index = state.HomePage.findIndex(
+        post =>
+          post.organizationposts.id === action.payload.organizationposts.id,
+      );
+      if (index !== -1) {
+        state.HomePage[index] = action.payload;
+      } else {
+        state.HomePage.unshift(action.payload);
+      }
+    },
+    likeGroupPost: (state: FundingPosts, action: PayloadAction<number>) => {
+      const postId = action.payload;
+      const postIndex = state.HomePage.findIndex(
+        post => post.organizationposts.id === postId,
+      );
+      state.HomePage[postIndex].organizationposts.attended =
+        !state.HomePage[postIndex].organizationposts.attended;
+      if (state.HomePage[postIndex].organizationposts.attended) {
+        state.HomePage[postIndex].organizationposts.peopleAttended =
+          state.HomePage[postIndex].organizationposts.peopleAttended + 1;
+      } else {
+        state.HomePage[postIndex].organizationposts.peopleAttended =
+          state.HomePage[postIndex].organizationposts.peopleAttended - 1;
+      }
     },
   },
 });
 export const {
-  pushFundingPost,
-  pushMyFundingPost,
   setHomePageFundingPost,
-  setMyFundingPosts,
   clearFundingPosts,
-  clearMyFundingPosts,
-  addToTheEndOfFundingPost,
+  likeGroupPost,
+  setGroupPost,
 } = FundingPostSlice.actions;
 
 export type {FundingPosts, IOrganizationPost, Account};

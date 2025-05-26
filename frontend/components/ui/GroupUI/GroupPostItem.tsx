@@ -6,7 +6,6 @@ import {
   Portal,
   RadioButton,
 } from 'react-native-paper';
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Dimensions,
   Image,
@@ -15,8 +14,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
+import {
+  likeGroupPost,
+  setGroupPost,
+} from '../../../redux/OrganizationPostReducer';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../../../global/Color';
@@ -24,8 +26,10 @@ import {IGroupPost} from '../../../global/types';
 import ImageSwiper from '../ImageSwiper';
 import {RootState} from '../../../redux/Store';
 import {Route} from '../../../constants/route';
+import {attendOrganizationPost} from '../../../api/OrganizationPostApi';
 import {getFontFamily} from '../../../utils/fonts';
 import {getInfoUserById} from '../../../api/AccountsApi';
+import {likePostReducer} from '../../../redux/SharingPostReducer';
 import {timeAgo} from '../../../utils/helper';
 import {useNavigation} from '@react-navigation/native';
 
@@ -112,11 +116,16 @@ const GroupPostItem = (props: GroupPostItemProps) => {
   };
 
   const handleLiked = async () => {
-    // dispatch(likePostReducer(item.id));
-    // const response: any = await likePost(item.id, accessToken);
-    // if (response.status !== 200) {
-    //   dispatch(likePostReducer(item.id));
-    // }
+    dispatch(likeGroupPost(item.organizationposts.id));
+    const response: any = await attendOrganizationPost(
+      item.organizationposts.id,
+      accessToken,
+    );
+    if (response.status !== 200) {
+      dispatch(likeGroupPost(item.organizationposts.id));
+    } else {
+      // dispatch(setGroupPost(item));
+    }
   };
 
   const handleShowComment = () => {

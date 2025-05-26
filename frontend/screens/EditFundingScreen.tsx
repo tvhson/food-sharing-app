@@ -16,7 +16,6 @@ import {MAP_API_KEY} from '@env';
 import {RootState} from '../redux/Store';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {createNotifications} from 'react-native-notificated';
-import {updateMyFundingPost} from '../redux/OrganizationPostReducer';
 import {updateOrganizationPost} from '../api/OrganizationPostApi';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 
@@ -250,7 +249,6 @@ const EditFundingScreen = ({navigation, route}: any) => {
 
       <GooglePlacesAutocomplete
         ref={autocompleteRef}
-        debounce={500}
         fetchDetails={true}
         placeholder="Enter your organization address"
         onPress={(data, details = null) => {
