@@ -1,14 +1,15 @@
+import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
+import React, {useState} from 'react';
 /* eslint-disable react-native/no-inline-styles */
 import {Text, TextInput, TouchableWithoutFeedback, View} from 'react-native';
-import React, {useState} from 'react';
-import {Image} from '@rneui/themed';
-import Colors from '../../global/Color';
-import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
-import {changeRoleById} from '../../api/AccountsApi';
 import {useDispatch, useSelector} from 'react-redux';
-import {changeRole} from '../../redux/AccountsReducer';
+
+import Colors from '../../global/Color';
+import {Image} from '@rneui/themed';
 import {RootState} from '../../redux/Store';
 import {banAccount} from '../../api/ReportApi';
+import {changeRole} from '../../redux/AccountsReducer';
+import {changeRoleById} from '../../api/AccountsApi';
 import {createNotifications} from 'react-native-notificated';
 
 const {useNotifications} = createNotifications();
@@ -299,7 +300,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                   <Text style={{fontWeight: '500', color: 'black'}}>
                     {'\u2022'} Ngày sinh:{' '}
                   </Text>
-                  {new Date(item.birthDate).toLocaleDateString()}
+                  {new Date(item.birthDate).toLocaleDateString('vi-VN')}
                 </Text>
               ) : null}
               {item.locationName ? (

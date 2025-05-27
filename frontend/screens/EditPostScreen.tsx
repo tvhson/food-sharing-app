@@ -1,6 +1,6 @@
 import {Button, Icon} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ScrollView,
   Text,
@@ -9,8 +9,10 @@ import {
   View,
 } from 'react-native';
 
+import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
 import Colors from '../global/Color';
 import {DatePickerInput} from 'react-native-paper-dates';
+import {FoodType} from './CreatePostScreen';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import ImageSwiper from '../components/ui/ImageSwiper';
 import {MAP_API_KEY} from '@env';
@@ -31,6 +33,8 @@ const EditPostScreen = ({route, navigation}: any) => {
   const dispatch = useDispatch();
   const {showLoading, hideLoading} = useLoading();
   const item = route.params.item;
+  console.log(item);
+
   const {notify} = useNotifications();
   const location = route.params.location;
   const accessToken = route.params.accessToken;
@@ -41,7 +45,7 @@ const EditPostScreen = ({route, navigation}: any) => {
   const [note, setNote] = useState(item.note || '');
   const [status, setStatus] = useState(item.status || '');
   const [locationName, setLocationName] = useState(item.locationName || '');
-  const [portion, setPortion] = useState(item.portion || '');
+  const [portion, setPortion] = useState(item.portion.toString() || '');
   const [latitude, setLatitude] = useState(
     location && location.latitude ? location.latitude : null,
   );
@@ -57,6 +61,10 @@ const EditPostScreen = ({route, navigation}: any) => {
   const [pickUpEndDate, setPickUpEndDate] = useState(
     new Date(item.pickUpEndDate) || new Date(),
   );
+  const [type, setType] = useState<FoodType | null>(
+    item.type === 'VEGETARIAN' ? FoodType.VEGETARIAN : FoodType.NON_VEGETARIAN,
+  );
+  const [isTagVisible, setIsTagVisible] = useState(false);
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any[]>([]);
   const [oldImages, setOldImages] = useState<string[]>(item.images || []); // Add state for original images
@@ -94,6 +102,12 @@ const EditPostScreen = ({route, navigation}: any) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (autocompleteRef.current) {
+      autocompleteRef.current.setAddressText(locationName);
+    }
+  }, [item]);
 
   const postImage = async (newImages: any) => {
     setImageUpload((prevImages: any) => {
@@ -373,6 +387,32 @@ const EditPostScreen = ({route, navigation}: any) => {
           onChangeText={setPortion}
           keyboardType="numeric"
         />
+        <TouchableOpacity
+          onPress={() => {
+            setIsTagVisible(true);
+          }}
+          style={{
+            padding: 10,
+            paddingVertical: 13,
+            backgroundColor: '#eff2ff',
+            borderRadius: 8,
+            width: '90%',
+            borderWidth: 2,
+            marginTop: 20,
+            borderColor: Colors.greenPrimary,
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: type === null ? '#706d6d' : 'black',
+              fontFamily: getFontFamily('regular'),
+            }}>
+            {type === null ? 'Loại thực phẩm' : type}
+          </Text>
+          <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
+        </TouchableOpacity>
         <View style={{marginHorizontal: 10, marginTop: 20}}>
           <View
             style={{
@@ -596,6 +636,11 @@ const EditPostScreen = ({route, navigation}: any) => {
 
         <View style={{height: 30}} />
       </View>
+      <ChooseTagBottomSheet
+        isVisible={isTagVisible}
+        setVisible={setIsTagVisible}
+        setType={setType}
+      />
     </ScrollView>
   );
 };

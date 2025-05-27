@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {
   FlatList,
   RefreshControl,
@@ -9,13 +8,7 @@ import {
 } from 'react-native';
 import {IGetGroupResponse, getGroup} from '../api/GroupApi';
 import {Icon, SearchBar} from '@rneui/themed';
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {
-  clearFundingPosts,
-  pushFundingPost,
-} from '../redux/OrganizationPostReducer';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../global/Color';
@@ -26,7 +19,6 @@ import {RootState} from '../redux/Store';
 import {Route} from '../constants/route';
 import getDistance from 'geolib/es/getDistance';
 import {getFontFamily} from '../utils/fonts';
-import {getOrganizationPost} from '../api/OrganizationPostApi';
 import {moderateScale} from 'react-native-size-matters';
 import {scale} from '../utils/scale';
 import screenWidth from '../global/Constant';
@@ -178,7 +170,7 @@ export const FundingScreen = ({navigation}: any) => {
       </View>
 
       <FlatList
-        data={filterPosts ?? groups}
+        data={filterPosts ?? (groups || [])}
         renderItem={({item}) => <OrganizationPost2 item={item} />}
         keyExtractor={item => item.id.toString()}
         refreshControl={

@@ -62,11 +62,12 @@ const OrganizationPost2 = (props: IOrganizationPost2Props) => {
         />
         <View style={styles.itemContainer}>
           <Text style={styles.textTime}>
-            Diễn ra vào {new Date(item.startDate).toLocaleDateString()}
+            Bắt đầu hoạt động từ{' '}
+            {new Date(item.startDate).toLocaleDateString('vi-VN')}
           </Text>
           {item.endDate && (
             <Text style={styles.textTime}>
-              Kết thúc vào {new Date(item.endDate).toLocaleDateString()}
+              Kết thúc vào {new Date(item.endDate).toLocaleDateString('vi-VN')}
             </Text>
           )}
           <Text style={styles.textTitle}>{item.name}</Text>

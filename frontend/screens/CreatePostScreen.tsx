@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {Button, Icon} from '@rneui/themed';
-/* eslint-disable react-native/no-inline-styles */
 import React, {useRef, useState} from 'react';
 import {
   ScrollView,

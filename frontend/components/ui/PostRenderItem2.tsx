@@ -6,7 +6,6 @@ import {
   Portal,
   RadioButton,
 } from 'react-native-paper';
-import React, {useState} from 'react';
 import {
   Dimensions,
   Image,
@@ -15,20 +14,21 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {deletePost, likePost, reportPost} from '../../api/PostApi';
+import React, {useState} from 'react';
 import {
+  SharingPost,
   deleteMyPost,
   likePostReducer,
-  SharingPost,
 } from '../../redux/SharingPostReducer';
 import {calculateExpiredDate, timeAgo} from '../../utils/helper';
+import {deletePost, likePost, reportPost} from '../../api/PostApi';
+import {useDispatch, useSelector} from 'react-redux';
 
-import {notify} from 'react-native-notificated';
 import Colors from '../../global/Color';
+import ImageSwiper from './ImageSwiper';
 import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
-import ImageSwiper from './ImageSwiper';
+import {notify} from 'react-native-notificated';
 
 const PostRenderItem2 = (props: any) => {
   const {
@@ -513,8 +513,9 @@ const PostRenderItem2 = (props: any) => {
                     : Colors.text,
                 marginLeft: 16,
               }}>
-              Lấy từ ngày {new Date(item.pickUpStartDate).toLocaleDateString()}{' '}
-              đến ngày {new Date(item.pickUpEndDate).toLocaleDateString()}
+              Lấy từ ngày{' '}
+              {new Date(item.pickUpStartDate).toLocaleDateString('vi-VN')} đến
+              ngày {new Date(item.pickUpEndDate).toLocaleDateString('vi-VN')}
             </Text>
           </View>
         </View>

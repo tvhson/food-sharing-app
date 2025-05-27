@@ -96,6 +96,7 @@ const OrganizationPostDetail2 = (props: any) => {
                           : Colors.greenPrimary,
                     },
                   ]}
+                  disabled={item.joined === 'REQUESTED'}
                   onPress={handleAttend}>
                   <Image
                     source={
