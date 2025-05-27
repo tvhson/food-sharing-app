@@ -1,3 +1,4 @@
+import {Avatar, Icon} from 'react-native-paper';
 import {IGetGroupResponse, joinGroup} from '../api/GroupApi';
 import {
   Image,
@@ -13,15 +14,14 @@ import React, {useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../global/Color';
-import {Avatar, Icon} from 'react-native-paper';
 import {Linking} from 'react-native';
 import {RootState} from '../redux/Store';
 import {Route} from '../constants/route';
 import {addGroup} from '../redux/GroupReducer';
 import {getFontFamily} from '../utils/fonts';
+import {scale} from '../utils/scale';
 import {useNavigation} from '@react-navigation/native';
 import {useNotifications} from 'react-native-notificated';
-import {scale} from '../utils/scale';
 
 const OrganizationPostDetail2 = (props: any) => {
   const navigation: any = useNavigation();

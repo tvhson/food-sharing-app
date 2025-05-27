@@ -152,7 +152,7 @@ export const getGroupTodo = async (
 
 export interface ICreateGroupTodoRequest {
   title: string;
-  date: string;
+  date: Date;
   status: 'pending' | 'completed';
 }
 export const createGroupTodo = async (
@@ -208,6 +208,7 @@ export const updateGroupTodo = async (
 
 export interface IGetGroupStatementResponse {
   id: number;
+  createdAt: string;
   description: string;
   user: {
     id: number;

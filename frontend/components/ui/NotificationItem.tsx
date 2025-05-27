@@ -1,4 +1,5 @@
 import {Image, Text, TouchableWithoutFeedback, View} from 'react-native';
+import {acceptInvite, rejectInvite} from '../../api/GroupApi';
 import {calculateExpiredDate, timeAgo} from '../../utils/helper';
 import {
   createNotification,
@@ -32,7 +33,7 @@ const NotificationItem = ({
     state.sharingPost.MyPosts.find(post => post.id === item.linkId),
   );
 
-  const handleNavigate = () => {
+  const handleNavigate = async () => {
     if (item.type === 'MESSAGE') {
       return () => {
         if (!roomChat) {
@@ -104,7 +105,7 @@ const NotificationItem = ({
       imageUrl: item.imageUrl,
       description: 'Bạn đã xác nhận việc nhận thức ăn',
       type: 'DONE',
-      createdDate: item.createdDate,
+      createdDate: new Date(),
       linkId: item.linkId,
       userId: item.userId,
       senderId: item.senderId,
@@ -142,6 +143,74 @@ const NotificationItem = ({
       } else {
         console.log(response3);
       }
+    }
+  };
+
+  const handleAcceptGroupInvitation = async () => {
+    try {
+      const notificationUpdate = {
+        id: item.id,
+        title: 'Chấp nhận',
+        imageUrl: item.imageUrl,
+        description: 'Bạn đã chấp nhận lời mời tham gia nhóm',
+        type: 'DONE',
+        createdDate: new Date(),
+        linkId: item.linkId,
+        userId: item.userId,
+        senderId: item.senderId,
+        read: true,
+      };
+      const response1: any = await updateNotification(
+        item.id,
+        accessToken,
+        notificationUpdate,
+      );
+      if (response1.status === 200) {
+        dispatch(updateNotificationAfter(notificationUpdate));
+      } else {
+        console.log(response1);
+      }
+      const response2 = await acceptInvite(
+        accessToken,
+        item.linkId,
+        item.userId,
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeclineGroupInvitation = async () => {
+    try {
+      const notificationUpdate = {
+        id: item.id,
+        title: 'Từ chối',
+        imageUrl: item.imageUrl,
+        description: 'Bạn đã từ chối lời mời tham gia nhóm',
+        type: 'DONE',
+        createdDate: item.createdDate,
+        linkId: item.linkId,
+        userId: item.userId,
+        senderId: item.senderId,
+        read: true,
+      };
+      const response1: any = await updateNotification(
+        item.id,
+        accessToken,
+        notificationUpdate,
+      );
+      if (response1.status === 200) {
+        dispatch(updateNotificationAfter(notificationUpdate));
+      } else {
+        console.log(response1);
+      }
+      const response2 = await rejectInvite(
+        accessToken,
+        item.linkId,
+        item.userId,
+      );
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -195,7 +264,7 @@ const NotificationItem = ({
               <Text style={{fontSize: 12, color: Colors.grayText}}>
                 {timeAgo(item.createdDate)}
               </Text>
-              {item.type === 'RECEIVED' ? (
+              {item.type === 'RECEIVED' || item.type === 'GROUP_INVITATION' ? (
                 <View
                   style={{
                     flex: 1,
@@ -213,7 +282,13 @@ const NotificationItem = ({
                       paddingHorizontal: 20,
                     }}
                     titleStyle={{fontWeight: '700', fontSize: 12}}
-                    onPress={() => handleDecline()}
+                    onPress={() => {
+                      if (item.type === 'RECEIVED') {
+                        handleDecline();
+                      } else {
+                        handleAcceptGroupInvitation();
+                      }
+                    }}
                   />
                   <Button
                     title={'Chấp nhận'}
@@ -225,7 +300,13 @@ const NotificationItem = ({
                       paddingHorizontal: 20,
                     }}
                     titleStyle={{fontWeight: '700', fontSize: 12}}
-                    onPress={() => handleAccept()}
+                    onPress={() => {
+                      if (item.type === 'RECEIVED') {
+                        handleAccept();
+                      } else {
+                        handleAcceptGroupInvitation();
+                      }
+                    }}
                   />
                 </View>
               ) : null}

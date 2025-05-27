@@ -15,6 +15,7 @@ import {RootState} from '../redux/Store';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {createNotifications} from 'react-native-notificated';
 import {createOrganizationPost} from '../api/OrganizationPostApi';
+import {setGroupPost} from '../redux/OrganizationPostReducer';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 
 const {useNotifications} = createNotifications();
@@ -67,7 +68,8 @@ const CreateFundingScreen = ({navigation, route}: any) => {
               title: 'Thành công',
             },
           });
-          navigation.navigate('GroupHome');
+          dispatch(setGroupPost(response2.data));
+          navigation.goBack();
         }
       })
       .catch((error: any) => {

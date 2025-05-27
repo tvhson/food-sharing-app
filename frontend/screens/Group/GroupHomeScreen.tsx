@@ -6,9 +6,20 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  IGetGroupResponse,
+  IGetGroupStatementResponse,
+  IGetGroupTodoResponse,
+  createGroupStatement,
+  createGroupTodo,
+  getGroupStatement,
+  getGroupTodo,
+  updateGroupTodo,
+} from '../../api/GroupApi';
 import {
   IOrganizationPost,
   setHomePageFundingPost,
@@ -19,8 +30,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import Colors from '../../global/Color';
 import Comment from '../../components/ui/Comment';
+import {DatePickerInput} from 'react-native-paper-dates';
+import GroupModalMember from './component/GroupModalMember';
 import GroupPostItem from '../../components/ui/GroupUI/GroupPostItem';
-import {IGetGroupResponse} from '../../api/GroupApi';
+import GroupStatementItem from './component/GroupStatementItem';
+import GroupTodoItem from './component/GroupTodoItem';
 import {IGroupPost} from '../../global/types';
 import {Icon} from 'react-native-paper';
 import {RootState} from '../../redux/Store';
@@ -33,8 +47,6 @@ import {useLoading} from '../../utils/LoadingContext';
 import {useNavigation} from '@react-navigation/native';
 import {useNotifications} from 'react-native-notificated';
 
-const IMAGE_HEIGHT = screenHeight * 0.25;
-
 const GroupHomeScreen = ({route}: {route: any}) => {
   const dispatch = useDispatch();
   const navigation: any = useNavigation();
@@ -43,23 +55,37 @@ const GroupHomeScreen = ({route}: {route: any}) => {
   const groupPosts = useSelector(
     (state: RootState) => state.fundingPost.HomePage,
   );
+
   const {group}: {group: IGetGroupResponse} = route.params;
+  const [todoData, setTodoData] = useState<IGetGroupTodoResponse[]>([]);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const [tab, setTab] = useState<'post' | 'todo' | 'statement'>('post');
   const [refreshing, setRefreshing] = useState(false);
   const [commentPostId, setCommentPostId] = useState<number>(0);
   const [showComment, setShowComment] = useState(false);
+  const [todoDescription, setTodoDescription] = useState('');
+  const [todoStartDate, setTodoStartDate] = useState(new Date());
+  const [statementMember, setStatementMember] =
+    useState<IGetGroupResponse['members'][number]>();
+  const [isModalMemberVisible, setIsModalMemberVisible] = useState(false);
+  const [statementDescription, setStatementDescription] = useState('');
+  const [statementData, setStatementData] = useState<
+    IGetGroupStatementResponse[]
+  >([]);
   const {notify} = useNotifications();
   const {showLoading, hideLoading} = useLoading();
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const IMAGE_HEIGHT = screenHeight * 0.25;
     const offsetY = event.nativeEvent.contentOffset.y;
-    setShowStickyHeader(offsetY > IMAGE_HEIGHT - 30);
+    setShowStickyHeader(offsetY > IMAGE_HEIGHT - scale(30));
   };
 
   const handleRefresh = async () => {
     setRefreshing(true);
     await getGroupPost();
+    await getTodoData();
+    await getStatementData();
     setRefreshing(false);
   };
 
@@ -67,6 +93,110 @@ const GroupHomeScreen = ({route}: {route: any}) => {
     navigation.navigate(Route.CreateFundingPost, {
       group,
     });
+  };
+
+  const handleCreateTodo = async () => {
+    try {
+      const response = await createGroupTodo(accessToken, group.id, {
+        title: todoDescription,
+        date: todoStartDate,
+        status: 'pending',
+      });
+      setTodoDescription('');
+      setTodoStartDate(new Date());
+      handleRefresh();
+    } catch (error) {
+      notify('error', {
+        params: {
+          description: 'Không thể tạo todo',
+          title: 'Lỗi',
+        },
+      });
+    }
+  };
+
+  const handleFinishTodo = async (todoId: number) => {
+    try {
+      showLoading();
+      const todo = todoData.find(todo => todo.id === todoId);
+      const response = await updateGroupTodo(accessToken, todoId, {
+        title: todo?.title || '',
+        date: new Date(todo?.date || ''),
+        status: todo?.status === 'completed' ? 'pending' : 'completed',
+      });
+      setTodoData(todoData.map(todo => (todo.id === todoId ? response : todo)));
+
+      hideLoading();
+    } catch (error) {
+      hideLoading();
+      notify('error', {
+        params: {
+          description: 'Không thể hoàn thành todo',
+          title: 'Lỗi',
+        },
+      });
+    }
+  };
+
+  const handleCreateStatement = async () => {
+    try {
+      if (!statementMember) {
+        notify('error', {
+          params: {
+            description: 'Vui lòng chọn người ủng hộ',
+            title: 'Lỗi',
+          },
+        });
+        return;
+      }
+      const response = await createGroupStatement(accessToken, group.id, {
+        user: {
+          id: statementMember?.id,
+        },
+        description: statementDescription,
+      });
+      setStatementDescription('');
+      setStatementMember(undefined);
+      handleRefresh();
+    } catch (error) {
+      notify('error', {
+        params: {
+          description: 'Không thể tạo sao kê',
+          title: 'Lỗi',
+        },
+      });
+    }
+  };
+
+  const getStatementData = async () => {
+    try {
+      const response = await getGroupStatement(accessToken, group.id);
+      setStatementData(response);
+    } catch (error) {
+      notify('error', {
+        params: {
+          description: 'Không thể lấy data',
+          title: 'Lỗi',
+        },
+      });
+    }
+  };
+
+  const getTodoData = async () => {
+    try {
+      const response = await getGroupTodo(accessToken, group.id);
+      setTodoData(response);
+    } catch (error) {
+      notify('error', {
+        params: {
+          description: 'Không thể lấy data',
+          title: 'Lỗi',
+          style: {
+            multiline: 100,
+          },
+        },
+      });
+    }
   };
 
   const getGroupPost = async () => {
@@ -90,6 +220,8 @@ const GroupHomeScreen = ({route}: {route: any}) => {
 
   useEffect(() => {
     getGroupPost();
+    getTodoData();
+    getStatementData();
   }, []);
 
   const renderStickyHeader = () => (
@@ -121,7 +253,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           {'  '}
           {group.members.length} thành viên
         </Text>
-        {group.joinType === 'private' && (
+        {group.joinType === 'private' && group.author.id === userInfo.id && (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
@@ -156,48 +288,50 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           </View>
         )}
       </View>
-      <View
-        style={{
-          width: '90%',
-          marginTop: scale(10),
-          backgroundColor: Colors.white,
-          padding: scale(10),
-          borderRadius: 10,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <Image
-          source={{uri: group.imageUrl}}
-          style={{width: 30, height: 30, borderRadius: 100}}
-        />
-        <Text
-          onPress={() => {
-            handleGoToCreateGroupPost();
-          }}
+      {group.author.id === userInfo.id && (
+        <View
           style={{
-            flex: 1,
-            fontSize: moderateScale(16),
-            fontFamily: getFontFamily('regular'),
-            color: Colors.grayText,
-            borderRadius: 20,
-            marginHorizontal: scale(10),
-            borderWidth: 1,
-            borderColor: Colors.black,
-            paddingVertical: scale(5),
-            paddingHorizontal: scale(16),
+            width: '90%',
+            marginTop: scale(10),
+            backgroundColor: Colors.white,
+            padding: scale(10),
+            borderRadius: 10,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}>
-          Bạn muốn nhắn gì?
-        </Text>
+          <Image
+            source={{uri: group.imageUrl}}
+            style={{width: 30, height: 30, borderRadius: 100}}
+          />
+          <Text
+            onPress={() => {
+              handleGoToCreateGroupPost();
+            }}
+            style={{
+              flex: 1,
+              fontSize: moderateScale(16),
+              fontFamily: getFontFamily('regular'),
+              color: Colors.grayText,
+              borderRadius: 20,
+              marginHorizontal: scale(10),
+              borderWidth: 1,
+              borderColor: Colors.black,
+              paddingVertical: scale(5),
+              paddingHorizontal: scale(16),
+            }}>
+            Bạn muốn nhắn gì?
+          </Text>
 
-        <TouchableOpacity
-          style={{alignItems: 'center', justifyContent: 'center'}}
-          onPress={() => {
-            handleGoToCreateGroupPost();
-          }}>
-          <Icon source="image" size={20} color={Colors.greenPrimary} />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={{alignItems: 'center', justifyContent: 'center'}}
+            onPress={() => {
+              handleGoToCreateGroupPost();
+            }}>
+            <Icon source="image" size={20} color={Colors.greenPrimary} />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 
@@ -220,45 +354,247 @@ const GroupHomeScreen = ({route}: {route: any}) => {
     </View>
   );
 
+  const renderPost = () => {
+    return groupPosts.length > 0 ? (
+      <View>
+        {groupPosts.map(post => (
+          <GroupPostItem
+            item={post}
+            setCommentPostId={setCommentPostId}
+            setShowComment={setShowComment}
+          />
+        ))}
+      </View>
+    ) : (
+      <View style={{flex: 1, alignItems: 'center', marginTop: scale(40)}}>
+        <Text style={styles.title}>Không có bài viết</Text>
+      </View>
+    );
+  };
+
+  const renderTodo = () => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {group.author.id === userInfo.id && (
+          <View
+            style={{
+              backgroundColor: 'white',
+              paddingVertical: scale(10),
+              borderRadius: 8,
+              width: '90%',
+              marginTop: scale(10),
+              gap: scale(10),
+            }}>
+            <TextInput
+              placeholder="Việc cần làm..."
+              placeholderTextColor={'#706d6d'}
+              style={{
+                fontSize: 16,
+                padding: 10,
+                backgroundColor: '#eff2ff',
+                borderRadius: 8,
+                color: 'black',
+                borderWidth: 2,
+                borderColor: Colors.greenPrimary,
+                marginHorizontal: scale(10),
+              }}
+              value={todoDescription}
+              onChangeText={setTodoDescription}
+            />
+            <DatePickerInput
+              locale="vi"
+              label="Ngày bắt đầu"
+              value={todoStartDate}
+              onChange={(date: Date | undefined) =>
+                setTodoStartDate(date || new Date())
+              }
+              inputMode="start"
+              saveLabel="Lưu"
+              style={{
+                backgroundColor: '#eff2ff',
+                color: 'black',
+                fontFamily: getFontFamily('regular'),
+              }}
+              mode="outlined"
+              outlineStyle={{
+                borderColor: Colors.greenPrimary,
+                borderRadius: 8,
+                borderWidth: 2,
+                marginHorizontal: scale(10),
+              }}
+              contentStyle={{
+                fontFamily: getFontFamily('regular'),
+              }}
+            />
+            <TouchableOpacity
+              style={{
+                backgroundColor: Colors.greenPrimary,
+                paddingHorizontal: scale(10),
+                paddingVertical: scale(5),
+                borderRadius: 8,
+                alignSelf: 'flex-end',
+                marginHorizontal: scale(10),
+              }}
+              onPress={() => {
+                handleCreateTodo();
+              }}>
+              <Text style={{color: 'white', fontFamily: getFontFamily('bold')}}>
+                Thêm
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        <View
+          style={{
+            flex: 1,
+            width: '90%',
+            marginTop: scale(10),
+            borderRadius: scale(10),
+            overflow: 'hidden',
+          }}>
+          {todoData.map((todo, index) => (
+            <GroupTodoItem
+              key={todo.id}
+              todo={todo}
+              handleFinishTodo={handleFinishTodo}
+              isAuthor={group.author.id === userInfo.id}
+              index={index}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderStatement = () => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {group.author.id === userInfo.id && (
+          <View
+            style={{
+              backgroundColor: 'white',
+              paddingVertical: scale(10),
+              borderRadius: 8,
+              width: '90%',
+              marginTop: scale(10),
+              gap: scale(10),
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                setIsModalMemberVisible(true);
+              }}>
+              <TextInput
+                placeholder="Nguời ủng hộ"
+                placeholderTextColor={'#706d6d'}
+                style={{
+                  fontSize: 16,
+                  padding: 10,
+                  backgroundColor: '#eff2ff',
+                  borderRadius: 8,
+                  color: 'black',
+                  borderWidth: 2,
+                  borderColor: Colors.greenPrimary,
+                  marginHorizontal: scale(10),
+                }}
+                editable={false}
+                value={statementMember?.name || ''}
+              />
+            </TouchableOpacity>
+            <TextInput
+              placeholder="Đồ ủng hộ"
+              placeholderTextColor={'#706d6d'}
+              style={{
+                fontSize: 16,
+                padding: 10,
+                backgroundColor: '#eff2ff',
+                borderRadius: 8,
+                color: 'black',
+                borderWidth: 2,
+                borderColor: Colors.greenPrimary,
+                marginHorizontal: scale(10),
+              }}
+              value={statementDescription}
+              onChangeText={setStatementDescription}
+            />
+            <TouchableOpacity
+              style={{
+                backgroundColor: Colors.greenPrimary,
+                paddingHorizontal: scale(10),
+                paddingVertical: scale(5),
+                borderRadius: 8,
+                alignSelf: 'flex-end',
+                marginHorizontal: scale(10),
+              }}
+              onPress={() => {
+                handleCreateStatement();
+              }}>
+              <Text style={{color: 'white', fontFamily: getFontFamily('bold')}}>
+                Thêm
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        <View style={{height: scale(10)}} />
+        <View style={{flex: 1, width: '90%'}}>
+          {statementData.map(statement => (
+            <GroupStatementItem key={statement.id} statement={statement} />
+          ))}
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
-      onScroll={handleScroll}>
-      {showStickyHeader && renderStickyHeader()}
+    <View style={{flex: 1}}>
       <TouchableOpacity
         style={styles.backButtonHeader}
         onPress={() => navigation.goBack()}>
         <Icon source="arrow-left" size={20} color="black" />
       </TouchableOpacity>
-      {renderHeader()}
-      {renderTab()}
-      {tab === 'post' &&
-        (groupPosts.length > 0 ? (
-          <View>
-            {groupPosts.map(post => (
-              <GroupPostItem
-                item={post}
-                setCommentPostId={setCommentPostId}
-                setShowComment={setShowComment}
-              />
-            ))}
-          </View>
-        ) : (
-          <View style={{flex: 1, alignItems: 'center', marginTop: scale(40)}}>
-            <Text style={styles.title}>Không có bài viết</Text>
-          </View>
-        ))}
-      <Comment
-        isVisible={showComment}
-        setVisible={setShowComment}
-        commentPostId={commentPostId}
-        type="GROUP_POST"
-      />
-    </ScrollView>
+      {showStickyHeader && renderStickyHeader()}
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+        onScroll={handleScroll}>
+        {renderHeader()}
+        {renderTab()}
+        {tab === 'post' && renderPost()}
+        {tab === 'todo' && renderTodo()}
+        {tab === 'statement' && renderStatement()}
+        <Comment
+          isVisible={showComment}
+          setVisible={setShowComment}
+          commentPostId={commentPostId}
+          type="GROUP_POST"
+        />
+        <GroupModalMember
+          members={group.members}
+          setSelectedMember={member => {
+            setStatementMember(member);
+
+            setIsModalMemberVisible(false);
+          }}
+          selectedMember={statementMember}
+          isVisible={isModalMemberVisible}
+          onClose={() => setIsModalMemberVisible(false)}
+        />
+        <View style={{height: scale(20)}} />
+      </ScrollView>
+    </View>
   );
 };
 
@@ -271,7 +607,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: IMAGE_HEIGHT,
+    height: screenHeight * 0.25,
   },
   backButtonHeader: {
     padding: 10,
