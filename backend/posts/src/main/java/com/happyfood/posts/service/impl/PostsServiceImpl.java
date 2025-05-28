@@ -1,5 +1,7 @@
 package com.happyfood.posts.service.impl;
 
+import com.happyfood.posts.adapter.AccountsAdapter;
+import com.happyfood.posts.dto.AccountsDto;
 import com.happyfood.posts.dto.Coordinates;
 import com.happyfood.posts.dto.NumberPostsReceivedDto;
 import com.happyfood.posts.dto.PostsDto;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class PostsServiceImpl implements IPostsService {
     private static final double EARTH_RADIUS_KM = 6371.0;
     private final PostsRepository postsRepository;
+    private final AccountsAdapter accountsAdapter;
 
     @Override
     public PostsDto createPost(Long userId, PostsDto postsDto) {
@@ -199,6 +202,10 @@ public class PostsServiceImpl implements IPostsService {
         if (posts.getUserIdReceived() != null && !posts.getUserIdReceived().isEmpty()) {
             postsDto.setIsReceived(Arrays.stream(posts.getUserIdReceived().split("-")).anyMatch(s -> s.equals(userId.toString())));
         }
+
+        AccountsDto accountsDto = accountsAdapter.getAccount(posts.getCreatedById());
+        postsDto.setAuthor(accountsDto);
+
         return postsDto;
     }
 

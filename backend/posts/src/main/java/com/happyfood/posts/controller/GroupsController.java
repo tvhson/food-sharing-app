@@ -24,6 +24,11 @@ public class GroupsController {
         return ResponseEntity.ok(groupsService.getAllGroups(userId));
     }
 
+    @GetMapping("/{groupId}")
+    ResponseEntity<GroupsDto> getGroupById(@RequestHeader Long userId, @PathVariable Long groupId) {
+        return ResponseEntity.ok(groupsService.getGroupById(groupId, userId));
+    }
+
     @PutMapping("/{groupId}")
     ResponseEntity<GroupsDto> updateGroupById(@RequestHeader Long userId, @RequestBody GroupsDto groupsDto, @PathVariable Long groupId) {
         return ResponseEntity.ok(groupsService.updateGroup(userId, groupId, groupsDto));

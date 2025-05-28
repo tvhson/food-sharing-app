@@ -147,7 +147,7 @@ public class GroupsServiceImpl implements IGroupsService {
                                           .description(statementsDto.getDescription())
                                           .groupId(groupId)
                                           .userId(statementsDto.getUser().getId())
-                                          .createdDate(statementsDto.getCreatedDate())
+                                          .createdDate(new Date())
                                           .build();
         statements = statementsRepository.save(statements);
         return convertToStatementResponse(statements);
@@ -267,6 +267,19 @@ public class GroupsServiceImpl implements IGroupsService {
                 throw new CustomException("Người dùng đã là thành viên của nhóm", HttpStatus.BAD_REQUEST);
             }
         }
+
+        if ("PUBLIC".equals(groups.getJoinType())) {
+            if (groups.getMemberIds() != null && !groups.getMemberIds().isEmpty()) {
+                List<String> memberIds = Arrays.asList(groups.getMemberIds().split("-"));
+                if (!memberIds.contains(String.valueOf(userId))) {
+                    groups.setMemberIds(groups.getMemberIds() + "-" + userId);
+                }
+            } else {
+                groups.setMemberIds(userId.toString());
+            }
+            return convertToResponse(groupsRepository.save(groups), userId);
+        }
+
         if (groups.getRequestIds() != null && !groups.getRequestIds().isEmpty()) {
             List<String> requestIds = Arrays.asList(groups.getRequestIds().split("-"));
             if (requestIds.contains(String.valueOf(userId))) {

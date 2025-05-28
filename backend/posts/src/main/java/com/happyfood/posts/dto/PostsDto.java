@@ -28,7 +28,7 @@ public class PostsDto {
     private String latitude;
     private String longitude;
     private double distance;
-    private Long createdById;
+    private AccountsDto author;
     private Long receiverId;
     private Date createdDate;
     private int portion;
