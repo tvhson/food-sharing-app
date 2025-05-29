@@ -43,7 +43,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [isAddPeopleModalVisible, setIsAddPeopleModalVisible] = useState(false);
   const [selectedPeople, setSelectedPeople] = useState<Partial<UserInfo>[]>([]);
-  const [joinType, setJoinType] = useState<'public' | 'private'>('public');
+  const [joinType, setJoinType] = useState<'PUBLIC' | 'PRIVATE'>('PUBLIC');
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
@@ -263,14 +263,14 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             marginTop: 20,
             width: '90%',
           }}>
-          {['public', 'private'].map(type => (
+          {['PUBLIC', 'PRIVATE'].map(type => (
             <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
               <RadioButton
                 color={Colors.greenPrimary}
                 key={type}
                 value={type}
                 status={joinType === type ? 'checked' : 'unchecked'}
-                onPress={() => setJoinType(type as 'public' | 'private')}
+                onPress={() => setJoinType(type as 'PUBLIC' | 'PRIVATE')}
               />
               <Text
                 style={{
@@ -278,7 +278,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
                   fontSize: 16,
                   color: Colors.text,
                 }}>
-                {type === 'public' ? 'Công khai' : 'Riêng tư'}
+                {type === 'PUBLIC' ? 'Công khai' : 'Riêng tư'}
               </Text>
             </View>
           ))}

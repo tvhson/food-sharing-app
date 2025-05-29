@@ -1,5 +1,5 @@
 import {Image, Text, TouchableWithoutFeedback, View} from 'react-native';
-import {acceptInvite, rejectInvite} from '../../api/GroupApi';
+import {acceptInvite, getGroupById, rejectInvite} from '../../api/GroupApi';
 import {calculateExpiredDate, timeAgo} from '../../utils/helper';
 import {
   createNotification,
@@ -14,6 +14,7 @@ import {RootState} from '../../redux/Store';
 import {Route} from '../../constants/route';
 import {confirmReceiveFood} from '../../api/PostApi';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
+import {useLoading} from '../../utils/LoadingContext';
 
 const NotificationItem = ({
   item,
@@ -25,6 +26,7 @@ const NotificationItem = ({
   const location = useSelector((state: RootState) => state.location);
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
+  const {showLoading, hideLoading} = useLoading();
 
   const roomChat = useSelector((state: RootState) =>
     state.chatRoom.chatRooms.find(chatRoom => chatRoom.id === item.linkId),
@@ -41,6 +43,11 @@ const NotificationItem = ({
         }
         navigation.navigate(Route.ChatRoom, {item: roomChat});
       };
+    } else if (item.type === 'GROUP_INVITATION') {
+      showLoading();
+      const response = await getGroupById(accessToken, item.linkId);
+      navigation.navigate(Route.OrganizationPostDetail2, {item: response});
+      hideLoading();
     } else if (item.type === 'RATING') {
       setSelectedItem(item);
       setVisible(true);

@@ -4,7 +4,7 @@ export interface IGetGroupResponse {
   id: number;
   name: string;
   description: string;
-  joinType: 'public' | 'private';
+  joinType: 'PUBLIC' | 'PRIVATE';
   imageUrl: string;
   author: {
     id: number;
@@ -47,10 +47,27 @@ export const getGroup = async (token: string): Promise<IGetGroupResponse[]> => {
   }
 };
 
+export const getGroupById = async (
+  token: string,
+  groupId: number,
+): Promise<IGetGroupResponse> => {
+  try {
+    const response = await ApiManager(`groups/${groupId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export interface ICreateGroupRequest {
   name: string;
   description: string;
-  joinType: 'public' | 'private';
+  joinType: 'PUBLIC' | 'PRIVATE';
   imageUrl: string;
   startDate: string;
   endDate?: string;

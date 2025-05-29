@@ -253,7 +253,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           {'  '}
           {group.members.length} thành viên
         </Text>
-        {group.joinType === 'private' && group.author.id === userInfo.id && (
+        {group.joinType === 'PRIVATE' && group.author.id === userInfo.id && (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
@@ -467,6 +467,11 @@ const GroupHomeScreen = ({route}: {route: any}) => {
             />
           ))}
         </View>
+        {todoData.length === 0 && (
+          <View style={{flex: 1, alignItems: 'center', marginTop: scale(30)}}>
+            <Text style={styles.title}>Không có bài viết</Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -550,6 +555,11 @@ const GroupHomeScreen = ({route}: {route: any}) => {
             <GroupStatementItem key={statement.id} statement={statement} />
           ))}
         </View>
+        {statementData.length === 0 && (
+          <View style={{flex: 1, alignItems: 'center', marginTop: scale(30)}}>
+            <Text style={styles.title}>Không có bài viết</Text>
+          </View>
+        )}
       </View>
     );
   };
