@@ -36,6 +36,11 @@ const FundingPostSlice = createSlice({
     ) => {
       state.HomePage = action.payload;
     },
+    deleteGroupPost: (state: FundingPosts, action: PayloadAction<number>) => {
+      state.HomePage = state.HomePage.filter(
+        post => post.organizationposts.id !== action.payload,
+      );
+    },
     clearFundingPosts: (state: FundingPosts) => {
       state.HomePage = [];
     },
@@ -72,6 +77,7 @@ export const {
   clearFundingPosts,
   likeGroupPost,
   setGroupPost,
+  deleteGroupPost,
 } = FundingPostSlice.actions;
 
 export type {FundingPosts, IOrganizationPost, Account};

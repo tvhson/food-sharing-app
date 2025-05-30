@@ -14,10 +14,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
+  attendOrganizationPost,
+  deleteOrganizationPost,
+} from '../../../api/OrganizationPostApi';
+import {
+  deleteGroupPost,
   likeGroupPost,
-  setGroupPost,
 } from '../../../redux/OrganizationPostReducer';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -26,10 +30,9 @@ import {IGroupPost} from '../../../global/types';
 import ImageSwiper from '../ImageSwiper';
 import {RootState} from '../../../redux/Store';
 import {Route} from '../../../constants/route';
-import {attendOrganizationPost} from '../../../api/OrganizationPostApi';
 import {getFontFamily} from '../../../utils/fonts';
-import {getInfoUserById} from '../../../api/AccountsApi';
-import {likePostReducer} from '../../../redux/SharingPostReducer';
+import {notify} from 'react-native-notificated';
+import {reportPost} from '../../../api/PostApi';
 import {timeAgo} from '../../../utils/helper';
 import {useNavigation} from '@react-navigation/native';
 
@@ -81,36 +84,59 @@ const GroupPostItem = (props: GroupPostItemProps) => {
 
   const handleDeletePost = async () => {
     if (accessToken && item.accounts.id === userInfo.id) {
-      //   const response: any = await deletePost(item.id, accessToken);
-      //   if (response.status === 200) {
-      //     dispatch(deleteMyPost(item.id));
-      //   }
+      const response: any = await deleteOrganizationPost(
+        item.organizationposts.id,
+        accessToken,
+      );
+      if (response.status === 200) {
+        dispatch(deleteGroupPost(item.organizationposts.id));
+        notify('success', {
+          params: {
+            description: 'Xóa bài viết thành công',
+            title: 'Thành công',
+          },
+        });
+      } else {
+        notify('error', {
+          params: {
+            description: 'Xóa bài viết thất bại',
+            title: 'Lỗi',
+          },
+        });
+      }
     }
     setVisibleDialogDelete(false);
   };
   const handleReportPost = async () => {
     if (accessToken) {
-      //   const response: any = await reportPost(accessToken, {
-      //     title: reason,
-      //     description: descriptionReason,
-      //     imageUrl: item.images[0],
-      //     status: 'PENDING',
-      //     linkId: item.id,
-      //     note: '',
-      //     type: 'POST',
-      //     senderId: userInfo.id,
-      //     accusedId: item.createdById,
-      //     senderName: userInfo.name,
-      //   });
-      //   if (response.status === 200) {
-      //     console.log('Report post success');
-      //     notify('success', {
-      //       params: {
-      //         description: 'Báo cáo thành công',
-      //         title: 'Thành công',
-      //       },
-      //     });
-      //   }
+      const response: any = await reportPost(accessToken, {
+        title: reason,
+        description: descriptionReason,
+        imageUrl: item.organizationposts.imageUrl,
+        status: 'PENDING',
+        linkId: item.organizationposts.id,
+        note: '',
+        type: 'POST',
+        senderId: userInfo.id,
+        accusedId: item.accounts.id,
+        senderName: userInfo.name,
+      });
+      if (response.status === 200) {
+        console.log('Report post success');
+        notify('success', {
+          params: {
+            description: 'Báo cáo thành công',
+            title: 'Thành công',
+          },
+        });
+      } else {
+        notify('error', {
+          params: {
+            description: 'Báo cáo thất bại',
+            title: 'Lỗi',
+          },
+        });
+      }
       setVisibleDialogReport(false);
     }
   };
@@ -275,11 +301,9 @@ const GroupPostItem = (props: GroupPostItemProps) => {
             <Menu.Item
               onPress={() => {
                 setVisible(false);
-                // navigation.navigate('EditPost', {
-                //   location: location,
-                //   accessToken: accessToken,
-                //   item: item,
-                // });
+                navigation.navigate(Route.EditFundingPost, {
+                  item: item,
+                });
               }}
               title="Sửa bài viết"
               leadingIcon="pencil"

@@ -97,6 +97,15 @@ const GroupHomeScreen = ({route}: {route: any}) => {
 
   const handleCreateTodo = async () => {
     try {
+      if (todoDescription.trim() === '') {
+        notify('error', {
+          params: {
+            description: 'Vui lòng nhập mô tả',
+            title: 'Lỗi',
+          },
+        });
+        return;
+      }
       const response = await createGroupTodo(accessToken, group.id, {
         title: todoDescription,
         date: todoStartDate,
@@ -140,10 +149,10 @@ const GroupHomeScreen = ({route}: {route: any}) => {
 
   const handleCreateStatement = async () => {
     try {
-      if (!statementMember) {
+      if (!statementMember || statementDescription.trim() === '') {
         notify('error', {
           params: {
-            description: 'Vui lòng chọn người ủng hộ',
+            description: 'Vui lòng chọn người ủng hộ và nhập mô tả',
             title: 'Lỗi',
           },
         });

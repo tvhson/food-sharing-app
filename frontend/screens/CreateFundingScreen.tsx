@@ -17,6 +17,7 @@ import {createNotifications} from 'react-native-notificated';
 import {createOrganizationPost} from '../api/OrganizationPostApi';
 import {setGroupPost} from '../redux/OrganizationPostReducer';
 import {uploadPhoto} from '../api/UploadPhotoApi';
+import {useLoading} from '../utils/LoadingContext';
 
 const {useNotifications} = createNotifications();
 
@@ -27,13 +28,15 @@ const CreateFundingScreen = ({navigation, route}: any) => {
   const [description, setDescription] = useState('');
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
+  const {showLoading, hideLoading} = useLoading();
 
   const group = route.params.group;
 
   const postImage = async (image: any) => {
     setImageUpload(image);
   };
-  const handleCreatePost = () => {
+  const handleCreatePost = async () => {
+    showLoading();
     let imageUrl = '';
     const dataForm = new FormData();
     if (imageUpload) {
@@ -42,7 +45,7 @@ const CreateFundingScreen = ({navigation, route}: any) => {
         name: imageUpload.filename || 'image.jpeg',
         type: imageUpload.mime || 'image/jpeg',
       });
-      uploadPhoto(dataForm, accessToken).then((response: any) => {
+      await uploadPhoto(dataForm, accessToken).then((response: any) => {
         if (response.status === 200) {
           imageUrl = response.data[0];
         } else {
@@ -52,7 +55,8 @@ const CreateFundingScreen = ({navigation, route}: any) => {
         }
       });
     }
-    createOrganizationPost(
+
+    await createOrganizationPost(
       {
         imageUrl,
         description,
@@ -80,6 +84,9 @@ const CreateFundingScreen = ({navigation, route}: any) => {
             style: {multiline: 100},
           },
         });
+      })
+      .finally(() => {
+        hideLoading();
       });
   };
 

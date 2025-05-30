@@ -8,21 +8,21 @@ import {
 } from 'react-native';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
+import {UserInfo, saveUser} from '../redux/UserReducer';
+import {useDispatch, useSelector} from 'react-redux';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../global/Color';
 import EditProfileScreen from './EditProfileScreen';
 import ListPost from '../components/ui/PersonalPageUI/ListPost';
 import {RootState} from '../redux/Store';
 import {TabView} from 'react-native-tab-view';
-import {saveUser, UserInfo} from '../redux/UserReducer';
-import {getFontFamily} from '../utils/fonts';
-import screenWidth from '../global/Constant';
-import {useDispatch, useSelector} from 'react-redux';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {createNotifications} from 'react-native-notificated';
-import {uploadPhoto} from '../api/UploadPhotoApi';
+import {getFontFamily} from '../utils/fonts';
+import screenWidth from '../global/Constant';
 import {updateUser} from '../api/AccountsApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {uploadPhoto} from '../api/UploadPhotoApi';
 
 const {useNotifications} = createNotifications();
 
