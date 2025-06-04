@@ -442,12 +442,12 @@ const GroupPostItem = (props: GroupPostItemProps) => {
               style={{width: 50, height: 50}}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={{marginLeft: 10}}>
+          {/* <TouchableOpacity style={{marginLeft: 10}}>
             <Image
               source={require('../../../assets/images/share.png')}
               style={{width: 50, height: 50}}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text
             style={{
               marginLeft: 10,
@@ -455,13 +455,8 @@ const GroupPostItem = (props: GroupPostItemProps) => {
               color: Colors.black,
               fontSize: 14,
             }}>
-            {item.organizationposts.attended
-              ? item.organizationposts.peopleAttended === 1
-                ? 'Bạn'
-                : `Bạn và ${
-                    item.organizationposts.peopleAttended - 1
-                  } người khác`
-              : `${item.organizationposts.peopleAttended} người`}
+            {item.organizationposts.attended &&
+              `${item.organizationposts.peopleAttended} người`}
           </Text>
         </View>
       </View>

@@ -422,9 +422,10 @@ const ChatRoomScreen = ({navigation, route}: any) => {
                 justifyContent: 'center',
                 paddingHorizontal: 10,
               }}>
-              <Send {...props} disabled={!imageUpload && !props.text}>
+              <Send {...props}>
                 <TouchableOpacity
                   style={{marginRight: 10, marginBottom: 10}}
+                  disabled={!imageUpload && !props.text}
                   onPress={() => {
                     onSend(
                       [

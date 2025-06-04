@@ -40,7 +40,8 @@ const PersonalPage = ({navigation}: any) => {
   const [imageUrl, setImageUrl] = useState(userInfo.imageUrl);
   const accessToken = useSelector((state: RootState) => state.token.key);
   const myPosts = useSelector((state: RootState) => state.sharingPost.MyPosts);
-
+  const [numberOfGroup, setNumberOfGroup] = useState(0);
+  const [numberOfPost, setNumberOfPost] = useState(0);
   const postImage = (image: any) => {
     const dataForm = new FormData();
     dataForm.append('file', {
@@ -146,12 +147,12 @@ const PersonalPage = ({navigation}: any) => {
             <Text style={styles.textName}>{userInfo.name}</Text>
           </View>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.textNumberStat}>{myPosts.length}</Text>
+            <Text style={styles.textNumberStat}>{numberOfPost}</Text>
             <Text style={styles.textSection1}>bài viết</Text>
           </View>
 
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.textNumberStat}>0</Text>
+            <Text style={styles.textNumberStat}>{numberOfGroup}</Text>
             <Text style={styles.textSection1}>Hội nhóm </Text>
           </View>
         </View>
@@ -242,6 +243,7 @@ const PersonalPage = ({navigation}: any) => {
                   type="POST"
                   otherId={userInfo.id}
                   navigation={navigation}
+                  setNumberOfPost={setNumberOfPost}
                 />
               );
             case 'second':
@@ -250,6 +252,7 @@ const PersonalPage = ({navigation}: any) => {
                   type="OPOST"
                   otherId={userInfo.id}
                   navigation={navigation}
+                  setNumberOfGroup={setNumberOfGroup}
                 />
               );
             default:

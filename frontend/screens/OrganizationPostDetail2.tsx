@@ -188,7 +188,12 @@ const OrganizationPostDetail2 = (props: any) => {
       </View>
       <View style={{paddingHorizontal: scale(20)}}>
         {item.members.map((member, index) => (
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingBottom: scale(10),
+            }}>
             <Avatar.Image
               size={60}
               source={{uri: member.imageUrl}}

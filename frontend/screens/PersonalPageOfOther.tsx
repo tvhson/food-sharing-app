@@ -30,7 +30,8 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
   const otherId = route.params.id;
   const [otherInfo, setOtherInfo] = useState<any>();
   const [roomChat, setRoomChat] = useState();
-
+  const [numberOfGroup, setNumberOfGroup] = useState(0);
+  const [numberOfPost, setNumberOfPost] = useState(0);
   const [index, setIndex] = useState(0);
   const routes = [
     {key: 'first', title: 'Bài viết'},
@@ -141,16 +142,12 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
             <Text style={styles.textName}>{userInfo.name}</Text>
           </View>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.textNumberStat}>0</Text>
+            <Text style={styles.textNumberStat}>{numberOfPost}</Text>
             <Text style={styles.textSection1}>bài viết</Text>
           </View>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.textNumberStat}>0</Text>
-            <Text style={styles.textSection1}>đã nhận</Text>
-          </View>
-          <View style={{justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={styles.textNumberStat}>0</Text>
-            <Text style={styles.textSection1}>sự kiện </Text>
+            <Text style={styles.textNumberStat}>{numberOfGroup}</Text>
+            <Text style={styles.textSection1}>Hội nhóm </Text>
           </View>
         </View>
         <TouchableOpacity style={styles.btnEdit} onPress={handleNavigate}>
@@ -220,6 +217,7 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
                   type="POST"
                   otherId={otherId}
                   navigation={navigation}
+                  setNumberOfPost={setNumberOfPost}
                 />
               );
             case 'second':
@@ -228,6 +226,7 @@ const PersonalPageOfOther = ({navigation, route}: any) => {
                   type="OPOST"
                   otherId={otherId}
                   navigation={navigation}
+                  setNumberOfGroup={setNumberOfGroup}
                 />
               );
             default:

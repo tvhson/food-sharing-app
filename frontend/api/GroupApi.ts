@@ -142,6 +142,23 @@ export const getMyGroup = async (
   }
 };
 
+export const getGroupByUserId = async (
+  token: string,
+  userId: number,
+): Promise<IGetGroupResponse[]> => {
+  try {
+    const response = await ApiManager(`groups/groups-of-user/${userId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export interface IGetGroupTodoResponse {
   id: number;
   title: string;

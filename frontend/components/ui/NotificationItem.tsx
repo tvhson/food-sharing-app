@@ -15,6 +15,7 @@ import {Route} from '../../constants/route';
 import {confirmReceiveFood} from '../../api/PostApi';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
 import {useLoading} from '../../utils/LoadingContext';
+import {scale} from '../../utils/scale';
 
 const NotificationItem = ({
   item,
@@ -153,6 +154,75 @@ const NotificationItem = ({
     }
   };
 
+  const handleAcceptGroupRequest = async () => {
+    try {
+      const notificationUpdate = {
+        id: item.id,
+        title: 'Chấp nhận',
+        imageUrl: item.imageUrl,
+        description: 'Bạn đã chấp nhận yêu cầu tham gia nhóm',
+        type: 'DONE',
+        createdDate: new Date(),
+        linkId: item.linkId,
+        userId: item.userId,
+        senderId: item.senderId,
+        read: true,
+      };
+      const response1: any = await updateNotification(
+        item.id,
+        accessToken,
+        notificationUpdate,
+      );
+      if (response1.status === 200) {
+        dispatch(updateNotificationAfter(notificationUpdate));
+
+        const response2: any = await acceptInvite(
+          accessToken,
+          item.linkId,
+          item.senderId,
+        );
+      } else {
+        console.log(response1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeclineGroupRequest = async () => {
+    try {
+      const notificationUpdate = {
+        id: item.id,
+        title: 'Từ chối',
+        imageUrl: item.imageUrl,
+        description: 'Bạn đã từ chối yêu cầu tham gia nhóm',
+        type: 'DONE',
+        createdDate: new Date(),
+        linkId: item.linkId,
+        userId: item.userId,
+        senderId: item.senderId,
+        read: true,
+      };
+      const response1: any = await updateNotification(
+        item.id,
+        accessToken,
+        notificationUpdate,
+      );
+      if (response1.status === 200) {
+        dispatch(updateNotificationAfter(notificationUpdate));
+        const response2 = await rejectInvite(
+          accessToken,
+          item.linkId,
+          item.senderId,
+        );
+      } else {
+        console.log(response1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleAcceptGroupInvitation = async () => {
     try {
       const notificationUpdate = {
@@ -263,21 +333,20 @@ const NotificationItem = ({
 
             <View
               style={{
-                flexDirection: 'row',
                 justifyContent: 'flex-start',
-                alignContent: 'center',
-                alignItems: 'center',
               }}>
               <Text style={{fontSize: 12, color: Colors.grayText}}>
                 {timeAgo(item.createdDate)}
               </Text>
-              {item.type === 'RECEIVED' || item.type === 'GROUP_INVITATION' ? (
+              {item.type === 'RECEIVED' ||
+              item.type === 'GROUP_INVITATION' ||
+              item.type === 'GROUP_REQUEST' ? (
                 <View
                   style={{
                     flex: 1,
                     flexDirection: 'row',
-                    justifyContent: 'space-around',
                     marginVertical: 3,
+                    gap: scale(10),
                   }}>
                   <Button
                     title={'Từ chối'}
@@ -292,6 +361,8 @@ const NotificationItem = ({
                     onPress={() => {
                       if (item.type === 'RECEIVED') {
                         handleDecline();
+                      } else if (item.type === 'GROUP_REQUEST') {
+                        handleDeclineGroupRequest();
                       } else {
                         handleAcceptGroupInvitation();
                       }
@@ -310,6 +381,8 @@ const NotificationItem = ({
                     onPress={() => {
                       if (item.type === 'RECEIVED') {
                         handleAccept();
+                      } else if (item.type === 'GROUP_REQUEST') {
+                        handleAcceptGroupRequest();
                       } else {
                         handleAcceptGroupInvitation();
                       }

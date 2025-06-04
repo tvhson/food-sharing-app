@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {Image, Rating} from '@rneui/themed';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
 import {Button, Dialog, IconButton, Portal} from 'react-native-paper';
 import {getFontFamily} from '../../utils/fonts';
 import Colors from '../../global/Color';
@@ -22,6 +22,7 @@ const DialogRating = (props: {
   const {visible, setVisible, item} = props;
   const accessToken = useSelector((state: RootState) => state.token.key);
   const userInfo = useSelector((state: RootState) => state.userInfo);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
   const [rating, setRating] = useState(5);
@@ -35,6 +36,7 @@ const DialogRating = (props: {
     return nameMatch ? nameMatch[1].trim() : null;
   };
   const handleSubmitRating = async () => {
+    setIsLoading(true);
     const response1: any = await earnPoint(
       {accountId: item.senderId, point: rating * 5},
       accessToken,
@@ -83,6 +85,7 @@ const DialogRating = (props: {
     setVisible(false); // Close the dialog
     setRating(5); // Reset the rating
     // Here, you can send the rating to a server or perform other actions
+    setIsLoading(false);
   };
   const renderStars = () => {
     const stars = [];
@@ -102,6 +105,20 @@ const DialogRating = (props: {
 
   return (
     <Portal>
+      {/* <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        }}>
+        <ActivityIndicator size="large" color={Colors.greenPrimary} />
+      </View> */}
+
       <Dialog
         style={{backgroundColor: 'white'}}
         visible={visible}
@@ -147,6 +164,8 @@ const DialogRating = (props: {
               {renderStars()}
             </View>
             <Button
+              loading={isLoading}
+              disabled={isLoading}
               onPress={handleSubmitRating}
               labelStyle={{color: 'white'}}
               style={{

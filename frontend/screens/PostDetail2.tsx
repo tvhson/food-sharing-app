@@ -158,6 +158,7 @@ const PostDetail2 = ({route, navigation}: any) => {
   };
 
   const handleReceived = async () => {
+    showLoading();
     if (accessToken) {
       try {
         const response: any = await createNotification(
@@ -189,8 +190,11 @@ const PostDetail2 = ({route, navigation}: any) => {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        hideLoading();
       }
     }
+    hideLoading();
   };
 
   const handleLiked = async () => {
@@ -593,12 +597,12 @@ const PostDetail2 = ({route, navigation}: any) => {
                   style={{width: 50, height: 50}}
                 />
               </TouchableOpacity>
-              <TouchableOpacity style={{marginLeft: 10}}>
+              {/* <TouchableOpacity style={{marginLeft: 10}}>
                 <Image
                   source={require('../assets/images/share.png')}
                   style={{width: 50, height: 50}}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <Text
                 style={{
                   marginLeft: 10,
@@ -606,11 +610,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                   color: Colors.black,
                   fontSize: 14,
                 }}>
-                {liked
-                  ? likeCount === 1
-                    ? 'Bạn'
-                    : `Bạn và ${likeCount - 1} người khác`
-                  : `${likeCount} người`}
+                {likeCount && `${likeCount} người`}
               </Text>
             </View>
           </View>

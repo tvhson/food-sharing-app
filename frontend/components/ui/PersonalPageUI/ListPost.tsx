@@ -17,16 +17,18 @@ import screenWidth from '../../../global/Constant';
 import {useLoading} from '../../../utils/LoadingContext';
 import {useDispatch, useSelector} from 'react-redux';
 import {setMyPosts} from '../../../redux/SharingPostReducer';
-import {getMyGroup} from '../../../api/GroupApi';
+import {getGroupByUserId, getMyGroup} from '../../../api/GroupApi';
 
 interface ListPostProps {
   type: 'POST' | 'OPOST';
   otherId?: number;
   navigation: any;
+  setNumberOfGroup?: (number: number) => void;
+  setNumberOfPost?: (number: number) => void;
 }
 
 const ListPost = (props: ListPostProps) => {
-  const {type, otherId, navigation} = props;
+  const {type, otherId, navigation, setNumberOfGroup, setNumberOfPost} = props;
   const {showLoading, hideLoading} = useLoading();
   const dispatch = useDispatch();
 
@@ -43,6 +45,7 @@ const ListPost = (props: ListPostProps) => {
       if (response.status === 200) {
         setPosts(response.data);
         dispatch(setMyPosts(response.data));
+        setNumberOfPost?.(response.data.length);
       } else {
         console.log('error');
       }
@@ -50,12 +53,9 @@ const ListPost = (props: ListPostProps) => {
     };
     const getMyGroupData = async () => {
       showLoading();
-      const response: any = await getMyGroup(accessToken);
-      if (response.status === 200) {
-        setPosts(response.data);
-      } else {
-        console.log('error');
-      }
+      const response: any = await getGroupByUserId(accessToken, otherId || -1);
+      setPosts(response);
+      setNumberOfGroup?.(response.length);
       hideLoading();
     };
     const fetchData = async () => {
@@ -75,17 +75,14 @@ const ListPost = (props: ListPostProps) => {
       const response: any = await getPostOfOther(otherId, accessToken);
       if (response.status === 200) {
         setPosts(response.data);
+        setNumberOfPost?.(response.data.length);
       }
       hideLoading();
     } else {
       showLoading();
-      const response: any = await getOrganizationPostByUserId(
-        otherId,
-        accessToken,
-      );
-      if (response.status === 200) {
-        setPosts(response.data);
-      }
+      const response: any = await getGroupByUserId(accessToken, otherId || -1);
+      setPosts(response);
+      setNumberOfGroup?.(response.length);
       hideLoading();
     }
     setRefreshing(false);

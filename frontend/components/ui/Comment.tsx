@@ -108,6 +108,7 @@ const Comment = (props: {
     } else {
       getCommentList();
     }
+    setIsLoading(false);
   }, [accessToken, commentPostId, notify, isVisible]);
 
   const postImage = async (newImages: any) => {
@@ -180,8 +181,8 @@ const Comment = (props: {
             });
           });
       }
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   return (

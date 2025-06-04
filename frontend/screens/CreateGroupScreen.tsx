@@ -47,9 +47,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
-
-  const [loadingGetLocation, setLoadingGetLocation] = useState(false);
-
   const autocompleteRef = useRef<any | null>(null);
   const postImage = async (newImages: any) => {
     setImageUpload(newImages);
@@ -69,7 +66,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
         });
         return;
       }
-      setLoadingGetLocation(true);
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
@@ -80,7 +76,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
         autocompleteRef.current?.setAddressText(
           response.data.results[0].formatted_address,
         );
-        setLoadingGetLocation(false);
         return response.data.results[0].formatted_address;
       }
       notify('error', {
@@ -422,7 +417,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             marginTop: 20,
             borderRadius: 10,
           }}
-          loading={loadingGetLocation}
           titleStyle={{fontFamily: getFontFamily('bold')}}
         />
 

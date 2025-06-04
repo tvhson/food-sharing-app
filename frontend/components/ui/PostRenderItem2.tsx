@@ -562,12 +562,12 @@ const PostRenderItem2 = (props: any) => {
               style={{width: 50, height: 50}}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={{marginLeft: 10}}>
+          {/* <TouchableOpacity style={{marginLeft: 10}}>
             <Image
               source={require('../../assets/images/share.png')}
               style={{width: 50, height: 50}}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text
             style={{
               marginLeft: 10,
@@ -575,11 +575,7 @@ const PostRenderItem2 = (props: any) => {
               color: Colors.black,
               fontSize: 14,
             }}>
-            {liked
-              ? item.likeCount === 1
-                ? 'Bạn'
-                : `Bạn và ${item.likeCount - 1} người khác`
-              : `${item.likeCount} người`}
+            {item.likeCount && `${item.likeCount} người`}
           </Text>
         </View>
       </View>
