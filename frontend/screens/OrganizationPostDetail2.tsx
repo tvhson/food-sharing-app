@@ -1,7 +1,13 @@
 import {Avatar, Icon} from 'react-native-paper';
-import {IGetGroupResponse, joinGroup} from '../api/GroupApi';
+import {
+  getGroup,
+  getGroupById,
+  IGetGroupResponse,
+  joinGroup,
+} from '../api/GroupApi';
 import {
   Image,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,16 +28,17 @@ import {getFontFamily} from '../utils/fonts';
 import {scale} from '../utils/scale';
 import {useNavigation} from '@react-navigation/native';
 import {useNotifications} from 'react-native-notificated';
+import {useLoading} from '../utils/LoadingContext';
 
 const OrganizationPostDetail2 = (props: any) => {
   const navigation: any = useNavigation();
-  const item: IGetGroupResponse = props.route.params.item;
-
+  const [refreshing, setRefreshing] = useState(false);
   const {notify} = useNotifications();
   const token = useSelector((state: RootState) => state.token.key);
   const user = useSelector((state: RootState) => state.userInfo);
   const dispatch = useDispatch();
-
+  const [item, setItem] = useState<IGetGroupResponse>(props.route.params.item);
+  const {showLoading, hideLoading} = useLoading();
   const handleAttend = async () => {
     if (item.joined === 'JOINED') {
       navigation.navigate(Route.GroupHomeScreen, {
@@ -39,10 +46,11 @@ const OrganizationPostDetail2 = (props: any) => {
       });
       return;
     }
-
+    showLoading();
     await joinGroup(token, item.id, user.id)
       .then(response => {
         dispatch(addGroup(response));
+        setItem(response);
       })
       .catch(error => {
         notify('error', {
@@ -54,8 +62,38 @@ const OrganizationPostDetail2 = (props: any) => {
             },
           },
         });
+      })
+      .finally(() => {
+        hideLoading();
       });
   };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    showLoading();
+    await getGroupById(token, item.id)
+      .then(response => {
+        setItem(response);
+      })
+      .catch(error => {
+        notify('error', {
+          params: {
+            description: 'Không thể lấy thông tin nhóm',
+            title: 'Lỗi',
+            style: {
+              multiline: 100,
+            },
+          },
+        });
+      })
+      .finally(() => {
+        hideLoading();
+        setRefreshing(false);
+      });
+    hideLoading();
+    setRefreshing(false);
+  };
+
   const handleBack = () => {
     navigation.goBack();
   };
@@ -181,7 +219,11 @@ const OrganizationPostDetail2 = (props: any) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       {renderHeader()}
       <View style={{paddingHorizontal: scale(20)}}>
         <Text style={styles.textTitle2}>Danh sách thành viên</Text>

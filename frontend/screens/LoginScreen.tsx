@@ -3,7 +3,9 @@ import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {Button, Icon} from '@rneui/themed';
 import {
   Image,
+  ImageBackground,
   Keyboard,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -142,137 +144,139 @@ const LoginScreen = ({navigation}: any) => {
         //dismiss keyboard
         Keyboard.dismiss();
       }}>
-      <View style={styles.container}>
-        <Image
-          source={require('../assets/images/LoginBackground.png')}
-          style={styles.background}
-        />
-        <View
-          style={{
-            flex: 1,
-            position: 'absolute',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-          }}>
-          <Icon
-            name="arrow-back"
-            type="ionicons"
-            size={30}
-            onPress={() => navigation.goBack()}
+      <ImageBackground
+        source={require('../assets/images/LoginBackground.png')}
+        style={styles.background}
+        resizeMode="cover">
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          style={styles.container}>
+          <View
             style={{
-              alignItems: 'flex-start',
-              marginTop: 20,
-              marginLeft: 20,
-              width: 30,
-              height: 30,
-              color: 'black',
-            }}
-          />
-          <Animated.View
-            entering={FadeInUp.delay(200).duration(1000).springify()}
-            style={{alignSelf: 'center'}}>
-            <Text
+              flex: 1,
+              flexDirection: 'column',
+              width: '100%',
+              height: '100%',
+            }}>
+            <Icon
+              name="arrow-back"
+              type="ionicons"
+              size={30}
+              onPress={() => navigation.goBack()}
               style={{
-                fontSize: 46,
-                fontWeight: 'bold',
-                color: 'white',
-              }}>
-              Chào mừng!{'\n '}Đăng nhập
-            </Text>
-          </Animated.View>
-          <Animated.View
-            entering={FadeInUp.delay(300).duration(1000).springify()}
-            style={{alignSelf: 'center'}}>
-            <TouchableOpacity onPress={handleRegister}>
-              <Text
-                style={{
-                  fontSize: 20,
-                  color: 'white',
-                  textDecorationLine: 'underline',
-                }}>
-                Chưa có tài khoản? Đăng ký ngay
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View
-            entering={FadeInUp.delay(400).duration(1000).springify()}
-            style={{marginTop: 130, alignItems: 'center'}}>
-            <TextInput
-              placeholder="Email"
-              placeholderTextColor={'#706d6d'}
-              style={{
-                fontSize: 16,
-                padding: 10,
-                backgroundColor: '#eff2ff',
-                borderRadius: 8,
-                width: '90%',
+                alignItems: 'flex-start',
+                marginTop: 20,
+                marginLeft: 20,
+                width: 30,
+                height: 30,
                 color: 'black',
               }}
-              onChangeText={setEmail}
             />
-          </Animated.View>
-          <Animated.View
-            entering={FadeInUp.delay(500).duration(1000).springify()}
-            style={{marginTop: 20, alignItems: 'center'}}>
-            <View
-              style={{
-                padding: 10,
-                paddingVertical: 0,
-                backgroundColor: '#eff2ff',
-                borderRadius: 8,
-                width: '90%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
+            <Animated.View
+              entering={FadeInUp.delay(200).duration(1000).springify()}
+              style={{alignSelf: 'center'}}>
+              <Text
+                style={{
+                  fontSize: 46,
+                  fontWeight: 'bold',
+                  color: 'white',
+                }}>
+                Chào mừng!{'\n '}Đăng nhập
+              </Text>
+            </Animated.View>
+            <Animated.View
+              entering={FadeInUp.delay(300).duration(1000).springify()}
+              style={{alignSelf: 'center'}}>
+              <TouchableOpacity onPress={handleRegister}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    color: 'white',
+                    textDecorationLine: 'underline',
+                  }}>
+                  Chưa có tài khoản? Đăng ký ngay
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+            <Animated.View
+              entering={FadeInUp.delay(400).duration(1000).springify()}
+              style={{marginTop: 130, alignItems: 'center'}}>
               <TextInput
-                placeholder="Mật khẩu"
+                placeholder="Email"
                 placeholderTextColor={'#706d6d'}
                 style={{
                   fontSize: 16,
-                  color: 'black',
+                  padding: 10,
+                  backgroundColor: '#eff2ff',
+                  borderRadius: 8,
                   width: '90%',
+                  color: 'black',
                 }}
-                secureTextEntry={!showPassword}
-                onChangeText={setPassword}
+                onChangeText={setEmail}
               />
-              <TouchableOpacity
-                onPress={() => {
-                  setShowPassword(!showPassword);
+            </Animated.View>
+            <Animated.View
+              entering={FadeInUp.delay(500).duration(1000).springify()}
+              style={{marginTop: 20, alignItems: 'center'}}>
+              <View
+                style={{
+                  padding: 10,
+                  paddingVertical: 0,
+                  backgroundColor: '#eff2ff',
+                  borderRadius: 8,
+                  width: '90%',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}>
-                <Icon
-                  name={showPassword ? 'eye' : 'eye-with-line'}
-                  type="entypo"
-                  size={24}
-                  color={'#706d6d'}
+                <TextInput
+                  placeholder="Mật khẩu"
+                  placeholderTextColor={'#706d6d'}
+                  style={{
+                    fontSize: 16,
+                    color: 'black',
+                    width: '90%',
+                  }}
+                  secureTextEntry={!showPassword}
+                  onChangeText={setPassword}
                 />
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowPassword(!showPassword);
+                  }}>
+                  <Icon
+                    name={showPassword ? 'eye' : 'eye-with-line'}
+                    type="entypo"
+                    size={24}
+                    color={'#706d6d'}
+                  />
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
 
-          <Animated.View
-            entering={FadeInDown.delay(400).duration(1000).springify()}
-            style={{
-              marginTop: 220,
-              alignItems: 'center',
-              width: '100%',
-            }}>
-            <Button
-              title="Đăng nhập"
-              onPress={handleLogin}
-              titleStyle={{fontWeight: '700', fontSize: 20}}
-              buttonStyle={{
-                backgroundColor: Colors.greenPrimary,
-                borderColor: 'transparent',
-                borderWidth: 0,
-                borderRadius: 30,
-                width: 300,
-              }}
-            />
-          </Animated.View>
-        </View>
-      </View>
+            <Animated.View
+              entering={FadeInDown.delay(400).duration(1000).springify()}
+              style={{
+                marginTop: 220,
+                alignItems: 'center',
+                width: '100%',
+              }}>
+              <Button
+                title="Đăng nhập"
+                onPress={handleLogin}
+                titleStyle={{fontWeight: '700', fontSize: 20}}
+                buttonStyle={{
+                  backgroundColor: Colors.greenPrimary,
+                  borderColor: 'transparent',
+                  borderWidth: 0,
+                  borderRadius: 30,
+                  width: 300,
+                }}
+              />
+            </Animated.View>
+          </View>
+        </ScrollView>
+      </ImageBackground>
     </TouchableWithoutFeedback>
   );
 };

@@ -89,10 +89,8 @@ const MapScreen = ({navigation}: any) => {
 
   useEffect(() => {
     if (!mapRef.current) return;
-    console.log('Im here filteredMarkers', filteredMarkers.length);
 
     if (filteredMarkers.length === 0) {
-      console.log('Im here notify');
       notify('error', {
         params: {
           description: 'Không tìm thấy địa điểm nào trong khu vực này',

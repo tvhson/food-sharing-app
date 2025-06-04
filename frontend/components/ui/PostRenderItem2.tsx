@@ -53,6 +53,10 @@ const PostRenderItem2 = (props: any) => {
     (state: RootState) =>
       state.sharingPost.HomePage.find(post => post.id === item.id)?.isLiked,
   );
+  const likeCount = useSelector(
+    (state: RootState) =>
+      state.sharingPost.HomePage.find(post => post.id === item.id)?.likeCount,
+  );
   const screenWidth = Dimensions.get('window').width;
   const [visible, setVisible] = useState<boolean>(false);
   const [visibleDialogDelete, setVisibleDialogDelete] =
@@ -575,7 +579,7 @@ const PostRenderItem2 = (props: any) => {
               color: Colors.black,
               fontSize: 14,
             }}>
-            {item.likeCount && `${item.likeCount} người`}
+            {likeCount && `${likeCount} người`}
           </Text>
         </View>
       </View>

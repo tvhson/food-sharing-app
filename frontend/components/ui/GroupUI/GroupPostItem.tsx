@@ -47,6 +47,18 @@ const GroupPostItem = (props: GroupPostItemProps) => {
   const dispatch = useDispatch();
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const accessToken = useSelector((state: RootState) => state.token.key);
+  const attended = useSelector(
+    (state: RootState) =>
+      state.fundingPost.HomePage.find(
+        post => post.organizationposts.id === item.organizationposts.id,
+      )?.organizationposts.attended,
+  );
+  const likeCount = useSelector(
+    (state: RootState) =>
+      state.fundingPost.HomePage.find(
+        post => post.organizationposts.id === item.organizationposts.id,
+      )?.organizationposts.peopleAttended,
+  );
   const navigation: any = useNavigation();
 
   const screenWidth = Dimensions.get('window').width;
@@ -427,7 +439,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
           <TouchableOpacity onPress={handleLiked}>
             <Image
               source={
-                item.organizationposts.attended
+                attended
                   ? require('../../../assets/images/liked.png')
                   : require('../../../assets/images/like.png')
               }
@@ -455,8 +467,7 @@ const GroupPostItem = (props: GroupPostItemProps) => {
               color: Colors.black,
               fontSize: 14,
             }}>
-            {item.organizationposts.attended &&
-              `${item.organizationposts.peopleAttended} người`}
+            {likeCount && `${likeCount} người`}
           </Text>
         </View>
       </View>

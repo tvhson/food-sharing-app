@@ -126,11 +126,7 @@ const PostDetail2 = ({route, navigation}: any) => {
     if (response.status === 200) {
       setItem(response.data);
       setLiked(response.data.isLiked);
-      setLikeCount(
-        response.data.isLiked
-          ? response.data.likeCount + 1
-          : response.data.likeCount,
-      );
+      setLikeCount(response.data.likeCount);
     }
   };
 
