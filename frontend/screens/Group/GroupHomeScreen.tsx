@@ -244,7 +244,12 @@ const GroupHomeScreen = ({route}: {route: any}) => {
       style={{justifyContent: 'center', alignItems: 'center', width: '100%'}}>
       <Image source={{uri: group.imageUrl}} style={styles.image} />
       <Text style={styles.title}>{group.name}</Text>
-      <View
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate(Route.GroupMember, {
+            group,
+          });
+        }}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -296,7 +301,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
             )}
           </View>
         )}
-      </View>
+      </TouchableOpacity>
       {group.author.id === userInfo.id && (
         <View
           style={{
@@ -368,6 +373,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
       <View>
         {groupPosts.map(post => (
           <GroupPostItem
+            key={post.organizationposts.id}
             item={post}
             setCommentPostId={setCommentPostId}
             setShowComment={setShowComment}

@@ -231,6 +231,7 @@ const OrganizationPostDetail2 = (props: any) => {
       <View style={{paddingHorizontal: scale(20)}}>
         {item.members.map((member, index) => (
           <View
+            key={member.id}
             style={{
               flexDirection: 'row',
               alignItems: 'center',

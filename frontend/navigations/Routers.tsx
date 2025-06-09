@@ -190,11 +190,11 @@ const Router = () => {
           }}
         />
         <Stack.Screen
-          name={Route.GroupList}
+          name={Route.GroupMember}
           component={ListGroupScreen}
           options={{
             headerShown: true,
-            headerTitle: 'Hội nhóm',
+            headerTitle: 'Danh sách thành viên',
             headerStyle: {backgroundColor: Colors.button},
             headerTitleStyle: {
               color: 'white',

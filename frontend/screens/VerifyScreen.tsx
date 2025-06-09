@@ -161,7 +161,7 @@ const VerifyScreen = ({navigation}: any) => {
         </Text>
       </View>
       <SearchBar
-        placeholder="Search account by name"
+        placeholder="Tìm tài khoản bằng tên"
         containerStyle={{
           backgroundColor: 'transparent',
           borderColor: 'transparent',

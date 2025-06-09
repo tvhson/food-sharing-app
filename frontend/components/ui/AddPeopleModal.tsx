@@ -1,5 +1,12 @@
 import {Checkbox, Searchbar} from 'react-native-paper';
-import {FlatList, Image, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useState} from 'react';
 
 import Colors from '../../global/Color';
@@ -9,17 +16,25 @@ import {UserInfo} from '../../redux/UserReducer';
 import {getFontFamily} from '../../utils/fonts';
 import {getInfoUserByEmail} from '../../api/AccountsApi';
 import {useSelector} from 'react-redux';
+import {scale} from '../../utils/scale';
+import {notify} from 'react-native-notificated';
 
 const AddPeopleModal = ({
   isVisible,
   onClose,
   selectedPeople,
   setSelectedPeople,
+  isAddMember = false,
+  groupMembers = [],
+  onAddMember = () => {},
 }: {
   isVisible: boolean;
   onClose: () => void;
   selectedPeople: Partial<UserInfo>[];
   setSelectedPeople: (people: Partial<UserInfo>[]) => void;
+  isAddMember?: boolean;
+  groupMembers?: Partial<UserInfo>[];
+  onAddMember?: (people: Partial<UserInfo>[]) => void;
 }) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
   const {email: userEmail} = useSelector((state: RootState) => state.userInfo);
@@ -36,7 +51,29 @@ const AddPeopleModal = ({
     if (validateEmail(query) && query !== userEmail) {
       getInfoUserByEmail(query, accessToken)
         .then(response => {
-          setFilteredList([...filteredList, response]);
+          const isExist = selectedPeople.find(
+            person => person.id === response.id,
+          );
+          const isExistInGroup = groupMembers?.find(
+            person => person.id === response.id,
+          );
+          if (isExistInGroup) {
+            notify('error', {
+              params: {
+                title: 'Lỗi',
+                description: 'Thành viên đã tồn tại trong nhóm',
+                style: {
+                  multiline: 100,
+                },
+              },
+            });
+            setSearchQuery('');
+            return;
+          }
+          if (!isExist) {
+            setFilteredList([...filteredList, response]);
+          }
+          setSearchQuery('');
         })
         .catch(error => {
           console.log(error);
@@ -110,7 +147,7 @@ const AddPeopleModal = ({
         />
 
         <FlatList
-          style={{width: '100%'}}
+          style={{width: '100%', maxHeight: scale(500)}}
           data={filteredList}
           renderItem={renderItem}
           ListEmptyComponent={
@@ -127,6 +164,24 @@ const AddPeopleModal = ({
           }
           keyExtractor={item => item.id?.toString() || ''}
         />
+        {isAddMember && selectedPeople.length > 0 && (
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.greenPrimary,
+              padding: scale(10),
+              borderRadius: scale(10),
+              marginTop: scale(20),
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={() => {
+              onAddMember(selectedPeople);
+            }}>
+            <Text style={{color: 'white', fontFamily: getFontFamily('bold')}}>
+              Thêm
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ReactNativeModal>
   );

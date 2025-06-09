@@ -37,4 +37,5 @@ export enum Route {
   GroupCreatePost = 'GroupCreatePost',
   GroupEditPost = 'GroupEditPost',
   Support = 'Support',
+  GroupMember = 'GroupMember',
 }
