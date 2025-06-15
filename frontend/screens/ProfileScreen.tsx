@@ -141,8 +141,6 @@ const ProfileScreen = ({navigation, route}: any) => {
       <EditProfileScreen
         isVisible={isEditVisible}
         setVisible={setIsEditVisible}
-        userInfo={userInfo}
-        token={accessToken}
       />
       <UploadPhoto
         isVisible={isUploadVisible}
@@ -253,22 +251,6 @@ const ProfileScreen = ({navigation, route}: any) => {
             }}
             titleStyle={{color: 'black'}}
             icon={{name: 'location', type: 'entypo', color: 'black'}}
-          />
-          <Button
-            title={'Hội nhóm'}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black'}}
-            icon={{
-              name: 'account-group',
-              type: 'material-community',
-              color: 'black',
-            }}
-            onPress={() => {
-              navigation.navigate(Route.GroupList);
-            }}
           />
         </View>
       ) : null}

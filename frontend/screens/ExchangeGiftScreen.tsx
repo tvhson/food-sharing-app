@@ -20,6 +20,7 @@ import {RootState} from '../redux/Store';
 import {getFontFamily} from '../utils/fonts';
 import {useLoading} from '../utils/LoadingContext';
 import {useSelector} from 'react-redux';
+import {moderateScale, scale} from '../utils/scale';
 
 const ExchangeGiftScreen = ({navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();
@@ -64,18 +65,18 @@ const ExchangeGiftScreen = ({navigation}: any) => {
       <View style={styles.header}>
         <View
           style={{
-            padding: 20,
+            padding: scale(20),
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 20,
+            gap: scale(20),
           }}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon source={'arrow-left'} size={30} color={Colors.white} />
+            <Icon source={'arrow-left'} size={scale(30)} color={Colors.white} />
           </TouchableOpacity>
           <Text
             style={{
               color: Colors.white,
-              fontSize: 20,
+              fontSize: moderateScale(20),
               fontFamily: getFontFamily('semibold'),
             }}>
             Đổi quà
@@ -83,7 +84,7 @@ const ExchangeGiftScreen = ({navigation}: any) => {
         </View>
         <View
           style={{
-            paddingHorizontal: 20,
+            paddingHorizontal: scale(20),
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
@@ -91,20 +92,20 @@ const ExchangeGiftScreen = ({navigation}: any) => {
             <View
               style={{
                 flexDirection: 'row',
-                gap: 10,
+                gap: scale(10),
                 alignItems: 'center',
               }}>
               <View>
                 <Image
                   source={require('../assets/images/star-white.png')}
-                  style={{width: 60, height: 60}}
+                  style={{width: scale(60), height: scale(60)}}
                 />
               </View>
 
               <Text
                 style={{
                   color: Colors.white,
-                  fontSize: 55,
+                  fontSize: moderateScale(55),
                   fontFamily: getFontFamily('bold'),
                 }}>
                 {myPoint}
@@ -113,14 +114,14 @@ const ExchangeGiftScreen = ({navigation}: any) => {
             <Text
               style={{
                 color: Colors.white,
-                fontSize: 36,
+                fontSize: moderateScale(36),
                 fontFamily: getFontFamily('semibold'),
               }}>
               Star Point
             </Text>
           </View>
 
-          <View style={{justifyContent: 'space-between', gap: 10}}>
+          <View style={{justifyContent: 'space-between', gap: scale(10)}}>
             <Button
               mode="contained"
               buttonColor={Colors.greenLight3}
@@ -129,8 +130,9 @@ const ExchangeGiftScreen = ({navigation}: any) => {
               <Text
                 style={{
                   color: Colors.black,
-                  fontSize: 20,
+                  fontSize: moderateScale(20),
                   fontFamily: getFontFamily('bold'),
+                  lineHeight: scale(30),
                 }}>
                 Lịch sử
               </Text>
@@ -143,8 +145,9 @@ const ExchangeGiftScreen = ({navigation}: any) => {
               <Text
                 style={{
                   color: Colors.black,
-                  fontSize: 20,
+                  fontSize: moderateScale(20),
                   fontFamily: getFontFamily('bold'),
+                  lineHeight: scale(30),
                 }}>
                 Quy đổi
               </Text>
@@ -163,14 +166,14 @@ const ExchangeGiftScreen = ({navigation}: any) => {
           style={{
             alignSelf: 'center',
             justifyContent: 'center',
-            paddingHorizontal: 50,
-            borderBottomWidth: 5,
+            paddingHorizontal: scale(50),
+            borderBottomWidth: scale(5),
             borderBottomColor: Colors.greenPrimary,
             flexDirection: 'column',
           }}>
           <Text
             style={{
-              fontSize: 30,
+              fontSize: moderateScale(30),
               color: Colors.black,
               fontFamily: getFontFamily('bold'),
             }}>
@@ -211,23 +214,23 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: Colors.greenPrimary,
-    height: 300,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    height: scale(300),
+    borderBottomLeftRadius: scale(20),
+    borderBottomRightRadius: scale(20),
   },
   listContainer: {
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginHorizontal: 20,
-    marginTop: -70,
+    borderTopLeftRadius: scale(20),
+    borderTopRightRadius: scale(20),
+    marginHorizontal: scale(20),
+    marginTop: scale(-70),
     flex: 1,
-    paddingTop: 20,
+    paddingTop: scale(20),
   },
   button1: {
-    borderRadius: 8,
-    width: 150,
-    height: 50,
+    borderRadius: scale(8),
+    width: scale(150),
+    height: scale(50),
     justifyContent: 'center',
   },
 });

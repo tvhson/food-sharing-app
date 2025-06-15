@@ -1,103 +1,83 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {UserInfo, saveUser} from '../redux/UserReducer';
+import React, {useRef} from 'react';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {saveUser, UserInfo} from '../redux/UserReducer';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Colors from '../global/Color';
-import {DatePickerInput} from 'react-native-paper-dates';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import Colors from '../global/Color';
 /* eslint-disable react-native/no-inline-styles */
-import {Icon} from '@rneui/themed';
 import {MAP_API_KEY} from '@env';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {Button, Icon} from '@rneui/themed';
+import axios from 'axios';
+import {useForm} from 'react-hook-form';
 import Modal from 'react-native-modal';
 import {createNotifications} from 'react-native-notificated';
-import {getFontFamily} from '../utils/fonts';
+import {scale, ScaledSheet} from 'react-native-size-matters';
+import {useDispatch, useSelector} from 'react-redux';
 import {updateUser} from '../api/AccountsApi';
-import {useDispatch} from 'react-redux';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {CustomText} from '../components/ui/CustomText';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {formatDate} from '../utils/helper';
+import {
+  createEditProfileValidate,
+  EditProfileValidateSchema,
+} from '../utils/schema/edit-profile';
 
 const {useNotifications, ModalNotificationsProvider} = createNotifications();
-function EditProfileScreen(props: any) {
+
+interface EditProfileScreenProps {
+  isVisible: boolean;
+  setVisible: (visible: boolean) => void;
+}
+
+function EditProfileScreen(props: EditProfileScreenProps) {
   const dispatch = useDispatch();
   const {notify} = useNotifications();
-  const [name, setName] = useState('');
-  const [locationName, setLocationName] = useState('');
-  const [description, setDescription] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [birthDate, setBirthDate] = useState(new Date());
-  const [latitude, setLatitude] = useState(0);
-  const [longitude, setLongitude] = useState(0);
+  const userInfo = useSelector((state: RootState) => state.userInfo);
+  const accessToken = useSelector((state: RootState) => state.token.key);
+
+  const locationState = useSelector((state: RootState) => state.location);
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: {errors},
+  } = useForm<EditProfileValidateSchema>({
+    resolver: zodResolver(createEditProfileValidate()),
+    defaultValues: {
+      name: userInfo.name,
+      location: userInfo.locationName,
+      phone: userInfo.phone,
+      birthDate: userInfo.birthDate ? formatDate(userInfo.birthDate) : '',
+      latitude: userInfo.latitude,
+      longitude: userInfo.longitude,
+    },
+  });
+
   const autocompleteRef = useRef<any | null>(null);
 
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
   };
 
-  const saveProfile = async () => {
-    let current = new Date();
-    current.setHours(0, 0, 0, 0);
-    if (name === '') {
-      notify('error', {
-        params: {description: 'Name is required.', title: 'Error'},
-      });
-      return;
-    }
-    if (phone && phone.length < 10) {
-      notify('error', {
-        params: {
-          description: 'Phone number must be 10  digits.',
-          title: 'Error',
-          isModalNotification: true,
-          style: {multiline: 100},
-        },
-      });
-      return;
-    }
-    const isOnlyDigits = /^\d+$/.test(phone);
-    if (!isOnlyDigits) {
-      notify('error', {
-        params: {
-          description: 'Phone number must contain only digits.',
-          title: 'Error',
-          isModalNotification: true,
-          style: {multiline: 100},
-        },
-      });
-      return;
-    }
-    if (birthDate > current) {
-      notify('error', {
-        params: {
-          description: 'Birthday must be less than current date.',
-          title: 'Error',
-          isModalNotification: true,
-          style: {multiline: 100},
-        },
-      });
-      return;
-    }
+  const saveProfile = async (data: EditProfileValidateSchema) => {
     updateUser(
       {
-        name,
-        locationName:
-          locationName === '' ? props.userInfo.locationName : locationName,
-        description,
-        phone,
-        birthDate,
-        email,
-        imageUrl: props.userInfo.imageUrl,
-        latitude: latitude === 0 ? props.userInfo.latitude : latitude,
-        longitude: longitude === 0 ? props.userInfo.longitude : longitude,
-        status: props.userInfo.status,
+        name: data.name,
+        locationName: data.location,
+        phone: data.phone,
+        birthDate: formatDate(data.birthDate),
+        email: userInfo.email,
+        imageUrl: userInfo.imageUrl,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        status: userInfo.status,
       },
-      props.token,
+      accessToken,
     )
       .then((response: any) => {
         if (response.status === 200) {
@@ -106,14 +86,14 @@ function EditProfileScreen(props: any) {
           props.setVisible(false);
           notify('success', {
             params: {
-              description: 'Update profile successful.',
-              title: 'Success',
+              description: 'Cập nhật thông tin thành công.',
+              title: 'Thành công',
             },
           });
           AsyncStorage.setItem('userInfo', JSON.stringify(response.data));
         } else {
           notify('error', {
-            params: {description: 'Update profile failed.', title: 'Error'},
+            params: {description: 'Cập nhật thông tin thất bại.', title: 'Lỗi'},
           });
         }
       })
@@ -121,35 +101,53 @@ function EditProfileScreen(props: any) {
         notify('error', {
           params: {
             description: error.message,
-            title: 'Error',
+            title: 'Lỗi',
             style: {multiline: 100},
           },
         });
       });
   };
-  useEffect(() => {
-    if (props.userInfo) {
-      setName(props.userInfo.name);
-      setDescription(props.userInfo.description);
-      setPhone(props.userInfo.phone);
-      setEmail(props.userInfo.email);
-      if (props.userInfo.birthDate !== null) {
-        setBirthDate(new Date(props.userInfo.birthDate));
+
+  const getLocationName = async (
+    latitudeCurrent: number,
+    longitudeCurrent: number,
+  ) => {
+    try {
+      if (!latitudeCurrent || !longitudeCurrent) {
+        notify('error', {
+          params: {
+            description: 'Không thể lấy vị trí hiện tại.',
+            title: 'Lỗi',
+          },
+        });
+        return;
       }
-      if (props.userInfo.locationName !== null) {
-        setLocationName(props.userInfo.locationName);
-        autocompleteRef.current?.setAddressText(props.userInfo.locationName);
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
+      );
+      if (response.data.results.length > 0) {
+        setValue('location', response.data.results[0].formatted_address, {
+          shouldValidate: true,
+        });
+        setValue('latitude', latitudeCurrent, {
+          shouldValidate: true,
+        });
+        setValue('longitude', longitudeCurrent, {
+          shouldValidate: true,
+        });
+        autocompleteRef.current?.setAddressText(
+          response.data.results[0].formatted_address,
+        );
+        return response.data.results[0].formatted_address;
       }
+      notify('error', {
+        params: {description: 'Không thể lấy vị trí hiện tại.', title: 'Lỗi'},
+      });
+      return '';
+    } catch (error) {
+      console.error(error);
     }
-  }, [
-    props.userInfo,
-    props.userInfo?.birthDate,
-    props.userInfo?.description,
-    props.userInfo?.locationName,
-    props.userInfo?.name,
-    props.userInfo?.phoneNumber,
-    props.isVisible,
-  ]);
+  };
 
   return (
     <Modal
@@ -161,130 +159,57 @@ function EditProfileScreen(props: any) {
       backdropTransitionInTiming={500}
       backdropTransitionOutTiming={500}
       style={{margin: 0}}>
-      <ModalNotificationsProvider notificationTopPosition={0} />
+      <ModalNotificationsProvider notificationTopPosition={scale(10)} />
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
         keyboardShouldPersistTaps="handled">
         <View style={styles.modalContent}>
-          <View style={{height: 70}} />
-          <View style={{marginLeft: 10}}>
-            <Text
-              style={{
-                fontFamily: getFontFamily('regular'),
-              }}>
-              * Bắt buộc phải điền
-            </Text>
-          </View>
-          <View style={{marginHorizontal: 10}}>
-            <Text
-              style={{
-                marginTop: 30,
-                color: 'black',
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-              }}>
-              Tên*
-            </Text>
-            <TextInput
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: 'black',
-                color: 'black',
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-              }}
-              placeholder="Nhập tên đầy đủ của bạn"
-              value={name}
-              onChangeText={text => setName(text)}
-            />
-          </View>
+          <View style={{height: scale(50)}} />
 
-          {/* <View style={{marginHorizontal: 10}}>
-            <Text
-              style={{
-                marginTop: 30,
-                color: 'black',
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-              }}>
-              Mô tả
-            </Text>
-            <TextInput
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: 'black',
-                color: 'black',
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-              }}
-              placeholder="Nhập mô tả về bạn"
-              value={description}
-              onChangeText={text => setDescription(text)}
-            />
-          </View> */}
+          <CustomInput
+            controller={{
+              control,
+              name: 'name',
+            }}
+            label="Tên"
+            errorText={errors.name?.message}
+            required={true}
+          />
+          <CustomInput
+            controller={{
+              control,
+              name: 'phone',
+            }}
+            label="Số điện thoại"
+            errorText={errors.phone?.message}
+            required={true}
+          />
+          <CustomInput
+            controller={{
+              control,
+              name: 'birthDate',
+            }}
+            label="Ngày sinh"
+            errorText={errors.birthDate?.message}
+            required={true}
+            isDatePicker
+            placeholder="DD/MM/YYYY"
+            calendarPickerProps={{
+              maximumDate: new Date(),
+              date: new Date(),
+            }}
+            labelColor={Colors.gray600}
+          />
 
-          <View style={{marginHorizontal: 10}}>
-            <Text
-              style={{
-                marginTop: 30,
-                color: 'black',
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-              }}>
-              Số điện thoại*
-            </Text>
-            <TextInput
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: 'black',
-                color: 'black',
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-              }}
-              placeholder="Nhập số điện thoại của bạn"
-              value={phone}
-              onChangeText={text => setPhone(text)}
-              maxLength={10}
-              keyboardType="numeric"
-            />
-          </View>
-          <View style={{marginHorizontal: 10, marginTop: 30}}>
-            <View
-              style={{
-                width: '100%',
-                alignItems: 'center',
-              }}>
-              <DatePickerInput
-                locale="en"
-                label="Ngày sinh"
-                value={birthDate}
-                onChange={(date: Date | undefined) =>
-                  setBirthDate(date || new Date())
-                }
-                inputMode="start"
-                style={{width: 300, fontFamily: getFontFamily('regular')}}
-                mode="outlined"
-              />
-            </View>
-          </View>
-          <View style={{marginHorizontal: 10}}>
-            <Text
-              style={{
-                marginTop: 30,
-                color: 'black',
-                fontSize: 16,
-                fontFamily: getFontFamily('regular'),
-              }}>
-              Địa chỉ
-            </Text>
+          <View>
             <GooglePlacesAutocomplete
               ref={autocompleteRef}
               fetchDetails={true}
-              placeholder={'Nhập địa chỉ của bạn'}
+              placeholder={'Nhập địa chỉ của bạn '}
               onPress={(data, details = null) => {
-                setLocationName(data.description);
-                setLatitude(details?.geometry.location.lat || 0);
-                setLongitude(details?.geometry.location.lng || 0);
+                setValue('location', data.description);
+                setValue('latitude', details?.geometry.location.lat || 0);
+                setValue('longitude', details?.geometry.location.lng || 0);
               }}
               disableScroll={true}
               query={{
@@ -292,27 +217,55 @@ function EditProfileScreen(props: any) {
                 language: 'vi',
               }}
               styles={{
-                container: {borderBottomWidth: 1, borderBottomColor: 'black'},
+                container: {
+                  borderColor: errors.location ? Colors.red : Colors.gray300,
+                  borderRadius: scale(10),
+                  borderWidth: 1,
+                  backgroundColor: Colors.white,
+                },
                 textInput: {
-                  fontSize: 16,
-                  color: 'black',
+                  fontSize: scale(16),
+                  color: Colors.black,
+                  backgroundColor: Colors.white,
                   fontFamily: getFontFamily('regular'),
                 },
               }}
             />
+            {errors.location && (
+              <CustomText
+                fontType="medium"
+                size={14}
+                textColor={Colors.red}
+                style={[{marginTop: scale(-16), paddingHorizontal: scale(10)}]}>
+                {errors.location.message}
+              </CustomText>
+            )}
           </View>
+          <Button
+            title="Sử dụng vị trí hiện tại"
+            onPress={() =>
+              getLocationName(locationState.latitude, locationState.longitude)
+            }
+            buttonStyle={{
+              backgroundColor: Colors.greenPrimary,
+              width: scale(200),
+              alignSelf: 'center',
+              borderRadius: scale(10),
+            }}
+            titleStyle={{fontFamily: getFontFamily('bold')}}
+          />
 
-          <View style={{height: 100}} />
+          <View style={{height: scale(100)}} />
         </View>
       </ScrollView>
       <View style={styles.bottomView}>
-        <TouchableOpacity onPress={saveProfile}>
+        <TouchableOpacity onPress={handleSubmit(saveProfile)}>
           <View
             style={{
-              borderRadius: 30,
+              borderRadius: scale(30),
               backgroundColor: Colors.greenPrimary,
-              paddingHorizontal: 150,
-              paddingVertical: 6,
+              paddingHorizontal: scale(150),
+              paddingVertical: scale(6),
               elevation: 5,
             }}>
             <Text style={styles.bottomText}>Lưu</Text>
@@ -321,7 +274,7 @@ function EditProfileScreen(props: any) {
       </View>
       <View style={styles.topView}>
         <View style={{margin: 20, flexDirection: 'row'}}>
-          <TouchableOpacity onPress={toggleModal} style={{marginTop: 3}}>
+          <TouchableOpacity onPress={toggleModal} style={{marginTop: scale(3)}}>
             <Icon type="antdesign" name="close" />
           </TouchableOpacity>
           <Text style={styles.title}>Sửa thông tin</Text>
@@ -331,15 +284,17 @@ function EditProfileScreen(props: any) {
   );
 }
 export default EditProfileScreen;
-const styles = StyleSheet.create({
+const styles = ScaledSheet.create({
   modalContent: {
     backgroundColor: '#fff',
+    paddingHorizontal: scale(16),
+    gap: scale(20),
     flex: 1,
   },
   title: {
-    fontSize: 20,
+    fontSize: scale(20),
     color: 'black',
-    marginLeft: 30,
+    marginLeft: scale(30),
     fontFamily: getFontFamily('bold'),
   },
   bottomView: {
@@ -347,7 +302,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 70,
+    height: scale(70),
     justifyContent: 'center',
     alignItems: 'center',
     borderTopColor: '#ccc',
@@ -357,7 +312,7 @@ const styles = StyleSheet.create({
   bottomText: {
     color: 'white',
     fontFamily: getFontFamily('bold'),
-    fontSize: 18,
+    fontSize: scale(18),
   },
   topView: {
     position: 'absolute',

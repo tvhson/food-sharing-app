@@ -2,9 +2,9 @@ import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import Colors from '../global/Color';
 import {Icon} from 'react-native-paper';
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {getFontFamily} from '../utils/fonts';
+import {moderateScale, scale} from '../utils/scale';
 
 const PointRuleScreen = ({navigation}: any) => {
   const data = [
@@ -35,18 +35,18 @@ const PointRuleScreen = ({navigation}: any) => {
       <View style={styles.header}>
         <View
           style={{
-            padding: 20,
+            padding: scale(20),
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 20,
+            gap: scale(20),
           }}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon source={'arrow-left'} size={30} color={Colors.white} />
+            <Icon source={'arrow-left'} size={scale(30)} color={Colors.white} />
           </TouchableOpacity>
           <Text
             style={{
               color: Colors.white,
-              fontSize: 20,
+              fontSize: moderateScale(20),
               fontFamily: getFontFamily('semibold'),
             }}>
             Đổi quà
@@ -62,7 +62,7 @@ const PointRuleScreen = ({navigation}: any) => {
         <Text
           style={{
             alignSelf: 'center',
-            fontSize: 24,
+            fontSize: moderateScale(24),
             fontFamily: getFontFamily('bold'),
             color: Colors.greenPrimary,
           }}>
@@ -71,17 +71,18 @@ const PointRuleScreen = ({navigation}: any) => {
         <FlatList
           data={data}
           keyExtractor={item => item.id.toString()}
-          style={{marginTop: 20}}
+          style={{marginTop: scale(20)}}
           renderItem={({item}) => (
             <View
               style={{
-                padding: 15,
+                padding: scale(15),
                 flexDirection: 'row',
                 justifyContent: 'space-between',
+                gap: scale(10),
               }}>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: moderateScale(16),
                   fontFamily: getFontFamily('bold'),
                   color: Colors.black,
                 }}>
@@ -89,7 +90,7 @@ const PointRuleScreen = ({navigation}: any) => {
               </Text>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: moderateScale(16),
                   fontFamily: getFontFamily('semibold'),
                   color: Colors.greenPrimary,
                 }}>
@@ -111,16 +112,16 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: Colors.greenPrimary,
-    height: 300,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    height: scale(300),
+    borderBottomLeftRadius: scale(20),
+    borderBottomRightRadius: scale(20),
   },
   listContainer: {
     backgroundColor: Colors.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginHorizontal: 20,
-    marginTop: -220,
+    borderTopLeftRadius: scale(20),
+    borderTopRightRadius: scale(20),
+    marginHorizontal: scale(20),
+    marginTop: scale(-220),
     flex: 1,
     paddingTop: 20,
   },

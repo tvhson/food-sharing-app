@@ -25,6 +25,18 @@ import {createNotifications} from 'react-native-notificated';
 import {getFontFamily} from '../utils/fonts';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useLoading} from '../utils/LoadingContext';
+import {
+  createGroupValidate,
+  GroupValidateSchema,
+} from '../utils/schema/create-group';
+import {Controller, useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {formatDate} from '../utils/helper';
+import {moderateScale, scale} from '../utils/scale';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {CustomText} from '../components/ui/CustomText';
+import screenWidth from '../global/Constant';
+import {parseDDMMYYYY} from '../utils/schema/hook-forms';
 
 const {useNotifications} = createNotifications();
 
@@ -33,23 +45,39 @@ const CreateGroupScreen = ({route, navigation}: any) => {
   const dispatch = useDispatch();
   const {notify} = useNotifications();
   const location = useSelector((state: RootState) => state.location);
-
   const accessToken = useSelector((state: RootState) => state.token.key);
-  const [groupName, setGroupName] = useState('');
-  const [description, setDescription] = useState('');
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: {errors},
+  } = useForm<GroupValidateSchema>({
+    resolver: zodResolver(createGroupValidate()),
+    defaultValues: {
+      name: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+      image: null,
+      joinType: 'PUBLIC',
+      locationName: '',
+      latitude: 0,
+      longitude: 0,
+    },
+  });
+
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [isAddPeopleModalVisible, setIsAddPeopleModalVisible] = useState(false);
   const [selectedPeople, setSelectedPeople] = useState<Partial<UserInfo>[]>([]);
-  const [joinType, setJoinType] = useState<'PUBLIC' | 'PRIVATE'>('PUBLIC');
-  const [locationName, setLocationName] = useState('');
-  const [latitude, setLatitude] = useState(0);
-  const [longitude, setLongitude] = useState(0);
+
   const autocompleteRef = useRef<any | null>(null);
   const postImage = async (newImages: any) => {
     setImageUpload(newImages);
+    setValue('image', newImages, {
+      shouldValidate: true,
+    });
   };
 
   const getLocationName = async (
@@ -70,9 +98,9 @@ const CreateGroupScreen = ({route, navigation}: any) => {
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
       if (response.data.results.length > 0) {
-        setLocationName(response.data.results[0].formatted_address);
-        setLatitude(latitudeCurrent);
-        setLongitude(longitudeCurrent);
+        setValue('locationName', response.data.results[0].formatted_address);
+        setValue('latitude', latitudeCurrent);
+        setValue('longitude', longitudeCurrent);
         autocompleteRef.current?.setAddressText(
           response.data.results[0].formatted_address,
         );
@@ -87,55 +115,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
     }
   };
 
-  const validateForm = () => {
-    if (groupName === '') {
-      notify('error', {
-        params: {
-          description: 'Tên nhóm là bắt buộc.',
-          title: 'Lỗi',
-          style: {multiline: 100},
-        },
-      });
-      return false;
-    }
-    if (description === '') {
-      notify('error', {
-        params: {
-          description: 'Giới thiệu về nhóm là bắt buộc.',
-          title: 'Lỗi',
-          style: {multiline: 100},
-        },
-      });
-      return false;
-    }
-
-    if (startDate === null) {
-      notify('error', {
-        params: {description: 'Ngày bắt đầu là bắt buộc.', title: 'Lỗi'},
-      });
-      return false;
-    }
-
-    if (locationName === '') {
-      notify('error', {
-        params: {description: 'Địa chỉ diễn ra là bắt buộc.', title: 'Lỗi'},
-      });
-      return false;
-    }
-    if (imageUpload === null) {
-      notify('error', {
-        params: {description: 'Ảnh là bắt buộc.', title: 'Lỗi'},
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const handleCreatePost = async () => {
-    if (!validateForm()) {
-      return;
-    }
-
+  const handleCreatePost = async (data: GroupValidateSchema) => {
     let imageUrl = null;
 
     const dataForm = new FormData();
@@ -160,16 +140,21 @@ const CreateGroupScreen = ({route, navigation}: any) => {
       }
 
       const group: ICreateGroupRequest = {
-        name: groupName,
-        description: description,
-        joinType: joinType,
+        name: data.name,
+        description: data.description,
+        joinType: data.joinType,
         imageUrl: imageUrl,
-        startDate: startDate.toISOString(),
-        endDate: endDate?.toISOString() || '',
-        locationName: locationName,
-        latitude: latitude,
-        longitude: longitude,
+        startDate: data.startDate
+          ? parseDDMMYYYY(data.startDate)?.toISOString() || ''
+          : new Date().toISOString(),
+        endDate: data.endDate
+          ? parseDDMMYYYY(data.endDate)?.toISOString()
+          : undefined,
+        locationName: data.locationName,
+        latitude: data.latitude,
+        longitude: data.longitude,
       };
+
       await createGroup(accessToken, group)
         .then(response => {
           selectedPeople.forEach(async person => {
@@ -178,6 +163,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           navigation.goBack();
         })
         .catch(error => {
+          console.log('Im here 4');
           console.log(error);
           notify('error', {
             params: {
@@ -212,291 +198,281 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           isCircle={false}
           postImage={postImage}
         />
-        <TextInput
-          placeholder="Tên nhóm (bắt buộc)"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={groupName}
-          onChangeText={setGroupName}
-        />
-        <TextInput
-          placeholder="Giới thiệu về nhóm (bắt buộc)"
-          placeholderTextColor={'#706d6d'}
-          multiline
-          numberOfLines={4}
-          style={{
-            height: 100,
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={description}
-          onChangeText={setDescription}
-        />
-
         <View
           style={{
-            flexDirection: 'row',
-            marginTop: 20,
-            width: '90%',
+            paddingHorizontal: scale(16),
+            gap: scale(20),
+            marginTop: scale(20),
           }}>
-          {['PUBLIC', 'PRIVATE'].map(type => (
-            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-              <RadioButton
-                color={Colors.greenPrimary}
-                key={type}
-                value={type}
-                status={joinType === type ? 'checked' : 'unchecked'}
-                onPress={() => setJoinType(type as 'PUBLIC' | 'PRIVATE')}
-              />
-              <Text
-                style={{
-                  fontFamily: getFontFamily('regular'),
-                  fontSize: 16,
-                  color: Colors.text,
-                }}>
-                {type === 'PUBLIC' ? 'Công khai' : 'Riêng tư'}
-              </Text>
-            </View>
-          ))}
-        </View>
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày bắt đầu (bắt buộc)"
-              saveLabel="Lưu"
-              value={startDate}
-              onChange={(date: Date | undefined) =>
-                setStartDate(date || new Date())
-              }
-              inputMode="start"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-            />
-          </View>
-        </View>
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày kết thúc (tùy chọn)"
-              saveLabel="Lưu"
-              value={endDate}
-              onChange={(date: Date | undefined) =>
-                setEndDate(date || new Date())
-              }
-              inputMode="start"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-            />
-          </View>
-        </View>
-
-        <TouchableOpacity
-          onPress={() => {
-            setIsAddPeopleModalVisible(true);
-          }}
-          style={{
-            padding: 10,
-            paddingVertical: 13,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-          }}>
-          <Text
-            style={{
-              fontSize: 16,
-              color: '#706d6d',
-              fontFamily: getFontFamily('regular'),
-            }}>
-            Thêm thành viên
-          </Text>
-          <Icon
-            name="account-plus"
-            type="material-community"
-            size={20}
-            color="#333"
+          <CustomInput
+            controller={{
+              control,
+              name: 'name',
+            }}
+            errorText={errors.name?.message}
+            label="Tên nhóm"
+            labelColor={Colors.gray600}
+            required
           />
-        </TouchableOpacity>
-        <GooglePlacesAutocomplete
-          ref={autocompleteRef}
-          fetchDetails={true}
-          placeholder="Địa chỉ diễn ra"
-          onPress={(data, details = null) => {
-            setLocationName(data.description);
-            setLatitude(details?.geometry.location.lat || 0);
-            setLongitude(details?.geometry.location.lng || 0);
-          }}
-          disableScroll={true}
-          query={{
-            key: MAP_API_KEY,
-            language: 'vi',
-          }}
-          styles={{
-            container: {
-              borderColor: Colors.greenPrimary,
-              borderRadius: 8,
-              borderWidth: 2,
-              width: '90%',
-              backgroundColor: '#eff2ff',
-              marginTop: 20,
-            },
-            textInput: {
-              fontSize: 16,
-              color: 'black',
-              backgroundColor: '#eff2ff',
-              fontFamily: getFontFamily('regular'),
-            },
-          }}
-        />
-        <Button
-          title="Sử dụng vị trí hiện tại"
-          onPress={() => getLocationName(location.latitude, location.longitude)}
-          buttonStyle={{
-            backgroundColor: Colors.greenPrimary,
-            width: 200,
-            alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 10,
-          }}
-          titleStyle={{fontFamily: getFontFamily('bold')}}
-        />
 
-        <View
-          style={{
-            width: '90%',
-            height: 300,
-            alignSelf: 'center',
-            borderColor: Colors.greenPrimary,
-            borderRadius: 20,
-            borderWidth: 2,
-            overflow: 'hidden',
-            marginTop: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#eff2ff',
-          }}>
-          {imageUpload ? (
-            <>
-              <View style={{position: 'relative', width: 350, height: 300}}>
-                <Image
-                  source={{uri: imageUpload.path}}
-                  style={{width: '100%', height: '100%'}}
-                />
-                <TouchableOpacity
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 10,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    alignContent: 'center',
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    backgroundColor: 'black',
-                    zIndex: 1,
-                  }}
-                  onPress={() => {
-                    setImageUpload(null);
-                  }}>
-                  <Icon name="close" type="ionicon" size={20} color="white" />
-                </TouchableOpacity>
+          <CustomInput
+            controller={{
+              control,
+              name: 'description',
+            }}
+            errorText={errors.description?.message}
+            label="Mô tả"
+            labelColor={Colors.gray600}
+            required
+          />
+
+          <Controller
+            control={control}
+            name="joinType"
+            render={({field: {value, onChange}}) => (
+              <View style={{flexDirection: 'row', gap: scale(10)}}>
+                {['PUBLIC', 'PRIVATE'].map(type => (
+                  <View
+                    key={type}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      flex: 1,
+                    }}>
+                    <RadioButton
+                      color={Colors.greenPrimary}
+                      key={type}
+                      value={type}
+                      status={value === type ? 'checked' : 'unchecked'}
+                      onPress={() => onChange(type as 'PUBLIC' | 'PRIVATE')}
+                    />
+                    <Text
+                      style={{
+                        fontFamily: getFontFamily('regular'),
+                        fontSize: 16,
+                        color: Colors.text,
+                      }}>
+                      {type === 'PUBLIC' ? 'Công khai' : 'Riêng tư'}
+                    </Text>
+                  </View>
+                ))}
               </View>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity
-                onPress={() => {
-                  setIsUploadVisible(!isUploadVisible);
-                }}>
-                <Icon
-                  name="camera"
-                  type="ionicon"
-                  size={60}
-                  color={Colors.greenPrimary}
-                  style={{marginTop: 20}}
-                />
-              </TouchableOpacity>
+            )}
+          />
 
-              <Text style={{color: Colors.greenPrimary, fontSize: 18}}>
-                Thêm ảnh
-              </Text>
-            </>
+          <CustomInput
+            controller={{
+              control,
+              name: 'startDate',
+            }}
+            errorText={errors.startDate?.message}
+            label="Ngày bắt đầu"
+            labelColor={Colors.gray600}
+            placeholder="DD/MM/YYYY"
+            required
+            isDatePicker
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'endDate',
+            }}
+            errorText={errors.endDate?.message}
+            label="Ngày kết thúc"
+            labelColor={Colors.gray600}
+            placeholder="DD/MM/YYYY"
+            isDatePicker
+          />
+
+          <TouchableOpacity
+            onPress={() => {
+              setIsAddPeopleModalVisible(true);
+            }}
+            style={{
+              padding: scale(10),
+              paddingVertical: scale(13),
+              backgroundColor: Colors.white,
+              borderRadius: scale(10),
+              borderWidth: scale(1),
+              borderColor: Colors.gray300,
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: '#706d6d',
+                fontFamily: getFontFamily('regular'),
+              }}>
+              Thêm thành viên
+            </Text>
+            <Icon
+              name="account-plus"
+              type="material-community"
+              size={20}
+              color="#333"
+            />
+          </TouchableOpacity>
+
+          <View style={{height: scale(50)}}>
+            <GooglePlacesAutocomplete
+              ref={autocompleteRef}
+              fetchDetails={true}
+              placeholder="Địa chỉ diễn ra"
+              onPress={(data, details = null) => {
+                setValue('locationName', data.description, {
+                  shouldValidate: true,
+                });
+                setValue('latitude', details?.geometry.location.lat || 0, {
+                  shouldValidate: true,
+                });
+                setValue('longitude', details?.geometry.location.lng || 0, {
+                  shouldValidate: true,
+                });
+              }}
+              disableScroll={true}
+              query={{
+                key: MAP_API_KEY,
+                language: 'vi',
+              }}
+              styles={{
+                container: {
+                  borderColor: errors.locationName
+                    ? Colors.red
+                    : Colors.gray300,
+                  borderRadius: scale(10),
+                  borderWidth: scale(1),
+                  backgroundColor: Colors.white,
+                },
+                textInput: {
+                  fontSize: moderateScale(16),
+                  color: Colors.text,
+                  backgroundColor: Colors.white,
+                  fontFamily: getFontFamily('regular'),
+                },
+              }}
+            />
+          </View>
+          {errors.locationName && (
+            <CustomText
+              fontType="medium"
+              size={14}
+              textColor={Colors.red}
+              style={[{marginTop: scale(-16), paddingHorizontal: scale(10)}]}>
+              {errors.locationName.message}
+            </CustomText>
+          )}
+          <Button
+            title="Sử dụng vị trí hiện tại"
+            onPress={() =>
+              getLocationName(location.latitude, location.longitude)
+            }
+            buttonStyle={{
+              backgroundColor: Colors.greenPrimary,
+              width: scale(200),
+              alignSelf: 'center',
+              borderRadius: scale(10),
+            }}
+            titleStyle={{fontFamily: getFontFamily('bold')}}
+          />
+          <View
+            style={{
+              width: screenWidth - scale(32),
+              height: scale(300),
+              alignSelf: 'center',
+              borderColor: errors.image ? Colors.red : Colors.gray300,
+              borderRadius: scale(10),
+              borderWidth: 1,
+              overflow: 'hidden',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: Colors.white,
+            }}>
+            {imageUpload ? (
+              <>
+                <View
+                  style={{
+                    position: 'relative',
+                    width: screenWidth - scale(32),
+                    height: scale(300),
+                  }}>
+                  <Image
+                    source={{uri: imageUpload.path}}
+                    style={{width: '100%', height: '100%'}}
+                  />
+                  <TouchableOpacity
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 10,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      alignContent: 'center',
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'black',
+                      zIndex: 1,
+                    }}
+                    onPress={() => {
+                      setImageUpload(null);
+                    }}>
+                    <Icon name="close" type="ionicon" size={20} color="white" />
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsUploadVisible(!isUploadVisible);
+                  }}>
+                  <Icon
+                    name="camera"
+                    type="ionicon"
+                    size={60}
+                    color={Colors.greenPrimary}
+                    style={{marginTop: scale(20)}}
+                  />
+                </TouchableOpacity>
+
+                <Text
+                  style={{
+                    color: Colors.greenPrimary,
+                    fontSize: moderateScale(18),
+                    fontFamily: getFontFamily('bold'),
+                  }}>
+                  Thêm ảnh
+                </Text>
+              </>
+            )}
+          </View>
+          {errors.image && (
+            <CustomText
+              fontType="medium"
+              size={14}
+              textColor={Colors.red}
+              style={[{marginTop: scale(-16), paddingHorizontal: scale(10)}]}>
+              {errors.image.message as string}
+            </CustomText>
           )}
         </View>
 
         <Button
           title="Tạo nhóm"
-          onPress={handleCreatePost}
+          onPress={handleSubmit(handleCreatePost)}
           buttonStyle={{
             backgroundColor: Colors.greenPrimary,
-            width: 200,
+            width: scale(200),
             alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 10,
+            marginTop: scale(20),
+            borderRadius: scale(10),
           }}
+          titleStyle={{fontFamily: getFontFamily('bold')}}
         />
 
-        <View style={{height: 30}} />
+        <View style={{height: scale(30)}} />
       </View>
       <AddPeopleModal
         isVisible={isAddPeopleModalVisible}

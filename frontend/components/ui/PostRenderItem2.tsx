@@ -29,6 +29,7 @@ import ImageSwiper from './ImageSwiper';
 import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
 import {notify} from 'react-native-notificated';
+import {moderateScale, scale} from '../../utils/scale';
 
 const PostRenderItem2 = (props: any) => {
   const {
@@ -154,16 +155,17 @@ const PostRenderItem2 = (props: any) => {
         backgroundColor: 'white',
         width: screenWidth * 0.9,
         alignSelf: 'center',
-        marginTop: 16,
-        padding: 16,
-        borderRadius: 30,
+        marginTop: scale(16),
+        padding: scale(16),
+        borderRadius: scale(30),
       }}>
       <Portal>
         <Dialog
           visible={visibleDialogDelete}
           onDismiss={() => setVisibleDialogDelete(false)}>
-          <Dialog.Icon icon="alert" />
-          <Dialog.Title style={{textAlign: 'center'}}>
+          <Dialog.Icon icon="alert" color={Colors.red} />
+          <Dialog.Title
+            style={{textAlign: 'center', fontFamily: getFontFamily('regular')}}>
             Xác nhận xóa bài viết
           </Dialog.Title>
           <Dialog.Content>
@@ -171,11 +173,17 @@ const PostRenderItem2 = (props: any) => {
           </Dialog.Content>
           <Dialog.Actions>
             <Button
+              labelStyle={{fontFamily: getFontFamily('bold')}}
               onPress={() => setVisibleDialogDelete(false)}
-              textColor="red">
+              textColor={Colors.gray500}>
               Hủy
             </Button>
-            <Button onPress={() => handleDeletePost()}>Xóa</Button>
+            <Button
+              labelStyle={{fontFamily: getFontFamily('bold')}}
+              onPress={() => handleDeletePost()}
+              textColor={Colors.red}>
+              Xóa
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -184,12 +192,12 @@ const PostRenderItem2 = (props: any) => {
           style={{backgroundColor: 'white'}}
           visible={visibleDialogReport}
           onDismiss={() => setVisibleDialogReport(false)}>
-          <Dialog.Icon icon="alert" />
+          <Dialog.Icon icon="alert" color={Colors.red} />
           <Dialog.Title
             style={{textAlign: 'center', fontFamily: getFontFamily('regular')}}>
             Báo cáo bài viết
           </Dialog.Title>
-          <Dialog.Content style={{paddingHorizontal: 0}}>
+          <Dialog.Content style={{paddingHorizontal: scale(16)}}>
             <RadioButton.Group
               onValueChange={newValue => setReason(newValue)}
               value={reason}>
@@ -197,9 +205,11 @@ const PostRenderItem2 = (props: any) => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  marginLeft: 20,
                 }}>
-                <RadioButton value="Spam or Misleading Information" />
+                <RadioButton
+                  value="Spam or Misleading Information"
+                  color={Colors.greenPrimary}
+                />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
                   Bài viết linh tinh, lặp lại, thông tin sai lệch
                 </Text>
@@ -208,9 +218,11 @@ const PostRenderItem2 = (props: any) => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  marginLeft: 20,
                 }}>
-                <RadioButton value="Offensive Content" />
+                <RadioButton
+                  value="Offensive Content"
+                  color={Colors.greenPrimary}
+                />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
                   Nội dung không lành mạnh
                 </Text>
@@ -219,9 +231,11 @@ const PostRenderItem2 = (props: any) => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  marginLeft: 20,
                 }}>
-                <RadioButton value="Scam or Fraudulent Activity" />
+                <RadioButton
+                  value="Scam or Fraudulent Activity"
+                  color={Colors.greenPrimary}
+                />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
                   Bài viết lừa đảo
                 </Text>
@@ -230,9 +244,11 @@ const PostRenderItem2 = (props: any) => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  marginLeft: 20,
                 }}>
-                <RadioButton value="Health and Safety Concerns" />
+                <RadioButton
+                  value="Health and Safety Concerns"
+                  color={Colors.greenPrimary}
+                />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
                   Bài viết chứa các lo ngại về sức khỏe
                 </Text>
@@ -241,25 +257,27 @@ const PostRenderItem2 = (props: any) => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  marginLeft: 20,
                 }}>
-                <RadioButton value="Other" />
+                <RadioButton value="Other" color={Colors.greenPrimary} />
                 <Text style={{fontFamily: getFontFamily('regular')}}>Khác</Text>
               </View>
             </RadioButton.Group>
             {reason === 'Other' && (
-              <View style={{marginHorizontal: 10}}>
+              <View
+                style={{paddingHorizontal: scale(10), marginTop: scale(10)}}>
                 <TextInput
                   style={{
-                    borderBottomWidth: 1,
-                    borderBottomColor: 'black',
+                    borderWidth: 1,
+                    borderColor: Colors.gray500,
+                    borderRadius: scale(10),
                     color: 'black',
-                    fontSize: 16,
+                    fontSize: moderateScale(14),
                     fontFamily: getFontFamily('regular'),
                   }}
                   placeholder="Nhập lý do của bạn"
                   value={descriptionReason}
                   multiline
+                  numberOfLines={4}
                   onChangeText={text => setDescriptionReason(text)}
                 />
               </View>
@@ -269,12 +287,13 @@ const PostRenderItem2 = (props: any) => {
             <Button
               labelStyle={{fontFamily: getFontFamily('bold')}}
               onPress={() => setVisibleDialogReport(false)}
-              textColor="red">
+              textColor={Colors.gray500}>
               Hủy
             </Button>
             <Button
               labelStyle={{fontFamily: getFontFamily('bold')}}
-              onPress={() => handleReportPost()}>
+              onPress={() => handleReportPost()}
+              textColor={Colors.red}>
               Báo cáo
             </Button>
           </Dialog.Actions>
@@ -330,13 +349,17 @@ const PostRenderItem2 = (props: any) => {
                 userInfo.imageUrl ||
                 'https://randomuser.me/api/portraits/men/36.jpg',
             }}
-            style={{width: 50, height: 50, borderRadius: 25}}
+            style={{
+              width: scale(50),
+              height: scale(50),
+              borderRadius: scale(25),
+            }}
           />
         </TouchableOpacity>
-        <View style={{alignSelf: 'center', marginLeft: 16}}>
+        <View style={{alignSelf: 'center', marginLeft: scale(16)}}>
           <Text
             style={{
-              fontSize: 18,
+              fontSize: moderateScale(18),
               fontFamily: getFontFamily('semibold'),
               color: Colors.text,
             }}>
@@ -345,14 +368,14 @@ const PostRenderItem2 = (props: any) => {
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
               source={require('../../assets/images/ion_earth.png')}
-              style={{width: 20, height: 20}}
+              style={{width: scale(20), height: scale(20)}}
             />
             <Text
               style={{
-                fontSize: 12,
+                fontSize: moderateScale(12),
                 fontFamily: getFontFamily('regular'),
                 color: Colors.grayText,
-                marginLeft: 4,
+                marginLeft: scale(4),
               }}>
               {createdDate}
             </Text>
@@ -364,9 +387,9 @@ const PostRenderItem2 = (props: any) => {
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: Colors.background,
-            borderRadius: 20,
-            width: 40,
-            height: 40,
+            borderRadius: scale(20),
+            width: scale(40),
+            height: scale(40),
             alignSelf: 'center',
             position: 'absolute',
             right: 0,
@@ -383,19 +406,19 @@ const PostRenderItem2 = (props: any) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 10,
+            marginTop: scale(10),
           }}>
           <Image
             source={require('../../assets/images/foodIcon.png')}
-            style={{width: 25, height: 25}}
+            style={{width: scale(25), height: scale(25)}}
           />
           <View style={{flex: 1}}>
             <Text
               style={{
-                fontSize: 24,
+                fontSize: moderateScale(24),
                 fontFamily: getFontFamily('bold'),
                 color: Colors.text,
-                marginLeft: 16,
+                marginLeft: scale(16),
               }}>
               {item.title}
             </Text>
@@ -405,19 +428,19 @@ const PostRenderItem2 = (props: any) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 10,
+            marginTop: scale(10),
           }}>
           <Image
             source={require('../../assets/images/distance.png')}
-            style={{width: 25, height: 25}}
+            style={{width: scale(25), height: scale(25)}}
           />
           <View style={{flex: 1}}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: moderateScale(16),
                 fontFamily: getFontFamily('regular'),
                 color: Colors.text,
-                marginLeft: 16,
+                marginLeft: scale(16),
               }}>
               Cách bạn{' '}
               {item?.distance < 0.1
@@ -430,19 +453,19 @@ const PostRenderItem2 = (props: any) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 10,
+            marginTop: scale(10),
           }}>
           <Image
             source={require('../../assets/images/clock.png')}
-            style={{width: 25, height: 25}}
+            style={{width: scale(25), height: scale(25)}}
           />
           <View style={{flex: 1}}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: moderateScale(16),
                 fontFamily: getFontFamily('regular'),
                 color: expiredString === 'Hết hạn' ? 'red' : Colors.text,
-                marginLeft: 16,
+                marginLeft: scale(16),
               }}>
               {expiredString === 'Hết hạn'
                 ? 'Hết hạn'
@@ -454,19 +477,19 @@ const PostRenderItem2 = (props: any) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 10,
+            marginTop: scale(10),
           }}>
           <Image
             source={require('../../assets/images/part.png')}
-            style={{width: 25, height: 25}}
+            style={{width: scale(25), height: scale(25)}}
           />
           <View style={{flex: 1}}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: moderateScale(16),
                 fontFamily: getFontFamily('regular'),
                 color: item.portion === 0 ? 'red' : Colors.text,
-                marginLeft: 16,
+                marginLeft: scale(16),
               }}>
               {item.portion > 0 ? `Còn ${item.portion} phần` : 'Hết phần'}
             </Text>
@@ -476,19 +499,19 @@ const PostRenderItem2 = (props: any) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 10,
+            marginTop: scale(10),
           }}>
           <Image
             source={require('../../assets/images/scales.png')}
-            style={{width: 25, height: 25}}
+            style={{width: scale(25), height: scale(25)}}
           />
           <View style={{flex: 1}}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: moderateScale(16),
                 fontFamily: getFontFamily('regular'),
                 color: Colors.text,
-                marginLeft: 16,
+                marginLeft: scale(16),
               }}>
               {item.weight} kg
             </Text>
@@ -498,22 +521,22 @@ const PostRenderItem2 = (props: any) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: 10,
+            marginTop: scale(10),
           }}>
           <Image
             source={require('../../assets/images/pickUp.png')}
-            style={{width: 25, height: 25}}
+            style={{width: scale(25), height: scale(25)}}
           />
           <View style={{flex: 1}}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: moderateScale(16),
                 fontFamily: getFontFamily('regular'),
                 color:
                   new Date(item.pickUpEndDate) < new Date()
                     ? 'red'
                     : Colors.text,
-                marginLeft: 16,
+                marginLeft: scale(16),
               }}>
               Lấy từ ngày{' '}
               {new Date(item.pickUpStartDate).toLocaleDateString('vi-VN')} đến
@@ -525,8 +548,8 @@ const PostRenderItem2 = (props: any) => {
           style={{
             width: screenWidth * 0.85,
             height: screenWidth,
-            borderRadius: 20,
-            marginTop: 10,
+            borderRadius: scale(20),
+            marginTop: scale(10),
             overflow: 'hidden',
             alignSelf: 'center',
             pointerEvents: 'box-none',
@@ -545,7 +568,11 @@ const PostRenderItem2 = (props: any) => {
           />
         </View>
         <View
-          style={{flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: scale(15),
+          }}>
           <TouchableOpacity onPress={handleLiked}>
             <Image
               source={
@@ -553,15 +580,15 @@ const PostRenderItem2 = (props: any) => {
                   ? require('../../assets/images/liked.png')
                   : require('../../assets/images/like.png')
               }
-              style={{width: 50, height: 50}}
+              style={{width: scale(50), height: scale(50)}}
             />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{marginLeft: 10}}
+            style={{marginLeft: scale(10)}}
             onPress={handleShowComment}>
             <Image
               source={require('../../assets/images/comment.png')}
-              style={{width: 50, height: 50}}
+              style={{width: scale(50), height: scale(50)}}
             />
           </TouchableOpacity>
           {/* <TouchableOpacity style={{marginLeft: 10}}>
@@ -572,10 +599,10 @@ const PostRenderItem2 = (props: any) => {
           </TouchableOpacity> */}
           <Text
             style={{
-              marginLeft: 10,
+              marginLeft: scale(10),
               fontFamily: getFontFamily('regular'),
               color: Colors.black,
-              fontSize: 14,
+              fontSize: moderateScale(14),
             }}>
             {likeCount && `${likeCount} người`}
           </Text>

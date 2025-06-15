@@ -226,7 +226,6 @@ const Router = () => {
         />
         <Stack.Screen name={Route.Support} component={SupportScreen} />
       </Stack.Navigator>
-      <EditProfileScreen />
     </>
   );
 };

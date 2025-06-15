@@ -28,6 +28,13 @@ import screenWidth from '../../../global/Constant';
 import {uploadPhoto} from '../../../api/UploadPhotoApi';
 import {useNotifications} from 'react-native-notificated';
 import {useSelector} from 'react-redux';
+import {moderateScale, scale} from '../../../utils/scale';
+import {CustomInput} from '../CustomInput/CustomInput';
+import {createExchangeRewardValidate} from '../../../utils/schema/exchange-reward';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {ExchangeRewardValidateSchema} from '../../../utils/schema/exchange-reward';
+import {CustomText} from '../CustomText';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
 const RewardItem = (props: {
   id: number;
@@ -46,9 +53,8 @@ const RewardItem = (props: {
   const [point, setPoint] = React.useState(props.pointsRequired);
   const accessToken = useSelector((state: RootState) => state.token.key);
   const autocompleteRef = useRef<any | null>(null);
-  const [locationName, setLocationName] = React.useState('');
   const location = useSelector((state: RootState) => state.location);
-  const [phone, setPhone] = React.useState('');
+
   const [visible, setVisible] = useState<boolean>(false);
   const userInfo = useSelector((state: RootState) => state.userInfo);
   const [isUploadVisible, setIsUploadVisible] = useState(0);
@@ -61,6 +67,20 @@ const RewardItem = (props: {
       stockQuantity: props.stockQuantity,
       imageUrl: props.imageUrl,
     },
+  });
+
+  const {
+    control: redeemControl,
+    handleSubmit: redeemHandleSubmit,
+    formState: redeemFormState,
+    setValue: redeemSetValue,
+  } = useForm<ExchangeRewardValidateSchema>({
+    resolver: zodResolver(createExchangeRewardValidate()),
+    defaultValues: {
+      phone: '',
+      address: '',
+    },
+    mode: 'onChange',
   });
 
   const openMenu = () => {
@@ -95,7 +115,9 @@ const RewardItem = (props: {
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
       if (response.data.results.length > 0) {
-        setLocationName(response.data.results[0].formatted_address);
+        redeemSetValue('address', response.data.results[0].formatted_address, {
+          shouldValidate: true,
+        });
 
         autocompleteRef.current?.setAddressText(
           response.data.results[0].formatted_address,
@@ -114,49 +136,13 @@ const RewardItem = (props: {
     }
   };
 
-  const handleRedeem = async () => {
-    //regex phone number
-    const phoneRegex = new RegExp('^[0-9]{10}$');
-    if (!phoneRegex.test(phone)) {
-      setDialogRedeemVisible(false);
-
-      setQuantity(1);
-      setPoint(props.pointsRequired);
-      setPhone('');
-      setLocationName('');
-      notify('error', {
-        params: {
-          description: 'Số điện thoại không hợp lệ.',
-          title: 'Lỗi',
-        },
-      });
-
-      return;
-    }
-
-    if (!locationName || !phone) {
-      setDialogRedeemVisible(false);
-
-      setQuantity(1);
-      setPoint(props.pointsRequired);
-      setPhone('');
-      setLocationName('');
-      notify('error', {
-        params: {
-          description: 'Vui lòng điền đầy đủ thông tin.',
-          title: 'Lỗi',
-        },
-      });
-
-      return;
-    }
-
+  const handleRedeem = async (data: ExchangeRewardValidateSchema) => {
     const response: any = await redeemPoint(
       {
         point: point || 0,
         rewardId: props.id,
-        location: locationName,
-        phone: phone,
+        location: data.address,
+        phone: data.phone,
       },
       accessToken,
     );
@@ -165,8 +151,6 @@ const RewardItem = (props: {
       props.onRefresh?.();
       setQuantity(1);
       setPoint(props.pointsRequired);
-      setPhone('');
-      setLocationName('');
 
       notify('success', {
         params: {
@@ -178,8 +162,6 @@ const RewardItem = (props: {
       setDialogRedeemVisible(false);
       setQuantity(1);
       setPoint(props.pointsRequired);
-      setPhone('');
-      setLocationName('');
 
       notify('error', {
         params: {
@@ -247,33 +229,31 @@ const RewardItem = (props: {
     return (
       <Portal>
         <Dialog
-          style={{backgroundColor: 'white', paddingHorizontal: 20}}
+          style={{backgroundColor: 'white'}}
           visible={dialogRedeemVisible}
           onDismiss={() => {
             setQuantity(1);
             setPoint(props.pointsRequired);
-            setPhone('');
-            setLocationName('');
             setDialogRedeemVisible(false);
           }}>
           <Dialog.Content>
             <View
               style={{
-                paddingBottom: 10,
-                borderBottomWidth: 4,
+                paddingBottom: scale(10),
+                borderBottomWidth: scale(4),
                 borderBottomColor: Colors.greenPrimary,
               }}>
               <Text
                 style={{
                   alignSelf: 'center',
-                  fontSize: 24,
+                  fontSize: moderateScale(20),
                   fontFamily: getFontFamily('bold'),
                   color: Colors.black,
                 }}>
                 Đổi quà
               </Text>
             </View>
-            <View style={{gap: 10, marginTop: 10}}>
+            <View style={{gap: scale(10), marginTop: scale(10)}}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -281,8 +261,8 @@ const RewardItem = (props: {
                 }}>
                 <Text
                   style={{
-                    fontSize: 24,
-                    fontFamily: getFontFamily('semibold'),
+                    fontSize: moderateScale(16),
+                    fontFamily: getFontFamily('regular'),
                     color: Colors.black,
                   }}>
                   {props.rewardName}
@@ -290,7 +270,7 @@ const RewardItem = (props: {
                 <View
                   style={{
                     flexDirection: 'row',
-                    gap: 10,
+                    gap: scale(10),
                     alignItems: 'center',
                   }}>
                   <TouchableOpacity
@@ -312,12 +292,12 @@ const RewardItem = (props: {
                     style={{
                       alignItems: 'center',
                       justifyContent: 'center',
-                      width: 30,
+                      width: scale(30),
                     }}>
                     <Text
                       style={{
-                        fontSize: 20,
-                        fontFamily: getFontFamily('semibold'),
+                        fontSize: moderateScale(16),
+                        fontFamily: getFontFamily('regular'),
                         color: Colors.black,
                       }}>
                       {quantity}
@@ -333,7 +313,7 @@ const RewardItem = (props: {
                     }}
                     disabled={quantity === props.stockQuantity}
                     style={{
-                      borderRadius: 100,
+                      borderRadius: scale(100),
                       borderWidth: 1,
                       borderColor: Colors.black,
                     }}>
@@ -348,8 +328,8 @@ const RewardItem = (props: {
                 }}>
                 <Text
                   style={{
-                    fontSize: 24,
-                    fontFamily: getFontFamily('semibold'),
+                    fontSize: moderateScale(16),
+                    fontFamily: getFontFamily('regular'),
                     color: Colors.black,
                   }}>
                   Star Point
@@ -364,54 +344,74 @@ const RewardItem = (props: {
                     <Text
                       style={{
                         color: Colors.black,
-                        fontSize: 24,
-                        fontFamily: getFontFamily('bold'),
+                        fontSize: moderateScale(16),
+                        fontFamily: getFontFamily('regular'),
                       }}>
                       {point}
                     </Text>
                     <View>
                       <Image
                         source={require('../../../assets/images/star-black.png')}
-                        style={{width: 24, height: 24}}
+                        style={{width: scale(24), height: scale(24)}}
                       />
                     </View>
                   </View>
                 </View>
               </View>
-              <TextInput
-                placeholder="Số điện thoại"
-                placeholderTextColor={'#706d6d'}
-                style={{
-                  fontSize: 16,
-                  padding: 10,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  color: 'black',
-                  borderWidth: 2,
-                  borderColor: Colors.greenPrimary,
-                  fontFamily: getFontFamily('regular'),
+              <CustomInput
+                controller={{
+                  control: redeemControl,
+                  name: 'phone',
                 }}
-                maxLength={10}
-                value={phone}
-                onChangeText={setPhone}
+                label="Số điện thoại"
+                labelColor={Colors.gray600}
                 keyboardType="numeric"
+                errorText={redeemFormState.errors.phone?.message}
               />
-              <TextInput
-                placeholder="Địa chỉ nhận"
-                placeholderTextColor={'#706d6d'}
-                style={{
-                  fontSize: 16,
-                  padding: 10,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  color: 'black',
-                  borderWidth: 2,
-                  borderColor: Colors.greenPrimary,
-                  fontFamily: getFontFamily('regular'),
-                }}
-                value={locationName}
-                onChangeText={setLocationName}
-              />
+              <View style={{height: scale(50)}}>
+                <GooglePlacesAutocomplete
+                  ref={autocompleteRef}
+                  fetchDetails={true}
+                  placeholder="Địa chỉ nhận"
+                  onPress={(data, details = null) => {
+                    redeemSetValue('address', data.description, {
+                      shouldValidate: true,
+                    });
+                  }}
+                  disableScroll={true}
+                  query={{
+                    key: MAP_API_KEY,
+                    language: 'vi',
+                  }}
+                  styles={{
+                    container: {
+                      borderColor: redeemFormState.errors.address
+                        ? Colors.red
+                        : Colors.gray300,
+                      borderRadius: scale(10),
+                      borderWidth: 1,
+                      backgroundColor: Colors.white,
+                    },
+                    textInput: {
+                      fontSize: scale(16),
+                      color: Colors.black,
+                      backgroundColor: Colors.white,
+                      fontFamily: getFontFamily('regular'),
+                    },
+                  }}
+                />
+                {redeemFormState.errors.address && (
+                  <CustomText
+                    fontType="medium"
+                    size={14}
+                    textColor={Colors.red}
+                    style={[
+                      {marginTop: scale(-16), paddingHorizontal: scale(10)},
+                    ]}>
+                    {redeemFormState.errors.address.message}
+                  </CustomText>
+                )}
+              </View>
 
               <Button
                 onPress={() =>
@@ -419,13 +419,13 @@ const RewardItem = (props: {
                 }
                 style={{
                   backgroundColor: Colors.greenPrimary,
-                  width: 200,
+                  width: scale(200),
                   alignSelf: 'center',
-                  borderRadius: 10,
+                  borderRadius: scale(10),
                 }}
                 labelStyle={{
                   fontFamily: getFontFamily('bold'),
-                  fontSize: 16,
+                  fontSize: moderateScale(16),
                   color: 'white',
                 }}>
                 Sử dụng vị trí hiện tại
@@ -438,22 +438,21 @@ const RewardItem = (props: {
                 setDialogRedeemVisible(false);
                 setQuantity(1);
                 setPoint(props.pointsRequired);
-                setPhone('');
-                setLocationName('');
               }}
               textColor="red"
               labelStyle={{
                 fontFamily: getFontFamily('regular'),
-                fontSize: 20,
+                fontSize: moderateScale(20),
               }}>
               Hủy
             </Button>
             <Button
-              onPress={handleRedeem}
+              onPress={redeemHandleSubmit(handleRedeem)}
               textColor={Colors.greenPrimary}
               labelStyle={{
                 fontFamily: getFontFamily('regular'),
-                fontSize: 20,
+                fontSize: moderateScale(20),
+                lineHeight: scale(30),
               }}>
               Đổi quà
             </Button>
@@ -488,8 +487,8 @@ const RewardItem = (props: {
         <UploadPhoto
           isVisible={isUploadVisible}
           setVisible={setIsUploadVisible}
-          height={300}
-          width={350}
+          height={scale(300)}
+          width={scale(350)}
           isCircle={false}
           postImage={postImage}
           isMultiple={false}
@@ -508,7 +507,7 @@ const RewardItem = (props: {
               <Text
                 style={{
                   alignSelf: 'center',
-                  fontSize: 24,
+                  fontSize: moderateScale(24),
                   fontFamily: getFontFamily('bold'),
                   color: Colors.black,
                 }}>
@@ -527,7 +526,7 @@ const RewardItem = (props: {
               textColor="red"
               labelStyle={{
                 fontFamily: getFontFamily('regular'),
-                fontSize: 20,
+                fontSize: moderateScale(20),
               }}>
               Hủy
             </Button>
@@ -536,7 +535,7 @@ const RewardItem = (props: {
               textColor={Colors.greenPrimary}
               labelStyle={{
                 fontFamily: getFontFamily('regular'),
-                fontSize: 20,
+                fontSize: moderateScale(20),
               }}>
               Lưu
             </Button>
@@ -563,7 +562,7 @@ const RewardItem = (props: {
               <Text
                 style={{
                   alignSelf: 'center',
-                  fontSize: 24,
+                  fontSize: moderateScale(24),
                   fontFamily: getFontFamily('bold'),
                   color: Colors.black,
                 }}>
@@ -573,7 +572,7 @@ const RewardItem = (props: {
             <View>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: moderateScale(20),
                   fontFamily: getFontFamily('semibold'),
                   color: Colors.black,
                 }}>
@@ -589,7 +588,7 @@ const RewardItem = (props: {
               textColor="red"
               labelStyle={{
                 fontFamily: getFontFamily('regular'),
-                fontSize: 20,
+                fontSize: moderateScale(20),
               }}>
               Hủy
             </Button>
@@ -598,7 +597,7 @@ const RewardItem = (props: {
               textColor={Colors.greenPrimary}
               labelStyle={{
                 fontFamily: getFontFamily('regular'),
-                fontSize: 20,
+                fontSize: moderateScale(20),
               }}>
               Xóa
             </Button>
@@ -635,7 +634,7 @@ const RewardItem = (props: {
     <TouchableWithoutFeedback onLongPress={event => handleOnLongPress(event)}>
       <View
         style={{
-          padding: 10,
+          padding: scale(10),
           width: screenWidth * 0.45,
           height: 'auto',
         }}>
@@ -645,11 +644,11 @@ const RewardItem = (props: {
         {userInfo.role === 'ADMIN' ? dialogDelete() : null}
         <Image
           source={{uri: props.imageUrl}}
-          style={{width: '100%', height: 145, borderRadius: 10}}
+          style={{width: '100%', height: scale(145), borderRadius: scale(10)}}
         />
         <Text
           style={{
-            fontSize: 20,
+            fontSize: moderateScale(20),
             color:
               props.stockQuantity === 0
                 ? Colors.gray
@@ -660,13 +659,13 @@ const RewardItem = (props: {
                 : Colors.red,
             fontFamily: getFontFamily('semibold'),
             alignSelf: 'center',
-            marginTop: 4,
+            marginTop: scale(4),
           }}>
           {props.rewardName}
         </Text>
         <Text
           style={{
-            fontSize: 15,
+            fontSize: moderateScale(15),
             color:
               props.stockQuantity === 0
                 ? Colors.gray
@@ -677,7 +676,7 @@ const RewardItem = (props: {
                 : Colors.red,
             fontFamily: getFontFamily('regular'),
             alignSelf: 'center',
-            marginTop: 4,
+            marginTop: scale(4),
           }}>
           {props.pointsRequired} Star Point
         </Text>
@@ -685,10 +684,11 @@ const RewardItem = (props: {
           mode="contained"
           buttonColor={Colors.greenPrimary}
           style={{
-            borderRadius: 8,
+            borderRadius: scale(8),
             justifyContent: 'center',
             alignSelf: 'center',
-            marginTop: 10,
+            marginTop: scale(10),
+            gap: scale(10),
           }}
           disabled={
             props.myPoint === undefined ||
@@ -699,15 +699,14 @@ const RewardItem = (props: {
             setDialogRedeemVisible(true);
             setQuantity(1);
             setPoint(props.pointsRequired);
-            setPhone('');
-            setLocationName('');
           }}>
-          <Icon source={'gift-outline'} size={20} color={Colors.white} />
+          <Icon source={'gift-outline'} size={scale(20)} color={Colors.white} />
           <Text
             style={{
               color: Colors.white,
-              fontSize: 14,
+              fontSize: moderateScale(14),
               fontFamily: getFontFamily('bold'),
+              marginLeft: scale(5),
             }}>
             Đổi quà
           </Text>

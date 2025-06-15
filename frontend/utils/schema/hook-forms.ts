@@ -3,6 +3,7 @@ import {
   emailRegex,
   nameRegex,
   validateBirthday,
+  validateDate,
   validateDateNotInFuture,
   validateDateNotInThePast,
 } from './regex';
@@ -122,6 +123,28 @@ export const zodDateNotInThePast = (
     .refine(value => validateDateNotInThePast(value), {
       message: messageInvalid ?? 'Ngày không hợp lệ',
     });
+};
+
+export const zodDate = (message?: string, required: boolean = true) => {
+  const base = z.string();
+
+  if (required) {
+    return base
+      .min(1, {message: message ?? 'Ngày không được để trống'})
+      .refine(value => !!validateDate(value), {
+        message: message ?? 'Ngày không hợp lệ',
+      });
+  } else {
+    return base.optional().refine(
+      value => {
+        if (!value) return true;
+        return !!validateDate(value);
+      },
+      {
+        message: message ?? 'Ngày không hợp lệ',
+      },
+    );
+  }
 };
 
 export const parseDDMMYYYY = (dateStr: string): Date | null => {

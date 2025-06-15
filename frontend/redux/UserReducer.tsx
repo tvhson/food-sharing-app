@@ -47,9 +47,9 @@ const UserSlice = createSlice({
       state.description = action.payload.description || '';
       state.status = action.payload.status;
       state.bannedDate = action.payload.bannedDate;
-      state.locationName = action.payload.locationName;
-      state.latitude = action.payload.latitude;
-      state.longitude = action.payload.longitude;
+      state.locationName = action.payload.locationName || '';
+      state.latitude = Number(action.payload.latitude) || 0;
+      state.longitude = Number(action.payload.longitude) || 0;
     },
     updateAvatar: (state: UserInfo, action: PayloadAction<string>) => {
       state.imageUrl = action.payload;

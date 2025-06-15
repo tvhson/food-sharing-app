@@ -220,8 +220,6 @@ const PersonalPage = ({navigation}: any) => {
       <EditProfileScreen
         isVisible={isEditVisible}
         setVisible={setIsEditVisible}
-        userInfo={userInfo}
-        token={accessToken}
       />
       <UploadPhoto
         isVisible={isUploadVisible}
