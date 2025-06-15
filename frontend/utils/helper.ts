@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import {FoodType} from '../screens/CreatePostScreen';
 import getDistance from 'geolib/es/getDistance';
 
@@ -100,4 +101,20 @@ export const getFoodTypeKey = (
   return (Object.keys(FoodType) as Array<keyof typeof FoodType>).find(
     key => FoodType[key] === value,
   );
+};
+
+export const formatDate = (
+  date: string | Date | dayjs.Dayjs,
+  format: string = 'DD/MM/YYYY',
+): string => {
+  try {
+    const dayjsDate = dayjs(date);
+    if (!dayjsDate.isValid()) {
+      return '';
+    }
+    return dayjsDate.format(format);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
 };

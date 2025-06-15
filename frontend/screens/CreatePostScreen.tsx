@@ -1,41 +1,34 @@
 import {Button, Icon} from '@rneui/themed';
 import React, {useRef, useState} from 'react';
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
-import Colors from '../global/Color';
-import {DatePickerInput} from 'react-native-paper-dates';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import ImageSwiper from '../components/ui/ImageSwiper';
 import {MAP_API_KEY} from '@env';
-import {RootState} from '../redux/Store';
-import UploadPhoto from '../components/ui/UploadPhoto';
+import {zodResolver} from '@hookform/resolvers/zod';
 import axios from 'axios';
+import {Controller, useForm} from 'react-hook-form';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {createNotifications} from 'react-native-notificated';
-import {createPost} from '../api/PostApi';
 import {earnPoint} from '../api/LoyaltyApi';
+import {createPost} from '../api/PostApi';
+import {uploadPhoto} from '../api/UploadPhotoApi';
+import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {CustomText} from '../components/ui/CustomText';
+import ImageSwiper from '../components/ui/ImageSwiper';
+import UploadPhoto from '../components/ui/UploadPhoto';
+import Colors from '../global/Color';
+import screenWidth from '../global/Constant';
+import {pushMyPost} from '../redux/SharingPostReducer';
+import {RootState} from '../redux/Store';
 import {getFontFamily} from '../utils/fonts';
 import {getFoodTypeKey} from '../utils/helper';
-import {pushMyPost} from '../redux/SharingPostReducer';
-import screenWidth from '../global/Constant';
-import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useLoading} from '../utils/LoadingContext';
+import {scale} from '../utils/scale';
 import {
   createCreatePostValidate,
   CreatePostValidateSchema,
 } from '../utils/schema/create-post';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {Controller, useForm} from 'react-hook-form';
-import {CustomInput} from '../components/ui/CustomInput/CustomInput';
-import {scale} from '../utils/scale';
-import {CustomText} from '../components/ui/CustomText';
 import {parseDDMMYYYY} from '../utils/schema/hook-forms';
 
 const {useNotifications} = createNotifications();

@@ -291,8 +291,6 @@ const PostRenderItem2 = (props: any) => {
               onPress={() => {
                 setVisible(false);
                 navigation.navigate('EditPost', {
-                  location: location,
-                  accessToken: accessToken,
                   item: item,
                 });
               }}

@@ -1,69 +1,78 @@
 import {Button, Icon} from '@rneui/themed';
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 
-import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
-import Colors from '../global/Color';
-import {DatePickerInput} from 'react-native-paper-dates';
-import {FoodType} from './CreatePostScreen';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import ImageSwiper from '../components/ui/ImageSwiper';
 import {MAP_API_KEY} from '@env';
-import UploadPhoto from '../components/ui/UploadPhoto';
+import {zodResolver} from '@hookform/resolvers/zod';
 import axios from 'axios';
+import {Controller, useForm} from 'react-hook-form';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {createNotifications} from 'react-native-notificated';
-import {getFontFamily} from '../utils/fonts';
-import screenWidth from '../global/Constant';
-import {updateMyPost} from '../redux/SharingPostReducer';
+import {useDispatch, useSelector} from 'react-redux';
 import {updatePost} from '../api/PostApi';
 import {uploadPhoto} from '../api/UploadPhotoApi';
-import {useDispatch} from 'react-redux';
+import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {CustomText} from '../components/ui/CustomText';
+import ImageSwiper from '../components/ui/ImageSwiper';
+import UploadPhoto from '../components/ui/UploadPhoto';
+import Colors from '../global/Color';
+import screenWidth from '../global/Constant';
+import {SharingPost, updateMyPost} from '../redux/SharingPostReducer';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
+import {formatDate, getFoodTypeKey} from '../utils/helper';
 import {useLoading} from '../utils/LoadingContext';
+import {scale} from '../utils/scale';
+import {
+  createCreatePostValidate,
+  CreatePostValidateSchema,
+} from '../utils/schema/create-post';
+import {parseDDMMYYYY} from '../utils/schema/hook-forms';
+import {FoodType} from './CreatePostScreen';
 
 const {useNotifications} = createNotifications();
 
 const EditPostScreen = ({route, navigation}: any) => {
   const dispatch = useDispatch();
   const {showLoading, hideLoading} = useLoading();
-  const item = route.params.item;
-  console.log(item);
+  const item: SharingPost = route.params.item;
+  const locationState = useSelector((state: RootState) => state.location);
+  const accessToken = useSelector((state: RootState) => state.token.key);
 
   const {notify} = useNotifications();
-  const location = route.params.location;
-  const accessToken = route.params.accessToken;
-  const [title, setTitle] = useState(item.title || '');
-  const [content, setContent] = useState(item.content || '');
-  const [weight, setWeight] = useState(item.weight || '');
-  const [description, setDescription] = useState(item.description || '');
-  const [note, setNote] = useState(item.note || '');
-  const [status, setStatus] = useState(item.status || '');
-  const [locationName, setLocationName] = useState(item.locationName || '');
-  const [portion, setPortion] = useState(item.portion.toString() || '');
-  const [latitude, setLatitude] = useState(
-    location && location.latitude ? location.latitude : null,
-  );
-  const [longitude, setLongitude] = useState(
-    location && location.longitude ? location.longitude : null,
-  );
-  const [expiredDate, setExpiredDate] = useState(
-    new Date(item.expiredDate) || new Date(),
-  );
-  const [pickUpStartDate, setPickUpStartDate] = useState(
-    new Date(item.pickUpStartDate) || new Date(),
-  );
-  const [pickUpEndDate, setPickUpEndDate] = useState(
-    new Date(item.pickUpEndDate) || new Date(),
-  );
-  const [type, setType] = useState<FoodType | null>(
-    item.type === 'VEGETARIAN' ? FoodType.VEGETARIAN : FoodType.NON_VEGETARIAN,
-  );
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: {errors, isDirty},
+  } = useForm<CreatePostValidateSchema>({
+    resolver: zodResolver(createCreatePostValidate()),
+    defaultValues: {
+      title: item.title || '',
+      images: item.images || [],
+      description: item.description || '',
+      type:
+        item.type === 'VEGETARIAN'
+          ? FoodType.VEGETARIAN
+          : FoodType.NON_VEGETARIAN || undefined,
+      location: item.locationName || '',
+      latitude: Number(item.latitude) || 0,
+      longitude: Number(item.longitude) || 0,
+      weight: item.weight.toString() || '',
+      portion: item.portion.toString() || '',
+      expiredDate: item.expiredDate ? formatDate(item.expiredDate) : '',
+      pickUpStartDate: item.pickUpStartDate
+        ? formatDate(item.pickUpStartDate)
+        : '',
+      pickUpEndDate: item.pickUpEndDate ? formatDate(item.pickUpEndDate) : '',
+    },
+    mode: 'onChange',
+  });
+
   const [isTagVisible, setIsTagVisible] = useState(false);
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any[]>([]);
@@ -86,9 +95,15 @@ const EditPostScreen = ({route, navigation}: any) => {
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
       if (response.data.results.length > 0) {
-        setLocationName(response.data.results[0].formatted_address);
-        setLatitude(latitudeCurrent);
-        setLongitude(longitudeCurrent);
+        setValue('location', response.data.results[0].formatted_address, {
+          shouldValidate: true,
+        });
+        setValue('latitude', latitudeCurrent, {
+          shouldValidate: true,
+        });
+        setValue('longitude', longitudeCurrent, {
+          shouldValidate: true,
+        });
         autocompleteRef.current?.setAddressText(
           response.data.results[0].formatted_address,
         );
@@ -105,73 +120,27 @@ const EditPostScreen = ({route, navigation}: any) => {
 
   useEffect(() => {
     if (autocompleteRef.current) {
-      autocompleteRef.current.setAddressText(locationName);
+      autocompleteRef.current.setAddressText(item.locationName);
     }
   }, [item]);
 
   const postImage = async (newImages: any) => {
     setImageUpload((prevImages: any) => {
       if (Array.isArray(newImages)) {
+        setValue('images', [...prevImages, ...newImages], {
+          shouldValidate: true,
+        });
         return [...prevImages, ...newImages];
       } else {
+        setValue('images', [...prevImages, newImages], {
+          shouldValidate: true,
+        });
         return [...prevImages, newImages];
       }
     });
   };
 
-  const handleEditPost = () => {
-    let currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    expiredDate.setHours(0, 0, 0, 0);
-    pickUpStartDate.setHours(0, 0, 0, 0);
-    pickUpEndDate.setHours(0, 0, 0, 0);
-
-    if (title === '') {
-      notify('error', {
-        params: {description: 'Tên món ăn là bắt buộc.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (locationName === '') {
-      notify('error', {
-        params: {description: 'Địa điểm nhận là bắt buộc.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (imageUpload.length === 0 && oldImages.length === 0) {
-      notify('error', {
-        params: {description: 'Ảnh là bắt buộc.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (expiredDate < currentDate) {
-      notify('error', {
-        params: {description: 'Ngày hết hạn không hợp lệ.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (pickUpStartDate < currentDate) {
-      notify('error', {
-        params: {description: 'Ngày bắt đầu nhận không hợp lệ.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (pickUpEndDate < currentDate) {
-      notify('error', {
-        params: {description: 'Ngày kết thúc nhận không hợp lệ.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (pickUpEndDate < pickUpStartDate) {
-      notify('error', {
-        params: {
-          description: 'Ngày kết thúc nhận phải lớn hơn ngày bắt đầu nhận.',
-          title: 'Lỗi',
-          style: {multiline: 100},
-        },
-      });
-      return;
-    }
+  const handleEditPost = async (data: CreatePostValidateSchema) => {
     showLoading();
     if (imageUpload.length > 0) {
       const dataForm = new FormData();
@@ -192,24 +161,22 @@ const EditPostScreen = ({route, navigation}: any) => {
             updatePost(
               item.id,
               {
-                title,
+                ...data,
+                expiredDate: parseDDMMYYYY(data.expiredDate)?.toISOString(),
+                pickUpStartDate: parseDDMMYYYY(
+                  data.pickUpStartDate,
+                )?.toISOString(),
+                pickUpEndDate: parseDDMMYYYY(data.pickUpEndDate)?.toISOString(),
+                type: getFoodTypeKey(data.type),
+                content: '',
+                status: '',
+                locationName: data.location,
                 images: allImages,
-                content,
-                weight,
-                description,
-                portion,
-                note,
-                status,
-                locationName,
-                latitude,
-                longitude,
-                expiredDate,
-                pickUpStartDate,
-                pickUpEndDate,
               },
               accessToken,
             )
               .then((response2: any) => {
+                console.log('response2', response2);
                 if (response2.status === 200) {
                   notify('success', {
                     params: {
@@ -248,24 +215,20 @@ const EditPostScreen = ({route, navigation}: any) => {
       updatePost(
         item.id,
         {
-          title,
+          ...data,
+          locationName: data.location,
           images: oldImages,
-          content,
-          weight,
-          description,
-          portion,
-          note,
-          status,
-          locationName,
-          latitude,
-          longitude,
-          expiredDate,
-          pickUpStartDate,
-          pickUpEndDate,
+          expiredDate: parseDDMMYYYY(data.expiredDate)?.toISOString(),
+          pickUpStartDate: parseDDMMYYYY(data.pickUpStartDate)?.toISOString(),
+          pickUpEndDate: parseDDMMYYYY(data.pickUpEndDate)?.toISOString(),
+          type: getFoodTypeKey(data.type),
+          content: '',
+          status: '',
         },
         accessToken,
       )
         .then((response: any) => {
+          console.log('response', response);
           if (response.status === 200) {
             notify('success', {
               params: {
@@ -304,343 +267,329 @@ const EditPostScreen = ({route, navigation}: any) => {
         <UploadPhoto
           isVisible={isUploadVisible}
           setVisible={setIsUploadVisible}
-          height={300}
-          width={350}
+          height={scale(300)}
+          width={scale(350)}
           isCircle={false}
           postImage={postImage}
           isMultiple={true}
         />
-        <TextInput
-          placeholder="Tên món ăn"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={title}
-          onChangeText={setTitle}
-        />
-        <TextInput
-          placeholder="Mô tả món ăn"
-          placeholderTextColor={'#706d6d'}
-          multiline
-          numberOfLines={4}
-          style={{
-            height: 100,
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={description}
-          onChangeText={setDescription}
-        />
-        <TextInput
-          placeholder="Trọng lượng (kg)"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={weight}
-          onChangeText={setWeight}
-          keyboardType="numeric"
-        />
-        <TextInput
-          placeholder="Số phần"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={portion}
-          onChangeText={setPortion}
-          keyboardType="numeric"
-        />
-        <TouchableOpacity
-          onPress={() => {
-            setIsTagVisible(true);
-          }}
-          style={{
-            padding: 10,
-            paddingVertical: 13,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-          }}>
-          <Text
-            style={{
-              fontSize: 16,
-              color: type === null ? '#706d6d' : 'black',
-              fontFamily: getFontFamily('regular'),
-            }}>
-            {type === null ? 'Loại thực phẩm' : type}
-          </Text>
-          <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
-        </TouchableOpacity>
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày hết hạn"
-              value={expiredDate}
-              onChange={(date: Date | undefined) =>
-                setExpiredDate(date || new Date())
-              }
-              inputMode="start"
-              saveLabel="Lưu"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-            />
-          </View>
-        </View>
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày bắt đầu nhận"
-              value={pickUpStartDate}
-              onChange={(date: Date | undefined) =>
-                setPickUpStartDate(date || new Date())
-              }
-              saveLabel="Lưu"
-              inputMode="start"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-            />
-          </View>
-        </View>
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày kết thúc nhận"
-              saveLabel="Lưu"
-              value={pickUpEndDate}
-              onChange={(date: Date | undefined) =>
-                setPickUpEndDate(date || new Date())
-              }
-              inputMode="start"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-            />
-          </View>
-        </View>
-
-        <GooglePlacesAutocomplete
-          ref={autocompleteRef}
-          fetchDetails={true}
-          placeholder="Địa chỉ nhận"
-          onPress={(data, details = null) => {
-            setLocationName(data.description);
-            setLatitude(details?.geometry.location.lat || 0);
-            setLongitude(details?.geometry.location.lng || 0);
-          }}
-          disableScroll={true}
-          query={{
-            key: MAP_API_KEY,
-            language: 'vi',
-          }}
-          styles={{
-            container: {
-              borderColor: Colors.greenPrimary,
-              borderRadius: 8,
-              borderWidth: 2,
-              width: '90%',
-              backgroundColor: '#eff2ff',
-              marginTop: 20,
-            },
-            textInput: {
-              fontSize: 16,
-              color: 'black',
-              backgroundColor: '#eff2ff',
-              fontFamily: getFontFamily('regular'),
-            },
-          }}
-        />
-        <Button
-          title="Sử dụng vị trí hiện tại"
-          onPress={() => getLocationName(location.latitude, location.longitude)}
-          buttonStyle={{
-            backgroundColor: Colors.greenPrimary,
-            width: 200,
-            alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 10,
-          }}
-        />
         <View
           style={{
-            width: '90%',
-            height: 300,
-            alignSelf: 'center',
-            borderColor: Colors.greenPrimary,
-            borderRadius: 20,
-            borderWidth: 2,
-            overflow: 'hidden',
-            marginTop: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#eff2ff',
+            paddingHorizontal: scale(16),
+            marginTop: scale(20),
+            gap: scale(20),
           }}>
-          {(imageUpload && imageUpload.length > 0) ||
-          (oldImages && oldImages.length > 0) ? (
-            <>
-              <ImageSwiper
-                style={{width: screenWidth * 0.9, height: 300}}
-                images={[
-                  ...oldImages.map(img => ({path: img})),
-                  ...imageUpload,
-                ]}
-                isCreatePost={true}
-                setImageUpload={(newImages: any[]) => {
-                  // Handle image removal by filtering both old and new images
-                  const removedPath = newImages.map(img => img.path);
-                  setOldImages(
-                    oldImages.filter((img: any) => removedPath.includes(img)),
-                  );
-                  setImageUpload(
-                    newImages.filter(
-                      img => img.path && !oldImages.includes(img.path),
-                    ),
-                  );
-                }}
-                setIsUploadVisible={setIsUploadVisible}
-                isUploadVisible={isUploadVisible}
-              />
-            </>
-          ) : (
-            <>
-              <TouchableOpacity
-                style={{marginTop: 20}}
-                onPress={() => {
-                  setIsUploadVisible(!isUploadVisible);
-                }}>
-                <Icon
-                  name="camera"
-                  type="ionicon"
-                  size={60}
-                  color={Colors.greenPrimary}
+          <CustomInput
+            controller={{
+              control,
+              name: 'title',
+            }}
+            errorText={errors.title?.message}
+            label="Tên món ăn"
+            labelColor={Colors.gray600}
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'description',
+            }}
+            errorText={errors.description?.message}
+            label="Mô tả món ăn"
+            labelColor={Colors.gray600}
+            multiline
+            numberOfLines={4}
+            isTextArea={true}
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'weight',
+            }}
+            errorText={errors.weight?.message}
+            label="Trọng lượng (kg)"
+            labelColor={Colors.gray600}
+            keyboardType="numeric"
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'portion',
+            }}
+            errorText={errors.portion?.message}
+            label="Số phần"
+            labelColor={Colors.gray600}
+            keyboardType="numeric"
+          />
+
+          <Controller
+            control={control}
+            name="type"
+            render={({field: {onChange, value}, fieldState: {error}}) => (
+              <>
+                <ChooseTagBottomSheet
+                  isVisible={isTagVisible}
+                  setVisible={setIsTagVisible}
+                  setType={onChange}
                 />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsTagVisible(true);
+                  }}
+                  style={{
+                    padding: scale(10),
+                    paddingVertical: scale(16),
+                    backgroundColor: Colors.white,
+                    borderRadius: scale(10),
+                    borderWidth: 1,
+                    borderColor: error ? Colors.red : Colors.gray300,
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: scale(16),
+                      color:
+                        value === undefined ? Colors.gray600 : Colors.black,
+                      fontFamily: getFontFamily('regular'),
+                    }}>
+                    {value === undefined ? 'Loại thực phẩm' : value}
+                  </Text>
+                  <Icon
+                    name="chevron-down"
+                    type="ionicon"
+                    size={scale(20)}
+                    color={Colors.gray600}
+                  />
+                </TouchableOpacity>
+                {error && (
+                  <CustomText
+                    fontType="medium"
+                    size={14}
+                    textColor={Colors.red}
+                    style={[
+                      {marginTop: scale(-16), paddingHorizontal: scale(10)},
+                    ]}>
+                    {error.message}
+                  </CustomText>
+                )}
+              </>
+            )}
+          />
 
-              <Text
-                style={{
-                  color: Colors.greenPrimary,
-                  fontSize: 18,
-                  fontFamily: getFontFamily('regular'),
-                }}>
-                Thêm ảnh
-              </Text>
-            </>
+          <CustomInput
+            controller={{
+              control,
+              name: 'expiredDate',
+            }}
+            errorText={errors.expiredDate?.message}
+            label="Ngày hết hạn"
+            labelColor={Colors.gray600}
+            isDatePicker
+            placeholder="DD/MM/YYYY"
+            calendarPickerProps={{
+              minimumDate: new Date(),
+              date: new Date(),
+            }}
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'pickUpStartDate',
+            }}
+            errorText={errors.pickUpStartDate?.message}
+            label="Ngày bắt đầu nhận"
+            labelColor={Colors.gray600}
+            isDatePicker
+            placeholder="DD/MM/YYYY"
+            calendarPickerProps={{
+              minimumDate: new Date(),
+              date: new Date(),
+            }}
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'pickUpEndDate',
+            }}
+            errorText={errors.pickUpEndDate?.message}
+            label="Ngày kết thúc nhận"
+            labelColor={Colors.gray600}
+            isDatePicker
+            placeholder="DD/MM/YYYY"
+            calendarPickerProps={{
+              minimumDate: new Date(),
+              date: new Date(),
+            }}
+          />
+
+          <GooglePlacesAutocomplete
+            ref={autocompleteRef}
+            fetchDetails={true}
+            placeholder="Địa chỉ nhận"
+            onPress={(data, details = null) => {
+              setValue('location', data.description, {
+                shouldValidate: true,
+              });
+              setValue('latitude', details?.geometry.location.lat || 0, {
+                shouldValidate: true,
+              });
+              setValue('longitude', details?.geometry.location.lng || 0, {
+                shouldValidate: true,
+              });
+            }}
+            disableScroll={true}
+            query={{
+              key: MAP_API_KEY,
+              language: 'vi',
+            }}
+            styles={{
+              container: {
+                borderColor: errors.location ? Colors.red : Colors.gray300,
+                borderRadius: scale(10),
+                borderWidth: 1,
+                backgroundColor: Colors.white,
+              },
+              textInput: {
+                fontSize: scale(16),
+                color: Colors.black,
+                backgroundColor: Colors.white,
+                fontFamily: getFontFamily('regular'),
+              },
+            }}
+          />
+          {errors.location && (
+            <CustomText
+              fontType="medium"
+              size={14}
+              textColor={Colors.red}
+              style={[{marginTop: scale(-16), paddingHorizontal: scale(10)}]}>
+              {errors.location.message}
+            </CustomText>
           )}
+
+          <Button
+            title="Sử dụng vị trí hiện tại"
+            onPress={() =>
+              getLocationName(locationState.latitude, locationState.longitude)
+            }
+            buttonStyle={{
+              backgroundColor: Colors.greenPrimary,
+              width: scale(200),
+              alignSelf: 'center',
+              borderRadius: scale(10),
+            }}
+            titleStyle={{fontFamily: getFontFamily('bold')}}
+          />
+
+          <View>
+            <View
+              style={{
+                width: screenWidth - scale(32),
+                height: scale(300),
+                alignSelf: 'center',
+                borderColor: errors.images ? Colors.red : Colors.gray300,
+                borderRadius: scale(10),
+                borderWidth: 1,
+                overflow: 'hidden',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: Colors.white,
+              }}>
+              {(imageUpload && imageUpload.length > 0) ||
+              (oldImages && oldImages.length > 0) ? (
+                <>
+                  <ImageSwiper
+                    style={{width: screenWidth * 0.9, height: 300}}
+                    images={[
+                      ...oldImages.map(img => ({path: img})),
+                      ...imageUpload,
+                    ]}
+                    isCreatePost={true}
+                    setImageUpload={(newImages: any[]) => {
+                      // Handle image removal by filtering both old and new images
+                      const removedPath = newImages.map(img => img.path);
+                      setOldImages(
+                        oldImages.filter((img: any) =>
+                          removedPath.includes(img),
+                        ),
+                      );
+                      setImageUpload(
+                        newImages.filter(
+                          img => img.path && !oldImages.includes(img.path),
+                        ),
+                      );
+                      setValue(
+                        'images',
+                        [
+                          ...oldImages.filter(img => removedPath.includes(img)),
+                          ...newImages.filter(
+                            img => img.path && !oldImages.includes(img.path),
+                          ),
+                        ],
+                        {
+                          shouldValidate: true,
+                        },
+                      );
+                    }}
+                    setIsUploadVisible={setIsUploadVisible}
+                    isUploadVisible={isUploadVisible}
+                  />
+                </>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={{marginTop: 20}}
+                    onPress={() => {
+                      setIsUploadVisible(!isUploadVisible);
+                    }}>
+                    <Icon
+                      name="camera"
+                      type="ionicon"
+                      size={60}
+                      color={Colors.greenPrimary}
+                    />
+                  </TouchableOpacity>
+
+                  <Text
+                    style={{
+                      color: Colors.greenPrimary,
+                      fontSize: 18,
+                      fontFamily: getFontFamily('regular'),
+                    }}>
+                    Thêm ảnh
+                  </Text>
+                </>
+              )}
+            </View>
+            {errors.images && (
+              <CustomText
+                fontType="medium"
+                size={14}
+                textColor={Colors.red}
+                style={[{marginTop: scale(4), paddingHorizontal: scale(10)}]}>
+                {errors.images.message}
+              </CustomText>
+            )}
+          </View>
+          <Button
+            title="Chỉnh sửa"
+            onPress={handleSubmit(handleEditPost)}
+            buttonStyle={{
+              backgroundColor: Colors.greenPrimary,
+              width: scale(200),
+              alignSelf: 'center',
+              marginBottom: scale(20),
+              borderRadius: scale(10),
+            }}
+            disabled={!isDirty}
+          />
         </View>
-
-        <Button
-          title="Chỉnh sửa"
-          onPress={handleEditPost}
-          buttonStyle={{
-            backgroundColor: Colors.greenPrimary,
-            width: 200,
-            alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 10,
-          }}
-        />
-
-        <View style={{height: 30}} />
       </View>
-      <ChooseTagBottomSheet
-        isVisible={isTagVisible}
-        setVisible={setIsTagVisible}
-        setType={setType}
-      />
     </ScrollView>
   );
 };

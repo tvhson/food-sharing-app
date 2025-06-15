@@ -22,7 +22,7 @@ import Animated, {
 
 import {moderateScale, scale} from '../../../utils/scale';
 
-import {formatDate} from '../../../utils/LoadingContext';
+import {formatDate} from '../../../utils/helper';
 import Colors from '../../../global/Color';
 
 import {CalendarPicker, CalendarPickerRef} from '../pickers';
