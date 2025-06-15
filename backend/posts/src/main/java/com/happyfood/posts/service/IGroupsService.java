@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface IGroupsService {
     List<GroupsDto> getAllGroups(Long userId);
+    List<GroupsDto> getGroupsByUserId(Long userId);
     GroupsDto getGroupById(Long groupId, Long userId);
     GroupsDto createGroup(Long userId, GroupsDto groupsDto);
     GroupsDto updateGroup(Long userId, Long groupId, GroupsDto groupsDto);

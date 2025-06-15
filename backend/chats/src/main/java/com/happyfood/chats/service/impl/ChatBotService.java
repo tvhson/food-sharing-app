@@ -31,10 +31,10 @@ public class ChatBotService implements IChatBotService {
     @Value("${openai.api.url}")
     private String apiUrl;
 
-    @Value("${openai.api.model}")
+    @Value("${openai.api.model_3_5_turbo.name}")
     private String model;
 
-    @Value("${openai.api.prompt}")
+    @Value("${openai.api.model_3_5_turbo.prompt}")
     private String prompt;
 
     @Override
@@ -112,11 +112,11 @@ public class ChatBotService implements IChatBotService {
                                    .role(ChatBotRole.ASSISTANT.getValue())
                                    .build());
 
-        String beginningMessage = "## ❓ Bạn muốn hỏi về\n\n"
-                                  + "- [➡️ Chính sách đổi điểm thưởng](#)\n"
-                                  + "- [➡️ Chính sách khiếu nại](#)\n"
-                                  + "- [➡️ Cách giao nhận thức ăn](#)\n"
-                                  + "- [❔ Câu hỏi thường gặp](#)";
+        String beginningMessage = "## ❓ Bạn muốn hỏi về \n"
+                                  + "- ➡️ Chính sách đổi điểm thưởng \n"
+                                  + "- ➡️ Chính sách khiếu nại \n"
+                                  + "- ➡️ Cách giao nhận thức ăn \n"
+                                  + "- ❔ Câu hỏi thường gặp \n";
         chatMessages.add(ChatBotDto.builder()
                                    .content(beginningMessage)
                                    .role(ChatBotRole.ASSISTANT.getValue())
