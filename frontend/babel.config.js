@@ -8,6 +8,7 @@ module.exports = {
         path: '.env',
       },
     ],
-    'react-native-reanimated/plugin', // must be LAST
+    '@babel/plugin-transform-export-namespace-from', // 👈 plugin để fix lỗi zod esm
+    'react-native-reanimated/plugin', // 👈 luôn để cuối
   ],
 };

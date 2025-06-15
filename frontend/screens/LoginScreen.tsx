@@ -1,5 +1,4 @@
 import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
-/* eslint-disable react-native/no-inline-styles */
 import {Button, Icon} from '@rneui/themed';
 import {
   Image,
@@ -25,6 +24,12 @@ import {enableScreens} from 'react-native-screens';
 import {login} from '../api/LoginApi';
 import {setStatus} from '../redux/LoadingReducer';
 import {setToken} from '../redux/TokenReducer';
+import {createLoginValidate, LoginValidateSchema} from '../utils/schema/login';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {moderateScale, scale} from '../utils/scale';
+import {getFontFamily} from '../utils/fonts';
 
 enableScreens();
 
@@ -33,54 +38,34 @@ const {useNotifications} = createNotifications();
 const LoginScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
   const {notify} = useNotifications();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm<LoginValidateSchema>({
+    resolver: zodResolver(createLoginValidate()),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    mode: 'onChange',
+  });
+
   const isLoading = useSelector((state: RootState) => state.loading.status);
 
-  //test crashlytics
-  // useEffect(() => {
-  //   crashlytics().log('Login mounted.');
-  // }, []);
-
-  const validateEmail = (email: string) => {
-    const re =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  };
   const handleRegister = () => {
     navigation.navigate('Register');
   };
 
-  const handleLogin = async () => {
-    //console.log(email, password);
-    if (email === '' || password === '') {
-      notify('error', {
-        params: {description: 'Hãy nhập các thông tin', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (!validateEmail(email)) {
-      notify('error', {
-        params: {description: 'Email không hợp lệ', title: 'Lỗi'},
-      });
-      return;
-    }
+  const handleLogin = async (data: LoginValidateSchema) => {
     try {
       dispatch(setStatus(true));
-      await login({email, password})
+      await login({email: data.email, password: data.password})
         .then((response: any) => {
           console.log(response);
 
           if (response.status === 200) {
-            //test crashlytics
-            // crashlytics().log('Login success.');
-            // crashlytics().setUserId(email);
-            // crashlytics().setAttributes({
-            //   email: email,
-            //   password: password,
-            // });
-            // crashlytics().crash();
             if (response.data) {
               AsyncStorage.setItem('token', response.data.accessToken);
               AsyncStorage.setItem('isLogin', 'true');
@@ -130,10 +115,6 @@ const LoginScreen = ({navigation}: any) => {
     }
   };
 
-  useEffect(() => {
-    setEmail('');
-    setPassword('');
-  }, []);
   if (isLoading) {
     return <AppLoader />;
   }
@@ -141,7 +122,6 @@ const LoginScreen = ({navigation}: any) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        //dismiss keyboard
         Keyboard.dismiss();
       }}>
       <ImageBackground
@@ -162,14 +142,14 @@ const LoginScreen = ({navigation}: any) => {
               name="arrow-back"
               type="ionicons"
               size={30}
+              color={Colors.white}
               onPress={() => navigation.goBack()}
               style={{
                 alignItems: 'flex-start',
-                marginTop: 20,
-                marginLeft: 20,
-                width: 30,
-                height: 30,
-                color: 'black',
+                marginTop: scale(20),
+                marginLeft: scale(20),
+                width: scale(30),
+                height: scale(30),
               }}
             />
             <Animated.View
@@ -177,9 +157,10 @@ const LoginScreen = ({navigation}: any) => {
               style={{alignSelf: 'center'}}>
               <Text
                 style={{
-                  fontSize: 46,
-                  fontWeight: 'bold',
+                  fontSize: moderateScale(46),
                   color: 'white',
+                  fontFamily: getFontFamily('bold'),
+                  textAlign: 'center',
                 }}>
                 Chào mừng!{'\n '}Đăng nhập
               </Text>
@@ -190,9 +171,10 @@ const LoginScreen = ({navigation}: any) => {
               <TouchableOpacity onPress={handleRegister}>
                 <Text
                   style={{
-                    fontSize: 20,
+                    fontSize: moderateScale(20),
                     color: 'white',
                     textDecorationLine: 'underline',
+                    fontFamily: getFontFamily('regular'),
                   }}>
                   Chưa có tài khoản? Đăng ký ngay
                 </Text>
@@ -200,77 +182,58 @@ const LoginScreen = ({navigation}: any) => {
             </Animated.View>
             <Animated.View
               entering={FadeInUp.delay(400).duration(1000).springify()}
-              style={{marginTop: 130, alignItems: 'center'}}>
-              <TextInput
-                placeholder="Email"
-                placeholderTextColor={'#706d6d'}
-                style={{
-                  fontSize: 16,
-                  padding: 10,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  width: '90%',
-                  color: 'black',
-                }}
-                onChangeText={setEmail}
-              />
+              style={{marginTop: scale(80), alignItems: 'center'}}>
+              <View style={{paddingHorizontal: scale(16)}}>
+                <CustomInput
+                  controller={{
+                    control,
+                    name: 'email',
+                  }}
+                  labelColor={Colors.gray600}
+                  errorText={errors.email?.message}
+                  label="Email"
+                  keyboardType="email-address"
+                />
+              </View>
             </Animated.View>
             <Animated.View
               entering={FadeInUp.delay(500).duration(1000).springify()}
               style={{marginTop: 20, alignItems: 'center'}}>
-              <View
-                style={{
-                  padding: 10,
-                  paddingVertical: 0,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  width: '90%',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  placeholder="Mật khẩu"
-                  placeholderTextColor={'#706d6d'}
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    width: '90%',
+              <View style={{paddingHorizontal: scale(16)}}>
+                <CustomInput
+                  labelColor={Colors.gray600}
+                  controller={{
+                    control,
+                    name: 'password',
                   }}
-                  secureTextEntry={!showPassword}
-                  onChangeText={setPassword}
+                  errorText={errors.password?.message}
+                  label="Mật khẩu"
+                  secureTextEntry
                 />
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowPassword(!showPassword);
-                  }}>
-                  <Icon
-                    name={showPassword ? 'eye' : 'eye-with-line'}
-                    type="entypo"
-                    size={24}
-                    color={'#706d6d'}
-                  />
-                </TouchableOpacity>
               </View>
             </Animated.View>
 
             <Animated.View
               entering={FadeInDown.delay(400).duration(1000).springify()}
               style={{
-                marginTop: 220,
+                marginTop: scale(170),
                 alignItems: 'center',
                 width: '100%',
               }}>
               <Button
                 title="Đăng nhập"
-                onPress={handleLogin}
-                titleStyle={{fontWeight: '700', fontSize: 20}}
+                onPress={handleSubmit(handleLogin)}
+                titleStyle={{
+                  fontWeight: '700',
+                  fontSize: moderateScale(20),
+                  fontFamily: getFontFamily('bold'),
+                }}
                 buttonStyle={{
                   backgroundColor: Colors.greenPrimary,
                   borderColor: 'transparent',
                   borderWidth: 0,
-                  borderRadius: 30,
-                  width: 300,
+                  borderRadius: scale(30),
+                  width: scale(300),
                 }}
               />
             </Animated.View>

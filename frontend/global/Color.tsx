@@ -60,6 +60,16 @@ const Colors = {
   bag9Bg: '#eb849c',
   bag10Bg: '#979dc1',
   bag11Bg: '#c7d3c0',
+
+  gray100: '#F8F9FF',
+  gray200: '#EFEFEF',
+  gray300: '#D5D5D5',
+  gray400: '#BBBBBB',
+  gray500: '#949494',
+  gray600: '#6E6E6E',
+  gray700: '#353535',
+  gray800: '#212121',
+  gray900: '#101010',
 };
 
 export default Colors;

@@ -1,4 +1,5 @@
 // LoadingContext.js
+import dayjs from 'dayjs';
 import React, {createContext, useState, useContext} from 'react';
 
 const LoadingContext = createContext({
@@ -20,4 +21,20 @@ export const LoadingProvider = ({children}: any) => {
       {children}
     </LoadingContext.Provider>
   );
+};
+
+export const formatDate = (
+  date: string | Date | dayjs.Dayjs,
+  format: string = 'DD/MM/YYYY',
+): string => {
+  try {
+    const dayjsDate = dayjs(date);
+    if (!dayjsDate.isValid()) {
+      return '';
+    }
+    return dayjsDate.format(format);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
 };

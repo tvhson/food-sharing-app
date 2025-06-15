@@ -19,80 +19,38 @@ import React, {useEffect, useState} from 'react';
 import Colors from '../global/Color';
 import {createNotifications} from 'react-native-notificated';
 import {register} from '../api/RegisterApi';
-import {scale} from '../utils/scale';
+import {moderateScale, scale} from '../utils/scale';
+import {
+  createRegisterValidate,
+  RegisterValidateSchema,
+} from '../utils/schema/register';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {getFontFamily} from '../utils/fonts';
 
 const {useNotifications} = createNotifications();
 
 const RegisterScreen = ({navigation}: any) => {
   const {notify} = useNotifications();
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const validateEmail = (email: string) => {
-    const re =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  };
-  const validatePassword = (password: string) => {
-    const re = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return re.test(String(password));
-  };
-  const validateConfirmPassword = (
-    password: string,
-    confirmPassword: string,
-  ) => {
-    return password === confirmPassword;
-  };
-  const handleRegister = async () => {
-    if (
-      name === '' ||
-      username === '' ||
-      password === '' ||
-      confirmPassword === ''
-    ) {
-      notify('error', {
-        params: {
-          description: 'Vui lòng nhập hết tất cả thông tin',
-          title: 'Lỗi',
-        },
-      });
-      return;
-    }
-    if (!validateEmail(username)) {
-      notify('error', {
-        params: {
-          description: 'Email không hợp lệ.',
-          title: 'Lỗi',
-        },
-      });
-      return;
-    }
 
-    if (!validatePassword(password)) {
-      notify('error', {
-        params: {
-          description:
-            'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái và số.',
-          title: 'Lỗi',
-          style: {multiline: 100},
-        },
-      });
-      return;
-    }
-    if (!validateConfirmPassword(password, confirmPassword)) {
-      notify('error', {
-        params: {
-          description: 'Mật khẩu không khớp.',
-          title: 'Lỗi',
-        },
-      });
-      return;
-    }
-    const email: string = username;
-    register({name, email, password})
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm<RegisterValidateSchema>({
+    resolver: zodResolver(createRegisterValidate()),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    mode: 'onChange',
+  });
+
+  const handleRegister = async (data: RegisterValidateSchema) => {
+    register({name: data.name, email: data.email, password: data.password})
       .then(response => {
         if (response.status === 200) {
           notify('success', {
@@ -101,12 +59,7 @@ const RegisterScreen = ({navigation}: any) => {
               title: 'Thành công',
             },
           });
-          setName('');
-          setUsername('');
-          setPassword('');
-          setConfirmPassword('');
-          setShowPassword(false);
-          setShowConfirmPassword(false);
+
           navigation.navigate('Login');
         } else {
           notify('error', {
@@ -129,22 +82,8 @@ const RegisterScreen = ({navigation}: any) => {
   };
 
   const handleLogin = () => {
-    setName('');
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
-    setShowPassword(false);
-    setShowConfirmPassword(false);
     navigation.navigate('Login');
   };
-  useEffect(() => {
-    setName('');
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
-    setShowPassword(false);
-    setShowConfirmPassword(false);
-  }, []);
 
   return (
     <TouchableWithoutFeedback
@@ -170,14 +109,14 @@ const RegisterScreen = ({navigation}: any) => {
               name="arrow-back"
               type="ionicons"
               size={30}
+              color={Colors.white}
               onPress={() => navigation.goBack()}
               style={{
                 alignItems: 'flex-start',
-                marginTop: 20,
-                marginLeft: 20,
-                width: 30,
-                height: 30,
-                color: 'black',
+                marginTop: scale(20),
+                marginLeft: scale(20),
+                width: scale(30),
+                height: scale(30),
               }}
             />
             <Animated.View
@@ -185,9 +124,9 @@ const RegisterScreen = ({navigation}: any) => {
               style={{alignSelf: 'center'}}>
               <Text
                 style={{
-                  fontSize: 46,
-                  fontWeight: 'bold',
-                  color: 'white',
+                  fontSize: moderateScale(40),
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.white,
                 }}>
                 Tạo tài khoản mới
               </Text>
@@ -198,9 +137,10 @@ const RegisterScreen = ({navigation}: any) => {
               <TouchableOpacity onPress={handleLogin}>
                 <Text
                   style={{
-                    fontSize: 20,
-                    color: 'white',
+                    fontSize: moderateScale(20),
+                    color: Colors.white,
                     textDecorationLine: 'underline',
+                    fontFamily: getFontFamily('regular'),
                   }}>
                   Đã đăng ký? Đăng nhập ngay
                 </Text>
@@ -208,112 +148,66 @@ const RegisterScreen = ({navigation}: any) => {
             </Animated.View>
             <Animated.View
               entering={FadeInUp.delay(400).duration(1000).springify()}
-              style={{marginTop: scale(55), alignItems: 'center'}}>
-              <TextInput
-                placeholder="Tên"
-                placeholderTextColor={'#706d6d'}
-                style={{
-                  fontSize: 16,
-                  padding: 10,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  width: '90%',
-                  color: 'black',
-                }}
-                onChangeText={setName}
-              />
+              style={{marginTop: scale(80), alignItems: 'center'}}>
+              <View style={{paddingHorizontal: scale(16)}}>
+                <CustomInput
+                  controller={{
+                    control,
+                    name: 'name',
+                  }}
+                  errorText={errors.name?.message}
+                  label="Tên"
+                  labelColor={Colors.gray600}
+                />
+              </View>
             </Animated.View>
             <Animated.View
               entering={FadeInUp.delay(400).duration(1000).springify()}
               style={{marginTop: 20, alignItems: 'center'}}>
-              <TextInput
-                placeholder="Email"
-                placeholderTextColor={'#706d6d'}
-                style={{
-                  fontSize: 16,
-                  padding: 10,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  width: '90%',
-                  color: 'black',
-                }}
-                onChangeText={setUsername}
-              />
-            </Animated.View>
-            <Animated.View
-              entering={FadeInUp.delay(500).duration(1000).springify()}
-              style={{marginTop: 20, alignItems: 'center'}}>
-              <View
-                style={{
-                  padding: 10,
-                  paddingVertical: 0,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  width: '90%',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  placeholder="Mật khẩu"
-                  placeholderTextColor={'#706d6d'}
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    width: '90%',
+              <View style={{paddingHorizontal: scale(16)}}>
+                <CustomInput
+                  controller={{
+                    control,
+                    name: 'email',
                   }}
-                  secureTextEntry={!showPassword}
-                  onChangeText={setPassword}
+                  errorText={errors.email?.message}
+                  label="Email"
+                  labelColor={Colors.gray600}
+                  keyboardType="email-address"
                 />
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowPassword(!showPassword);
-                  }}>
-                  <Icon
-                    name={showPassword ? 'eye' : 'eye-with-line'}
-                    type="entypo"
-                    size={24}
-                    color={'#706d6d'}
-                  />
-                </TouchableOpacity>
+              </View>
+            </Animated.View>
+
+            <Animated.View
+              entering={FadeInUp.delay(600).duration(1000).springify()}
+              style={{marginTop: 20, alignItems: 'center'}}>
+              <View style={{paddingHorizontal: scale(16)}}>
+                <CustomInput
+                  controller={{
+                    control,
+                    name: 'password',
+                  }}
+                  errorText={errors.password?.message}
+                  label="Mật khẩu"
+                  labelColor={Colors.gray600}
+                  secureTextEntry
+                />
               </View>
             </Animated.View>
             <Animated.View
               entering={FadeInUp.delay(600).duration(1000).springify()}
               style={{marginTop: 20, alignItems: 'center'}}>
-              <View
-                style={{
-                  padding: 10,
-                  paddingVertical: 0,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  width: '90%',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  placeholder="Nhập lại mật khẩu"
-                  placeholderTextColor={'#706d6d'}
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    width: '90%',
+              <View style={{paddingHorizontal: scale(16)}}>
+                <CustomInput
+                  controller={{
+                    control,
+                    name: 'confirmPassword',
                   }}
-                  secureTextEntry={!showConfirmPassword}
-                  onChangeText={setConfirmPassword}
+                  errorText={errors.confirmPassword?.message}
+                  label="Nhập lại mật khẩu"
+                  labelColor={Colors.gray600}
+                  secureTextEntry
                 />
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowConfirmPassword(!showConfirmPassword);
-                  }}>
-                  <Icon
-                    name={showConfirmPassword ? 'eye' : 'eye-with-line'}
-                    type="entypo"
-                    size={24}
-                    color={'#706d6d'}
-                  />
-                </TouchableOpacity>
               </View>
             </Animated.View>
 
@@ -326,14 +220,18 @@ const RegisterScreen = ({navigation}: any) => {
               }}>
               <Button
                 title="Đăng ký"
-                onPress={handleRegister}
-                titleStyle={{fontWeight: '700', fontSize: 20}}
+                onPress={handleSubmit(handleRegister)}
+                titleStyle={{
+                  fontWeight: '700',
+                  fontSize: moderateScale(20),
+                  fontFamily: getFontFamily('bold'),
+                }}
                 buttonStyle={{
                   backgroundColor: Colors.button,
                   borderColor: 'transparent',
                   borderWidth: 0,
-                  borderRadius: 30,
-                  width: 300,
+                  borderRadius: scale(30),
+                  width: scale(300),
                 }}
               />
             </Animated.View>
