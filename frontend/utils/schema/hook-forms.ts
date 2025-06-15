@@ -4,6 +4,7 @@ import {
   nameRegex,
   validateBirthday,
   validateDateNotInFuture,
+  validateDateNotInThePast,
 } from './regex';
 
 import {z} from 'zod';
@@ -99,11 +100,47 @@ export const zodConfirmPassword = () => {
     });
 };
 
-export const zodDate = (messageRequired?: string, messageInvalid?: string) => {
+export const zodDateNotInFuture = (
+  messageRequired?: string,
+  messageInvalid?: string,
+) => {
   return z
     .string()
     .min(1, {message: messageRequired ?? 'Ngày không được để trống'})
     .refine(value => validateDateNotInFuture(value), {
       message: messageInvalid ?? 'Ngày không hợp lệ',
     });
+};
+
+export const zodDateNotInThePast = (
+  messageRequired?: string,
+  messageInvalid?: string,
+) => {
+  return z
+    .string()
+    .min(1, {message: messageRequired ?? 'Ngày không được để trống'})
+    .refine(value => validateDateNotInThePast(value), {
+      message: messageInvalid ?? 'Ngày không hợp lệ',
+    });
+};
+
+export const parseDDMMYYYY = (dateStr: string): Date | null => {
+  const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const match = dateStr.match(datePattern);
+
+  if (!match) return null;
+
+  const [_, day, month, year] = match.map(Number);
+  const date = new Date(year, month - 1, day);
+
+  // Extra check: validate again after parsing
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null; // Invalid date
+  }
+
+  return date;
 };

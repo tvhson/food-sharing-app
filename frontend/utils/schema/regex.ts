@@ -72,3 +72,18 @@ export const validateDateNotInFuture = (value: string) => {
 
   return date <= today;
 };
+
+export const validateDateNotInThePast = (value: string) => {
+  const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+
+  if (!datePattern.test(value)) return false;
+
+  const [day, month, year] = value.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  // Check if the date is not in the past
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return date >= today;
+};

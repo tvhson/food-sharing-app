@@ -245,7 +245,6 @@ export const CustomInput = <T extends FieldValues>(props: InputProps<T>) => {
               height: label ? scale(56) : scale(50),
             },
             isTextArea && [
-              styles.textAreaContainer,
               {alignItems: 'flex-start'},
               {height: scale(183), paddingVertical: scale(16)},
             ],
@@ -333,7 +332,9 @@ export const CustomInput = <T extends FieldValues>(props: InputProps<T>) => {
                     },
                     {
                       marginTop:
-                        isTextArea && label ? INITIAL_POSITION + scale(4) : 0,
+                        (isTextArea || isDatePicker) && label
+                          ? INITIAL_POSITION + scale(4)
+                          : 0,
                     },
                     inputStyle,
                   ]}
@@ -443,9 +444,6 @@ const styles = StyleSheet.create({
   },
   textUppercase: {
     textTransform: 'uppercase',
-  },
-  textAreaContainer: {
-    borderRadius: 0,
   },
   input: {
     fontFamily: getFontFamily('regular'),

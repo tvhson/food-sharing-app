@@ -27,6 +27,16 @@ import {pushMyPost} from '../redux/SharingPostReducer';
 import screenWidth from '../global/Constant';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useLoading} from '../utils/LoadingContext';
+import {
+  createCreatePostValidate,
+  CreatePostValidateSchema,
+} from '../utils/schema/create-post';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {Controller, useForm} from 'react-hook-form';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {scale} from '../utils/scale';
+import {CustomText} from '../components/ui/CustomText';
+import {parseDDMMYYYY} from '../utils/schema/hook-forms';
 
 const {useNotifications} = createNotifications();
 
@@ -41,26 +51,37 @@ const CreatePostScreen = ({route, navigation}: any) => {
   const dispatch = useDispatch();
   const {notify} = useNotifications();
   const userInfo = useSelector((state: RootState) => state.userInfo);
+  const locationRoute = route.params.location;
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: {errors},
+  } = useForm<CreatePostValidateSchema>({
+    resolver: zodResolver(createCreatePostValidate()),
+    defaultValues: {
+      title: '',
+      images: [],
+      description: '',
+      type: undefined,
+      location: '',
+      latitude: locationRoute.latitude || 0,
+      longitude: locationRoute.longitude || 0,
+      weight: '',
+      portion: '',
+      expiredDate: '',
+      pickUpStartDate: '',
+      pickUpEndDate: '',
+    },
+    mode: 'onChange',
+  });
+
   const [isTagVisible, setIsTagVisible] = useState(false);
-  const location = route.params.location;
+
   const accessToken = route.params.accessToken;
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [weight, setWeight] = useState('');
-  const [description, setDescription] = useState('');
-  const [portion, setPortion] = useState('');
-  const [status, setStatus] = useState('');
-  const [type, setType] = useState<FoodType | null>(null);
-  const [locationName, setLocationName] = useState('');
-  const [latitude, setLatitude] = useState(
-    location && location.latitude ? location.latitude : null,
-  );
-  const [longitude, setLongitude] = useState(
-    location && location.longitude ? location.longitude : null,
-  );
-  const [expiredDate, setExpiredDate] = useState(new Date());
-  const [pickUpStartDate, setPickUpStartDate] = useState(new Date());
-  const [pickUpEndDate, setPickUpEndDate] = useState(new Date());
+
   const [isUploadVisible, setIsUploadVisible] = useState(false);
   const [imageUpload, setImageUpload] = useState<any>(null);
 
@@ -81,9 +102,15 @@ const CreatePostScreen = ({route, navigation}: any) => {
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
       if (response.data.results.length > 0) {
-        setLocationName(response.data.results[0].formatted_address);
-        setLatitude(latitudeCurrent);
-        setLongitude(longitudeCurrent);
+        setValue('location', response.data.results[0].formatted_address, {
+          shouldValidate: true,
+        });
+        setValue('latitude', latitudeCurrent, {
+          shouldValidate: true,
+        });
+        setValue('longitude', longitudeCurrent, {
+          shouldValidate: true,
+        });
         autocompleteRef.current?.setAddressText(
           response.data.results[0].formatted_address,
         );
@@ -99,10 +126,12 @@ const CreatePostScreen = ({route, navigation}: any) => {
   };
 
   const postImage = async (newImages: any) => {
-    console.log('newImages', newImages);
-
     // Ensure newImages is always an array
     const imagesArray = Array.isArray(newImages) ? newImages : [newImages];
+
+    setValue('images', imagesArray, {
+      shouldValidate: true,
+    });
 
     setImageUpload((prevImages: any) => {
       return prevImages && prevImages.length > 0
@@ -111,66 +140,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
     });
   };
 
-  const handleCreatePost = () => {
-    let currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    expiredDate.setHours(0, 0, 0, 0);
-    pickUpStartDate.setHours(0, 0, 0, 0);
-    pickUpEndDate.setHours(0, 0, 0, 0);
-
-    if (title === '') {
-      notify('error', {
-        params: {description: 'Tên món ăn là bắt buộc.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (locationName === '') {
-      notify('error', {
-        params: {description: 'Địa điểm nhận là bắt buộc.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (imageUpload === null) {
-      notify('error', {
-        params: {description: 'Ảnh là bắt buộc.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (expiredDate < currentDate) {
-      notify('error', {
-        params: {description: 'Ngày hết hạn không hợp lệ.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (pickUpStartDate < currentDate) {
-      notify('error', {
-        params: {description: 'Ngày bắt đầu nhận không hợp lệ.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (pickUpEndDate < currentDate) {
-      notify('error', {
-        params: {description: 'Ngày kết thúc nhận không hợp lệ.', title: 'Lỗi'},
-      });
-      return;
-    }
-    if (pickUpEndDate < pickUpStartDate) {
-      notify('error', {
-        params: {
-          description: 'Ngày kết thúc nhận phải lớn hơn ngày bắt đầu nhận.',
-          title: 'Lỗi',
-          style: {multiline: 100},
-        },
-      });
-      return;
-    }
-    if (type === null) {
-      notify('error', {
-        params: {description: 'Phải chọn loại thực phẩm.', title: 'Lỗi'},
-      });
-      return;
-    }
-
+  const handleCreatePost = async (data: CreatePostValidateSchema) => {
     const dataForm = new FormData();
     if (imageUpload && imageUpload.length > 0) {
       if (Array.isArray(imageUpload)) {
@@ -195,20 +165,22 @@ const CreatePostScreen = ({route, navigation}: any) => {
           if (response.status === 200) {
             createPost(
               {
-                title,
+                title: data.title,
+                content: '',
+                status: '',
                 images: response.data,
-                content,
-                weight,
-                description,
-                portion,
-                status,
-                locationName,
-                latitude,
-                longitude,
-                expiredDate,
-                pickUpStartDate,
-                pickUpEndDate,
-                type: getFoodTypeKey(type),
+                weight: data.weight,
+                description: data.description,
+                portion: data.portion,
+                locationName: data.location,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                expiredDate: parseDDMMYYYY(data.expiredDate)?.toISOString(),
+                pickUpStartDate: parseDDMMYYYY(
+                  data.pickUpStartDate,
+                )?.toISOString(),
+                pickUpEndDate: parseDDMMYYYY(data.pickUpEndDate)?.toISOString(),
+                type: getFoodTypeKey(data.type),
               },
               accessToken,
             )
@@ -230,8 +202,9 @@ const CreatePostScreen = ({route, navigation}: any) => {
                   navigation.navigate('Home');
                 } else {
                   notify('error', {
-                    params: {description: response2.data, title: 'Lỗi'},
+                    params: {description: 'Lỗi', title: 'Lỗi'},
                   });
+                  console.log(response2);
                   hideLoading();
                 }
               })
@@ -274,355 +247,304 @@ const CreatePostScreen = ({route, navigation}: any) => {
         <UploadPhoto
           isVisible={isUploadVisible}
           setVisible={setIsUploadVisible}
-          height={300}
-          width={350}
+          height={scale(300)}
+          width={scale(350)}
           isCircle={false}
           postImage={postImage}
           isMultiple={true}
         />
-        <TextInput
-          placeholder="Tên món ăn"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={title}
-          onChangeText={setTitle}
-        />
-        <TextInput
-          placeholder="Mô tả món ăn"
-          placeholderTextColor={'#706d6d'}
-          multiline
-          numberOfLines={4}
-          style={{
-            height: 100,
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={description}
-          onChangeText={setDescription}
-        />
-        <TextInput
-          placeholder="Trọng lượng (kg)"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={weight}
-          onChangeText={setWeight}
-          keyboardType="numeric"
-        />
-        <TextInput
-          placeholder="Số phần"
-          placeholderTextColor={'#706d6d'}
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            color: 'black',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            fontFamily: getFontFamily('regular'),
-          }}
-          value={portion}
-          onChangeText={setPortion}
-          keyboardType="numeric"
-        />
-
-        <TouchableOpacity
-          onPress={() => {
-            setIsTagVisible(true);
-          }}
-          style={{
-            padding: 10,
-            paddingVertical: 13,
-            backgroundColor: '#eff2ff',
-            borderRadius: 8,
-            width: '90%',
-            borderWidth: 2,
-            marginTop: 20,
-            borderColor: Colors.greenPrimary,
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-          }}>
-          <Text
-            style={{
-              fontSize: 16,
-              color: type === null ? '#706d6d' : 'black',
-              fontFamily: getFontFamily('regular'),
-            }}>
-            {type === null ? 'Loại thực phẩm' : type}
-          </Text>
-          <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
-        </TouchableOpacity>
-        {/* <TouchableOpacity
-          style={{width: '90%'}}
-          onPress={() => {
-            setIsTagVisible(true);
-          }}>
-          <TextInput
-            placeholder="Loại thực phẩm"
-            placeholderTextColor={'#706d6d'}
-            style={{
-              fontSize: 16,
-              padding: 10,
-              backgroundColor: '#eff2ff',
-              borderRadius: 8,
-              color: 'black',
-              borderWidth: 2,
-              marginTop: 20,
-              borderColor: Colors.greenPrimary,
-              fontFamily: getFontFamily('regular'),
-            }}
-            value={portion}
-            onChangeText={setPortion}
-            readOnly
-          />
-        </TouchableOpacity> */}
-
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày hết hạn"
-              value={expiredDate}
-              onChange={(date: Date | undefined) =>
-                setExpiredDate(date || new Date())
-              }
-              inputMode="start"
-              saveLabel="Lưu"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-            />
-          </View>
-        </View>
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày bắt đầu nhận"
-              value={pickUpStartDate}
-              onChange={(date: Date | undefined) =>
-                setPickUpStartDate(date || new Date())
-              }
-              saveLabel="Lưu"
-              inputMode="start"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-            />
-          </View>
-        </View>
-        <View style={{marginHorizontal: 10, marginTop: 20}}>
-          <View
-            style={{
-              width: '100%',
-              alignItems: 'center',
-            }}>
-            <DatePickerInput
-              locale="vi"
-              label="Ngày kết thúc nhận"
-              saveLabel="Lưu"
-              value={pickUpEndDate}
-              onChange={(date: Date | undefined) =>
-                setPickUpEndDate(date || new Date())
-              }
-              inputMode="start"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                maxWidth: '95%',
-                fontFamily: getFontFamily('regular'),
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-              }}
-            />
-          </View>
-        </View>
-
-        <GooglePlacesAutocomplete
-          ref={autocompleteRef}
-          fetchDetails={true}
-          placeholder="Địa chỉ nhận"
-          onPress={(data, details = null) => {
-            setLocationName(data.description);
-            setLatitude(details?.geometry.location.lat || 0);
-            setLongitude(details?.geometry.location.lng || 0);
-          }}
-          disableScroll={true}
-          query={{
-            key: MAP_API_KEY,
-            language: 'vi',
-          }}
-          styles={{
-            container: {
-              borderColor: Colors.greenPrimary,
-              borderRadius: 8,
-              borderWidth: 2,
-              width: '90%',
-              backgroundColor: '#eff2ff',
-              marginTop: 20,
-            },
-            textInput: {
-              fontSize: 16,
-              color: 'black',
-              backgroundColor: '#eff2ff',
-              fontFamily: getFontFamily('regular'),
-            },
-          }}
-        />
-        <Button
-          title="Sử dụng vị trí hiện tại"
-          onPress={() => getLocationName(location.latitude, location.longitude)}
-          buttonStyle={{
-            backgroundColor: Colors.greenPrimary,
-            width: 200,
-            alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 10,
-          }}
-          titleStyle={{fontFamily: getFontFamily('bold')}}
-        />
         <View
           style={{
-            width: '90%',
-            height: 300,
-            alignSelf: 'center',
-            borderColor: Colors.greenPrimary,
-            borderRadius: 20,
-            borderWidth: 2,
-            overflow: 'hidden',
-            marginTop: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#eff2ff',
+            paddingHorizontal: scale(16),
+            marginTop: scale(20),
+            gap: scale(20),
           }}>
-          {imageUpload && imageUpload.length > 0 ? (
-            <>
-              <ImageSwiper
-                style={{width: screenWidth * 0.9, height: 300}}
-                images={imageUpload}
-                isCreatePost={true}
-                setImageUpload={setImageUpload}
-                setIsUploadVisible={setIsUploadVisible}
-                isUploadVisible={isUploadVisible}
-              />
-            </>
-          ) : (
-            <>
-              <TouchableOpacity
-                style={{marginTop: 20}}
-                onPress={() => {
-                  setIsUploadVisible(!isUploadVisible);
-                }}>
-                <Icon
-                  name="camera"
-                  type="ionicon"
-                  size={60}
-                  color={Colors.greenPrimary}
+          <CustomInput
+            controller={{
+              control,
+              name: 'title',
+            }}
+            errorText={errors.title?.message}
+            label="Tên món ăn"
+            labelColor={Colors.gray600}
+          />
+          <CustomInput
+            controller={{
+              control,
+              name: 'description',
+            }}
+            errorText={errors.description?.message}
+            label="Mô tả món ăn"
+            labelColor={Colors.gray600}
+            multiline
+            numberOfLines={4}
+            isTextArea={true}
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'weight',
+            }}
+            errorText={errors.weight?.message}
+            label="Trọng lượng (kg)"
+            labelColor={Colors.gray600}
+            keyboardType="numeric"
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'portion',
+            }}
+            errorText={errors.portion?.message}
+            label="Số phần"
+            labelColor={Colors.gray600}
+            keyboardType="numeric"
+          />
+
+          <Controller
+            control={control}
+            name="type"
+            render={({field: {onChange, value}, fieldState: {error}}) => (
+              <>
+                <ChooseTagBottomSheet
+                  isVisible={isTagVisible}
+                  setVisible={setIsTagVisible}
+                  setType={onChange}
                 />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsTagVisible(true);
+                  }}
+                  style={{
+                    padding: scale(10),
+                    paddingVertical: scale(16),
+                    backgroundColor: Colors.white,
+                    borderRadius: scale(10),
+                    borderWidth: 1,
+                    borderColor: error ? Colors.red : Colors.gray300,
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: scale(16),
+                      color:
+                        value === undefined ? Colors.gray600 : Colors.black,
+                      fontFamily: getFontFamily('regular'),
+                    }}>
+                    {value === undefined ? 'Loại thực phẩm' : value}
+                  </Text>
+                  <Icon
+                    name="chevron-down"
+                    type="ionicon"
+                    size={scale(20)}
+                    color={Colors.gray600}
+                  />
+                </TouchableOpacity>
+                {error && (
+                  <CustomText
+                    fontType="medium"
+                    size={14}
+                    textColor={Colors.red}
+                    style={[
+                      {marginTop: scale(-16), paddingHorizontal: scale(10)},
+                    ]}>
+                    {error.message}
+                  </CustomText>
+                )}
+              </>
+            )}
+          />
 
-              <Text
-                style={{
-                  color: Colors.greenPrimary,
-                  fontSize: 18,
-                  fontFamily: getFontFamily('regular'),
-                }}>
-                Thêm ảnh
-              </Text>
-            </>
+          <CustomInput
+            controller={{
+              control,
+              name: 'expiredDate',
+            }}
+            errorText={errors.expiredDate?.message}
+            label="Ngày hết hạn"
+            labelColor={Colors.gray600}
+            isDatePicker
+            placeholder="DD/MM/YYYY"
+            calendarPickerProps={{
+              minimumDate: new Date(),
+              date: new Date(),
+            }}
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'pickUpStartDate',
+            }}
+            errorText={errors.pickUpStartDate?.message}
+            label="Ngày bắt đầu nhận"
+            labelColor={Colors.gray600}
+            isDatePicker
+            placeholder="DD/MM/YYYY"
+            calendarPickerProps={{
+              minimumDate: new Date(),
+              date: new Date(),
+            }}
+          />
+
+          <CustomInput
+            controller={{
+              control,
+              name: 'pickUpEndDate',
+            }}
+            errorText={errors.pickUpEndDate?.message}
+            label="Ngày kết thúc nhận"
+            labelColor={Colors.gray600}
+            isDatePicker
+            placeholder="DD/MM/YYYY"
+            calendarPickerProps={{
+              minimumDate: new Date(),
+              date: new Date(),
+            }}
+          />
+
+          <GooglePlacesAutocomplete
+            ref={autocompleteRef}
+            fetchDetails={true}
+            placeholder="Địa chỉ nhận"
+            onPress={(data, details = null) => {
+              setValue('location', data.description, {
+                shouldValidate: true,
+              });
+              setValue('latitude', details?.geometry.location.lat || 0, {
+                shouldValidate: true,
+              });
+              setValue('longitude', details?.geometry.location.lng || 0, {
+                shouldValidate: true,
+              });
+            }}
+            disableScroll={true}
+            query={{
+              key: MAP_API_KEY,
+              language: 'vi',
+            }}
+            styles={{
+              container: {
+                borderColor: errors.location ? Colors.red : Colors.gray300,
+                borderRadius: scale(10),
+                borderWidth: 1,
+                backgroundColor: Colors.white,
+              },
+              textInput: {
+                fontSize: scale(16),
+                color: Colors.black,
+                backgroundColor: Colors.white,
+                fontFamily: getFontFamily('regular'),
+              },
+            }}
+          />
+          {errors.location && (
+            <CustomText
+              fontType="medium"
+              size={14}
+              textColor={Colors.red}
+              style={[{marginTop: scale(-16), paddingHorizontal: scale(10)}]}>
+              {errors.location.message}
+            </CustomText>
           )}
+
+          <Button
+            title="Sử dụng vị trí hiện tại"
+            onPress={() =>
+              getLocationName(getValues('latitude'), getValues('longitude'))
+            }
+            buttonStyle={{
+              backgroundColor: Colors.greenPrimary,
+              width: scale(200),
+              alignSelf: 'center',
+              borderRadius: scale(10),
+            }}
+            titleStyle={{fontFamily: getFontFamily('bold')}}
+          />
+
+          <View>
+            <View
+              style={{
+                width: screenWidth - scale(32),
+                height: scale(300),
+                alignSelf: 'center',
+                borderColor: errors.images ? Colors.red : Colors.gray300,
+                borderRadius: scale(10),
+                borderWidth: 1,
+                overflow: 'hidden',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: Colors.white,
+              }}>
+              {imageUpload && imageUpload.length > 0 ? (
+                <>
+                  <ImageSwiper
+                    style={{width: screenWidth - scale(32), height: scale(300)}}
+                    images={imageUpload}
+                    isCreatePost={true}
+                    setImageUpload={(newImages: any) => {
+                      setImageUpload(newImages);
+                      setValue('images', newImages, {
+                        shouldValidate: true,
+                      });
+                    }}
+                    setIsUploadVisible={setIsUploadVisible}
+                    isUploadVisible={isUploadVisible}
+                  />
+                </>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={{marginTop: scale(20)}}
+                    onPress={() => {
+                      setIsUploadVisible(!isUploadVisible);
+                    }}>
+                    <Icon
+                      name="camera"
+                      type="ionicon"
+                      size={60}
+                      color={Colors.greenPrimary}
+                    />
+                  </TouchableOpacity>
+
+                  <Text
+                    style={{
+                      color: Colors.greenPrimary,
+                      fontSize: scale(18),
+                      fontFamily: getFontFamily('regular'),
+                    }}>
+                    Thêm ảnh
+                  </Text>
+                </>
+              )}
+            </View>
+            {errors.images && (
+              <CustomText
+                fontType="medium"
+                size={14}
+                textColor={Colors.red}
+                style={[{marginTop: scale(4), paddingHorizontal: scale(10)}]}>
+                {errors.images.message}
+              </CustomText>
+            )}
+          </View>
+
+          <Button
+            title="Tạo bài viết"
+            onPress={handleSubmit(handleCreatePost)}
+            buttonStyle={{
+              backgroundColor: Colors.greenPrimary,
+              width: scale(200),
+              alignSelf: 'center',
+              marginBottom: scale(20),
+              borderRadius: scale(10),
+            }}
+          />
         </View>
-
-        <Button
-          title="Tạo bài viết"
-          onPress={handleCreatePost}
-          buttonStyle={{
-            backgroundColor: Colors.greenPrimary,
-            width: 200,
-            alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 10,
-          }}
-        />
-
-        <View style={{height: 30}} />
       </View>
-      <ChooseTagBottomSheet
-        isVisible={isTagVisible}
-        setVisible={setIsTagVisible}
-        setType={setType}
-      />
     </ScrollView>
   );
 };
