@@ -40,6 +40,22 @@ public class GroupsServiceImpl implements IGroupsService {
     }
 
     @Override
+    public List<GroupsDto> getGroupsByUserId(Long userId) {
+        List<Groups> groups = groupsRepository.findAll();
+        Collections.reverse(groups);
+        return groups.stream()
+                     .filter(group -> {
+                         if (group.getMemberIds() != null && !group.getMemberIds().isEmpty()) {
+                             List<String> memberIds = Arrays.asList(group.getMemberIds().split("-"));
+                             return memberIds.contains(String.valueOf(userId));
+                         }
+                         return false;
+                     })
+                     .map(group -> convertToResponse(group, userId))
+                     .toList();
+    }
+
+    @Override
     public GroupsDto getGroupById(Long groupId, Long userId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
 
@@ -289,6 +305,16 @@ public class GroupsServiceImpl implements IGroupsService {
         } else {
             groups.setRequestIds(userId.toString());
         }
+
+        accountsAdapter.createNotification(NotificationsDto.builder()
+                                                           .type("GROUP_REQUEST")
+                                                           .imageUrl(groups.getImageUrl())
+                                                           .title("Tham gia nhóm " + groups.getName())
+                                                           .description("Yêu cầu tham gia nhóm " + groups.getName())
+                                                           .linkId(groups.getId())
+                                                           .userId(groups.getAuthorId())
+                                                           .senderId(userId)
+                                                           .build());
 
         return convertToResponse(groupsRepository.save(groups), userId);
     }
