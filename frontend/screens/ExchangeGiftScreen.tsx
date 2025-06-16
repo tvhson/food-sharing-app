@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
-import {Button, Icon} from 'react-native-paper';
+import {Image} from '@rneui/themed';
+import React, {useEffect} from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -9,17 +8,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import {Button, Icon} from 'react-native-paper';
+import {useSelector} from 'react-redux';
 import {getMyPoint, getRewards} from '../api/LoyaltyApi';
-
-import Colors from '../global/Color';
-/* eslint-disable react-native/no-inline-styles */
-import {Image} from '@rneui/themed';
 import RewardItem from '../components/ui/ExchangePageUI/RewardItem';
+import Colors from '../global/Color';
 import {RootState} from '../redux/Store';
 import {getFontFamily} from '../utils/fonts';
 import {useLoading} from '../utils/LoadingContext';
-import {useSelector} from 'react-redux';
 import {moderateScale, scale} from '../utils/scale';
 
 const ExchangeGiftScreen = ({navigation}: any) => {

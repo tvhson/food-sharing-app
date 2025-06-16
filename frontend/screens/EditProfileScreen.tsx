@@ -1,16 +1,12 @@
-import React, {useRef} from 'react';
-import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import {saveUser, UserInfo} from '../redux/UserReducer';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
-import Colors from '../global/Color';
-/* eslint-disable react-native/no-inline-styles */
 import {MAP_API_KEY} from '@env';
 import {zodResolver} from '@hookform/resolvers/zod';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, Icon} from '@rneui/themed';
 import axios from 'axios';
+import React, {useRef} from 'react';
 import {useForm} from 'react-hook-form';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Modal from 'react-native-modal';
 import {createNotifications} from 'react-native-notificated';
 import {scale, ScaledSheet} from 'react-native-size-matters';
@@ -18,7 +14,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {updateUser} from '../api/AccountsApi';
 import {CustomInput} from '../components/ui/CustomInput/CustomInput';
 import {CustomText} from '../components/ui/CustomText';
+import Colors from '../global/Color';
 import {RootState} from '../redux/Store';
+import {saveUser, UserInfo} from '../redux/UserReducer';
 import {getFontFamily} from '../utils/fonts';
 import {formatDate} from '../utils/helper';
 import {
