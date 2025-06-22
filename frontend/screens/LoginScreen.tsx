@@ -1,35 +1,33 @@
-import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {Button, Icon} from '@rneui/themed';
+import React from 'react';
 import {
-  Image,
   ImageBackground,
   Keyboard,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {useDispatch, useSelector} from 'react-redux';
 
-import AppLoader from '../components/ui/AppLoader';
+import {zodResolver} from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Colors from '../global/Color';
-import {RootState} from '../redux/Store';
+import {useForm} from 'react-hook-form';
 import {createNotifications} from 'react-native-notificated';
 import {enableScreens} from 'react-native-screens';
 import {login} from '../api/LoginApi';
-import {setStatus} from '../redux/LoadingReducer';
-import {setToken} from '../redux/TokenReducer';
-import {createLoginValidate, LoginValidateSchema} from '../utils/schema/login';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
+import AppLoader from '../components/ui/AppLoader';
 import {CustomInput} from '../components/ui/CustomInput/CustomInput';
-import {moderateScale, scale} from '../utils/scale';
+import Colors from '../global/Color';
+import {setStatus} from '../redux/LoadingReducer';
+import {RootState} from '../redux/Store';
+import {setToken} from '../redux/TokenReducer';
 import {getFontFamily} from '../utils/fonts';
+import {moderateScale, scale} from '../utils/scale';
+import {createLoginValidate, LoginValidateSchema} from '../utils/schema/login';
 
 enableScreens();
 

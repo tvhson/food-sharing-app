@@ -1,16 +1,16 @@
-import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
 import React, {useState} from 'react';
+import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
 /* eslint-disable react-native/no-inline-styles */
-import {Text, TextInput, TouchableWithoutFeedback, View} from 'react-native';
+import {Text, TouchableWithoutFeedback, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
-import Colors from '../../global/Color';
 import {Image} from '@rneui/themed';
-import {RootState} from '../../redux/Store';
-import {banAccount} from '../../api/ReportApi';
-import {changeRole} from '../../redux/AccountsReducer';
-import {changeRoleById} from '../../api/AccountsApi';
 import {createNotifications} from 'react-native-notificated';
+import {changeRoleById} from '../../api/AccountsApi';
+import {banAccount} from '../../api/ReportApi';
+import Colors from '../../global/Color';
+import {changeRole} from '../../redux/AccountsReducer';
+import {RootState} from '../../redux/Store';
 
 const {useNotifications} = createNotifications();
 

@@ -20,8 +20,12 @@ export const createGroupValidate = () => {
         message: 'Vui lòng chọn loại nhóm',
       }),
       locationName: z.string().min(1, 'Vị trí không được để trống'),
-      latitude: z.number().min(1, 'Vị trí không được để trống'),
-      longitude: z.number().min(1, 'Vị trí không được để trống'),
+      latitude: z.number().refine(val => val !== undefined && val !== null, {
+        message: 'Vị trí không được để trống',
+      }),
+      longitude: z.number().refine(val => val !== undefined && val !== null, {
+        message: 'Vị trí không được để trống',
+      }),
     })
     .superRefine((data, ctx) => {
       const startDate = data.startDate

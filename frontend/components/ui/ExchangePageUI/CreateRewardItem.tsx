@@ -1,13 +1,11 @@
-/* eslint-disable react-native/no-inline-styles */
-import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import React from 'react';
-import Colors from '../../../global/Color';
+import {Controller, useFormContext} from 'react-hook-form';
+import {Image, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {Icon} from 'react-native-paper';
-import {getFontFamily} from '../../../utils/fonts';
-import {Controller, useFieldArray, useFormContext} from 'react-hook-form';
-import {RewardList} from '../../../screens/ManageReward/CreateRewardScreen';
-import {Image} from 'react-native';
+import Colors from '../../../global/Color';
 import screenWidth from '../../../global/Constant';
+import {RewardList} from '../../../screens/ManageReward/CreateRewardScreen';
+import {getFontFamily} from '../../../utils/fonts';
 
 const CreateRewardItem = (props: {
   item: any;

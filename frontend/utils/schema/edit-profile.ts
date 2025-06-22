@@ -14,7 +14,11 @@ export const createEditProfileValidate = () => {
       'Ngày sinh không được để trống',
       'Ngày sinh không hợp lệ',
     ),
-    latitude: z.number().min(1, 'Vị trí không được để trống'),
-    longitude: z.number().min(1, 'Vị trí không được để trống'),
+    latitude: z.number().refine(val => val !== undefined && val !== null, {
+      message: 'Vị trí không được để trống',
+    }),
+    longitude: z.number().refine(val => val !== undefined && val !== null, {
+      message: 'Vị trí không được để trống',
+    }),
   });
 };

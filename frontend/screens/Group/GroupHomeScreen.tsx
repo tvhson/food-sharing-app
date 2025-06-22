@@ -1,15 +1,15 @@
+import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   IGetGroupResponse,
   IGetGroupStatementResponse,
@@ -20,32 +20,37 @@ import {
   getGroupTodo,
   updateGroupTodo,
 } from '../../api/GroupApi';
-import {
-  IOrganizationPost,
-  setHomePageFundingPost,
-} from '../../redux/OrganizationPostReducer';
-import React, {useEffect, useState} from 'react';
+import {setHomePageFundingPost} from '../../redux/OrganizationPostReducer';
 import {moderateScale, scale, verticalScale} from '../../utils/scale';
-import {useDispatch, useSelector} from 'react-redux';
 
-import Colors from '../../global/Color';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useNavigation} from '@react-navigation/native';
+import {useForm} from 'react-hook-form';
+import {ScrollView} from 'react-native';
+import {useNotifications} from 'react-native-notificated';
+import {Icon} from 'react-native-paper';
+import {getOrganizationPost} from '../../api/OrganizationPostApi';
 import Comment from '../../components/ui/Comment';
-import {DatePickerInput} from 'react-native-paper-dates';
-import GroupModalMember from './component/GroupModalMember';
+import {CustomInput} from '../../components/ui/CustomInput/CustomInput';
 import GroupPostItem from '../../components/ui/GroupUI/GroupPostItem';
+import {Route} from '../../constants/route';
+import Colors from '../../global/Color';
+import {screenHeight} from '../../global/Constant';
+import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
+import {useLoading} from '../../utils/LoadingContext';
+import {
+  CreateGroupTodoSchema,
+  createGroupTodoValidate,
+} from '../../utils/schema/create-group-todos';
+import {parseDDMMYYYY} from '../../utils/schema/hook-forms';
+import GroupModalMember from './component/GroupModalMember';
 import GroupStatementItem from './component/GroupStatementItem';
 import GroupTodoItem from './component/GroupTodoItem';
-import {IGroupPost} from '../../global/types';
-import {Icon} from 'react-native-paper';
-import {RootState} from '../../redux/Store';
-import {Route} from '../../constants/route';
-import {ScrollView} from 'react-native';
-import {getFontFamily} from '../../utils/fonts';
-import {getOrganizationPost} from '../../api/OrganizationPostApi';
-import {screenHeight} from '../../global/Constant';
-import {useLoading} from '../../utils/LoadingContext';
-import {useNavigation} from '@react-navigation/native';
-import {useNotifications} from 'react-native-notificated';
+import {
+  CreateGroupStatementSchema,
+  createGroupStatementValidate,
+} from '../../utils/schema/create-group-statement';
 
 const GroupHomeScreen = ({route}: {route: any}) => {
   const dispatch = useDispatch();
@@ -63,17 +68,41 @@ const GroupHomeScreen = ({route}: {route: any}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [commentPostId, setCommentPostId] = useState<number>(0);
   const [showComment, setShowComment] = useState(false);
-  const [todoDescription, setTodoDescription] = useState('');
-  const [todoStartDate, setTodoStartDate] = useState(new Date());
   const [statementMember, setStatementMember] =
     useState<IGetGroupResponse['members'][number]>();
   const [isModalMemberVisible, setIsModalMemberVisible] = useState(false);
-  const [statementDescription, setStatementDescription] = useState('');
   const [statementData, setStatementData] = useState<
     IGetGroupStatementResponse[]
   >([]);
   const {notify} = useNotifications();
   const {showLoading, hideLoading} = useLoading();
+
+  const {
+    control: todoControl,
+    handleSubmit: handleTodoSubmit,
+    reset: resetTodoForm,
+    formState: {errors: todoErrors},
+  } = useForm<CreateGroupTodoSchema>({
+    resolver: zodResolver(createGroupTodoValidate()),
+    defaultValues: {
+      title: '',
+      date: '',
+    },
+  });
+
+  const {
+    control: statementControl,
+    handleSubmit: handleStatementSubmit,
+    reset: resetStatementForm,
+    setValue: setStatementValue,
+    formState: {errors: statementErrors},
+  } = useForm<CreateGroupStatementSchema>({
+    resolver: zodResolver(createGroupStatementValidate()),
+    defaultValues: {
+      description: '',
+      user: '',
+    },
+  });
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const IMAGE_HEIGHT = screenHeight * 0.25;
@@ -95,24 +124,14 @@ const GroupHomeScreen = ({route}: {route: any}) => {
     });
   };
 
-  const handleCreateTodo = async () => {
+  const handleCreateTodo = async (data: CreateGroupTodoSchema) => {
     try {
-      if (todoDescription.trim() === '') {
-        notify('error', {
-          params: {
-            description: 'Vui lòng nhập mô tả',
-            title: 'Lỗi',
-          },
-        });
-        return;
-      }
       const response = await createGroupTodo(accessToken, group.id, {
-        title: todoDescription,
-        date: todoStartDate,
+        title: data.title,
+        date: data.date ? parseDDMMYYYY(data.date) || new Date() : new Date(),
         status: 'pending',
       });
-      setTodoDescription('');
-      setTodoStartDate(new Date());
+      resetTodoForm();
       handleRefresh();
     } catch (error) {
       notify('error', {
@@ -147,12 +166,12 @@ const GroupHomeScreen = ({route}: {route: any}) => {
     }
   };
 
-  const handleCreateStatement = async () => {
+  const handleCreateStatement = async (data: CreateGroupStatementSchema) => {
     try {
-      if (!statementMember || statementDescription.trim() === '') {
+      if (!statementMember) {
         notify('error', {
           params: {
-            description: 'Vui lòng chọn người ủng hộ và nhập mô tả',
+            description: 'Vui lòng chọn người ủng hộ',
             title: 'Lỗi',
           },
         });
@@ -162,9 +181,9 @@ const GroupHomeScreen = ({route}: {route: any}) => {
         user: {
           id: statementMember?.id,
         },
-        description: statementDescription,
+        description: data.description,
       });
-      setStatementDescription('');
+      resetStatementForm();
       setStatementMember(undefined);
       handleRefresh();
     } catch (error) {
@@ -327,10 +346,10 @@ const GroupHomeScreen = ({route}: {route: any}) => {
               fontSize: moderateScale(16),
               fontFamily: getFontFamily('regular'),
               color: Colors.grayText,
-              borderRadius: 20,
+              borderRadius: scale(10),
               marginHorizontal: scale(10),
               borderWidth: 1,
-              borderColor: Colors.black,
+              borderColor: Colors.gray400,
               paddingVertical: scale(5),
               paddingHorizontal: scale(16),
             }}>
@@ -400,65 +419,46 @@ const GroupHomeScreen = ({route}: {route: any}) => {
             style={{
               backgroundColor: 'white',
               paddingVertical: scale(10),
-              borderRadius: 8,
+              borderRadius: scale(10),
               width: '90%',
               marginTop: scale(10),
               gap: scale(10),
+              paddingHorizontal: scale(10),
             }}>
-            <TextInput
-              placeholder="Việc cần làm..."
-              placeholderTextColor={'#706d6d'}
-              style={{
-                fontSize: 16,
-                padding: 10,
-                backgroundColor: '#eff2ff',
-                borderRadius: 8,
-                color: 'black',
-                borderWidth: 2,
-                borderColor: Colors.greenPrimary,
-                marginHorizontal: scale(10),
+            <CustomInput
+              controller={{
+                control: todoControl,
+                name: 'title',
               }}
-              value={todoDescription}
-              onChangeText={setTodoDescription}
+              label="Việc cần làm..."
+              labelColor={Colors.gray600}
+              errorText={todoErrors.title?.message}
             />
-            <DatePickerInput
-              locale="vi"
+            <CustomInput
+              controller={{
+                control: todoControl,
+                name: 'date',
+              }}
+              errorText={todoErrors.date?.message}
               label="Ngày bắt đầu"
-              value={todoStartDate}
-              onChange={(date: Date | undefined) =>
-                setTodoStartDate(date || new Date())
-              }
-              inputMode="start"
-              saveLabel="Lưu"
-              style={{
-                backgroundColor: '#eff2ff',
-                color: 'black',
-                fontFamily: getFontFamily('regular'),
-              }}
-              mode="outlined"
-              outlineStyle={{
-                borderColor: Colors.greenPrimary,
-                borderRadius: 8,
-                borderWidth: 2,
-                marginHorizontal: scale(10),
-              }}
-              contentStyle={{
-                fontFamily: getFontFamily('regular'),
-              }}
+              labelColor={Colors.gray600}
+              isDatePicker
             />
             <TouchableOpacity
               style={{
                 backgroundColor: Colors.greenPrimary,
                 paddingHorizontal: scale(10),
                 paddingVertical: scale(5),
-                borderRadius: 8,
+                borderRadius: scale(10),
                 alignSelf: 'flex-end',
-                marginHorizontal: scale(10),
               }}
-              onPress={() => {
-                handleCreateTodo();
-              }}>
-              <Text style={{color: 'white', fontFamily: getFontFamily('bold')}}>
+              onPress={handleTodoSubmit(handleCreateTodo)}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontFamily: getFontFamily('bold'),
+                  fontSize: moderateScale(16),
+                }}>
                 Thêm
               </Text>
             </TouchableOpacity>
@@ -504,61 +504,53 @@ const GroupHomeScreen = ({route}: {route: any}) => {
             style={{
               backgroundColor: 'white',
               paddingVertical: scale(10),
-              borderRadius: 8,
+              borderRadius: scale(10),
               width: '90%',
               marginTop: scale(10),
               gap: scale(10),
+              paddingHorizontal: scale(10),
             }}>
             <TouchableOpacity
               onPress={() => {
                 setIsModalMemberVisible(true);
               }}>
-              <TextInput
-                placeholder="Nguời ủng hộ"
-                placeholderTextColor={'#706d6d'}
-                style={{
-                  fontSize: 16,
-                  padding: 10,
-                  backgroundColor: '#eff2ff',
-                  borderRadius: 8,
-                  color: 'black',
-                  borderWidth: 2,
-                  borderColor: Colors.greenPrimary,
-                  marginHorizontal: scale(10),
-                }}
-                editable={false}
-                value={statementMember?.name || ''}
-              />
+              <View pointerEvents="none">
+                <CustomInput
+                  controller={{
+                    control: statementControl,
+                    name: 'user',
+                  }}
+                  label="Người ủng hộ"
+                  labelColor={Colors.gray600}
+                  errorText={statementErrors.user?.message}
+                  pointerEvents="none"
+                />
+              </View>
             </TouchableOpacity>
-            <TextInput
-              placeholder="Đồ ủng hộ"
-              placeholderTextColor={'#706d6d'}
-              style={{
-                fontSize: 16,
-                padding: 10,
-                backgroundColor: '#eff2ff',
-                borderRadius: 8,
-                color: 'black',
-                borderWidth: 2,
-                borderColor: Colors.greenPrimary,
-                marginHorizontal: scale(10),
+            <CustomInput
+              controller={{
+                control: statementControl,
+                name: 'description',
               }}
-              value={statementDescription}
-              onChangeText={setStatementDescription}
+              label="Đồ ủng hộ"
+              labelColor={Colors.gray600}
+              errorText={statementErrors.description?.message}
             />
             <TouchableOpacity
               style={{
                 backgroundColor: Colors.greenPrimary,
                 paddingHorizontal: scale(10),
                 paddingVertical: scale(5),
-                borderRadius: 8,
+                borderRadius: scale(10),
                 alignSelf: 'flex-end',
-                marginHorizontal: scale(10),
               }}
-              onPress={() => {
-                handleCreateStatement();
-              }}>
-              <Text style={{color: 'white', fontFamily: getFontFamily('bold')}}>
+              onPress={handleStatementSubmit(handleCreateStatement)}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontFamily: getFontFamily('bold'),
+                  fontSize: moderateScale(16),
+                }}>
                 Thêm
               </Text>
             </TouchableOpacity>
@@ -610,7 +602,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           members={group.members}
           setSelectedMember={member => {
             setStatementMember(member);
-
+            setStatementValue('user', member.name);
             setIsModalMemberVisible(false);
           }}
           selectedMember={statementMember}

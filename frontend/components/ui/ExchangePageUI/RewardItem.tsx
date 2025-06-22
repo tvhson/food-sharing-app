@@ -1,40 +1,38 @@
-import {Button, Dialog, Icon, Menu, Portal} from 'react-native-paper';
+import React, {useState} from 'react';
 import {FormProvider, useForm} from 'react-hook-form';
+import {Button, Dialog, Icon, Menu, Portal} from 'react-native-paper';
 import {
   IReward,
   deleteReward,
   redeemPoint,
   updateReward,
 } from '../../../api/LoyaltyApi';
-import React, {useRef, useState} from 'react';
-/* eslint-disable react-native/no-inline-styles */
 import {
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
-import Colors from '../../../global/Color';
-import EditRewardItem from './EditRewardItem';
-import {Image} from '@rneui/themed';
 import {MAP_API_KEY} from '@env';
-import {RootState} from '../../../redux/Store';
-import UploadPhoto from '../UploadPhoto';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {Image} from '@rneui/themed';
 import axios from 'axios';
-import {getFontFamily} from '../../../utils/fonts';
-import screenWidth from '../../../global/Constant';
-import {uploadPhoto} from '../../../api/UploadPhotoApi';
 import {useNotifications} from 'react-native-notificated';
 import {useSelector} from 'react-redux';
+import {uploadPhoto} from '../../../api/UploadPhotoApi';
+import Colors from '../../../global/Color';
+import screenWidth from '../../../global/Constant';
+import {RootState} from '../../../redux/Store';
+import {getFontFamily} from '../../../utils/fonts';
 import {moderateScale, scale} from '../../../utils/scale';
+import {
+  ExchangeRewardValidateSchema,
+  createExchangeRewardValidate,
+} from '../../../utils/schema/exchange-reward';
 import {CustomInput} from '../CustomInput/CustomInput';
-import {createExchangeRewardValidate} from '../../../utils/schema/exchange-reward';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {ExchangeRewardValidateSchema} from '../../../utils/schema/exchange-reward';
-import {CustomText} from '../CustomText';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import UploadPhoto from '../UploadPhoto';
+import EditRewardItem from './EditRewardItem';
 
 const RewardItem = (props: {
   id: number;
@@ -52,7 +50,6 @@ const RewardItem = (props: {
   const [quantity, setQuantity] = React.useState(1);
   const [point, setPoint] = React.useState(props.pointsRequired);
   const accessToken = useSelector((state: RootState) => state.token.key);
-  const autocompleteRef = useRef<any | null>(null);
   const location = useSelector((state: RootState) => state.location);
 
   const [visible, setVisible] = useState<boolean>(false);
@@ -119,9 +116,6 @@ const RewardItem = (props: {
           shouldValidate: true,
         });
 
-        autocompleteRef.current?.setAddressText(
-          response.data.results[0].formatted_address,
-        );
         return response.data.results[0].formatted_address;
       }
       notify('error', {
@@ -368,50 +362,16 @@ const RewardItem = (props: {
                 keyboardType="numeric"
                 errorText={redeemFormState.errors.phone?.message}
               />
-              <View style={{height: scale(50)}}>
-                <GooglePlacesAutocomplete
-                  ref={autocompleteRef}
-                  fetchDetails={true}
-                  placeholder="Địa chỉ nhận"
-                  onPress={(data, details = null) => {
-                    redeemSetValue('address', data.description, {
-                      shouldValidate: true,
-                    });
-                  }}
-                  disableScroll={true}
-                  query={{
-                    key: MAP_API_KEY,
-                    language: 'vi',
-                  }}
-                  styles={{
-                    container: {
-                      borderColor: redeemFormState.errors.address
-                        ? Colors.red
-                        : Colors.gray300,
-                      borderRadius: scale(10),
-                      borderWidth: 1,
-                      backgroundColor: Colors.white,
-                    },
-                    textInput: {
-                      fontSize: scale(16),
-                      color: Colors.black,
-                      backgroundColor: Colors.white,
-                      fontFamily: getFontFamily('regular'),
-                    },
-                  }}
-                />
-                {redeemFormState.errors.address && (
-                  <CustomText
-                    fontType="medium"
-                    size={14}
-                    textColor={Colors.red}
-                    style={[
-                      {marginTop: scale(-16), paddingHorizontal: scale(10)},
-                    ]}>
-                    {redeemFormState.errors.address.message}
-                  </CustomText>
-                )}
-              </View>
+
+              <CustomInput
+                controller={{
+                  control: redeemControl,
+                  name: 'address',
+                }}
+                label="Địa chỉ"
+                labelColor={Colors.gray600}
+                errorText={redeemFormState.errors.address?.message}
+              />
 
               <Button
                 onPress={() =>

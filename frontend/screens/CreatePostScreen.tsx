@@ -24,7 +24,7 @@ import {RootState} from '../redux/Store';
 import {getFontFamily} from '../utils/fonts';
 import {getFoodTypeKey} from '../utils/helper';
 import {useLoading} from '../utils/LoadingContext';
-import {scale} from '../utils/scale';
+import {moderateScale, scale} from '../utils/scale';
 import {
   createCreatePostValidate,
   CreatePostValidateSchema,
@@ -418,6 +418,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
             query={{
               key: MAP_API_KEY,
               language: 'vi',
+              components: 'country:vn',
             }}
             styles={{
               container: {
@@ -427,7 +428,7 @@ const CreatePostScreen = ({route, navigation}: any) => {
                 backgroundColor: Colors.white,
               },
               textInput: {
-                fontSize: scale(16),
+                fontSize: moderateScale(16),
                 color: Colors.black,
                 backgroundColor: Colors.white,
                 fontFamily: getFontFamily('regular'),

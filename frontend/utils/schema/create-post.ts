@@ -15,8 +15,12 @@ export const createCreatePostValidate = () => {
         message: 'Vui lòng chọn loại thực phẩm',
       }),
       location: z.string().min(1, {message: 'Vị trí không được để trống'}),
-      latitude: z.number().min(1, {message: 'Vị trí không được để trống'}),
-      longitude: z.number().min(1, {message: 'Vị trí không được để trống'}),
+      latitude: z.number().refine(val => val !== undefined && val !== null, {
+        message: 'Vị trí không được để trống',
+      }),
+      longitude: z.number().refine(val => val !== undefined && val !== null, {
+        message: 'Vị trí không được để trống',
+      }),
       weight: z.string().min(1, {message: 'Trọng lượng không được để trống'}),
       portion: z.string().min(1, {message: 'Số phần không được để trống'}),
       expiredDate: zodDateNotInThePast(

@@ -1,41 +1,32 @@
 import {Button, Icon} from '@rneui/themed';
-import {ICreateGroupRequest, createGroup, inviteUser} from '../api/GroupApi';
-import {
-  Image,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
 import React, {useRef, useState} from 'react';
+import {Image, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import {createGroup, ICreateGroupRequest, inviteUser} from '../api/GroupApi';
 
-import AddPeopleModal from '../components/ui/AddPeopleModal';
-import Colors from '../global/Color';
-import {DatePickerInput} from 'react-native-paper-dates';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {MAP_API_KEY} from '@env';
-import {RadioButton} from 'react-native-paper';
-import {RootState} from '../redux/Store';
-import UploadPhoto from '../components/ui/UploadPhoto';
-import {UserInfo} from '../redux/UserReducer';
+import {zodResolver} from '@hookform/resolvers/zod';
 import axios from 'axios';
+import {Controller, useForm} from 'react-hook-form';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {createNotifications} from 'react-native-notificated';
-import {getFontFamily} from '../utils/fonts';
+import {RadioButton} from 'react-native-paper';
 import {uploadPhoto} from '../api/UploadPhotoApi';
+import AddPeopleModal from '../components/ui/AddPeopleModal';
+import {CustomInput} from '../components/ui/CustomInput/CustomInput';
+import {CustomText} from '../components/ui/CustomText';
+import UploadPhoto from '../components/ui/UploadPhoto';
+import Colors from '../global/Color';
+import screenWidth from '../global/Constant';
+import {RootState} from '../redux/Store';
+import {UserInfo} from '../redux/UserReducer';
+import {getFontFamily} from '../utils/fonts';
 import {useLoading} from '../utils/LoadingContext';
+import {moderateScale, scale} from '../utils/scale';
 import {
   createGroupValidate,
   GroupValidateSchema,
 } from '../utils/schema/create-group';
-import {Controller, useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {formatDate} from '../utils/helper';
-import {moderateScale, scale} from '../utils/scale';
-import {CustomInput} from '../components/ui/CustomInput/CustomInput';
-import {CustomText} from '../components/ui/CustomText';
-import screenWidth from '../global/Constant';
 import {parseDDMMYYYY} from '../utils/schema/hook-forms';
 
 const {useNotifications} = createNotifications();
@@ -98,9 +89,16 @@ const CreateGroupScreen = ({route, navigation}: any) => {
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitudeCurrent},${longitudeCurrent}&key=${MAP_API_KEY}`,
       );
       if (response.data.results.length > 0) {
-        setValue('locationName', response.data.results[0].formatted_address);
-        setValue('latitude', latitudeCurrent);
-        setValue('longitude', longitudeCurrent);
+        console.log(latitudeCurrent, longitudeCurrent);
+        setValue('locationName', response.data.results[0].formatted_address, {
+          shouldValidate: true,
+        });
+        setValue('latitude', latitudeCurrent, {
+          shouldValidate: true,
+        });
+        setValue('longitude', longitudeCurrent, {
+          shouldValidate: true,
+        });
         autocompleteRef.current?.setAddressText(
           response.data.results[0].formatted_address,
         );
@@ -193,10 +191,11 @@ const CreateGroupScreen = ({route, navigation}: any) => {
         <UploadPhoto
           isVisible={isUploadVisible}
           setVisible={setIsUploadVisible}
-          height={300}
-          width={350}
+          height={scale(300)}
+          width={scale(350)}
           isCircle={false}
           postImage={postImage}
+          isMultiple={false}
         />
         <View
           style={{
@@ -301,7 +300,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             }}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: moderateScale(16),
                 color: '#706d6d',
                 fontFamily: getFontFamily('regular'),
               }}>
@@ -310,50 +309,47 @@ const CreateGroupScreen = ({route, navigation}: any) => {
             <Icon
               name="account-plus"
               type="material-community"
-              size={20}
+              size={moderateScale(20)}
               color="#333"
             />
           </TouchableOpacity>
 
-          <View style={{height: scale(50)}}>
-            <GooglePlacesAutocomplete
-              ref={autocompleteRef}
-              fetchDetails={true}
-              placeholder="Địa chỉ diễn ra"
-              onPress={(data, details = null) => {
-                setValue('locationName', data.description, {
-                  shouldValidate: true,
-                });
-                setValue('latitude', details?.geometry.location.lat || 0, {
-                  shouldValidate: true,
-                });
-                setValue('longitude', details?.geometry.location.lng || 0, {
-                  shouldValidate: true,
-                });
-              }}
-              disableScroll={true}
-              query={{
-                key: MAP_API_KEY,
-                language: 'vi',
-              }}
-              styles={{
-                container: {
-                  borderColor: errors.locationName
-                    ? Colors.red
-                    : Colors.gray300,
-                  borderRadius: scale(10),
-                  borderWidth: scale(1),
-                  backgroundColor: Colors.white,
-                },
-                textInput: {
-                  fontSize: moderateScale(16),
-                  color: Colors.text,
-                  backgroundColor: Colors.white,
-                  fontFamily: getFontFamily('regular'),
-                },
-              }}
-            />
-          </View>
+          <GooglePlacesAutocomplete
+            ref={autocompleteRef}
+            fetchDetails={true}
+            placeholder="Địa chỉ diễn ra"
+            onPress={(data, details = null) => {
+              setValue('locationName', data.description, {
+                shouldValidate: true,
+              });
+              setValue('latitude', details?.geometry.location.lat || 0, {
+                shouldValidate: true,
+              });
+              setValue('longitude', details?.geometry.location.lng || 0, {
+                shouldValidate: true,
+              });
+            }}
+            disableScroll={true}
+            query={{
+              key: MAP_API_KEY,
+              language: 'vi',
+              components: 'country:vn',
+            }}
+            styles={{
+              container: {
+                borderColor: errors.locationName ? Colors.red : Colors.gray300,
+                borderRadius: scale(10),
+                borderWidth: scale(1),
+                backgroundColor: Colors.white,
+              },
+              textInput: {
+                fontSize: moderateScale(16),
+                color: Colors.text,
+                backgroundColor: Colors.white,
+                fontFamily: getFontFamily('regular'),
+              },
+            }}
+          />
           {errors.locationName && (
             <CustomText
               fontType="medium"
@@ -403,22 +399,27 @@ const CreateGroupScreen = ({route, navigation}: any) => {
                   />
                   <TouchableOpacity
                     style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 10,
+                      width: scale(20),
+                      height: scale(20),
+                      borderRadius: scale(10),
                       justifyContent: 'center',
                       alignItems: 'center',
                       alignContent: 'center',
                       position: 'absolute',
-                      top: 10,
-                      right: 10,
+                      top: scale(10),
+                      right: scale(10),
                       backgroundColor: 'black',
                       zIndex: 1,
                     }}
                     onPress={() => {
                       setImageUpload(null);
                     }}>
-                    <Icon name="close" type="ionicon" size={20} color="white" />
+                    <Icon
+                      name="close"
+                      type="ionicon"
+                      size={moderateScale(20)}
+                      color="white"
+                    />
                   </TouchableOpacity>
                 </View>
               </>
@@ -431,7 +432,7 @@ const CreateGroupScreen = ({route, navigation}: any) => {
                   <Icon
                     name="camera"
                     type="ionicon"
-                    size={60}
+                    size={moderateScale(60)}
                     color={Colors.greenPrimary}
                     style={{marginTop: scale(20)}}
                   />
@@ -457,29 +458,28 @@ const CreateGroupScreen = ({route, navigation}: any) => {
               {errors.image.message as string}
             </CustomText>
           )}
+
+          <Button
+            title="Tạo nhóm"
+            onPress={handleSubmit(handleCreatePost)}
+            buttonStyle={{
+              backgroundColor: Colors.greenPrimary,
+              width: scale(200),
+              alignSelf: 'center',
+              borderRadius: scale(10),
+              marginBottom: scale(20),
+            }}
+            titleStyle={{fontFamily: getFontFamily('bold')}}
+          />
         </View>
 
-        <Button
-          title="Tạo nhóm"
-          onPress={handleSubmit(handleCreatePost)}
-          buttonStyle={{
-            backgroundColor: Colors.greenPrimary,
-            width: scale(200),
-            alignSelf: 'center',
-            marginTop: scale(20),
-            borderRadius: scale(10),
-          }}
-          titleStyle={{fontFamily: getFontFamily('bold')}}
+        <AddPeopleModal
+          isVisible={isAddPeopleModalVisible}
+          onClose={() => setIsAddPeopleModalVisible(false)}
+          selectedPeople={selectedPeople}
+          setSelectedPeople={setSelectedPeople}
         />
-
-        <View style={{height: scale(30)}} />
       </View>
-      <AddPeopleModal
-        isVisible={isAddPeopleModalVisible}
-        onClose={() => setIsAddPeopleModalVisible(false)}
-        selectedPeople={selectedPeople}
-        setSelectedPeople={setSelectedPeople}
-      />
     </ScrollView>
   );
 };
