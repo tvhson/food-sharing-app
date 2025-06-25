@@ -200,58 +200,66 @@ const ProfileScreen = ({navigation, route}: any) => {
             overflow: 'hidden',
             padding: 10,
           }}>
-          <Button
-            title={userInfo.name}
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black', marginLeft: 10}}
-            icon={{name: 'user', type: 'antdesign', color: 'black'}}
-          />
-          <Button
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            title={new Date(userInfo.birthDate).toLocaleDateString()}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black', marginLeft: 10}}
-            icon={{
-              name: 'birthday-cake',
-              type: 'font-awesome',
-              color: 'black',
-            }}
-          />
-          <Button
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            title={userInfo.phone}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black', marginLeft: 10}}
-            icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
-          />
-          <Button
-            disabled
-            disabledStyle={{backgroundColor: 'transparent'}}
-            disabledTitleStyle={{color: 'black'}}
-            title={userInfo.locationName}
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              justifyContent: 'flex-start',
-            }}
-            titleStyle={{color: 'black'}}
-            icon={{name: 'location', type: 'entypo', color: 'black'}}
-          />
+          {userInfo.name && (
+            <Button
+              title={userInfo.name}
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black', marginLeft: 10}}
+              icon={{name: 'user', type: 'antdesign', color: 'black'}}
+            />
+          )}
+          {userInfo.birthDate && (
+            <Button
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              title={new Date(userInfo.birthDate).toLocaleDateString()}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black', marginLeft: 10}}
+              icon={{
+                name: 'birthday-cake',
+                type: 'font-awesome',
+                color: 'black',
+              }}
+            />
+          )}
+          {userInfo.phone && (
+            <Button
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              title={userInfo.phone}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black', marginLeft: 10}}
+              icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
+            />
+          )}
+          {userInfo.locationName && (
+            <Button
+              disabled
+              disabledStyle={{backgroundColor: 'transparent'}}
+              disabledTitleStyle={{color: 'black'}}
+              title={userInfo.locationName}
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                justifyContent: 'flex-start',
+              }}
+              titleStyle={{color: 'black'}}
+              icon={{name: 'location', type: 'entypo', color: 'black'}}
+            />
+          )}
         </View>
       ) : null}
 

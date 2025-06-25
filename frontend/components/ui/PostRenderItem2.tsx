@@ -66,7 +66,7 @@ const PostRenderItem2 = (props: any) => {
     useState<boolean>(false);
   const [anchor, setAnchor] = useState({x: 0, y: 0});
   const [reason, setReason] = useState<string>(
-    'Spam or Misleading Information',
+    'Bài viết linh tinh, lặp lại, thông tin sai lệch',
   );
   const [descriptionReason, setDescriptionReason] = useState<string>('');
 
@@ -74,7 +74,7 @@ const PostRenderItem2 = (props: any) => {
   const expiredString = calculateExpiredDate(new Date(item.expiredDate));
 
   const openMenu = () => {
-    setReason('Spam or Misleading Information');
+    setReason('Bài viết linh tinh, lặp lại, thông tin sai lệch');
     setDescriptionReason('');
     setVisible(true);
   };
@@ -207,7 +207,7 @@ const PostRenderItem2 = (props: any) => {
                   alignItems: 'center',
                 }}>
                 <RadioButton
-                  value="Spam or Misleading Information"
+                  value="Bài viết linh tinh, lặp lại, thông tin sai lệch"
                   color={Colors.greenPrimary}
                 />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
@@ -220,7 +220,7 @@ const PostRenderItem2 = (props: any) => {
                   alignItems: 'center',
                 }}>
                 <RadioButton
-                  value="Offensive Content"
+                  value="Nội dung không lành mạnh"
                   color={Colors.greenPrimary}
                 />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
@@ -233,7 +233,7 @@ const PostRenderItem2 = (props: any) => {
                   alignItems: 'center',
                 }}>
                 <RadioButton
-                  value="Scam or Fraudulent Activity"
+                  value="Bài viết lừa đảo"
                   color={Colors.greenPrimary}
                 />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
@@ -246,7 +246,7 @@ const PostRenderItem2 = (props: any) => {
                   alignItems: 'center',
                 }}>
                 <RadioButton
-                  value="Health and Safety Concerns"
+                  value="Bài viết chứa các lo ngại về sức khỏe"
                   color={Colors.greenPrimary}
                 />
                 <Text style={{fontFamily: getFontFamily('regular')}}>
@@ -258,11 +258,11 @@ const PostRenderItem2 = (props: any) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}>
-                <RadioButton value="Other" color={Colors.greenPrimary} />
+                <RadioButton value="Khác" color={Colors.greenPrimary} />
                 <Text style={{fontFamily: getFontFamily('regular')}}>Khác</Text>
               </View>
             </RadioButton.Group>
-            {reason === 'Other' && (
+            {reason === 'Khác' && (
               <View
                 style={{paddingHorizontal: scale(10), marginTop: scale(10)}}>
                 <TextInput

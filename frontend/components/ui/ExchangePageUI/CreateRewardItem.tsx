@@ -6,6 +6,8 @@ import Colors from '../../../global/Color';
 import screenWidth from '../../../global/Constant';
 import {RewardList} from '../../../screens/ManageReward/CreateRewardScreen';
 import {getFontFamily} from '../../../utils/fonts';
+import {moderateScale, scale} from '../../../utils/scale';
+import {CustomInput} from '../CustomInput/CustomInput';
 
 const CreateRewardItem = (props: {
   item: any;
@@ -16,42 +18,48 @@ const CreateRewardItem = (props: {
 }) => {
   const {item, index, remove, isDisable, setUploadPhoto} = props;
 
-  const {control} = useFormContext<RewardList>();
+  const {
+    control,
+    formState: {errors},
+  } = useFormContext<RewardList>();
 
   return (
     <View
       style={{
         backgroundColor: Colors.greenPrimary,
-        padding: 30,
-        paddingHorizontal: 10,
+        padding: scale(30),
+        paddingHorizontal: scale(10),
         alignItems: 'center',
-        borderRadius: 20,
+        borderRadius: scale(10),
         justifyContent: 'center',
-        gap: 10,
+        gap: scale(10),
         flexDirection: 'row',
-        marginVertical: 15,
+        marginVertical: scale(15),
       }}>
       <TouchableOpacity
-        style={{position: 'absolute', top: 5, right: 5}}
+        style={{position: 'absolute', top: scale(5), right: scale(5)}}
         disabled={isDisable}
         onPress={() => remove(index)}>
-        <Icon source={'close'} size={30} color={Colors.white} />
+        <Icon source={'close'} size={24} color={Colors.white} />
       </TouchableOpacity>
       <Controller
         control={control}
         name={`rewards.${index}.imageUrl`}
         rules={{required: true}}
-        render={({field: {onChange, value}}) => {
+        render={({field: {onChange, value}, formState: {errors}}) => {
+          const error = errors.rewards?.[index]?.imageUrl;
           return (
             <View
               style={{
                 width: screenWidth / 3,
                 height: screenWidth / 3,
-                borderRadius: 20,
+                borderRadius: scale(20),
                 overflow: 'hidden',
                 backgroundColor: Colors.white,
                 justifyContent: 'center',
                 alignItems: 'center',
+                borderWidth: 1,
+                borderColor: error ? Colors.red : Colors.gray500,
               }}>
               {value ? (
                 <View>
@@ -65,11 +73,11 @@ const CreateRewardItem = (props: {
                     }}
                     style={{
                       position: 'absolute',
-                      top: 10,
-                      right: 10,
+                      top: scale(10),
+                      right: scale(10),
                       backgroundColor: Colors.black,
-                      padding: 5,
-                      borderRadius: 20,
+                      padding: scale(5),
+                      borderRadius: scale(20),
                     }}>
                     <Icon source={'close'} size={20} color={Colors.white} />
                   </TouchableOpacity>
@@ -88,7 +96,7 @@ const CreateRewardItem = (props: {
                   <Text
                     style={{
                       color: Colors.greenPrimary,
-                      fontSize: 16,
+                      fontSize: moderateScale(16),
                       fontFamily: getFontFamily('bold'),
                     }}>
                     Thêm ảnh
@@ -99,74 +107,32 @@ const CreateRewardItem = (props: {
           );
         }}
       />
-      <View style={{flex: 1, gap: 10}}>
-        <Controller
-          control={control}
-          name={`rewards.${index}.rewardName`}
-          rules={{required: true}}
-          render={({field: {onChange, value, onBlur}}) => (
-            <TextInput
-              style={{
-                backgroundColor: Colors.white,
-                borderRadius: 10,
-                paddingHorizontal: 10,
-                fontFamily: getFontFamily('regular'),
-                fontSize: 16,
-                color: Colors.black,
-                height: 40,
-              }}
-              placeholder="Tên quà"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-            />
-          )}
+      <View style={{flex: 1, gap: scale(10)}}>
+        <CustomInput
+          controller={{
+            name: `rewards.${index}.rewardName`,
+            control: control,
+          }}
+          errorText={errors.rewards?.[index]?.rewardName?.message}
+          label="Tên quà"
         />
-        <Controller
-          control={control}
-          name={`rewards.${index}.pointsRequired`}
-          rules={{required: true}}
-          render={({field: {onChange, value, onBlur}}) => (
-            <TextInput
-              style={{
-                backgroundColor: Colors.white,
-                borderRadius: 10,
-                paddingHorizontal: 10,
-                fontFamily: getFontFamily('regular'),
-                fontSize: 16,
-                color: Colors.black,
-                height: 40,
-              }}
-              placeholder="Số lượng Star Point"
-              value={value ? value.toString() : ''}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              keyboardType="numeric"
-            />
-          )}
+        <CustomInput
+          controller={{
+            name: `rewards.${index}.pointsRequired`,
+            control: control,
+          }}
+          errorText={errors.rewards?.[index]?.pointsRequired?.message}
+          label="Số lượng Star Point"
+          keyboardType="numeric"
         />
-        <Controller
-          control={control}
-          name={`rewards.${index}.stockQuantity`}
-          rules={{required: true}}
-          render={({field: {onChange, value, onBlur}}) => (
-            <TextInput
-              style={{
-                backgroundColor: Colors.white,
-                borderRadius: 10,
-                paddingHorizontal: 10,
-                fontFamily: getFontFamily('regular'),
-                fontSize: 16,
-                color: Colors.black,
-                height: 40,
-              }}
-              placeholder="Số lượng quà"
-              value={value ? value.toString() : ''}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              keyboardType="numeric"
-            />
-          )}
+        <CustomInput
+          controller={{
+            name: `rewards.${index}.stockQuantity`,
+            control: control,
+          }}
+          errorText={errors.rewards?.[index]?.stockQuantity?.message}
+          label="Số lượng quà"
+          keyboardType="numeric"
         />
       </View>
     </View>

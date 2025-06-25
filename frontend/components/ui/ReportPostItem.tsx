@@ -4,10 +4,11 @@ import React, {useEffect, useState} from 'react';
 import {Icon, Image} from '@rneui/themed';
 import Colors from '../../global/Color';
 import getDistance from 'geolib/es/getDistance';
+import {Route} from '../../constants/route';
 
 const ReportPostItem = ({item, navigation, location}: any) => {
   const handleOnPress = () => {
-    navigation.navigate('PostDetail', {item, location});
+    navigation.navigate(Route.PostDetail2, {item, location});
   };
   const [distance, setDistance] = useState<number>(0);
 

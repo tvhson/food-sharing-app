@@ -1,5 +1,5 @@
 import {FormProvider, useFieldArray, useForm} from 'react-hook-form';
-import {IReward, createRewards} from '../../api/LoyaltyApi';
+import {createRewards, IReward} from '../../api/LoyaltyApi';
 /* eslint-disable react-native/no-inline-styles */
 import {
   ScrollView,
@@ -9,17 +9,22 @@ import {
   View,
 } from 'react-native';
 
-import Colors from '../../global/Color';
-import CreateRewardItem from '../../components/ui/ExchangePageUI/CreateRewardItem';
-import {Icon} from 'react-native-paper';
+import {zodResolver} from '@hookform/resolvers/zod';
 import React from 'react';
-import {RootState} from '../../redux/Store';
-import UploadPhoto from '../../components/ui/UploadPhoto';
-import {getFontFamily} from '../../utils/fonts';
-import {uploadPhoto} from '../../api/UploadPhotoApi';
-import {useLoading} from '../../utils/LoadingContext';
 import {useNotifications} from 'react-native-notificated';
+import {Icon} from 'react-native-paper';
 import {useSelector} from 'react-redux';
+import {uploadPhoto} from '../../api/UploadPhotoApi';
+import CreateRewardItem from '../../components/ui/ExchangePageUI/CreateRewardItem';
+import UploadPhoto from '../../components/ui/UploadPhoto';
+import Colors from '../../global/Color';
+import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
+import {useLoading} from '../../utils/LoadingContext';
+import {
+  createRewardValidate,
+  CreateRewardValidateSchema,
+} from '../../utils/schema/create-reward';
 
 export type RewardList = {
   rewards: IReward[];
@@ -30,13 +35,16 @@ const CreateRewardScreen = ({navigation}: any) => {
   const {showLoading, hideLoading} = useLoading();
   const accessToken = useSelector((state: RootState) => state.token.key);
   const [isUploadVisible, setIsUploadVisible] = React.useState(0);
-  const methods = useForm<RewardList>({
+  const methods = useForm<CreateRewardValidateSchema>({
+    resolver: zodResolver(createRewardValidate()),
     defaultValues: {
       rewards: [
         {
           rewardName: '',
           rewardDescription: '',
           imageUrl: '',
+          pointsRequired: 0,
+          stockQuantity: 0,
         },
       ],
     },

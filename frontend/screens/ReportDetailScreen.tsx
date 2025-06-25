@@ -16,6 +16,7 @@ import {getInfoUserById} from '../api/AccountsApi';
 import {getOrganizationPostById} from '../api/OrganizationPostApi';
 import {getPostById} from '../api/PostApi';
 import {updateTheReport} from '../redux/ReportReducer';
+import {moderateScale, verticalScale} from '../utils/scale';
 
 const {useNotifications} = createNotifications();
 
@@ -155,7 +156,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
       }}>
       <View
         style={{
-          height: 60,
+          height: verticalScale(60),
           width: '100%',
           backgroundColor: Colors.button,
           borderBottomWidth: 1,
@@ -176,7 +177,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         </View>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: moderateScale(24),
             fontWeight: 'bold',
             color: 'white',
           }}>
@@ -184,7 +185,12 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         </Text>
       </View>
       <ScrollView style={{flex: 1, padding: 10}}>
-        <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(20),
+            color: 'black',
+            fontWeight: '500',
+          }}>
           Bài viết bị báo cáo
         </Text>
         {postData && item.type === 'POST' ? (
@@ -200,19 +206,34 @@ const ReportDetailScreen = ({navigation, route}: any) => {
             location={location}
           />
         ) : null}
-        <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(20),
+            color: 'black',
+            fontWeight: '500',
+          }}>
           Người báo cáo
         </Text>
         {senderInfo ? (
           <ReportAccountItem item={senderInfo} isReport={true} />
         ) : null}
-        <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(20),
+            color: 'black',
+            fontWeight: '500',
+          }}>
           Người bị báo cáo
         </Text>
         {accusedInfo ? (
           <ReportAccountItem item={accusedInfo} isReport={true} />
         ) : null}
-        <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(20),
+            color: 'black',
+            fontWeight: '500',
+          }}>
           Lý do báo cáo
         </Text>
         <View
@@ -222,13 +243,22 @@ const ReportDetailScreen = ({navigation, route}: any) => {
             borderRadius: 8,
             marginTop: 5,
           }}>
-          <Text style={{fontSize: 16, color: 'black'}}>
-            {item.title === 'Other' ? item.description : item.title}
+          <Text
+            style={{
+              fontSize: moderateScale(16),
+              color: 'black',
+            }}>
+            {item.title === 'Khác' ? item.description : item.title}
           </Text>
         </View>
         {item.status === 'PENDING' ? (
           <>
-            <Text style={{fontSize: 20, color: 'black', fontWeight: '500'}}>
+            <Text
+              style={{
+                fontSize: moderateScale(20),
+                color: 'black',
+                fontWeight: '500',
+              }}>
               Khóa tài khoản
             </Text>
             <View
@@ -324,7 +354,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                   width: 150,
                 }}
                 onPress={() => navigation.goBack()}
-                titleStyle={{fontWeight: '700', fontSize: 18}}
+                titleStyle={{fontWeight: '700', fontSize: moderateScale(18)}}
               />
               <Button
                 title={'Xong'}
@@ -337,12 +367,12 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                   paddingHorizontal: 45,
                 }}
                 onPress={handleDone}
-                titleStyle={{fontWeight: '700', fontSize: 18}}
+                titleStyle={{fontWeight: '700', fontSize: moderateScale(18)}}
               />
             </View>
           </>
         ) : null}
-        <View style={{height: 40}} />
+        <View style={{height: verticalScale(40)}} />
       </ScrollView>
     </View>
   );

@@ -1,9 +1,9 @@
-/* eslint-disable react-native/no-inline-styles */
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {Icon} from 'react-native-paper';
 import Colors from '../../global/Color';
 import {getFontFamily} from '../../utils/fonts';
+import {moderateScale, scale} from '../../utils/scale';
 
 const Header = (props: any) => {
   const {title, navigation} = props;
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
+    padding: scale(10),
     backgroundColor: Colors.white,
   },
   floatBtn: {
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   textTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontFamily: getFontFamily('bold'),
     fontWeight: 'bold',
     color: Colors.text,
