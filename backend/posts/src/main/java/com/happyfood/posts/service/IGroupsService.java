@@ -31,4 +31,6 @@ public interface IGroupsService {
     GroupsDto rejectGroupInvitation(Long groupId, Long userId);
     GroupsDto joinGroup(Long groupId, Long userId);
     GroupsDto leaveGroup(Long groupId, Long userId);
+
+    void deleteUser(Long userId);
 }

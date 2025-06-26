@@ -1,9 +1,7 @@
 package com.happyfood.chats.service.impl;
 
-import com.happyfood.chats.dto.ChatBotDto;
-import com.happyfood.chats.dto.ChatBotMessage;
-import com.happyfood.chats.dto.ChatBotRequest;
-import com.happyfood.chats.dto.ChatBotResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.happyfood.chats.dto.*;
 import com.happyfood.chats.entity.ChatBotHistory;
 import com.happyfood.chats.entity.ChatMessages;
 import com.happyfood.chats.exception.CustomException;
@@ -36,6 +34,12 @@ public class ChatBotService implements IChatBotService {
 
     @Value("${openai.api.model_3_5_turbo.prompt}")
     private String prompt;
+
+    @Value("${openai.api.model_4_0_turbo.name}")
+    private String model4;
+
+    @Value("${openai.api.model_4_0_turbo.prompt}")
+    private String prompt4;
 
     @Override
     public ChatBotDto chat(String content, Long userId) {
@@ -112,11 +116,11 @@ public class ChatBotService implements IChatBotService {
                                    .role(ChatBotRole.ASSISTANT.getValue())
                                    .build());
 
-        String beginningMessage = "## ❓ Bạn muốn hỏi về \n"
-                                  + "- ➡️ Chính sách đổi điểm thưởng \n"
-                                  + "- ➡️ Chính sách khiếu nại \n"
-                                  + "- ➡️ Cách giao nhận thức ăn \n"
-                                  + "- ❔ Câu hỏi thường gặp \n";
+        String beginningMessage = "## Bạn muốn hỏi về \n"
+                                  + "- Chính sách đổi điểm thưởng \n"
+                                  + "- Chính sách khiếu nại \n"
+                                  + "- Cách giao nhận thức ăn \n"
+                                  + "- Câu hỏi thường gặp \n";
         chatMessages.add(ChatBotDto.builder()
                                    .content(beginningMessage)
                                    .role(ChatBotRole.ASSISTANT.getValue())
@@ -133,5 +137,39 @@ public class ChatBotService implements IChatBotService {
         Collections.reverse(chatMessages);
 
         return chatMessages;
+    }
+
+    @Override
+    public MessageDto processImage(String imageUrl) {
+        ChatImageRequest request = new ChatImageRequest(
+                model4,
+                List.of(
+                        new ChatImageMessage(
+                                ChatBotRole.USER.getValue(),
+                                List.of(
+                                        ChatImageContent.text(prompt4),
+                                        ChatImageContent.image(imageUrl)
+                                       )
+                        )
+                       ),
+                1000
+        );
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(request);
+            System.out.println("📤 JSON payload gửi lên OpenAI:\n" + json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ChatBotResponse response = restTemplate.postForObject(apiUrl, request, ChatBotResponse.class);
+        if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
+            throw new CustomException("Failed to get a response from the OpenAI API", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return MessageDto.builder()
+                         .content(response.getChoices().get(0).getMessage().getContent())
+                         .build();
     }
 }

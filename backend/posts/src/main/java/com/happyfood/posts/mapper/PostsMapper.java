@@ -5,6 +5,7 @@ import com.happyfood.posts.entity.Images;
 import com.happyfood.posts.entity.Posts;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PostsMapper {
@@ -53,7 +54,9 @@ public class PostsMapper {
                        .isReceived(false)
                        .likeCount(posts.getUserIdLikes() != null && !posts.getUserIdLikes().isEmpty() ? Arrays.asList(posts.getUserIdLikes().split("-")).size() : 0)
                        .type(posts.getType())
-                       .ai("Món ăn này nhìn rất ngon và hấp dẫn! Bạn có thể cho tôi biết thêm về cách chế biến hoặc nguyên liệu không? Tôi rất muốn học cách làm món này.")
+                       .AIComments(posts.getAiComments() != null && !posts.getAiComments().isEmpty()
+                                   ? Arrays.asList(posts.getAiComments().split("-"))
+                                   : null)
                        .build();
     }
 }

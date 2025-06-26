@@ -25,7 +25,7 @@ spring:
         all-namespaces: true
     openfeign:
       circuitbreaker:
-        enabled: true
+        enabled: false
 
 management:
   endpoints:
@@ -65,31 +65,34 @@ logging:
     com:
       sontruong02003:
         posts: DEBUG
+    feign: DEBUG
+    feign.Logger: DEBUG
+    feign.codec: DEBUG
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 
-resilience4j.circuitbreaker:
-  configs:
-    default:
-      slidingWindowSize: 10
-      permittedNumberOfCallsInHalfOpenState: 2
-      failureRateThreshold: 50
-      waitDurationInOpenState: 10000
-
-resilience4j.retry:
-  configs:
-    default:
-      maxRetryAttempts: 3
-      waitDuration: 500
-      enableExponentialBackoff: true
-      exponentialBackoffMultiplier: 2
-
-resilience4j.ratelimiter:
-  configs:
-    default:
-      timeoutDuration: 1000
-      limitRefreshPeriod: 5000
-      limitForPeriod: 5
+#resilience4j.circuitbreaker:
+#  configs:
+#    default:
+#      slidingWindowSize: 10
+#      permittedNumberOfCallsInHalfOpenState: 2
+#      failureRateThreshold: 50
+#      waitDurationInOpenState: 20s
+#
+#resilience4j.retry:
+#  configs:
+#    default:
+#      maxRetryAttempts: 3
+#      waitDuration: 1s
+#      enableExponentialBackoff: true
+#      exponentialBackoffMultiplier: 2
+#
+#resilience4j.ratelimiter:
+#  configs:
+#    default:
+#      timeoutDuration: 20s
+#      limitRefreshPeriod: 20s
+#      limitForPeriod: 20
 
 #  {
 #    "Version": "2012-10-17",

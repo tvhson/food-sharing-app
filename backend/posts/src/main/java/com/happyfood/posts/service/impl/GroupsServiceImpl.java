@@ -346,6 +346,14 @@ public class GroupsServiceImpl implements IGroupsService {
         return convertToResponse(groupsRepository.save(groups), userId);
     }
 
+    @Override
+    public void deleteUser(Long userId) {
+        List<Groups> groups = groupsRepository.findByAuthorId(userId);
+        if (groups != null && !groups.isEmpty()) {
+            groups.forEach(groupsRepository::delete);
+        }
+    }
+
     private GroupsDto convertToResponse(Groups groups, Long userId) {
         GroupsDto groupsDto = GroupsMapper.mapToGroupsDto(groups);
         AccountsDto author = accountsAdapter.getAccount(groups.getAuthorId());

@@ -1,6 +1,8 @@
 package com.happyfood.chats.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.happyfood.chats.dto.ChatBotDto;
+import com.happyfood.chats.dto.MessageDto;
 import com.happyfood.chats.entity.ChatMessages;
 import com.happyfood.chats.entity.ChatRooms;
 import com.happyfood.chats.service.IChatBotService;
@@ -53,5 +55,18 @@ public class ChatsController {
     @GetMapping("/chatbot/history")
     public ResponseEntity<List<ChatBotDto>> getChatHistory(@RequestHeader Long userId) {
         return ResponseEntity.ok(chatBotService.getHistory(userId));
+    }
+
+    @PostMapping("/chatbot/image")
+    public ResponseEntity<MessageDto> processImage(@RequestBody ChatBotDto chatMessage) {
+        MessageDto response = chatBotService.processImage(chatMessage.getContent());
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
+            System.out.println("📤 JSON payload gửi lên OpenAI:\n" + json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok(response);
     }
 }

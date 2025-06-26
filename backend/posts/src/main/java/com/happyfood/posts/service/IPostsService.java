@@ -16,4 +16,5 @@ public interface IPostsService {
     void toggleLikePost(Long userId, Long postId);
     void confirmReceivedPost(Long userId, Long postId);
     NumberPostsReceivedDto getNumberPostsReceived(Long userId);
+    void deleteUser(Long userId);
 }

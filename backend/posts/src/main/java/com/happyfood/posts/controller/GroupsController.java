@@ -79,4 +79,10 @@ public class GroupsController {
     ResponseEntity<?> leaveGroup(@PathVariable Long groupId, @PathVariable Long userId) {
         return ResponseEntity.ok(groupsService.leaveGroup(groupId, userId));
     }
+
+    @DeleteMapping("/delete-user/{userId}")
+    ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        groupsService.deleteUser(userId);
+        return ResponseEntity.ok().build();
+    }
 }

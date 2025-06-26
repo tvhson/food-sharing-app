@@ -103,4 +103,10 @@ public class PostsController {
         commentsService.toggleLikeComment(userId, commentId);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/delete-user/{userId}")
+    ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        postsService.deleteUser(userId);
+        return ResponseEntity.ok().build();
+    }
 }

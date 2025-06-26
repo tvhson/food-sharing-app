@@ -7,6 +7,7 @@ import com.happyfood.accounts.exception.CustomException;
 import com.happyfood.accounts.mapper.AccountsMapper;
 import com.happyfood.accounts.repository.AccountsRepository;
 import com.happyfood.accounts.service.IAccountsService;
+import com.happyfood.accounts.service.client.PostsFeginClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ public class AccountsServiceImpl implements IAccountsService {
     private final AccountsRepository accountsRepository;
 //    private final StreamBridge streamBridge;
     private final PasswordEncoder passwordEncoder;
+    private final PostsFeginClient postsFeginClient;
 
     @Override
     public AccountsDto createAccount(AccountsDto accountsDto) {
@@ -84,6 +86,9 @@ public class AccountsServiceImpl implements IAccountsService {
                 .orElseThrow(() -> new CustomException("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND));
         accounts.setStatus("BANNED");
         accounts.setBannedDate(new Date(System.currentTimeMillis() + days * 24 * 60 * 60 * 1000));
+
+        postsFeginClient.deleteUser(accountId);
+        postsFeginClient.deleteUserGr(accountId);
 
         return AccountsMapper.mapToAccountsDto(accountsRepository.save(accounts));
     }

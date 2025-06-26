@@ -8,6 +8,7 @@ import com.happyfood.accounts.exception.CustomException;
 import com.happyfood.accounts.mapper.AccountsMapper;
 import com.happyfood.accounts.repository.AccountsRepository;
 import com.happyfood.accounts.service.IAccountsDetailsService;
+import com.happyfood.accounts.service.client.PostsFeginClient;
 import com.happyfood.accounts.service.client.SharingPostsFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

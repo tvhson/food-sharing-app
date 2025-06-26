@@ -1,10 +1,8 @@
 package com.happyfood.posts.service.impl;
 
 import com.happyfood.posts.adapter.AccountsAdapter;
-import com.happyfood.posts.dto.AccountsDto;
-import com.happyfood.posts.dto.Coordinates;
-import com.happyfood.posts.dto.NumberPostsReceivedDto;
-import com.happyfood.posts.dto.PostsDto;
+import com.happyfood.posts.dto.*;
+import com.happyfood.posts.entity.Groups;
 import com.happyfood.posts.entity.Images;
 import com.happyfood.posts.entity.Posts;
 import com.happyfood.posts.exception.CustomException;
@@ -36,6 +34,12 @@ public class PostsServiceImpl implements IPostsService {
         posts.setCreatedDate(new Date());
         if (postsDto.getTags() != null && !postsDto.getTags().isEmpty()) {
             posts.setTags(String.join("-", postsDto.getTags()));
+        }
+
+        if (!postsDto.getImages().isEmpty()) {
+            String comment = accountsAdapter.processImage(postsDto.getImages().get(0));
+
+            posts.setAiComments(comment);
         }
 
         posts.setImages(new ArrayList<>());
@@ -192,6 +196,25 @@ public class PostsServiceImpl implements IPostsService {
                                         .filter(post -> Arrays.stream(post.getUserIdReceived().split("-")).anyMatch(s -> s.equals(userId.toString())))
                                         .count();
         return NumberPostsReceivedDto.builder().numberPostsReceived(numberPostsReceived).build();
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        List<Posts> posts = postsRepository.findAllByCreatedById(userId);
+        for (Posts post : posts) {
+            post.setDeleted(true);
+        }
+        postsRepository.saveAll(posts);
+
+        accountsAdapter.createNotification(NotificationsDto.builder()
+                                                           .type("BAN")
+                                                           .imageUrl("https://cdn.pixabay.com/photo/2016/10/09/17/28/banned-1726366_1280.jpg")
+                                                           .title("Bạn đã bị xóa tài khoản")
+                                                           .description("Bạn đã bị xóa tài khoản do vi phạm các quy định của HappyFood. Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.")
+                                                           .linkId(1L)
+                                                           .userId(userId)
+                                                           .senderId(1L)
+                                                           .build());
     }
 
     private PostsDto convertToResponse(Posts posts, Long userId) {
