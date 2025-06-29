@@ -1,65 +1,62 @@
-/* eslint-disable react-native/no-inline-styles */
+import {Image} from '@rneui/themed';
+import React from 'react';
 import {Linking, Text, TouchableWithoutFeedback, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Icon, Image} from '@rneui/themed';
+import {IGetGroupResponse} from '../../api/GroupApi';
+import {Route} from '../../constants/route';
 import Colors from '../../global/Color';
-import getDistance from 'geolib/es/getDistance';
+import {getFontFamily} from '../../utils/fonts';
+import {moderateScale, scale} from '../../utils/scale';
 
-const ReportOrganizationItem = ({item, navigation, location}: any) => {
+interface IReportOrganizationItem {
+  item: IGetGroupResponse;
+  navigation: any;
+}
+
+const ReportOrganizationItem = ({
+  item,
+  navigation,
+}: IReportOrganizationItem) => {
   const handleOnPress = () => {
-    navigation.navigate('OrganizationPostDetail', {item, location});
+    navigation.navigate(Route.OrganizationPostDetail2, {item});
   };
-  const [distance, setDistance] = useState<number>(0);
-
-  useEffect(() => {
-    const getDistanceFromLocation = async () => {
-      if (location && location.latitude && location.longitude) {
-        setDistance(
-          getDistance(
-            {
-              latitude: item.organizationposts.latitude,
-              longitude: item.organizationposts.longitude,
-            },
-            {latitude: location.latitude, longitude: location.longitude},
-          ) / 1000,
-        );
-      }
-    };
-    getDistanceFromLocation();
-  }, [
-    item.organizationposts.latitude,
-    item.organizationposts.longitude,
-    location,
-  ]);
 
   return (
     <TouchableWithoutFeedback onPress={handleOnPress}>
       <View
         style={{
-          padding: 10,
-          marginVertical: 4,
+          padding: scale(10),
+          marginVertical: scale(4),
           backgroundColor: 'white',
-          borderRadius: 8,
+          borderRadius: scale(8),
           flexDirection: 'row',
           elevation: 2,
         }}>
         <Image
           source={{
-            uri: item.organizationposts.imageUrl
-              ? item.organizationposts.imageUrl
+            uri: item.imageUrl
+              ? item.imageUrl
               : 'https://www.w3schools.com/w3images/avatar2.png',
           }}
-          style={{width: 150, height: 150, borderRadius: 8}}
+          style={{
+            width: scale(150),
+            height: scale(150),
+            borderRadius: scale(8),
+          }}
         />
-        <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'column',
+            marginLeft: scale(8),
+          }}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text
               style={{
-                fontSize: 22,
-                fontWeight: '500',
+                fontSize: moderateScale(22),
+                fontFamily: getFontFamily('bold'),
                 color: Colors.postTitle,
               }}>
-              {item.organizationposts.title}
+              {item.name}
             </Text>
           </View>
           <View
@@ -69,48 +66,26 @@ const ReportOrganizationItem = ({item, navigation, location}: any) => {
               justifyContent: 'space-between',
             }}>
             <View>
-              <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: '500', color: 'black'}}>
-                  {'\u2022'} Description:{' '}
-                </Text>
-                {item.organizationposts.description}
-              </Text>
-              <Text>
+              <Text
+                style={{
+                  fontSize: moderateScale(16),
+                  color: Colors.grayText,
+                }}>
                 <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '500',
-                    color: 'black',
-                    textDecorationLine: 'none',
-                  }}>
-                  {'\u2022'} Link website:{' '}
+                  style={{fontFamily: getFontFamily('bold'), color: 'black'}}>
+                  {'\u2022'} Mô tả:{' '}
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'purple',
-                    textDecorationLine: 'underline',
-                  }}
-                  onPress={async () => {
-                    try {
-                      await Linking.openURL(
-                        item.organizationposts.linkWebsites,
-                      );
-                    } catch (error) {
-                      console.log('Failed to open URL:', error);
-                      await Linking.openURL('https://www.google.com');
-                    }
-                  }}>
-                  {item.organizationposts.linkWebsites}
-                </Text>
+                {item.description}
               </Text>
             </View>
 
             <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-              <Text style={{fontSize: 12, color: Colors.grayText}}>
-                {new Date(
-                  item.organizationposts.createdDate,
-                ).toLocaleDateString()}
+              <Text
+                style={{
+                  fontSize: moderateScale(12),
+                  color: Colors.grayText,
+                }}>
+                {new Date(item.createdDate).toLocaleDateString()}
               </Text>
             </View>
           </View>

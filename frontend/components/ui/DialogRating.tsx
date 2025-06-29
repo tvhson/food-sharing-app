@@ -1,18 +1,16 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {Image, Rating} from '@rneui/themed';
-import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {Button, Dialog, IconButton, Portal} from 'react-native-paper';
-import {getFontFamily} from '../../utils/fonts';
-import Colors from '../../global/Color';
-import {earnPoint} from '../../api/LoyaltyApi';
-import {RootState} from '../../redux/Store';
 import {useDispatch, useSelector} from 'react-redux';
+import {earnPoint} from '../../api/LoyaltyApi';
 import {
   createNotification,
   updateNotification,
 } from '../../api/NotificationApi';
+import Colors from '../../global/Color';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
+import {RootState} from '../../redux/Store';
+import {getFontFamily} from '../../utils/fonts';
 
 const DialogRating = (props: {
   visible: boolean;
@@ -26,6 +24,22 @@ const DialogRating = (props: {
   const dispatch = useDispatch();
 
   const [rating, setRating] = useState(5);
+  const stars = useMemo(() => {
+    const arr = [];
+    for (let i = 1; i <= 5; i++) {
+      arr.push(
+        <TouchableOpacity key={i} onPress={() => setRating(i)}>
+          <IconButton
+            icon={i <= rating ? 'star' : 'star-outline'}
+            size={30}
+            iconColor={Colors.yellow}
+          />
+        </TouchableOpacity>,
+      );
+    }
+    return arr;
+  }, [rating]);
+
   if (!item) {
     return null;
   }
@@ -87,21 +101,6 @@ const DialogRating = (props: {
     // Here, you can send the rating to a server or perform other actions
     setIsLoading(false);
   };
-  const renderStars = () => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <TouchableOpacity key={i} onPress={() => setRating(i)}>
-          <IconButton
-            icon={i <= rating ? 'star' : 'star-outline'}
-            size={30}
-            iconColor={Colors.yellow} // Filled star color
-          />
-        </TouchableOpacity>,
-      );
-    }
-    return stars;
-  };
 
   return (
     <Portal>
@@ -124,6 +123,7 @@ const DialogRating = (props: {
         visible={visible}
         onDismiss={() => {
           setVisible(false);
+          setRating(5);
         }}>
         <Dialog.Content>
           <View
@@ -161,7 +161,7 @@ const DialogRating = (props: {
                 justifyContent: 'center',
                 marginVertical: 10,
               }}>
-              {renderStars()}
+              {stars}
             </View>
             <Button
               loading={isLoading}

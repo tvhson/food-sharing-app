@@ -3,7 +3,7 @@ import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Accessory} from '@rneui/base';
+import {Accessory, Icon} from '@rneui/base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../global/Color';
 import EditProfileScreen from './EditProfileScreen';
@@ -19,6 +19,8 @@ import {getFontFamily} from '../utils/fonts';
 import {saveUser} from '../redux/UserReducer';
 import {updateUser} from '../api/AccountsApi';
 import {uploadPhoto} from '../api/UploadPhotoApi';
+import {Text} from 'react-native';
+import {scale} from '../utils/scale';
 
 const {useNotifications} = createNotifications();
 
@@ -193,72 +195,90 @@ const ProfileScreen = ({navigation, route}: any) => {
       {userInfo.role !== 'ADMIN' ? (
         <View
           style={{
-            marginHorizontal: 35,
+            paddingHorizontal: scale(20),
             backgroundColor: 'white',
-            borderRadius: 8,
-            marginVertical: 20,
+            borderRadius: scale(10),
+            marginVertical: scale(20),
             overflow: 'hidden',
-            padding: 10,
+            padding: scale(10),
+            width: '90%',
+            alignSelf: 'center',
           }}>
           {userInfo.name && (
-            <Button
-              title={userInfo.name}
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black', marginLeft: 10}}
-              icon={{name: 'user', type: 'antdesign', color: 'black'}}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="user" type="antdesign" color="black" />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                  paddingLeft: scale(10),
+                }}>
+                {userInfo.name}
+              </Text>
+            </View>
           )}
           {userInfo.birthDate && (
-            <Button
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              title={new Date(userInfo.birthDate).toLocaleDateString()}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black', marginLeft: 10}}
-              icon={{
-                name: 'birthday-cake',
-                type: 'font-awesome',
-                color: 'black',
-              }}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="birthday-cake" type="font-awesome" color="black" />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                  paddingLeft: scale(10),
+                }}>
+                {new Date(userInfo.birthDate).toLocaleDateString()}
+              </Text>
+            </View>
           )}
           {userInfo.phone && (
-            <Button
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              title={userInfo.phone}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black', marginLeft: 10}}
-              icon={{name: 'phone', type: 'font-awesome', color: 'black'}}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="phone" type="font-awesome" color="black" />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                  paddingLeft: scale(10),
+                }}>
+                {userInfo.phone}
+              </Text>
+            </View>
           )}
           {userInfo.locationName && (
-            <Button
-              disabled
-              disabledStyle={{backgroundColor: 'transparent'}}
-              disabledTitleStyle={{color: 'black'}}
-              title={userInfo.locationName}
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black'}}
-              icon={{name: 'location', type: 'entypo', color: 'black'}}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="location" type="entypo" color="black" />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                  paddingLeft: scale(10),
+                }}>
+                {userInfo.locationName}
+              </Text>
+            </View>
           )}
         </View>
       ) : null}
@@ -266,58 +286,88 @@ const ProfileScreen = ({navigation, route}: any) => {
       {userInfo.role === 'ADMIN' ? (
         <View
           style={{
-            marginHorizontal: 35,
+            paddingHorizontal: scale(20),
             backgroundColor: 'white',
-            borderRadius: 8,
-            marginVertical: 20,
+            borderRadius: scale(10),
+            marginVertical: scale(20),
             overflow: 'hidden',
-            padding: 10,
+            padding: scale(10),
+            width: '90%',
+            alignSelf: 'center',
           }}>
           <>
-            <Button
+            <TouchableOpacity
               onPress={() => navigation.navigate('Report')}
-              title="Quản lý báo cáo"
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
-              titleStyle={{color: 'black'}}
-              icon={{name: 'report', type: 'material-icon', color: 'black'}}
-            />
-            <Button
-              title="Quản lý tài khoản"
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="report" type="material-icon" color="black" />
+              <Text
+                style={{
+                  paddingLeft: scale(10),
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                }}>
+                Quản lý báo cáo
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => navigation.navigate('Verify')}
-              titleStyle={{color: 'black'}}
-              icon={{
-                name: 'verified-user',
-                type: 'material-icon',
-                color: 'black',
-              }}
-            />
-            <Button
-              title="Quản lý quà tặng"
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="verified-user" type="material-icon" color="black" />
+              <Text
+                style={{
+                  paddingLeft: scale(10),
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                }}>
+                Quản lý tài khoản
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => navigation.navigate('ManageReward')}
-              titleStyle={{color: 'black'}}
-              icon={{name: 'gift', type: 'ant-design', color: 'black'}}
-            />
-            <Button
-              title="Lịch sử đổi quà"
-              buttonStyle={{
-                backgroundColor: 'transparent',
-                justifyContent: 'flex-start',
-              }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="gift" type="ant-design" color="black" />
+              <Text
+                style={{
+                  paddingLeft: scale(10),
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                }}>
+                Quản lý quà tặng
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => navigation.navigate('HistoryExchangeGift')}
-              titleStyle={{color: 'black'}}
-              icon={{name: 'history', type: 'material-icon', color: 'black'}}
-            />
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="history" type="material-icon" color="black" />
+              <Text
+                style={{
+                  paddingLeft: scale(10),
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                }}>
+                Lịch sử đổi quà
+              </Text>
+            </TouchableOpacity>
           </>
         </View>
       ) : null}

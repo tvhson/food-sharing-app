@@ -1,7 +1,12 @@
 import React, {useState} from 'react';
 import {Button, Dialog, Menu, Portal, RadioButton} from 'react-native-paper';
 /* eslint-disable react-native/no-inline-styles */
-import {Text, TouchableWithoutFeedback, View} from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {Image} from '@rneui/themed';
@@ -11,6 +16,8 @@ import {banAccount} from '../../api/ReportApi';
 import Colors from '../../global/Color';
 import {changeRole} from '../../redux/AccountsReducer';
 import {RootState} from '../../redux/Store';
+import {Route} from '../../constants/route';
+import {useNavigation} from '@react-navigation/native';
 
 const {useNotifications} = createNotifications();
 
@@ -24,7 +31,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
   const [visible, setVisible] = useState<boolean>(false);
   const [anchor, setAnchor] = useState({x: 0, y: 0});
   const dispatch = useDispatch();
-
+  const navigation = useNavigation<any>();
   const openMenu = () => {
     setVisible(true);
   };
@@ -37,7 +44,9 @@ const ReportAccountItem = ({item, isReport}: any) => {
     setAnchor(anchorEvent);
     openMenu();
   };
-
+  const handleOnPress = () => {
+    navigation.navigate(Route.PersonalPageOfOther, {id: item.id});
+  };
   const handleChangeRole = async () => {
     const response: any = await changeRoleById(item.id, role, accessToken);
     if (response.status === 200) {
@@ -89,7 +98,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
   };
 
   return (
-    <TouchableWithoutFeedback onLongPress={handleOnLongPress}>
+    <TouchableOpacity onPress={handleOnPress} onLongPress={handleOnLongPress}>
       <View
         style={{
           padding: 10,
@@ -315,7 +324,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
           </View>
         </View>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 };
 export default ReportAccountItem;

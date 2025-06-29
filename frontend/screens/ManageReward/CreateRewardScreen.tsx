@@ -25,6 +25,8 @@ import {
   createRewardValidate,
   CreateRewardValidateSchema,
 } from '../../utils/schema/create-reward';
+import Header from '../../components/ui/Header';
+import {scale} from '../../utils/scale';
 
 export type RewardList = {
   rewards: IReward[];
@@ -41,13 +43,13 @@ const CreateRewardScreen = ({navigation}: any) => {
       rewards: [
         {
           rewardName: '',
-          rewardDescription: '',
           imageUrl: '',
-          pointsRequired: 0,
-          stockQuantity: 0,
+          pointsRequired: '',
+          stockQuantity: '',
         },
       ],
     },
+    mode: 'onChange',
   });
 
   const {fields, append, remove} = useFieldArray({
@@ -55,8 +57,17 @@ const CreateRewardScreen = ({navigation}: any) => {
     name: 'rewards',
   });
 
-  const onSubmit = async (data: RewardList) => {
-    const response: any = await createRewards(data, accessToken);
+  const onSubmit = async (data: CreateRewardValidateSchema) => {
+    const response: any = await createRewards(
+      {
+        rewards: data.rewards.map(item => ({
+          ...item,
+          pointsRequired: Number(item.pointsRequired),
+          stockQuantity: Number(item.stockQuantity),
+        })),
+      },
+      accessToken,
+    );
     if (response.status === 200) {
       notify('success', {
         params: {description: 'Tạo quà thành công', title: 'Thành công'},
@@ -87,6 +98,9 @@ const CreateRewardScreen = ({navigation}: any) => {
       methods.setValue(
         `rewards.${isUploadVisible - 1}.imageUrl`,
         response.data[0],
+        {
+          shouldValidate: true,
+        },
       );
     } else {
       notify('error', {
@@ -96,32 +110,6 @@ const CreateRewardScreen = ({navigation}: any) => {
         },
       });
     }
-  };
-
-  const renderHeader = () => {
-    return (
-      <View style={styles.header}>
-        <View
-          style={{
-            padding: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 20,
-          }}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon source={'arrow-left'} size={30} color={Colors.white} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: Colors.white,
-              fontSize: 20,
-              fontFamily: getFontFamily('semibold'),
-            }}>
-            Tạo quà
-          </Text>
-        </View>
-      </View>
-    );
   };
 
   return (
@@ -135,12 +123,12 @@ const CreateRewardScreen = ({navigation}: any) => {
         postImage={postImage}
         isMultiple={false}
       />
-      {renderHeader()}
+      <Header title="Tạo quà" navigation={navigation} />
       <ScrollView
         style={{
           flex: 1,
-          paddingHorizontal: 10,
-          paddingTop: 10,
+          paddingHorizontal: scale(10),
+          paddingTop: scale(10),
         }}>
         <FormProvider {...methods}>
           {fields.map((item, index) => (
@@ -159,30 +147,29 @@ const CreateRewardScreen = ({navigation}: any) => {
           onPress={() =>
             append({
               rewardName: '',
-              rewardDescription: '',
-              stockQuantity: 0,
-              pointsRequired: 0,
+              stockQuantity: '',
+              pointsRequired: '',
               imageUrl: '',
             })
           }
           style={{
             alignItems: 'center',
             backgroundColor: Colors.greenPrimary,
-            marginTop: 20,
-            marginBottom: 200,
-            borderRadius: 25,
-            width: 50,
-            height: 50,
+            marginTop: scale(20),
+            marginBottom: scale(200),
+            borderRadius: scale(25),
+            width: scale(50),
+            height: scale(50),
             justifyContent: 'center',
             alignSelf: 'center',
           }}>
-          <Icon source={'plus'} size={30} color={Colors.white} />
+          <Icon source={'plus'} size={scale(30)} color={Colors.white} />
         </TouchableOpacity>
       </ScrollView>
       <View
         style={{
           backgroundColor: Colors.white,
-          padding: 20,
+          padding: scale(20),
           position: 'absolute',
           bottom: 0,
           alignItems: 'center',
@@ -197,14 +184,14 @@ const CreateRewardScreen = ({navigation}: any) => {
           }}
           style={{
             backgroundColor: Colors.greenPrimary,
-            padding: 10,
-            borderRadius: 10,
-            paddingHorizontal: 50,
+            padding: scale(10),
+            borderRadius: scale(10),
+            paddingHorizontal: scale(50),
           }}>
           <Text
             style={{
               color: Colors.white,
-              fontSize: 16,
+              fontSize: scale(16),
               fontFamily: getFontFamily('semibold'),
             }}>
             Lưu
@@ -220,9 +207,6 @@ export default CreateRewardScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
-  },
-  header: {
-    backgroundColor: Colors.greenPrimary,
+    backgroundColor: Colors.background,
   },
 });

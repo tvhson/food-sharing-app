@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: scale(10),
     backgroundColor: Colors.white,
+    elevation: 5,
   },
   floatBtn: {
     position: 'absolute',

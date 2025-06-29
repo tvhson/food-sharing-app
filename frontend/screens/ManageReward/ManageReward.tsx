@@ -87,6 +87,7 @@ const ManageReward = ({navigation}: any) => {
           }
           keyExtractor={(item: any) => item.id.toString()}
           renderItem={({item}) => {
+            console.log(item);
             return (
               <RewardItem
                 imageUrl={item.imageUrl}

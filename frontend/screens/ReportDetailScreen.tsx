@@ -4,7 +4,6 @@ import {ScrollView, Text, View} from 'react-native';
 import {banAccount, updateReport} from '../api/ReportApi';
 import {useDispatch, useSelector} from 'react-redux';
 
-/* eslint-disable react-native/no-inline-styles */
 import {Button} from '@rneui/themed';
 import Colors from '../global/Color';
 import ReportAccountItem from '../components/ui/ReportAccountItem';
@@ -14,9 +13,12 @@ import {RootState} from '../redux/Store';
 import {createNotifications} from 'react-native-notificated';
 import {getInfoUserById} from '../api/AccountsApi';
 import {getOrganizationPostById} from '../api/OrganizationPostApi';
-import {getPostById} from '../api/PostApi';
+import {deletePost, getPostById} from '../api/PostApi';
 import {updateTheReport} from '../redux/ReportReducer';
-import {moderateScale, verticalScale} from '../utils/scale';
+import {moderateScale, scale, verticalScale} from '../utils/scale';
+import Header from '../components/ui/Header';
+import {getFontFamily} from '../utils/fonts';
+import {deleteGroup, getGroupById} from '../api/GroupApi';
 
 const {useNotifications} = createNotifications();
 
@@ -30,21 +32,25 @@ const ReportDetailScreen = ({navigation, route}: any) => {
   const [senderInfo, setSenderInfo] = useState<any>(null);
   const [accusedInfo, setAccusedInfo] = useState<any>(null);
   const [banDay, setBanDay] = useState<any>('1');
+  const [isDeletePost, setIsDeletePost] = useState<string>('false');
 
   useEffect(() => {
     const getPostDetail = async () => {
-      if (item && item.type === 'POST') {
-        const response: any = await getPostById(item.linkId, accessToken);
+      if (item && item?.type === 'POST') {
+        const response: any = await getPostById(item?.linkId, accessToken);
         if (response.status === 200) {
           setPostData(response.data);
         }
-      } else {
-        const response: any = await getOrganizationPostById(
-          item.linkId,
-          accessToken,
-        );
-        if (response.status === 200) {
-          setPostData(response.data);
+      } else if (
+        item &&
+        item?.type === 'ORGANIZATION' &&
+        item?.status === 'PENDING'
+      ) {
+        try {
+          const response: any = await getGroupById(accessToken, item?.linkId);
+          setPostData(response);
+        } catch (error) {
+          console.log(error);
         }
       }
     };
@@ -65,7 +71,40 @@ const ReportDetailScreen = ({navigation, route}: any) => {
     getSenderInfo();
     getAccusedInfo();
   }, [accessToken, item]);
+
+  const handleDeletePost = async () => {
+    try {
+      if (item.type === 'POST') {
+        const response: any = await deletePost(item.linkId, accessToken);
+        if (response.status !== 200) {
+          notify('error', {
+            params: {
+              description: 'Có lỗi xảy ra khi xóa bài viết',
+              title: 'Lỗi xóa bài viết',
+              style: {multiline: 100},
+            },
+          });
+        }
+      } else if (item.type === 'ORGANIZATION') {
+        const response: any = await deleteGroup(accessToken, item.linkId);
+      }
+    } catch (error) {
+      notify('error', {
+        params: {
+          description: 'Có lỗi xảy ra khi xóa nhóm',
+          title: 'Lỗi',
+          style: {multiline: 100},
+        },
+      });
+      console.log(error);
+    }
+  };
+
   const handleDone = async () => {
+    if (isDeletePost === 'true') {
+      await handleDeletePost();
+    }
+
     if (banDay === '0') {
       const response: any = await updateReport(item.id, accessToken, {
         title: item.title,
@@ -82,8 +121,8 @@ const ReportDetailScreen = ({navigation, route}: any) => {
       if (response.status === 200) {
         notify('success', {
           params: {
-            description: 'Report has been updated',
-            title: 'Report',
+            description: 'Báo cáo đã được cập nhật',
+            title: 'Báo cáo',
             style: {multiline: 100},
           },
         });
@@ -93,7 +132,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         notify('error', {
           params: {
             description: response.data,
-            title: 'Report',
+            title: 'Lỗi',
             style: {multiline: 100},
           },
         });
@@ -120,8 +159,8 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         if (response2.status === 200) {
           notify('success', {
             params: {
-              description: 'Report has been updated',
-              title: 'Report',
+              description: 'Báo cáo đã được cập nhật',
+              title: 'Báo cáo',
               style: {multiline: 100},
             },
           });
@@ -131,7 +170,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
           notify('error', {
             params: {
               description: response2.data,
-              title: 'Report',
+              title: 'Lỗi',
               style: {multiline: 100},
             },
           });
@@ -140,7 +179,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         notify('error', {
           params: {
             description: response.data,
-            title: 'Report',
+            title: 'Lỗi',
             style: {multiline: 100},
           },
         });
@@ -154,63 +193,44 @@ const ReportDetailScreen = ({navigation, route}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <View
-        style={{
-          height: verticalScale(60),
-          width: '100%',
-          backgroundColor: Colors.button,
-          borderBottomWidth: 1,
-          borderBlockColor: '#ccc',
-          justifyContent: 'center',
-
-          alignItems: 'center',
-        }}>
-        <View style={{position: 'absolute', top: -1, left: 10}}>
-          <IconButton
-            icon="chevron-left"
-            size={40}
-            iconColor="white"
-            onPress={() => {
-              navigation.goBack();
-            }}
-          />
-        </View>
-        <Text
-          style={{
-            fontSize: moderateScale(24),
-            fontWeight: 'bold',
-            color: 'white',
-          }}>
-          Quản lý báo cáo
-        </Text>
-      </View>
-      <ScrollView style={{flex: 1, padding: 10}}>
-        <Text
-          style={{
-            fontSize: moderateScale(20),
-            color: 'black',
-            fontWeight: '500',
-          }}>
-          Bài viết bị báo cáo
-        </Text>
+      <Header title="Quản lý báo cáo" navigation={navigation} />
+      <ScrollView style={{flex: 1, padding: scale(10)}}>
+        {item.type === 'POST' && (
+          <Text
+            style={{
+              fontSize: moderateScale(20),
+              color: 'black',
+              fontFamily: getFontFamily('bold'),
+            }}>
+            Bài viết bị báo cáo
+          </Text>
+        )}
+        {item.type === 'ORGANIZATION' && item.status === 'PENDING' && (
+          <Text
+            style={{
+              fontSize: moderateScale(20),
+              color: 'black',
+              fontFamily: getFontFamily('bold'),
+            }}>
+            Nhóm bị báo cáo
+          </Text>
+        )}
         {postData && item.type === 'POST' ? (
           <ReportPostItem
             item={postData}
             navigation={navigation}
             location={location}
           />
-        ) : postData && item.type === 'ORGANIZATIONPOST' ? (
-          <ReportOrganizationItem
-            item={postData}
-            navigation={navigation}
-            location={location}
-          />
+        ) : postData &&
+          item.type === 'ORGANIZATION' &&
+          item.status === 'PENDING' ? (
+          <ReportOrganizationItem item={postData} navigation={navigation} />
         ) : null}
         <Text
           style={{
             fontSize: moderateScale(20),
             color: 'black',
-            fontWeight: '500',
+            fontFamily: getFontFamily('bold'),
           }}>
           Người báo cáo
         </Text>
@@ -221,7 +241,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
           style={{
             fontSize: moderateScale(20),
             color: 'black',
-            fontWeight: '500',
+            fontFamily: getFontFamily('bold'),
           }}>
           Người bị báo cáo
         </Text>
@@ -232,16 +252,16 @@ const ReportDetailScreen = ({navigation, route}: any) => {
           style={{
             fontSize: moderateScale(20),
             color: 'black',
-            fontWeight: '500',
+            fontFamily: getFontFamily('bold'),
           }}>
           Lý do báo cáo
         </Text>
         <View
           style={{
             backgroundColor: 'white',
-            padding: 10,
-            borderRadius: 8,
-            marginTop: 5,
+            padding: scale(10),
+            borderRadius: scale(8),
+            marginTop: scale(5),
           }}>
           <Text
             style={{
@@ -257,16 +277,58 @@ const ReportDetailScreen = ({navigation, route}: any) => {
               style={{
                 fontSize: moderateScale(20),
                 color: 'black',
-                fontWeight: '500',
+                fontFamily: getFontFamily('bold'),
+              }}>
+              {item.type === 'POST' ? 'Xóa bài viết' : 'Xóa nhóm'}
+            </Text>
+            <View
+              style={{
+                backgroundColor: 'white',
+                padding: scale(10),
+                borderRadius: scale(8),
+                marginTop: scale(5),
+              }}>
+              <RadioButton.Group
+                onValueChange={newValue => setIsDeletePost(newValue)}
+                value={isDeletePost}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="true" />
+                  <Text>
+                    {item.type === 'POST' ? 'Xóa bài viết' : 'Xóa nhóm'}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <RadioButton value="false" />
+                  <Text>
+                    {item.type === 'POST'
+                      ? 'Không xóa bài viết'
+                      : 'Không xóa nhóm'}
+                  </Text>
+                </View>
+              </RadioButton.Group>
+            </View>
+            <Text
+              style={{
+                fontSize: moderateScale(20),
+                color: 'black',
+                fontFamily: getFontFamily('bold'),
               }}>
               Khóa tài khoản
             </Text>
             <View
               style={{
                 backgroundColor: 'white',
-                padding: 10,
-                borderRadius: 8,
-                marginTop: 5,
+                padding: scale(10),
+                borderRadius: scale(8),
+                marginTop: scale(5),
               }}>
               <RadioButton.Group
                 onValueChange={newValue => setBanDay(newValue)}
@@ -341,7 +403,7 @@ const ReportDetailScreen = ({navigation, route}: any) => {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                marginTop: 20,
+                marginTop: scale(20),
               }}>
               <Button
                 title={'Hủy'}
@@ -349,12 +411,15 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                   backgroundColor: Colors.grayText,
                   borderColor: 'transparent',
                   borderWidth: 0,
-                  borderRadius: 10,
-                  paddingHorizontal: 45,
-                  width: 150,
+                  borderRadius: scale(10),
+                  paddingHorizontal: scale(45),
+                  width: scale(150),
                 }}
                 onPress={() => navigation.goBack()}
-                titleStyle={{fontWeight: '700', fontSize: moderateScale(18)}}
+                titleStyle={{
+                  fontFamily: getFontFamily('bold'),
+                  fontSize: moderateScale(18),
+                }}
               />
               <Button
                 title={'Xong'}
@@ -362,12 +427,15 @@ const ReportDetailScreen = ({navigation, route}: any) => {
                   backgroundColor: Colors.greenPrimary,
                   borderColor: 'transparent',
                   borderWidth: 0,
-                  width: 150,
-                  borderRadius: 10,
-                  paddingHorizontal: 45,
+                  width: scale(150),
+                  borderRadius: scale(10),
+                  paddingHorizontal: scale(45),
                 }}
                 onPress={handleDone}
-                titleStyle={{fontWeight: '700', fontSize: moderateScale(18)}}
+                titleStyle={{
+                  fontFamily: getFontFamily('bold'),
+                  fontSize: moderateScale(18),
+                }}
               />
             </View>
           </>

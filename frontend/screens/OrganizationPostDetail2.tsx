@@ -25,7 +25,7 @@ import {RootState} from '../redux/Store';
 import {Route} from '../constants/route';
 import {addGroup} from '../redux/GroupReducer';
 import {getFontFamily} from '../utils/fonts';
-import {scale} from '../utils/scale';
+import {moderateScale, scale, verticalScale} from '../utils/scale';
 import {useNavigation} from '@react-navigation/native';
 import {useNotifications} from 'react-native-notificated';
 import {useLoading} from '../utils/LoadingContext';
@@ -264,31 +264,30 @@ const styles = StyleSheet.create({
   },
   topImg: {
     width: '100%',
-    height: scale(300),
+    height: verticalScale(300),
     borderBottomLeftRadius: scale(20),
     borderBottomRightRadius: scale(20),
   },
   floatBtn: {
     position: 'absolute',
-    left: 10,
-    top: 10,
+    left: scale(10),
+    top: scale(10),
     backgroundColor: Colors.white,
-    borderRadius: 20,
-    width: 40,
-    height: 40,
+    borderRadius: scale(20),
+    width: scale(40),
+    height: scale(40),
     zIndex: 100,
     justifyContent: 'center',
     alignItems: 'center',
   },
   textTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontFamily: getFontFamily('bold'),
-    fontWeight: 'bold',
     color: Colors.text,
     textAlign: 'center',
   },
   textLink: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: getFontFamily('regular'),
     color: '#3498db',
     textAlign: 'center',
@@ -296,21 +295,21 @@ const styles = StyleSheet.create({
   },
   btnJoin: {
     width: '80%',
-    height: 40,
+    height: scale(40),
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: scale(16),
     flexDirection: 'row',
-    borderRadius: 10,
+    borderRadius: scale(10),
     alignSelf: 'center',
   },
   textBtn: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: getFontFamily('bold'),
     marginLeft: 5,
   },
   textNormal: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontFamily: getFontFamily('regular'),
     color: Colors.black,
   },
@@ -320,14 +319,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   iconText: {
-    width: 25,
-    height: 25,
-    marginRight: 10,
+    width: scale(25),
+    height: scale(25),
+    marginRight: scale(10),
   },
   textTitle2: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontFamily: getFontFamily('bold'),
-    fontWeight: 'bold',
     color: Colors.text,
   },
 });

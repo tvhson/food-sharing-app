@@ -33,6 +33,11 @@ import {
 import {CustomInput} from '../CustomInput/CustomInput';
 import UploadPhoto from '../UploadPhoto';
 import EditRewardItem from './EditRewardItem';
+import {
+  createRewardValidate,
+  editRewardValidate,
+  EditRewardValidateSchema,
+} from '../../../utils/schema/create-reward';
 
 const RewardItem = (props: {
   id: number;
@@ -57,13 +62,15 @@ const RewardItem = (props: {
   const [isUploadVisible, setIsUploadVisible] = useState(0);
   const [anchor, setAnchor] = React.useState({x: 0, y: 0});
 
-  const methods = useForm<IReward>({
+  const methods = useForm<EditRewardValidateSchema>({
+    resolver: zodResolver(editRewardValidate()),
     defaultValues: {
       rewardName: props.rewardName,
-      pointsRequired: props.pointsRequired,
-      stockQuantity: props.stockQuantity,
+      pointsRequired: props.pointsRequired.toString(),
+      stockQuantity: props.stockQuantity.toString(),
       imageUrl: props.imageUrl,
     },
+    mode: 'onChange',
   });
 
   const {
@@ -166,9 +173,17 @@ const RewardItem = (props: {
     }
   };
 
-  const handleEdit = async (data: IReward) => {
+  const handleEdit = async (data: EditRewardValidateSchema) => {
     setDialogEditVisible(false);
-    const response: any = await updateReward(data, accessToken, props.id);
+    const response: any = await updateReward(
+      {
+        ...data,
+        pointsRequired: Number(data.pointsRequired),
+        stockQuantity: Number(data.stockQuantity),
+      },
+      accessToken,
+      props.id,
+    );
 
     if (response.status === 200) {
       notify('success', {
@@ -432,7 +447,9 @@ const RewardItem = (props: {
       });
       const response: any = await uploadPhoto(dataForm, accessToken);
       if (response.status === 200) {
-        methods.setValue('imageUrl', response.data[0]);
+        methods.setValue('imageUrl', response.data[0], {
+          shouldValidate: true,
+        });
       } else {
         notify('error', {
           params: {
@@ -442,6 +459,7 @@ const RewardItem = (props: {
         });
       }
     };
+
     return (
       <Portal>
         <UploadPhoto
@@ -462,7 +480,7 @@ const RewardItem = (props: {
           <Dialog.Content>
             <View
               style={{
-                paddingBottom: 10,
+                paddingBottom: scale(10),
               }}>
               <Text
                 style={{

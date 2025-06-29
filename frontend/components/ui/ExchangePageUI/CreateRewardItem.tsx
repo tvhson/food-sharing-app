@@ -8,6 +8,7 @@ import {RewardList} from '../../../screens/ManageReward/CreateRewardScreen';
 import {getFontFamily} from '../../../utils/fonts';
 import {moderateScale, scale} from '../../../utils/scale';
 import {CustomInput} from '../CustomInput/CustomInput';
+import {CustomText} from '../CustomText';
 
 const CreateRewardItem = (props: {
   item: any;
@@ -33,7 +34,6 @@ const CreateRewardItem = (props: {
         borderRadius: scale(10),
         justifyContent: 'center',
         gap: scale(10),
-        flexDirection: 'row',
         marginVertical: scale(15),
       }}>
       <TouchableOpacity
@@ -49,61 +49,78 @@ const CreateRewardItem = (props: {
         render={({field: {onChange, value}, formState: {errors}}) => {
           const error = errors.rewards?.[index]?.imageUrl;
           return (
-            <View
-              style={{
-                width: screenWidth / 3,
-                height: screenWidth / 3,
-                borderRadius: scale(20),
-                overflow: 'hidden',
-                backgroundColor: Colors.white,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 1,
-                borderColor: error ? Colors.red : Colors.gray500,
-              }}>
-              {value ? (
-                <View>
-                  <Image
-                    source={{uri: value}}
-                    style={{width: screenWidth / 3, height: screenWidth / 3}}
-                  />
+            <>
+              <View
+                style={{
+                  width: screenWidth * 0.85,
+                  height: screenWidth * 0.6,
+                  borderRadius: scale(20),
+                  overflow: 'hidden',
+                  backgroundColor: Colors.white,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: error ? Colors.red : Colors.gray500,
+                }}>
+                {value ? (
+                  <View>
+                    <Image
+                      source={{uri: value}}
+                      style={{
+                        width: screenWidth * 0.85,
+                        height: screenWidth * 0.6,
+                      }}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        onChange('');
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: scale(10),
+                        right: scale(10),
+                        backgroundColor: Colors.gray700,
+                        padding: scale(5),
+                        borderRadius: scale(20),
+                      }}>
+                      <Icon source={'close'} size={20} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
                   <TouchableOpacity
+                    style={{alignItems: 'center'}}
                     onPress={() => {
-                      onChange('');
-                    }}
-                    style={{
-                      position: 'absolute',
-                      top: scale(10),
-                      right: scale(10),
-                      backgroundColor: Colors.black,
-                      padding: scale(5),
-                      borderRadius: scale(20),
+                      setUploadPhoto(index + 1);
                     }}>
-                    <Icon source={'close'} size={20} color={Colors.white} />
+                    <Icon
+                      source={'camera'}
+                      size={50}
+                      color={Colors.greenPrimary}
+                    />
+                    <Text
+                      style={{
+                        color: Colors.greenPrimary,
+                        fontSize: moderateScale(16),
+                        fontFamily: getFontFamily('bold'),
+                      }}>
+                      Thêm ảnh
+                    </Text>
                   </TouchableOpacity>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  style={{alignItems: 'center'}}
-                  onPress={() => {
-                    setUploadPhoto(index + 1);
+                )}
+              </View>
+              {error && (
+                <CustomText
+                  fontType="medium"
+                  size={14}
+                  textColor={Colors.red}
+                  style={{
+                    marginTop: scale(4),
+                    paddingHorizontal: scale(10),
                   }}>
-                  <Icon
-                    source={'camera'}
-                    size={50}
-                    color={Colors.greenPrimary}
-                  />
-                  <Text
-                    style={{
-                      color: Colors.greenPrimary,
-                      fontSize: moderateScale(16),
-                      fontFamily: getFontFamily('bold'),
-                    }}>
-                    Thêm ảnh
-                  </Text>
-                </TouchableOpacity>
+                  {error.message}
+                </CustomText>
               )}
-            </View>
+            </>
           );
         }}
       />

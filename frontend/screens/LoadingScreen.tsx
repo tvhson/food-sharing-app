@@ -55,6 +55,7 @@ const LoadingScreen = ({navigation, route}: any) => {
   const dispatch = useDispatch();
 
   const onUserLogin = async (userInfo: UserInfo) => {
+    console.log('userInfo', userInfo);
     ZIMKit.connectUser(
       {
         userID: String(userInfo.id),

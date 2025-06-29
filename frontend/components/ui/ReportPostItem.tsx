@@ -1,14 +1,24 @@
-/* eslint-disable react-native/no-inline-styles */
 import {Text, TouchableWithoutFeedback, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {Icon, Image} from '@rneui/themed';
 import Colors from '../../global/Color';
 import getDistance from 'geolib/es/getDistance';
 import {Route} from '../../constants/route';
+import {calculateExpiredDate, timeAgo} from '../../utils/helper';
+import {moderateScale, scale} from '../../utils/scale';
+import {getFontFamily} from '../../utils/fonts';
 
 const ReportPostItem = ({item, navigation, location}: any) => {
   const handleOnPress = () => {
-    navigation.navigate(Route.PostDetail2, {item, location});
+    navigation.navigate(Route.PostDetail2, {
+      item: {
+        ...item,
+        distance: distance,
+      },
+      location,
+      createdDate: timeAgo(item.createdDate),
+      expiredString: calculateExpiredDate(new Date(item.expiredDate)),
+    });
   };
   const [distance, setDistance] = useState<number>(0);
 
@@ -30,10 +40,10 @@ const ReportPostItem = ({item, navigation, location}: any) => {
     <TouchableWithoutFeedback onPress={handleOnPress}>
       <View
         style={{
-          padding: 10,
-          marginVertical: 4,
+          padding: scale(10),
+          marginVertical: scale(4),
           backgroundColor: 'white',
-          borderRadius: 8,
+          borderRadius: scale(8),
           flexDirection: 'row',
           elevation: 2,
         }}>
@@ -43,14 +53,18 @@ const ReportPostItem = ({item, navigation, location}: any) => {
               ? item.images[0]
               : 'https://www.w3schools.com/w3images/avatar2.png',
           }}
-          style={{width: 150, height: 150, borderRadius: 8}}
+          style={{
+            width: scale(150),
+            height: scale(150),
+            borderRadius: scale(8),
+          }}
         />
-        <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>
+        <View style={{flex: 1, flexDirection: 'column', marginLeft: scale(8)}}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text
               style={{
-                fontSize: 22,
-                fontWeight: '500',
+                fontSize: moderateScale(22),
+                fontFamily: getFontFamily('bold'),
                 color: Colors.postTitle,
               }}>
               {item.title}
@@ -62,7 +76,8 @@ const ReportPostItem = ({item, navigation, location}: any) => {
                 size={14}
                 color="black"
               />
-              <Text style={{fontSize: 12, color: Colors.grayText}}>
+              <Text
+                style={{fontSize: moderateScale(12), color: Colors.grayText}}>
                 {distance < 0.1
                   ? `${(distance * 1000).toFixed(0)} m`
                   : `${distance.toFixed(2)} Km`}
@@ -76,26 +91,34 @@ const ReportPostItem = ({item, navigation, location}: any) => {
               justifyContent: 'space-between',
             }}>
             <View>
-              <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: '500', color: 'black'}}>
+              <Text
+                style={{fontSize: moderateScale(16), color: Colors.grayText}}>
+                <Text
+                  style={{fontFamily: getFontFamily('bold'), color: 'black'}}>
                   {'\u2022'} Mô tả:{' '}
                 </Text>
                 {item.description}
               </Text>
-              <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: '500', color: 'black'}}>
+              <Text
+                style={{fontSize: moderateScale(16), color: Colors.grayText}}>
+                <Text
+                  style={{fontFamily: getFontFamily('bold'), color: 'black'}}>
                   {'\u2022'} Hạn sử dụng:{' '}
                 </Text>
                 {new Date(item.expiredDate).toLocaleDateString()}
               </Text>
-              <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: '500', color: 'black'}}>
+              <Text
+                style={{fontSize: moderateScale(16), color: Colors.grayText}}>
+                <Text
+                  style={{fontFamily: getFontFamily('bold'), color: 'black'}}>
                   {'\u2022'} Ngày bắt đầu nhận:{' '}
                 </Text>
                 {new Date(item.pickUpStartDate).toLocaleDateString()}
               </Text>
-              <Text style={{fontSize: 16, color: Colors.grayText}}>
-                <Text style={{fontWeight: '500', color: 'black'}}>
+              <Text
+                style={{fontSize: moderateScale(16), color: Colors.grayText}}>
+                <Text
+                  style={{fontFamily: getFontFamily('bold'), color: 'black'}}>
                   {'\u2022'} Ngày kết thúc nhận:{' '}
                 </Text>
                 {new Date(item.pickUpEndDate).toLocaleDateString()}
@@ -103,7 +126,8 @@ const ReportPostItem = ({item, navigation, location}: any) => {
             </View>
 
             <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-              <Text style={{fontSize: 12, color: Colors.grayText}}>
+              <Text
+                style={{fontSize: moderateScale(12), color: Colors.grayText}}>
                 {new Date(item.createdDate).toLocaleDateString()}
               </Text>
             </View>

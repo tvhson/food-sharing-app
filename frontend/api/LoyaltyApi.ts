@@ -2,7 +2,6 @@ import ApiManager from './ApiManager';
 
 export interface IReward {
   rewardName: string;
-  rewardDescription: string;
   imageUrl: string;
   pointsRequired: number;
   stockQuantity: number;

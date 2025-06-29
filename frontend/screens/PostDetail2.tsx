@@ -1,7 +1,9 @@
+import React, {useEffect, useRef, useState} from 'react';
 import {
   FlatList,
   Image,
   Linking,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -9,35 +11,32 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {useNotifications} from 'react-native-notificated';
+import {useDispatch, useSelector} from 'react-redux';
 import {
-  IComment,
   createCommentToPost,
   getCommentByPostId,
   getPostById,
+  IComment,
   likePost,
 } from '../api/PostApi';
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useRef, useState} from 'react';
-import {notify, useNotifications} from 'react-native-notificated';
-import {useDispatch, useSelector} from 'react-redux';
 
-import Colors from '../global/Color';
+import {Icon} from 'react-native-paper';
+import {getRoomChats} from '../api/ChatApi';
+import {createNotification} from '../api/NotificationApi';
+import {uploadPhoto} from '../api/UploadPhotoApi';
+import AiComment from '../components/ui/AiComment';
 import CommentItem from '../components/ui/CommentItem';
 import Header from '../components/ui/Header';
-import {Icon} from 'react-native-paper';
 import ImageSwiper from '../components/ui/ImageSwiper';
-import {RootState} from '../redux/Store';
 import UploadPhoto from '../components/ui/UploadPhoto';
-import {createNotification} from '../api/NotificationApi';
-import {getFontFamily} from '../utils/fonts';
-import {getInfoUserById} from '../api/AccountsApi';
-import {getRoomChats} from '../api/ChatApi';
-import {likePostReducer, SharingPost} from '../redux/SharingPostReducer';
-import {scale} from '../utils/scale';
+import Colors from '../global/Color';
 import screenWidth from '../global/Constant';
-import {uploadPhoto} from '../api/UploadPhotoApi';
+import {likePostReducer, SharingPost} from '../redux/SharingPostReducer';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
 import {useLoading} from '../utils/LoadingContext';
+import {scale} from '../utils/scale';
 
 const PostDetail2 = ({route, navigation}: any) => {
   const [roomChat, setRoomChat] = useState<any>(null);

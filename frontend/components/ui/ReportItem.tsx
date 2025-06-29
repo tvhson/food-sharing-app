@@ -1,7 +1,8 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, Image, Text, TouchableWithoutFeedback} from 'react-native';
 import Colors from '../../global/Color';
+import {moderateScale, scale} from '../../utils/scale';
+import {getFontFamily} from '../../utils/fonts';
 
 const ReportItem = ({item, navigation}: any) => {
   function timeAgo(dateInput: Date | string | number) {
@@ -53,24 +54,28 @@ const ReportItem = ({item, navigation}: any) => {
       }}>
       <View
         style={{
-          padding: 10,
-          marginVertical: 4,
+          padding: scale(10),
+          marginVertical: scale(4),
           backgroundColor: 'white',
-          borderRadius: 8,
+          borderRadius: scale(8),
           flexDirection: 'row',
           elevation: 2,
         }}>
         <Image
           source={{uri: item.imageUrl}}
-          style={{width: 100, height: 100, borderRadius: 8}}
+          style={{
+            width: scale(100),
+            height: scale(100),
+            borderRadius: scale(8),
+          }}
         />
-        <View style={{flex: 1, flexDirection: 'column', marginLeft: 8}}>
+        <View style={{flex: 1, flexDirection: 'column', marginLeft: scale(8)}}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text
               style={{
-                fontSize: 22,
-                fontWeight: 'bold',
-                color: 'black',
+                fontSize: moderateScale(22),
+                fontFamily: getFontFamily('bold'),
+                color: Colors.black,
               }}>
               {item.senderName} báo cáo bài viết
             </Text>
@@ -81,11 +86,12 @@ const ReportItem = ({item, navigation}: any) => {
               flexDirection: 'column',
               justifyContent: 'space-between',
             }}>
-            <Text style={{fontSize: 16, color: Colors.grayText}}>
+            <Text style={{fontSize: moderateScale(16), color: Colors.grayText}}>
               Lý do: {item.title}
             </Text>
             <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-              <Text style={{fontSize: 12, color: Colors.grayText}}>
+              <Text
+                style={{fontSize: moderateScale(12), color: Colors.grayText}}>
                 {timeAgo(item.createdDate)}
               </Text>
             </View>

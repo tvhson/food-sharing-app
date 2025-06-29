@@ -23,6 +23,7 @@ export interface SharingPost {
   isReceived: boolean;
   type: string;
   distance: number;
+  aicomments: string[];
   author: {
     id: number;
     name: string;

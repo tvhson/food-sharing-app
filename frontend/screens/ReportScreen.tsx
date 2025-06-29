@@ -4,7 +4,6 @@ import {
   SegmentedButtons,
 } from 'react-native-paper';
 import {FlatList, RefreshControl, StyleSheet, Text, View} from 'react-native';
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {clearReports, setReports} from '../redux/ReportReducer';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,6 +12,9 @@ import Colors from '../global/Color';
 import ReportItem from '../components/ui/ReportItem';
 import {RootState} from '../redux/Store';
 import {getReport} from '../api/ReportApi';
+import {moderateScale, scale} from '../utils/scale';
+import {getFontFamily} from '../utils/fonts';
+import Header from '../components/ui/Header';
 
 const ReportScreen = ({navigation}: any) => {
   const ReportPendingDatas = useSelector(
@@ -93,38 +95,10 @@ const ReportScreen = ({navigation}: any) => {
         flex: 1,
         flexDirection: 'column',
       }}>
-      <View
-        style={{
-          height: 60,
-          width: '100%',
-          backgroundColor: Colors.button,
-          borderBottomWidth: 1,
-          borderBlockColor: '#ccc',
-          justifyContent: 'center',
+      <Header title="Quản lý báo cáo" navigation={navigation} />
 
-          alignItems: 'center',
-        }}>
-        <View style={{position: 'absolute', top: -1, left: 10}}>
-          <IconButton
-            icon="chevron-left"
-            size={40}
-            iconColor="white"
-            onPress={() => {
-              navigation.goBack();
-            }}
-          />
-        </View>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: 'bold',
-            color: 'white',
-          }}>
-          Quản lý báo cáo
-        </Text>
-      </View>
       <SegmentedButtons
-        style={{margin: 20}}
+        style={{margin: scale(20)}}
         value={valueOfSegmentButton}
         onValueChange={setValueOfSegmentButton}
         buttons={[
@@ -153,7 +127,7 @@ const ReportScreen = ({navigation}: any) => {
         ]}
       />
       <FlatList
-        style={{marginHorizontal: 8}}
+        style={{marginHorizontal: scale(8)}}
         data={
           valueOfSegmentButton === 'Pending' ? reportPending : reportFinished
         }
@@ -179,7 +153,7 @@ const ReportScreen = ({navigation}: any) => {
 export default ReportScreen;
 const styles = StyleSheet.create({
   loaderStyle: {
-    marginVertical: 16,
+    marginVertical: scale(16),
     alignItems: 'center',
   },
 });

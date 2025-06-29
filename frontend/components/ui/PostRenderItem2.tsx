@@ -9,6 +9,7 @@ import {
 import {
   Dimensions,
   Image,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -30,6 +31,7 @@ import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
 import {notify} from 'react-native-notificated';
 import {moderateScale, scale} from '../../utils/scale';
+import AiComment from './AiComment';
 
 const PostRenderItem2 = (props: any) => {
   const {
@@ -147,6 +149,33 @@ const PostRenderItem2 = (props: any) => {
       createdDate,
       expiredString,
     });
+  };
+
+  const renderAiComment = () => {
+    return item?.aicomments ? (
+      <ScrollView
+        horizontal
+        style={{
+          marginTop: scale(10),
+        }}>
+        <View style={{gap: scale(10)}}>
+          <View style={{flexDirection: 'row'}}>
+            {item.aicomments
+              .slice(0, Math.ceil(item.aicomments.length / 2))
+              .map((comment: string) => (
+                <AiComment key={`row1-${comment}`} comment={comment} />
+              ))}
+          </View>
+          <View style={{flexDirection: 'row'}}>
+            {item.aicomments
+              .slice(Math.ceil(item.aicomments.length / 2))
+              .map((comment: string) => (
+                <AiComment key={`row2-${comment}`} comment={comment} />
+              ))}
+          </View>
+        </View>
+      </ScrollView>
+    ) : null;
   };
 
   return (
@@ -567,6 +596,7 @@ const PostRenderItem2 = (props: any) => {
             }}
           />
         </View>
+        {renderAiComment()}
         <View
           style={{
             flexDirection: 'row',
