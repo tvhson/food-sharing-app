@@ -22,6 +22,7 @@ function UploadPhoto(props: any) {
     ImagePicker.openCamera({
       cropping: true,
       cropperCircleOverlay: props.isCircle,
+      cropperToolbarTitle: 'Chỉnh sửa ảnh',
     })
       .then(image => {
         props.postImage(image);
@@ -71,6 +72,7 @@ function UploadPhoto(props: any) {
         compressImageQuality: 1,
         cropping: true,
         cropperCircleOverlay: props.isCircle,
+        cropperToolbarTitle: 'Chỉnh sửa ảnh',
       })
         .then(image => {
           props.postImage(image);
