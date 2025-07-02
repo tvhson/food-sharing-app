@@ -7,7 +7,7 @@ import {Accessory, Icon} from '@rneui/base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../global/Color';
 import EditProfileScreen from './EditProfileScreen';
-import {RootState} from '../redux/Store';
+import {resetApp, RootState} from '../redux/Store';
 import {Route} from '../constants/route';
 import UploadPhoto from '../components/ui/UploadPhoto';
 import {ZIMKit} from '@zegocloud/zimkit-rn';
@@ -53,10 +53,9 @@ const ProfileScreen = ({navigation, route}: any) => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('isLogin');
-    await AsyncStorage.removeItem('userInfo');
-    await AsyncStorage.removeItem('recommendPost');
     disconnectSocket();
     disconnectChat();
+    dispatch(resetApp());
     navigation.reset({
       index: 0,
       routes: [{name: 'Landing'}],
@@ -94,7 +93,6 @@ const ProfileScreen = ({navigation, route}: any) => {
           .then((response2: any) => {
             //console.log(response2);
             if (response2.status === 200) {
-              AsyncStorage.setItem('userInfo', JSON.stringify(response2.data));
               const userInfo2: any = response2.data;
               dispatch(saveUser(userInfo2));
               notify('success', {

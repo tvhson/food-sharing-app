@@ -605,7 +605,7 @@ const PostDetail2 = ({route, navigation}: any) => {
                   color: Colors.black,
                   fontSize: 14,
                 }}>
-                {likeCount && `${likeCount} người`}
+                {likeCount && `${likeCount} người thích`}
               </Text>
             </View>
           </View>

@@ -72,7 +72,6 @@ const PersonalPage = ({navigation}: any) => {
           .then((response2: any) => {
             //console.log(response2);
             if (response2.status === 200) {
-              AsyncStorage.setItem('userInfo', JSON.stringify(response2.data));
               const userInfo2: any = response2.data;
               dispatch(saveUser(userInfo2));
               notify('success', {

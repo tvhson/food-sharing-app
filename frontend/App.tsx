@@ -21,23 +21,23 @@ import LoadingUI from './utils/LoadingUI';
 LogBox.ignoreAllLogs();
 
 registerTranslation('pl', {
-  save: 'Save',
-  selectSingle: 'Select date',
-  selectMultiple: 'Select dates',
-  selectRange: 'Select period',
+  save: 'Lưu',
+  selectSingle: 'Chọn ngày',
+  selectMultiple: 'Chọn ngày',
+  selectRange: 'Chọn khoảng thời gian',
   notAccordingToDateFormat: inputFormat => `Date format must be ${inputFormat}`,
   mustBeHigherThan: date => `Must be later then ${date}`,
   mustBeLowerThan: date => `Must be earlier then ${date}`,
   mustBeBetween: (startDate, endDate) =>
     `Must be between ${startDate} - ${endDate}`,
-  dateIsDisabled: 'Day is not allowed',
-  previous: 'Previous',
-  next: 'Next',
-  typeInDate: 'Type in date',
-  pickDateFromCalendar: 'Pick date from calendar',
-  close: 'Close',
-  hour: '',
-  minute: '',
+  dateIsDisabled: 'Ngày không được phép',
+  previous: 'Trước',
+  next: 'Tiếp',
+  typeInDate: 'Nhập ngày',
+  pickDateFromCalendar: 'Chọn ngày từ lịch',
+  close: 'Đóng',
+  hour: 'Giờ',
+  minute: 'Phút',
 });
 registerTranslation('en-GB', enGB);
 registerTranslation('en', en);

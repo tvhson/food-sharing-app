@@ -10,22 +10,38 @@ import ReportReducer from './ReportReducer';
 import SharingPostReducer from './SharingPostReducer';
 import TokenReducer from './TokenReducer';
 import UserReducer from './UserReducer';
-import {configureStore} from '@reduxjs/toolkit';
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
+
+const appReducer = combineReducers({
+  userInfo: UserReducer,
+  loading: LoadingReducer,
+  token: TokenReducer,
+  sharingPost: SharingPostReducer,
+  fundingPost: OrganizationPostReducer,
+  location: LocationReducer,
+  notification: NotificationReducer,
+  chatRoom: ChatRoomReducer,
+  report: ReportReducer,
+  account: AccountsReducer,
+  comment: CommentReducer,
+  group: GroupReducer,
+});
+
+export const RESET_APP = 'RESET_APP';
+
+export const resetApp = () => ({
+  type: RESET_APP,
+});
+
+const rootReducer = (state: any, action: any) => {
+  if (action.type === RESET_APP) {
+    state = undefined; // Reset all state
+  }
+  return appReducer(state, action);
+};
+
 export const Store = configureStore({
-  reducer: {
-    userInfo: UserReducer,
-    loading: LoadingReducer,
-    token: TokenReducer,
-    sharingPost: SharingPostReducer,
-    fundingPost: OrganizationPostReducer,
-    location: LocationReducer,
-    notification: NotificationReducer,
-    chatRoom: ChatRoomReducer,
-    report: ReportReducer,
-    account: AccountsReducer,
-    comment: CommentReducer,
-    group: GroupReducer,
-  },
+  reducer: rootReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       immutableCheck: false,

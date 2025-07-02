@@ -7,7 +7,8 @@ import BootSplash from 'react-native-bootsplash';
 import {Button} from '@rneui/themed';
 import Colors from '../global/Color';
 import {setStatus} from '../redux/LoadingReducer';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../redux/Store';
 
 const LandingScreen = ({navigation}: any) => {
   const handleRegister = () => {

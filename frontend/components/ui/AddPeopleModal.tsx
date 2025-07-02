@@ -51,6 +51,9 @@ const AddPeopleModal = ({
     if (validateEmail(query) && query !== userEmail) {
       getInfoUserByEmail(query, accessToken)
         .then(response => {
+          if (response.message === 'Không tìm thấy tài khoản') {
+            return;
+          }
           const isExist = selectedPeople.find(
             person => person.id === response.id,
           );
@@ -71,6 +74,7 @@ const AddPeopleModal = ({
             return;
           }
           if (!isExist) {
+            console.log('response', response);
             setFilteredList([...filteredList, response]);
           }
           setSearchQuery('');

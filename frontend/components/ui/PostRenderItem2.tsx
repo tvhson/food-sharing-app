@@ -634,7 +634,7 @@ const PostRenderItem2 = (props: any) => {
               color: Colors.black,
               fontSize: moderateScale(14),
             }}>
-            {likeCount && `${likeCount} người`}
+            {likeCount && `${likeCount} người thích`}
           </Text>
         </View>
       </View>

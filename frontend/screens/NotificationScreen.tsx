@@ -23,6 +23,7 @@ import NotificationItem from '../components/ui/NotificationItem';
 import {RootState} from '../redux/Store';
 import {getFontFamily} from '../utils/fonts';
 import {useFocusEffect} from '@react-navigation/native';
+import {moderateScale, scale} from '../utils/scale';
 
 const NotificationScreen = ({navigation}: any) => {
   const notificationDatas = useSelector(
@@ -52,10 +53,6 @@ const NotificationScreen = ({navigation}: any) => {
         getNotifications(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
             console.log(response.data);
-            AsyncStorage.setItem(
-              'notifications',
-              JSON.stringify(response.data),
-            );
 
             dispatch(setNotifications(response.data));
           } else {
@@ -75,10 +72,6 @@ const NotificationScreen = ({navigation}: any) => {
       if (accessToken) {
         getNotifications(accessToken.toString()).then((response: any) => {
           if (response.status === 200) {
-            AsyncStorage.setItem(
-              'notifications',
-              JSON.stringify(response.data),
-            );
             setNotifications(response.data);
             dispatch(setNotifications(response.data));
           } else {
@@ -122,10 +115,15 @@ const NotificationScreen = ({navigation}: any) => {
         setVisible={setVisible}
         item={selectedItem}
       />
-      <View style={{backgroundColor: 'white', padding: 10, height: 50}}>
+      <View
+        style={{
+          backgroundColor: 'white',
+          padding: scale(10),
+          height: scale(50),
+        }}>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: moderateScale(24),
             fontWeight: 'bold',
             color: Colors.greenText,
             fontFamily: getFontFamily('bold'),
@@ -135,9 +133,10 @@ const NotificationScreen = ({navigation}: any) => {
       </View>
 
       <FlatList
-        style={{marginTop: 20, marginHorizontal: 10, pointerEvents: 'none'}}
+        style={{marginTop: scale(20), marginHorizontal: scale(10)}}
         data={notificationDatas}
         keyExtractor={item => item.id.toString()}
+        showsVerticalScrollIndicator={false}
         renderItem={({item}) => {
           return (
             <NotificationItem

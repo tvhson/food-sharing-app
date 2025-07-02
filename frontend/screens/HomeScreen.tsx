@@ -78,7 +78,6 @@ const HomeScreen = ({navigation}: any) => {
         });
         if (response.status === 200) {
           dispatch(clearSharingPosts());
-          AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
           setRecommendPost(response.data);
           dispatch(setSharingPost(response.data));
           hideLoading();
@@ -105,9 +104,11 @@ const HomeScreen = ({navigation}: any) => {
         if (!type) return;
         const response: any = await getPosts(accessToken.toString(), {
           type,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          distance: 1000,
         });
         if (response.status === 200) {
-          AsyncStorage.setItem('recommendPost', JSON.stringify(response.data));
           setRecommendPost(response.data);
           dispatch(setSharingPost(response.data));
         } else {

@@ -19,7 +19,7 @@ const GroupStatementItem = ({
         <View style={styles.header}>
           <Text style={styles.title}>{statement.user.name}</Text>
           <Text style={styles.time}>
-            {timeAgo(statement.createdAt || new Date())}
+            {timeAgo(statement.createdDate || new Date())}
           </Text>
         </View>
         <Text style={styles.description}>

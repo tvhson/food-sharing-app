@@ -242,7 +242,7 @@ export const updateGroupTodo = async (
 
 export interface IGetGroupStatementResponse {
   id: number;
-  createdAt: string;
+  createdDate: string;
   description: string;
   user: {
     id: number;

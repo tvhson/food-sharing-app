@@ -19,8 +19,7 @@ import {
 import {
   clearMyPosts,
   clearSharingPosts,
-  pushMyPost,
-  pushSharingPost,
+  setSharingPost,
 } from '../redux/SharingPostReducer';
 import {connectChat, disconnectChat, getRoomChats} from '../api/ChatApi';
 import {
@@ -47,10 +46,13 @@ import {setLocation} from '../redux/LocationReducer';
 import {setReports} from '../redux/ReportReducer';
 import {setToken} from '../redux/TokenReducer';
 import {useDispatch} from 'react-redux';
+import {resetApp} from '../redux/Store';
+import {createNotifications} from 'react-native-notificated';
 
 enableScreens();
 
 const LoadingScreen = ({navigation, route}: any) => {
+  const {notify} = createNotifications();
   const token = route.params.token;
   const dispatch = useDispatch();
 
@@ -151,8 +153,27 @@ const LoadingScreen = ({navigation, route}: any) => {
     const saveInfo = async () => {
       let myId: number = 0;
 
-      const saveNotificationHandler = (body: any) => {
+      const saveNotificationHandler = async (body: any) => {
         dispatch(addNotification(body));
+        if (body.type === 'BAN') {
+          AsyncStorage.multiRemove(['token', 'isLogin']);
+          disconnectSocket();
+          disconnectChat();
+          dispatch(resetApp());
+          navigation.reset({index: 0, routes: [{name: 'Landing'}]});
+          await ZIMKit.disconnectUser();
+          await ZegoUIKitPrebuiltCallService.uninit();
+          notify('warning', {
+            params: {
+              title: 'Cảnh báo',
+              description: 'Bạn đã bị cấm sử dụng ứng dụng',
+              style: {
+                multiline: 100,
+              },
+            },
+          });
+          return;
+        }
       };
 
       const saveChatRoomHandler = (body: any) => {
@@ -242,9 +263,7 @@ const LoadingScreen = ({navigation, route}: any) => {
         const response: any = await getPosts(token.toString(), {type: 'ALL'});
         if (response?.status === 200) {
           dispatch(clearSharingPosts());
-          response?.data.forEach((post: any) =>
-            dispatch(pushSharingPost(post)),
-          );
+          dispatch(setSharingPost(response?.data));
         }
       } catch (error) {
         console.log(error);
@@ -256,7 +275,7 @@ const LoadingScreen = ({navigation, route}: any) => {
         const response: any = await getPostOfUser(token.toString());
         if (response?.status === 200) {
           dispatch(clearMyPosts());
-          response?.data.forEach((post: any) => dispatch(pushMyPost(post)));
+          dispatch(setSharingPost(response?.data));
         }
       } catch (error) {
         console.log(error);

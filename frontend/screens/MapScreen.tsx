@@ -21,7 +21,7 @@ const listFilter = [
   {id: 2, title: 'Trong vòng 5km', value: 5},
   {id: 3, title: 'Trong vòng 10km', value: 10},
   {id: 4, title: 'Trong vòng 20km', value: 20},
-  {id: 4, title: 'Tất cả', value: 100000},
+  {id: 5, title: 'Tất cả', value: 100000},
 ];
 const {useNotifications} = createNotifications();
 

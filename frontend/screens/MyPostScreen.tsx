@@ -92,10 +92,6 @@ const MyPostScreen = ({navigation, route}: any) => {
           distance: 1000,
         }).then((response: any) => {
           if (response.status === 200) {
-            AsyncStorage.setItem(
-              'recommendPost',
-              JSON.stringify(response.data),
-            );
             setMyPost(response.data);
           } else {
             console.log(response);

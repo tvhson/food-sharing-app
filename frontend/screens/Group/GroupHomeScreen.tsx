@@ -264,10 +264,13 @@ const GroupHomeScreen = ({route}: {route: any}) => {
       <Image source={{uri: group.imageUrl}} style={styles.image} />
       <Text style={styles.title}>{group.name}</Text>
       <TouchableOpacity
+        disabled={group.author.id !== userInfo.id}
         onPress={() => {
-          navigation.navigate(Route.GroupMember, {
-            group,
-          });
+          if (group.author.id === userInfo.id) {
+            navigation.navigate(Route.GroupMember, {
+              group,
+            });
+          }
         }}
         style={{
           flexDirection: 'row',
@@ -275,6 +278,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           justifyContent: 'space-between',
           width: '100%',
           paddingHorizontal: scale(30),
+          paddingVertical: scale(10),
         }}>
         <Text
           style={{
@@ -286,7 +290,7 @@ const GroupHomeScreen = ({route}: {route: any}) => {
           {'  '}
           {group.members.length} thành viên
         </Text>
-        {group.joinType === 'PRIVATE' && group.author.id === userInfo.id && (
+        {group.author.id === userInfo.id && (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
@@ -307,7 +311,11 @@ const GroupHomeScreen = ({route}: {route: any}) => {
                   backgroundColor: Colors.greenPrimary,
                   borderRadius: 10,
                 }}
-                onPress={() => {}}>
+                onPress={() => {
+                  navigation.navigate(Route.GroupMember, {
+                    group,
+                  });
+                }}>
                 <Text
                   style={{
                     color: Colors.white,

@@ -185,7 +185,6 @@ const CreatePostScreen = ({route, navigation}: any) => {
                       title: 'Thành công',
                     },
                   });
-                  dispatch(pushMyPost(response2.data));
                   const response3: any = earnPoint(
                     {point: 10, accountId: userInfo.id},
                     accessToken,

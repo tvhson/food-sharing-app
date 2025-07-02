@@ -98,9 +98,7 @@ const ListPost = (props: ListPostProps) => {
       });
     } else {
       navigation.navigate('OrganizationPostDetail2', {
-        item: {
-          organizationposts: item,
-        },
+        item: item,
       });
     }
   };

@@ -11,6 +11,7 @@ import Colors from '../../global/Color';
 import {updateNotificationAfter} from '../../redux/NotificationReducer';
 import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
+import {Rating} from '@rneui/themed';
 
 const DialogRating = (props: {
   visible: boolean;
@@ -155,14 +156,12 @@ const DialogRating = (props: {
               Bạn vừa nhận được đồ ăn từ {getName(item.description)}. Hãy đánh
               giá chất lượng món ăn của họ nhé!
             </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                marginVertical: 10,
-              }}>
-              {stars}
-            </View>
+            <Rating
+              showRating
+              imageSize={40}
+              onFinishRating={setRating}
+              style={{paddingVertical: 10}}
+            />
             <Button
               loading={isLoading}
               disabled={isLoading}

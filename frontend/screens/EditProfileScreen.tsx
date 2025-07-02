@@ -88,7 +88,6 @@ function EditProfileScreen(props: EditProfileScreenProps) {
               title: 'Thành công',
             },
           });
-          AsyncStorage.setItem('userInfo', JSON.stringify(response.data));
         } else {
           notify('error', {
             params: {description: 'Cập nhật thông tin thất bại.', title: 'Lỗi'},
@@ -234,7 +233,7 @@ function EditProfileScreen(props: EditProfileScreenProps) {
                 fontType="medium"
                 size={14}
                 textColor={Colors.red}
-                style={[{marginTop: scale(-16), paddingHorizontal: scale(10)}]}>
+                style={[{marginTop: scale(-4), paddingHorizontal: scale(10)}]}>
                 {errors.location.message}
               </CustomText>
             )}
