@@ -64,7 +64,6 @@ const SupportScreen = () => {
         GiftedChat.append(previousMessages, newMessage),
       );
       const response = await sendMessage(message.text, accessToken);
-      console.log('newMessage', newMessage);
 
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, [
