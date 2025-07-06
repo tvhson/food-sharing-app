@@ -118,3 +118,25 @@ export const formatDate = (
     return '';
   }
 };
+
+export function formatDateToShow(dateStr?: string) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('vi-VN', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+export function formatTimeToShow(dateStr?: string) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  let hour = date.getHours();
+  const minute = date.getMinutes();
+  const ampm = hour >= 12 ? 'Chiều' : 'Sáng';
+  hour = hour % 12;
+  hour = hour ? hour : 12;
+  const minStr = minute < 10 ? `0${minute}` : minute;
+  return `${hour}:${minStr} ${ampm}`;
+}

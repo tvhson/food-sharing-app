@@ -6,6 +6,7 @@ buildscript {
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.8.0"
+        FLIPPER_VERSION = "0.212.0"
     }
     repositories {
         google()

@@ -410,6 +410,28 @@ const PostDetail2 = ({route, navigation}: any) => {
                 marginTop: 5,
               }}>
               <Image
+                source={require('../assets/images/description.png')}
+                style={{width: 25, height: 25}}
+              />
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: getFontFamily('regular'),
+                    color: Colors.text,
+                    marginLeft: 16,
+                  }}>
+                  {item.description}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Image
                 source={require('../assets/images/distance.png')}
                 style={{width: 25, height: 25}}
               />

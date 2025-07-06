@@ -1,33 +1,49 @@
-import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
 import {Icon, SearchBar} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState, useCallback} from 'react';
+import {FlatList, RefreshControl, TouchableOpacity, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   SharingPost,
   clearSharingPosts,
   setSharingPost,
 } from '../redux/SharingPostReducer';
-import {useDispatch, useSelector} from 'react-redux';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
-import Colors from '../global/Color';
-import Comment from '../components/ui/Comment';
-import {FoodType} from './CreatePostScreen';
-import HeaderHome from '../components/ui/HeaderHome';
-import ImageDetailModal from '../components/ui/ImageDetailModal';
-import {Menu} from 'react-native-paper';
-import PostRenderItem2 from '../components/ui/PostRenderItem2';
-import {RootState} from '../redux/Store';
+import getDistance from 'geolib/es/getDistance';
 import {Text} from 'react-native';
 import {createNotifications} from 'react-native-notificated';
-import getDistance from 'geolib/es/getDistance';
+import {Menu} from 'react-native-paper';
+import {getPosts, useSearchPosts} from '../api/PostApi';
+import ChooseTagBottomSheet from '../components/ui/ChooseTagBottomSheet';
+import Comment from '../components/ui/Comment';
+import HeaderHome from '../components/ui/HeaderHome';
+import ImageDetailModal from '../components/ui/ImageDetailModal';
+import PostRenderItem2 from '../components/ui/PostRenderItem2';
+import Colors from '../global/Color';
+import {RootState} from '../redux/Store';
 import {getFontFamily} from '../utils/fonts';
 import {getFoodTypeKey} from '../utils/helper';
-import {getPosts} from '../api/PostApi';
-import {scale} from '../utils/scale';
 import {useLoading} from '../utils/LoadingContext';
+import {scale} from '../utils/scale';
+import {FoodType} from './CreatePostScreen';
 
 const {useNotifications} = createNotifications();
+
+// Custom debounce hook
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 const HomeScreen = ({navigation}: any) => {
   const accessToken = useSelector((state: RootState) => state.token.key);
@@ -58,9 +74,28 @@ const HomeScreen = ({navigation}: any) => {
 
   const location = useSelector((state: RootState) => state.location);
 
-  const updateSearch = (search: any) => {
+  // Debounce search input with 500ms delay
+  const debouncedSearch = useDebounce(search, 500);
+
+  // Server-side search using React Query with debounced value
+  const {data: searchResults, isLoading: isSearching} = useSearchPosts(
+    accessToken,
+    {keyword: debouncedSearch},
+    !!debouncedSearch.trim(), // Only search when debounced keyword exists
+  );
+
+  // Safely access search results data with memoization
+  const searchData = useMemo(() => {
+    return searchResults &&
+      typeof searchResults === 'object' &&
+      'data' in searchResults
+      ? (searchResults as any).data
+      : [];
+  }, [searchResults]);
+
+  const updateSearch = useCallback((search: any) => {
     setSearch(search);
-  };
+  }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -112,7 +147,6 @@ const HomeScreen = ({navigation}: any) => {
           setRecommendPost(response.data);
           dispatch(setSharingPost(response.data));
         } else {
-          console.log(response);
           notify('error', {
             params: {
               description: 'Không thể tải dữ liệu mới',
@@ -128,39 +162,42 @@ const HomeScreen = ({navigation}: any) => {
     fetchData();
   }, [foodType]);
 
-  useEffect(() => {
-    const applyFilter = () => {
-      let filtered = recommendPost;
+  // Memoize filtered data to prevent infinite re-renders
+  const filteredData = useMemo(() => {
+    // Use search results if searching, otherwise use recommended posts
+    let filtered = debouncedSearch.trim() ? searchData : recommendPost;
 
-      if (search !== '') {
-        filtered = filtered.filter((item: any) =>
-          item.title.toLowerCase().includes(search.toLowerCase()),
+    // Apply sorting if not searching
+    if (
+      !debouncedSearch.trim() &&
+      sortingMethod === 'distance' &&
+      location &&
+      location.latitude &&
+      location.longitude
+    ) {
+      filtered = [...filtered].sort((a: any, b: any) => {
+        const distanceA = getDistance(
+          {latitude: a.latitude, longitude: a.longitude},
+          {latitude: location.latitude, longitude: location.longitude},
         );
-      }
-      if (
-        sortingMethod === 'distance' &&
-        location &&
-        location.latitude &&
-        location.longitude
-      ) {
-        filtered = [...filtered].sort((a: any, b: any) => {
-          const distanceA = getDistance(
-            {latitude: a.latitude, longitude: a.longitude},
-            {latitude: location.latitude, longitude: location.longitude},
-          );
-          const distanceB = getDistance(
-            {latitude: b.latitude, longitude: b.longitude},
-            {latitude: location.latitude, longitude: location.longitude},
-          );
-          return distanceA - distanceB;
-        });
-      }
-      setFilterPosts(filtered);
-    };
-    if (recommendPost) {
-      applyFilter();
+        const distanceB = getDistance(
+          {latitude: b.latitude, longitude: b.longitude},
+          {latitude: location.latitude, longitude: location.longitude},
+        );
+        return distanceA - distanceB;
+      });
     }
-  }, [search, sortingMethod, recommendedPost]);
+    return filtered;
+  }, [debouncedSearch, searchData, sortingMethod, recommendPost, location]);
+
+  // Update filterPosts state when filteredData changes
+  useEffect(() => {
+    setFilterPosts(filteredData);
+  }, [filteredData]);
+
+  // Determine which data to display
+  const displayData = filterPosts ?? recommendPost;
+  const isLoading = isSearching && !!debouncedSearch.trim();
 
   return (
     <View
@@ -188,6 +225,7 @@ const HomeScreen = ({navigation}: any) => {
             round
             onChangeText={updateSearch}
             value={search}
+            showLoading={isLoading}
           />
         </View>
 
@@ -252,7 +290,7 @@ const HomeScreen = ({navigation}: any) => {
       </View>
       <FlatList
         style={{marginHorizontal: 8}}
-        data={filterPosts ?? recommendPost}
+        data={displayData}
         keyExtractor={item => item.id}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

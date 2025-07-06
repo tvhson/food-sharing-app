@@ -4,11 +4,17 @@ import {Icon} from 'react-native-paper';
 import Colors from '../../global/Color';
 import {getFontFamily} from '../../utils/fonts';
 import {moderateScale, scale} from '../../utils/scale';
+import {useNavigation} from '@react-navigation/native';
 
 const Header = (props: any) => {
   const {title, navigation} = props;
+  const navigation2: any = useNavigation();
   const handleBack = () => {
-    navigation.goBack();
+    if (navigation) {
+      navigation.goBack();
+    } else {
+      navigation2.goBack();
+    }
   };
   return (
     <View style={styles.row}>

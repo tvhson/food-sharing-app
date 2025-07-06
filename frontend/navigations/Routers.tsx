@@ -44,6 +44,9 @@ import VerifyScreen from '../screens/VerifyScreen';
 import WebViewScreen from '../screens/WebViewScreen';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {getFontFamily} from '../utils/fonts';
+import CreateEventScreen from '../screens/Events/CreateEventScreen';
+import EventDetailScreen from '../screens/Events/EventDetailScreen';
+import StatisticScreen from '../screens/Statistic/StatisticScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -225,6 +228,18 @@ const Router = () => {
           component={ZegoUIKitPrebuiltCallInCallScreen}
         />
         <Stack.Screen name={Route.Support} component={SupportScreen} />
+        <Stack.Screen
+          name={Route.CreateEventScreen}
+          component={CreateEventScreen}
+        />
+        <Stack.Screen
+          name={Route.EventDetailScreen}
+          component={EventDetailScreen}
+        />
+        <Stack.Screen
+          name={Route.StatisticScreen}
+          component={StatisticScreen}
+        />
       </Stack.Navigator>
     </>
   );

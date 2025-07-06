@@ -1,4 +1,5 @@
 import ApiManager from './ApiManager';
+import {useQuery} from '@tanstack/react-query';
 
 export interface IGetPostsParams {
   type: string;
@@ -21,6 +22,7 @@ export const getPosts = async (token: string, params: IGetPostsParams) => {
     return error;
   }
 };
+
 export const createPost = async (data: any, token: any) => {
   try {
     const result = await ApiManager('posts', {
@@ -238,4 +240,42 @@ export const confirmReceiveFood = async (
   } catch (error) {
     return error;
   }
+};
+
+export interface ISearchPostsParams {
+  keyword: string;
+}
+
+export const searchPosts = async (
+  token: string,
+  params: ISearchPostsParams,
+) => {
+  try {
+    const response = await ApiManager('posts/search', {
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      },
+      params: params,
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const useSearchPosts = (
+  token: string,
+  params: ISearchPostsParams,
+  enabled: boolean = true,
+) => {
+  return useQuery({
+    queryKey: ['search-posts', params.keyword],
+    queryFn: () => {
+      return searchPosts(token, params);
+    },
+    enabled: !!token && enabled && !!params.keyword.trim(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+  });
 };

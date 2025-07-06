@@ -13,6 +13,7 @@ import {RootState} from '../redux/Store';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {getFontFamily} from '../utils/fonts';
 import {useSelector} from 'react-redux';
+import EventListScreen from '../screens/Events/EventListScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -57,6 +58,22 @@ const BottomTabNavigator = ({route, navigation}: any) => {
                   focused
                     ? require('../assets/images/organization.png')
                     : require('../assets/images/organization-outline.png')
+                }
+                style={{width: 28, height: 28, alignSelf: 'center'}}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Events"
+          component={EventListScreen}
+          options={{
+            tabBarIcon: ({focused}) => (
+              <Image
+                source={
+                  focused
+                    ? require('../assets/images/clarity_event-solid.png')
+                    : require('../assets/images/clarity_event-line.png')
                 }
                 style={{width: 28, height: 28, alignSelf: 'center'}}
               />

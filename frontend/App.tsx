@@ -17,6 +17,7 @@ import {ZegoCallInvitationDialog} from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import analytics from '@react-native-firebase/analytics';
 import {LoadingProvider, useLoading} from './utils/LoadingContext';
 import LoadingUI from './utils/LoadingUI';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 LogBox.ignoreAllLogs();
 
@@ -44,6 +45,15 @@ registerTranslation('en', en);
 var encoder = new encoding.TextEncoder();
 
 const {NotificationsProvider} = createNotifications();
+
+const queryClient = new QueryClient();
+
+if (__DEV__) {
+  import('react-query-native-devtools').then(({addPlugin}) => {
+    addPlugin({queryClient});
+  });
+}
+
 function App() {
   const routeNameRef = React.useRef<string | undefined>(undefined);
   const navigationRef = React.useRef<NavigationContainerRef<any>>(null);
@@ -52,31 +62,33 @@ function App() {
       <Provider store={Store}>
         <LoadingProvider>
           <PaperProvider>
-            <NotificationsProvider>
-              <NavigationContainer
-                ref={navigationRef}
-                onReady={() => {
-                  routeNameRef.current =
-                    navigationRef?.current?.getCurrentRoute()?.name ?? '';
-                }}
-                onStateChange={async () => {
-                  const previousRouteName = routeNameRef.current;
-                  const currentRouteName =
-                    navigationRef.current?.getCurrentRoute()?.name;
+            <QueryClientProvider client={queryClient}>
+              <NotificationsProvider>
+                <NavigationContainer
+                  ref={navigationRef}
+                  onReady={() => {
+                    routeNameRef.current =
+                      navigationRef?.current?.getCurrentRoute()?.name ?? '';
+                  }}
+                  onStateChange={async () => {
+                    const previousRouteName = routeNameRef.current;
+                    const currentRouteName =
+                      navigationRef.current?.getCurrentRoute()?.name;
 
-                  if (previousRouteName !== currentRouteName) {
-                    await analytics().logScreenView({
-                      screen_name: currentRouteName,
-                      screen_class: currentRouteName,
-                    });
-                  }
-                  routeNameRef.current = currentRouteName;
-                }}>
-                <ZegoCallInvitationDialog />
-                <Router />
-              </NavigationContainer>
-              <GlobalLoading />
-            </NotificationsProvider>
+                    if (previousRouteName !== currentRouteName) {
+                      await analytics().logScreenView({
+                        screen_name: currentRouteName,
+                        screen_class: currentRouteName,
+                      });
+                    }
+                    routeNameRef.current = currentRouteName;
+                  }}>
+                  <ZegoCallInvitationDialog />
+                  <Router />
+                </NavigationContainer>
+                <GlobalLoading />
+              </NotificationsProvider>
+            </QueryClientProvider>
           </PaperProvider>
         </LoadingProvider>
       </Provider>

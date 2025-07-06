@@ -21,6 +21,7 @@ import {updateUser} from '../api/AccountsApi';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {Text} from 'react-native';
 import {scale} from '../utils/scale';
+import screenWidth from '../global/Constant';
 
 const {useNotifications} = createNotifications();
 
@@ -366,6 +367,24 @@ const ProfileScreen = ({navigation, route}: any) => {
                 Lịch sử đổi quà
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('StatisticScreen')}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: scale(10),
+              }}>
+              <Icon name="bar-chart" type="feather" color="black" />
+              <Text
+                style={{
+                  paddingLeft: scale(10),
+                  fontSize: 16,
+                  fontFamily: getFontFamily('bold'),
+                  color: Colors.black,
+                }}>
+                Thống kê
+              </Text>
+            </TouchableOpacity>
           </>
         </View>
       ) : null}
@@ -376,7 +395,8 @@ const ProfileScreen = ({navigation, route}: any) => {
             backgroundColor: Colors.button,
             alignSelf: 'center',
             borderRadius: 10,
-            paddingHorizontal: 100,
+            width: screenWidth * 0.9,
+            marginBottom: 10,
           }}
           titleStyle={{color: Colors.white}}
           icon={{name: 'gift', type: 'ant-design', color: 'white'}}
@@ -385,6 +405,18 @@ const ProfileScreen = ({navigation, route}: any) => {
               ? navigation.navigate('CreateReward')
               : navigation.navigate('ExchangeGift');
           }}
+        />
+        <Button
+          title="Thống kê"
+          buttonStyle={{
+            backgroundColor: Colors.bluePrimary,
+            alignSelf: 'center',
+            borderRadius: 10,
+            width: screenWidth * 0.9,
+          }}
+          titleStyle={{color: Colors.white}}
+          icon={{name: 'bar-chart', type: 'feather', color: 'white'}}
+          onPress={() => navigation.navigate('StatisticScreen')}
         />
       </View>
       <View style={{flex: 1, justifyContent: 'flex-end'}}>
