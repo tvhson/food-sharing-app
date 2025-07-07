@@ -81,9 +81,9 @@ public class CommentsServiceImpl implements ICommentsService {
     }
 
     @Override
-    public void deleteComment(Long userId, Long postId, Long commentId) {
+    public void deleteComment(Long userId, String role, Long postId, Long commentId) {
         Comments comments = commentsRepository.findById(commentId).orElseThrow(() -> new CustomException("Không tìm thấy bình luận", HttpStatus.NOT_FOUND));
-        if (!comments.getUserId().equals(userId) && !comments.getPost().getCreatedById().equals(userId)) {
+        if (!comments.getUserId().equals(userId) && !comments.getPost().getCreatedById().equals(userId) && !role.equals("ADMIN")) {
             throw new CustomException("Bạn không có quyền chỉnh sửa bình luận này", HttpStatus.FORBIDDEN);
         }
         commentsRepository.delete(comments);

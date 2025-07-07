@@ -175,10 +175,10 @@ public class OrganizationpostsServiceImpl implements IOrganizationpostsService {
     }
 
     @Override
-    public void deleteOrganizationposts(Long id, Long userId) {
+    public void deleteOrganizationposts(Long id, Long userId, String role) {
         Organizationposts organizationposts = organizationpostsRepository.findById(id).orElseThrow(() -> new CustomException("Không tìm thấy sự kiện", HttpStatus.NOT_FOUND));
 
-        if (!organizationposts.getUserId().equals(userId)) {
+        if (!organizationposts.getUserId().equals(userId) && !role.equals("ADMIN")) {
             throw new CustomException("Bạn không có quyền chỉnh sửa sự kiện này", HttpStatus.UNAUTHORIZED);
         }
 

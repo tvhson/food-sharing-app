@@ -12,7 +12,7 @@ public interface IGroupsService {
     GroupsDto getGroupById(Long groupId, Long userId);
     GroupsDto createGroup(Long userId, GroupsDto groupsDto);
     GroupsDto updateGroup(Long userId, Long groupId, GroupsDto groupsDto);
-    void deleteGroup(Long groupId);
+    void deleteGroup(Long userId, String role, Long groupId);
     List<GroupsDto> getMyGroups(Long userId);
 
     List<Todos> getTodosByGroupId(Long groupId);

@@ -96,8 +96,13 @@ public class GroupsServiceImpl implements IGroupsService {
     }
 
     @Override
-    public void deleteGroup(Long groupId) {
+    public void deleteGroup(Long userId, String role, Long groupId) {
         Groups groups = groupsRepository.findById(groupId).orElseThrow(() -> new CustomException("Không tìm thấy nhóm", HttpStatus.NOT_FOUND));
+
+        if (!"ADMIN".equals(role) && !groups.getAuthorId().equals(userId)) {
+            throw new CustomException("Bạn không có quyền xóa nhóm này", HttpStatus.FORBIDDEN);
+        }
+
         groupsRepository.delete(groups);
     }
 
@@ -195,15 +200,15 @@ public class GroupsServiceImpl implements IGroupsService {
             }
         }
 
-        if (groups.getRequestIds() != null && !groups.getRequestIds().isEmpty()) {
-            List<String> requestIds = Arrays.asList(groups.getRequestIds().split("-"));
-            if (requestIds.contains(String.valueOf(userId))) {
-                throw new CustomException("Người dùng đã gửi yêu cầu tham gia nhóm", HttpStatus.BAD_REQUEST);
-            }
-            groups.setRequestIds(groups.getRequestIds() + "-" + userId);
-        } else {
-            groups.setRequestIds(userId.toString());
-        }
+//        if (groups.getRequestIds() != null && !groups.getRequestIds().isEmpty()) {
+//            List<String> requestIds = Arrays.asList(groups.getRequestIds().split("-"));
+//            if (requestIds.contains(String.valueOf(userId))) {
+//                throw new CustomException("Người dùng đã gửi yêu cầu tham gia nhóm", HttpStatus.BAD_REQUEST);
+//            }
+//            groups.setRequestIds(groups.getRequestIds() + "-" + userId);
+//        } else {
+//            groups.setRequestIds(userId.toString());
+//        }
 
         accountsAdapter.createNotification(NotificationsDto.builder()
                                                            .type("GROUP_INVITATION")

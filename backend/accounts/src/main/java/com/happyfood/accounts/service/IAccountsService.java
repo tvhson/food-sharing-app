@@ -14,4 +14,8 @@ public interface IAccountsService {
     void changePassword(Long accountId,String oldPassword, String newPassword);
     void changeRole(Long accountId, String role);
     AccountsDto getAccountByEmail(String email);
+
+    void forgotPassword(String email);
+    void verifyOtp(String email, String otp);
+    void resetPassword(String email, String newPassword);
 }

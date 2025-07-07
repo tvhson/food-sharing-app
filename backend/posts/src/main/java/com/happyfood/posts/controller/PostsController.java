@@ -1,9 +1,6 @@
 package com.happyfood.posts.controller;
 
-import com.happyfood.posts.dto.CommentsDto;
-import com.happyfood.posts.dto.Coordinates;
-import com.happyfood.posts.dto.NumberPostsReceivedDto;
-import com.happyfood.posts.dto.PostsDto;
+import com.happyfood.posts.dto.*;
 import com.happyfood.posts.service.ICommentsService;
 import com.happyfood.posts.service.IPostsService;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +27,8 @@ public class PostsController {
     }
 
     @DeleteMapping("/{postId}")
-    ResponseEntity<?> deletePostById(@RequestHeader Long userId, @PathVariable Long postId) {
-        postsService.deletePostById(userId, postId);
+    ResponseEntity<?> deletePostById(@RequestHeader Long userId, @RequestHeader String role, @PathVariable Long postId) {
+        postsService.deletePostById(userId, role, postId);
         return ResponseEntity.ok().build();
     }
 
@@ -93,8 +90,8 @@ public class PostsController {
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")
-    ResponseEntity<?> deleteComment(@RequestHeader Long userId, @PathVariable Long postId, @PathVariable Long commentId) {
-        commentsService.deleteComment(userId, postId, commentId);
+    ResponseEntity<?> deleteComment(@RequestHeader Long userId, @RequestHeader String role, @PathVariable Long postId, @PathVariable Long commentId) {
+        commentsService.deleteComment(userId, role, postId, commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -108,5 +105,15 @@ public class PostsController {
     ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         postsService.deleteUser(userId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/search")
+    ResponseEntity<List<PostsDto>> searchPosts(@RequestParam String keyword, @RequestHeader Long userId) {
+        return ResponseEntity.ok(postsService.searchPosts(keyword, userId));
+    }
+
+    @GetMapping("/statistical")
+    ResponseEntity<Statistical> getStatistical(@RequestHeader Long userId) {
+        return ResponseEntity.ok(postsService.getStatistical(userId));
     }
 }

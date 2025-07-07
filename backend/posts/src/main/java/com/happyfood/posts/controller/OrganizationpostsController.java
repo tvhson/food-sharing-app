@@ -29,8 +29,8 @@ public class OrganizationpostsController {
     }
 
     @DeleteMapping("/{organizationpostId}")
-    ResponseEntity<?> deleteOrganizationpostsById(@PathVariable Long organizationpostId, @RequestHeader Long userId) {
-        organizationpostsService.deleteOrganizationposts(organizationpostId, userId);
+    ResponseEntity<?> deleteOrganizationpostsById(@PathVariable Long organizationpostId, @RequestHeader Long userId, @RequestHeader String role) {
+        organizationpostsService.deleteOrganizationposts(organizationpostId, userId, role);
         return ResponseEntity.ok().build();
     }
 
@@ -78,8 +78,8 @@ public class OrganizationpostsController {
     }
 
     @DeleteMapping("/{organizationpostId}/comments/{commentId}")
-    ResponseEntity<?> deleteComment(@RequestHeader Long userId, @PathVariable Long organizationpostId, @PathVariable Long commentId) {
-        commentsService.deleteComment(userId, organizationpostId, commentId);
+    ResponseEntity<?> deleteComment(@RequestHeader Long userId, @RequestHeader String role, @PathVariable Long organizationpostId, @PathVariable Long commentId) {
+        commentsService.deleteComment(userId, role, organizationpostId, commentId);
         return ResponseEntity.ok().build();
     }
 

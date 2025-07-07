@@ -110,19 +110,9 @@ public class ChatBotService implements IChatBotService {
         List<ChatBotHistory> chatBotHistories = chatBotHistoryRepository.findByUserId(userId);
         List<ChatBotDto> chatMessages = new ArrayList<>();
 
-        String helloMessage = "## 👋 Chào bạn, tôi là trợ lý ảo của HappyFood. Tôi có thể giúp gì cho bạn hôm nay?";
+        String helloMessage = "👋 Chào bạn, tôi là trợ lý ảo của HappyFood. Tôi có thể giúp gì cho bạn hôm nay?";
         chatMessages.add(ChatBotDto.builder()
                                    .content(helloMessage)
-                                   .role(ChatBotRole.ASSISTANT.getValue())
-                                   .build());
-
-        String beginningMessage = "## Bạn muốn hỏi về \n"
-                                  + "- Chính sách đổi điểm thưởng \n"
-                                  + "- Chính sách khiếu nại \n"
-                                  + "- Cách giao nhận thức ăn \n"
-                                  + "- Câu hỏi thường gặp \n";
-        chatMessages.add(ChatBotDto.builder()
-                                   .content(beginningMessage)
                                    .role(ChatBotRole.ASSISTANT.getValue())
                                    .build());
 

@@ -40,8 +40,8 @@ public class GroupsController {
     }
 
     @DeleteMapping("/{groupId}")
-    ResponseEntity<?> deleteGroupById(@RequestHeader Long userId, @PathVariable Long groupId) {
-        groupsService.deleteGroup(groupId);
+    ResponseEntity<?> deleteGroupById(@RequestHeader Long userId, @RequestHeader String role, @PathVariable Long groupId) {
+        groupsService.deleteGroup(userId, role, groupId);
         return ResponseEntity.ok().build();
     }
 

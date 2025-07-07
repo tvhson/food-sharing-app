@@ -12,6 +12,9 @@ public class RouterValidator {
     public static final List<String> openEndpoints = List.of(
             "/auth/register",
             "/auth/login",
+            "/auth/forgot-password",
+            "/auth/verify-otp",
+            "/auth/reset-password",
             "/ws-chats",
             "/ws-notifications"
     );
