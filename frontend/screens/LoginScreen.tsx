@@ -28,6 +28,7 @@ import {setToken} from '../redux/TokenReducer';
 import {getFontFamily} from '../utils/fonts';
 import {moderateScale, scale} from '../utils/scale';
 import {createLoginValidate, LoginValidateSchema} from '../utils/schema/login';
+import {CustomText} from '../components/ui/CustomText';
 
 enableScreens();
 
@@ -208,6 +209,22 @@ const LoginScreen = ({navigation}: any) => {
                   label="Mật khẩu"
                   secureTextEntry
                 />
+              </View>
+            </Animated.View>
+            <Animated.View
+              entering={FadeInUp.delay(500).duration(1000).springify()}
+              style={{marginTop: 20, alignItems: 'flex-end'}}>
+              <View style={{paddingHorizontal: scale(16)}}>
+                <CustomText
+                  onPress={() => navigation.navigate('ForgotPasswordScreen')}
+                  fontType="medium"
+                  style={{
+                    fontSize: moderateScale(16),
+                    color: Colors.white,
+                    textDecorationLine: 'underline',
+                  }}>
+                  Quên mật khẩu?
+                </CustomText>
               </View>
             </Animated.View>
 

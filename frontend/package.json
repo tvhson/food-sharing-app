@@ -27,6 +27,7 @@
     "@ronradtke/react-native-markdown-display": "^8.1.0",
     "@stomp/stompjs": "^7.0.0",
     "@tanstack/react-query": "^5.81.5",
+    "@tanstack/react-query-devtools": "^5.81.5",
     "@zegocloud/zego-uikit-prebuilt-call-rn": "^6.0.0",
     "@zegocloud/zego-uikit-rn": "^2.14.5",
     "@zegocloud/zimkit-rn": "^2.1.5",

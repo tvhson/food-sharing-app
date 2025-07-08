@@ -90,3 +90,47 @@ export const getInfoUserByEmail = async (
     throw error;
   }
 };
+
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await ApiManager('auth/forgot-password', {
+      method: 'GET',
+      params: {
+        email: email,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const verifyOtp = async (email: string, otp: string) => {
+  try {
+    const response = await ApiManager('auth/verify-otp', {
+      method: 'GET',
+      params: {
+        email: email,
+        otp: otp,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const resetPassword = async (email: string, newPassword: string) => {
+  try {
+    const response = await ApiManager('auth/reset-password', {
+      method: 'GET',
+      params: {
+        email: email,
+        newPassword: newPassword,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+};

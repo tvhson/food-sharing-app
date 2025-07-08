@@ -47,6 +47,7 @@ import {getFontFamily} from '../utils/fonts';
 import CreateEventScreen from '../screens/Events/CreateEventScreen';
 import EventDetailScreen from '../screens/Events/EventDetailScreen';
 import StatisticScreen from '../screens/Statistic/StatisticScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,10 @@ const Router = () => {
         <Stack.Screen name={Route.Landing} component={LandingScreen} />
         <Stack.Screen name={Route.Register} component={RegisterScreen} />
         <Stack.Screen name={Route.Login} component={LoginScreen} />
+        <Stack.Screen
+          name={Route.ForgotPasswordScreen}
+          component={ForgotPasswordScreen}
+        />
         <Stack.Screen
           name={Route.BottomTabNavigator}
           component={BottomTabNavigator}

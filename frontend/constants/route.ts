@@ -41,4 +41,5 @@ export enum Route {
   EventDetailScreen = 'EventDetailScreen',
   CreateEventScreen = 'CreateEventScreen',
   StatisticScreen = 'StatisticScreen',
+  ForgotPasswordScreen = 'ForgotPasswordScreen',
 }
