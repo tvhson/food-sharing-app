@@ -24,15 +24,26 @@ import {
 } from '../../utils/schema/forgot-password';
 import {Button} from '@rneui/themed';
 import Colors from '../../global/Color';
+import {useNotifications} from 'react-native-notificated';
+import {OtpInput} from './CustomInput/OtpInput';
 
 const ForgotPasswordForm = () => {
   const [otp, setOtp] = useState('');
+  const [errorOtp, setErrorOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [step, setStep] = useState<'email' | 'otp' | 'password'>('email');
+  const {notify} = useNotifications();
 
-  const forgotPasswordMutation = useForgotPassword();
-  const verifyOtpMutation = useVerifyOtp();
-  const resetPasswordMutation = useResetPassword();
+  const {
+    mutateAsync: forgotPasswordMutation,
+    isPending: isForgotPasswordPending,
+  } = useForgotPassword();
+  const {mutateAsync: verifyOtpMutation, isPending: isVerifyOtpPending} =
+    useVerifyOtp();
+  const {
+    mutateAsync: resetPasswordMutation,
+    isPending: isResetPasswordPending,
+  } = useResetPassword();
 
   const {
     control,
@@ -49,13 +60,8 @@ const ForgotPasswordForm = () => {
   const email = getValues('username');
 
   const handleForgotPassword = async (data: ForgotPasswordValidateSchema) => {
-    if (!data.username) {
-      Alert.alert('Error', 'Please enter your email');
-      return;
-    }
-
     try {
-      const result = await forgotPasswordMutation.mutateAsync(data.username);
+      const result = await forgotPasswordMutation(data.username);
       if (
         result &&
         typeof result === 'object' &&
@@ -63,7 +69,12 @@ const ForgotPasswordForm = () => {
         result.status === 200
       ) {
         setStep('otp');
-        Alert.alert('Success', 'OTP sent to your email');
+        notify('success', {
+          params: {
+            description: 'OTP đã được gửi đến email của bạn',
+            title: 'Thành công',
+          },
+        });
       } else {
         const errorMessage =
           result &&
@@ -73,22 +84,37 @@ const ForgotPasswordForm = () => {
           typeof result.data === 'object' &&
           'message' in result.data
             ? String(result.data.message)
-            : 'Failed to send OTP';
-        Alert.alert('Error', errorMessage);
+            : 'Lỗi khi gửi OTP';
+        notify('error', {
+          params: {
+            description: errorMessage,
+            title: 'Lỗi',
+          },
+        });
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to send OTP');
+      notify('error', {
+        params: {
+          description: 'Lỗi khi gửi OTP',
+          title: 'Lỗi',
+        },
+      });
     }
   };
 
   const handleVerifyOtp = async () => {
     if (!otp) {
-      Alert.alert('Error', 'Please enter OTP');
+      notify('error', {
+        params: {
+          description: 'Vui lòng nhập OTP',
+          title: 'Lỗi',
+        },
+      });
       return;
     }
 
     try {
-      const result = await verifyOtpMutation.mutateAsync({
+      const result = await verifyOtpMutation({
         email,
         otp,
       });
@@ -99,7 +125,12 @@ const ForgotPasswordForm = () => {
         result.status === 200
       ) {
         setStep('password');
-        Alert.alert('Success', 'OTP verified successfully');
+        notify('success', {
+          params: {
+            description: 'OTP đã được xác thực',
+            title: 'Thành công',
+          },
+        });
       } else {
         const errorMessage =
           result &&
@@ -109,22 +140,37 @@ const ForgotPasswordForm = () => {
           typeof result.data === 'object' &&
           'message' in result.data
             ? String(result.data.message)
-            : 'Invalid OTP';
-        Alert.alert('Error', errorMessage);
+            : 'OTP không hợp lệ';
+        notify('error', {
+          params: {
+            description: errorMessage,
+            title: 'Lỗi',
+          },
+        });
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to verify OTP');
+      notify('error', {
+        params: {
+          description: 'Lỗi khi xác thực OTP',
+          title: 'Lỗi',
+        },
+      });
     }
   };
 
   const handleResetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      notify('error', {
+        params: {
+          description: 'Mật khẩu phải có ít nhất 6 ký tự',
+          title: 'Lỗi',
+        },
+      });
       return;
     }
 
     try {
-      const result = await resetPasswordMutation.mutateAsync({
+      const result = await resetPasswordMutation({
         email,
         newPassword,
       });
@@ -134,7 +180,12 @@ const ForgotPasswordForm = () => {
         'status' in result &&
         result.status === 200
       ) {
-        Alert.alert('Success', 'Password reset successfully');
+        notify('success', {
+          params: {
+            description: 'Mật khẩu đã được đặt lại',
+            title: 'Thành công',
+          },
+        });
         setStep('email');
         setOtp('');
         setNewPassword('');
@@ -147,11 +198,21 @@ const ForgotPasswordForm = () => {
           typeof result.data === 'object' &&
           'message' in result.data
             ? String(result.data.message)
-            : 'Failed to reset password';
-        Alert.alert('Error', errorMessage);
+            : 'Lỗi khi đặt lại mật khẩu';
+        notify('error', {
+          params: {
+            description: errorMessage,
+            title: 'Lỗi',
+          },
+        });
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to reset password');
+      notify('error', {
+        params: {
+          description: 'Lỗi khi đặt lại mật khẩu',
+          title: 'Lỗi',
+        },
+      });
     }
   };
 
@@ -194,51 +255,82 @@ const ForgotPasswordForm = () => {
           alignItems: 'center',
           width: '100%',
         }}>
-        <Button
-          title="Gửi mã OTP"
+        <TouchableOpacity
+          style={styles.button}
           onPress={handleSubmit(handleForgotPassword)}
-          titleStyle={{
-            fontWeight: '700',
-            fontSize: moderateScale(20),
-            fontFamily: getFontFamily('bold'),
-            color: Colors.black,
-          }}
-          buttonStyle={{
-            backgroundColor: Colors.white,
-            borderColor: 'transparent',
-            borderWidth: 0,
-            borderRadius: scale(30),
-            width: scale(200),
-          }}
-        />
+          disabled={isForgotPasswordPending}>
+          <Text style={styles.buttonText}>
+            {isForgotPasswordPending ? 'Đang gửi...' : 'Gửi mã OTP'}
+          </Text>
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
 
   const renderOtpStep = () => (
     <View style={styles.container}>
-      <Text style={styles.title}>Enter OTP</Text>
-      <Text style={styles.subtitle}>OTP sent to {email}</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter OTP"
-        value={otp}
-        onChangeText={setOtp}
-        keyboardType="numeric"
-        maxLength={6}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleVerifyOtp}
-        disabled={verifyOtpMutation.isPending}>
-        <Text style={styles.buttonText}>
-          {verifyOtpMutation.isPending ? 'Verifying...' : 'Verify OTP'}
+      <Animated.View
+        entering={FadeInUp.delay(200).duration(1000).springify()}
+        style={{alignSelf: 'center'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(46),
+            color: 'white',
+            fontFamily: getFontFamily('bold'),
+            textAlign: 'center',
+          }}>
+          Nhập mã OTP
         </Text>
-      </TouchableOpacity>
+      </Animated.View>
+      <Animated.View
+        entering={FadeInUp.delay(200).duration(1000).springify()}
+        style={{alignSelf: 'center'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(20),
+            color: 'white',
+            fontFamily: getFontFamily('bold'),
+            textAlign: 'center',
+          }}>
+          OTP đã được gửi đến {email}
+        </Text>
+      </Animated.View>
+      <Animated.View
+        entering={FadeInUp.delay(200).duration(1000).springify()}
+        style={{alignSelf: 'center'}}>
+        <OtpInput
+          otpCount={6}
+          onCodeChanged={code => {
+            setOtp(code);
+            setErrorOtp('');
+          }}
+          autoFocus
+          containerStyle={{
+            gap: scale(6),
+          }}
+          inputMaskStyle={{
+            borderWidth: 1,
+            borderColor: 'white',
+            borderRadius: scale(10),
+          }}
+        />
+      </Animated.View>
+      <Animated.View
+        entering={FadeInUp.delay(200).duration(1000).springify()}
+        style={{alignSelf: 'center'}}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleVerifyOtp}
+          disabled={isVerifyOtpPending}>
+          <Text style={styles.buttonText}>
+            {isVerifyOtpPending ? 'Đang xác thực...' : 'Xác thực OTP'}
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => setStep('email')}>
-        <Text style={styles.backButtonText}>Back</Text>
+        <Text style={styles.backButtonText}>Quay lại</Text>
       </TouchableOpacity>
     </View>
   );
@@ -255,12 +347,12 @@ const ForgotPasswordForm = () => {
             fontFamily: getFontFamily('bold'),
             textAlign: 'center',
           }}>
-          Nhập mật khẩu mới
+          Đặt lại mật khẩu
         </Text>
       </Animated.View>
       <TextInput
         style={styles.input}
-        placeholder="Enter new password"
+        placeholder="Nhập mật khẩu mới"
         value={newPassword}
         onChangeText={setNewPassword}
         secureTextEntry
@@ -268,15 +360,15 @@ const ForgotPasswordForm = () => {
       <TouchableOpacity
         style={styles.button}
         onPress={handleResetPassword}
-        disabled={resetPasswordMutation.isPending}>
+        disabled={isResetPasswordPending}>
         <Text style={styles.buttonText}>
-          {resetPasswordMutation.isPending ? 'Resetting...' : 'Reset Password'}
+          {isResetPasswordPending ? 'Đang đặt lại...' : 'Đặt lại mật khẩu'}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => setStep('otp')}>
-        <Text style={styles.backButtonText}>Back</Text>
+        <Text style={styles.backButtonText}>Quay lại</Text>
       </TouchableOpacity>
     </View>
   );
@@ -336,7 +428,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButtonText: {
-    color: '#007AFF',
+    color: 'black',
     fontSize: 16,
   },
 });

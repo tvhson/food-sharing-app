@@ -213,7 +213,7 @@ const OtpItem = ({i}: {i: number}) => {
               exiting={exitingAnimated}
               style={[
                 styles.text,
-                {color: Colors.primary, fontSize: moderateScale(28)},
+                {color: Colors.text, fontSize: moderateScale(28)},
                 textStyle,
               ]}>
               {otpValue[i]}
