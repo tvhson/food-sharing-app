@@ -56,7 +56,7 @@ export const zodEmail = (message?: string) => {
 };
 
 export const zodEmailOrPhone = (
-  message: string = 'Error:emailOrPhoneInvalid',
+  message: string = 'Email hoặc số điện thoại không hợp lệ',
 ) => {
   return z
     .string()

@@ -1,4 +1,4 @@
-import {zodEmailOrPhone} from './hook-forms';
+import {zodEmail, zodEmailOrPhone} from './hook-forms';
 
 import {z} from 'zod';
 
@@ -8,6 +8,6 @@ export type ForgotPasswordValidateSchema = z.infer<
 
 export const createForgotPasswordValidate = () => {
   return z.object({
-    username: zodEmailOrPhone(),
+    username: zodEmail(),
   });
 };

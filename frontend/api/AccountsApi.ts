@@ -94,7 +94,7 @@ export const getInfoUserByEmail = async (
 export const forgotPassword = async (email: string) => {
   try {
     const response = await ApiManager('auth/forgot-password', {
-      method: 'GET',
+      method: 'POST',
       params: {
         email: email,
       },
@@ -108,7 +108,7 @@ export const forgotPassword = async (email: string) => {
 export const verifyOtp = async (email: string, otp: string) => {
   try {
     const response = await ApiManager('auth/verify-otp', {
-      method: 'GET',
+      method: 'POST',
       params: {
         email: email,
         otp: otp,
@@ -123,7 +123,7 @@ export const verifyOtp = async (email: string, otp: string) => {
 export const resetPassword = async (email: string, newPassword: string) => {
   try {
     const response = await ApiManager('auth/reset-password', {
-      method: 'GET',
+      method: 'POST',
       params: {
         email: email,
         newPassword: newPassword,

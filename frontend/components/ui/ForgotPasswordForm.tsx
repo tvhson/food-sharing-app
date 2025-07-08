@@ -12,9 +12,20 @@ import {
   useVerifyOtp,
   useResetPassword,
 } from '../../api/usePasswordReset';
+import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
+import {moderateScale, scale} from '../../utils/scale';
+import {getFontFamily} from '../../utils/fonts';
+import {CustomInput} from './CustomInput/CustomInput';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useForm} from 'react-hook-form';
+import {
+  createForgotPasswordValidate,
+  ForgotPasswordValidateSchema,
+} from '../../utils/schema/forgot-password';
+import {Button} from '@rneui/themed';
+import Colors from '../../global/Color';
 
 const ForgotPasswordForm = () => {
-  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [step, setStep] = useState<'email' | 'otp' | 'password'>('email');
@@ -23,14 +34,28 @@ const ForgotPasswordForm = () => {
   const verifyOtpMutation = useVerifyOtp();
   const resetPasswordMutation = useResetPassword();
 
-  const handleForgotPassword = async () => {
-    if (!email) {
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    formState: {errors},
+  } = useForm<ForgotPasswordValidateSchema>({
+    resolver: zodResolver(createForgotPasswordValidate()),
+    defaultValues: {
+      username: '',
+    },
+  });
+
+  const email = getValues('username');
+
+  const handleForgotPassword = async (data: ForgotPasswordValidateSchema) => {
+    if (!data.username) {
       Alert.alert('Error', 'Please enter your email');
       return;
     }
 
     try {
-      const result = await forgotPasswordMutation.mutateAsync(email);
+      const result = await forgotPasswordMutation.mutateAsync(data.username);
       if (
         result &&
         typeof result === 'object' &&
@@ -63,7 +88,10 @@ const ForgotPasswordForm = () => {
     }
 
     try {
-      const result = await verifyOtpMutation.mutateAsync({email, otp});
+      const result = await verifyOtpMutation.mutateAsync({
+        email,
+        otp,
+      });
       if (
         result &&
         typeof result === 'object' &&
@@ -108,7 +136,6 @@ const ForgotPasswordForm = () => {
       ) {
         Alert.alert('Success', 'Password reset successfully');
         setStep('email');
-        setEmail('');
         setOtp('');
         setNewPassword('');
       } else {
@@ -130,23 +157,61 @@ const ForgotPasswordForm = () => {
 
   const renderEmailStep = () => (
     <View style={styles.container}>
-      <Text style={styles.title}>Forgot Password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleForgotPassword}
-        disabled={forgotPasswordMutation.isPending}>
-        <Text style={styles.buttonText}>
-          {forgotPasswordMutation.isPending ? 'Sending...' : 'Send OTP'}
+      <Animated.View
+        entering={FadeInUp.delay(200).duration(1000).springify()}
+        style={{alignSelf: 'center'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(46),
+            color: 'white',
+            fontFamily: getFontFamily('bold'),
+            textAlign: 'center',
+          }}>
+          Quên mật khẩu
         </Text>
-      </TouchableOpacity>
+      </Animated.View>
+      <Animated.View
+        entering={FadeInUp.delay(400).duration(1000).springify()}
+        style={{marginTop: scale(80), alignItems: 'center'}}>
+        <View style={{paddingHorizontal: scale(16)}}>
+          <CustomInput
+            controller={{
+              control,
+              name: 'username',
+            }}
+            labelColor={Colors.gray600}
+            errorText={errors.username?.message}
+            label="Email"
+            keyboardType="email-address"
+          />
+        </View>
+      </Animated.View>
+
+      <Animated.View
+        entering={FadeInDown.delay(400).duration(1000).springify()}
+        style={{
+          marginTop: scale(30),
+          alignItems: 'center',
+          width: '100%',
+        }}>
+        <Button
+          title="Gửi mã OTP"
+          onPress={handleSubmit(handleForgotPassword)}
+          titleStyle={{
+            fontWeight: '700',
+            fontSize: moderateScale(20),
+            fontFamily: getFontFamily('bold'),
+            color: Colors.black,
+          }}
+          buttonStyle={{
+            backgroundColor: Colors.white,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            borderRadius: scale(30),
+            width: scale(200),
+          }}
+        />
+      </Animated.View>
     </View>
   );
 
@@ -180,7 +245,19 @@ const ForgotPasswordForm = () => {
 
   const renderPasswordStep = () => (
     <View style={styles.container}>
-      <Text style={styles.title}>Reset Password</Text>
+      <Animated.View
+        entering={FadeInUp.delay(200).duration(1000).springify()}
+        style={{alignSelf: 'center'}}>
+        <Text
+          style={{
+            fontSize: moderateScale(46),
+            color: 'white',
+            fontFamily: getFontFamily('bold'),
+            textAlign: 'center',
+          }}>
+          Nhập mật khẩu mới
+        </Text>
+      </Animated.View>
       <TextInput
         style={styles.input}
         placeholder="Enter new password"
