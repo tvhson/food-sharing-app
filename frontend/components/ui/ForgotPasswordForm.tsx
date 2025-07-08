@@ -28,11 +28,17 @@ import {Button} from '@rneui/themed';
 import Colors from '../../global/Color';
 import {useNotifications} from 'react-native-notificated';
 import {OtpInput} from './CustomInput/OtpInput';
+import {useLoading} from '../../utils/LoadingContext';
+import {CustomText} from './CustomText';
+import {useNavigation} from '@react-navigation/native';
+import {Route} from '../../constants/route';
 
 const ForgotPasswordForm = () => {
+  const {showLoading, hideLoading} = useLoading();
+  const navigation: any = useNavigation();
+
   const [otp, setOtp] = useState('');
   const [errorOtp, setErrorOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
   const [step, setStep] = useState<'email' | 'otp' | 'password'>('email');
   const {notify} = useNotifications();
 
@@ -54,6 +60,7 @@ const ForgotPasswordForm = () => {
     formState: {errors},
   } = useForm<ForgotPasswordValidateSchema>({
     resolver: zodResolver(createForgotPasswordValidate()),
+    mode: 'onChange',
     defaultValues: {
       username: '',
     },
@@ -66,6 +73,7 @@ const ForgotPasswordForm = () => {
     formState: {errors: errorsResetPassword},
   } = useForm<ResetPasswordValidateSchema>({
     resolver: zodResolver(createResetPasswordValidate()),
+    mode: 'onChange',
     defaultValues: {
       newPassword: '',
       confirmPassword: '',
@@ -76,6 +84,7 @@ const ForgotPasswordForm = () => {
 
   const handleForgotPassword = async (data: ForgotPasswordValidateSchema) => {
     try {
+      showLoading();
       const result = await forgotPasswordMutation(data.username);
       if (
         result &&
@@ -83,14 +92,19 @@ const ForgotPasswordForm = () => {
         'status' in result &&
         result.status === 200
       ) {
+        hideLoading();
         setStep('otp');
         notify('success', {
           params: {
             description: 'OTP đã được gửi đến email của bạn',
             title: 'Thành công',
+            style: {
+              multiline: 100,
+            },
           },
         });
       } else {
+        hideLoading();
         const errorMessage =
           result &&
           typeof result === 'object' &&
@@ -104,14 +118,21 @@ const ForgotPasswordForm = () => {
           params: {
             description: errorMessage,
             title: 'Lỗi',
+            style: {
+              multiline: 100,
+            },
           },
         });
       }
     } catch (error) {
+      hideLoading();
       notify('error', {
         params: {
           description: 'Lỗi khi gửi OTP',
           title: 'Lỗi',
+          style: {
+            multiline: 100,
+          },
         },
       });
     }
@@ -119,16 +140,12 @@ const ForgotPasswordForm = () => {
 
   const handleVerifyOtp = async () => {
     if (!otp) {
-      notify('error', {
-        params: {
-          description: 'Vui lòng nhập OTP',
-          title: 'Lỗi',
-        },
-      });
+      setErrorOtp('Vui lòng nhập OTP');
       return;
     }
 
     try {
+      showLoading();
       const result = await verifyOtpMutation({
         email,
         otp,
@@ -139,6 +156,7 @@ const ForgotPasswordForm = () => {
         'status' in result &&
         result.status === 200
       ) {
+        hideLoading();
         setStep('password');
         notify('success', {
           params: {
@@ -147,6 +165,7 @@ const ForgotPasswordForm = () => {
           },
         });
       } else {
+        hideLoading();
         const errorMessage =
           result &&
           typeof result === 'object' &&
@@ -160,14 +179,21 @@ const ForgotPasswordForm = () => {
           params: {
             description: errorMessage,
             title: 'Lỗi',
+            style: {
+              multiline: 100,
+            },
           },
         });
       }
     } catch (error) {
+      hideLoading();
       notify('error', {
         params: {
           description: 'Lỗi khi xác thực OTP',
           title: 'Lỗi',
+          style: {
+            multiline: 100,
+          },
         },
       });
     }
@@ -175,6 +201,7 @@ const ForgotPasswordForm = () => {
 
   const handleResetPassword = async (data: ResetPasswordValidateSchema) => {
     try {
+      showLoading();
       const result = await resetPasswordMutation({
         email,
         newPassword: data.newPassword,
@@ -185,16 +212,21 @@ const ForgotPasswordForm = () => {
         'status' in result &&
         result.status === 200
       ) {
+        hideLoading();
         notify('success', {
           params: {
             description: 'Mật khẩu đã được đặt lại',
             title: 'Thành công',
+            style: {
+              multiline: 100,
+            },
           },
         });
+        navigation.navigate(Route.Login);
         setStep('email');
         setOtp('');
-        setNewPassword('');
       } else {
+        hideLoading();
         const errorMessage =
           result &&
           typeof result === 'object' &&
@@ -208,14 +240,21 @@ const ForgotPasswordForm = () => {
           params: {
             description: errorMessage,
             title: 'Lỗi',
+            style: {
+              multiline: 100,
+            },
           },
         });
       }
     } catch (error) {
+      hideLoading();
       notify('error', {
         params: {
           description: 'Lỗi khi đặt lại mật khẩu',
           title: 'Lỗi',
+          style: {
+            multiline: 100,
+          },
         },
       });
     }
@@ -264,9 +303,7 @@ const ForgotPasswordForm = () => {
           style={styles.button}
           onPress={handleSubmit(handleForgotPassword)}
           disabled={isForgotPasswordPending}>
-          <Text style={styles.buttonText}>
-            {isForgotPasswordPending ? 'Đang gửi...' : 'Gửi mã OTP'}
-          </Text>
+          <Text style={styles.buttonText}>{'Gửi mã OTP'}</Text>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -319,6 +356,17 @@ const ForgotPasswordForm = () => {
             borderRadius: scale(10),
           }}
         />
+        {errorOtp && (
+          <CustomText
+            size={14}
+            style={{
+              color: Colors.red,
+              marginTop: scale(4),
+              textAlign: 'center',
+            }}>
+            {errorOtp}
+          </CustomText>
+        )}
       </Animated.View>
       <Animated.View
         entering={FadeInUp.delay(200).duration(1000).springify()}
@@ -327,9 +375,7 @@ const ForgotPasswordForm = () => {
           style={styles.button}
           onPress={handleVerifyOtp}
           disabled={isVerifyOtpPending}>
-          <Text style={styles.buttonText}>
-            {isVerifyOtpPending ? 'Đang xác thực...' : 'Xác thực OTP'}
-          </Text>
+          <Text style={styles.buttonText}>{'Xác thực OTP'}</Text>
         </TouchableOpacity>
       </Animated.View>
       <TouchableOpacity
@@ -387,19 +433,25 @@ const ForgotPasswordForm = () => {
           />
         </View>
       </Animated.View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSubmitResetPassword(handleResetPassword)}
-        disabled={isResetPasswordPending}>
-        <Text style={styles.buttonText}>
-          {isResetPasswordPending ? 'Đang đặt lại...' : 'Đặt lại mật khẩu'}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => setStep('otp')}>
-        <Text style={styles.backButtonText}>Quay lại</Text>
-      </TouchableOpacity>
+      <Animated.View
+        entering={FadeInUp.delay(600).duration(1000).springify()}
+        style={{marginTop: 20, alignItems: 'center'}}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmitResetPassword(handleResetPassword)}
+          disabled={isResetPasswordPending}>
+          <Text style={styles.buttonText}>{'Đặt lại mật khẩu'}</Text>
+        </TouchableOpacity>
+      </Animated.View>
+      <Animated.View
+        entering={FadeInUp.delay(600).duration(1000).springify()}
+        style={{marginTop: 20, alignItems: 'center'}}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => setStep('otp')}>
+          <Text style={styles.backButtonText}>Quay lại</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 
