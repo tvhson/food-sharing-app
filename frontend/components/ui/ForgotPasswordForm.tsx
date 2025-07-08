@@ -20,7 +20,9 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {
   createForgotPasswordValidate,
+  createResetPasswordValidate,
   ForgotPasswordValidateSchema,
+  ResetPasswordValidateSchema,
 } from '../../utils/schema/forgot-password';
 import {Button} from '@rneui/themed';
 import Colors from '../../global/Color';
@@ -54,6 +56,19 @@ const ForgotPasswordForm = () => {
     resolver: zodResolver(createForgotPasswordValidate()),
     defaultValues: {
       username: '',
+    },
+  });
+
+  const {
+    control: controlResetPassword,
+    handleSubmit: handleSubmitResetPassword,
+    getValues: getValuesResetPassword,
+    formState: {errors: errorsResetPassword},
+  } = useForm<ResetPasswordValidateSchema>({
+    resolver: zodResolver(createResetPasswordValidate()),
+    defaultValues: {
+      newPassword: '',
+      confirmPassword: '',
     },
   });
 
@@ -158,21 +173,11 @@ const ForgotPasswordForm = () => {
     }
   };
 
-  const handleResetPassword = async () => {
-    if (!newPassword || newPassword.length < 6) {
-      notify('error', {
-        params: {
-          description: 'Mật khẩu phải có ít nhất 6 ký tự',
-          title: 'Lỗi',
-        },
-      });
-      return;
-    }
-
+  const handleResetPassword = async (data: ResetPasswordValidateSchema) => {
     try {
       const result = await resetPasswordMutation({
         email,
-        newPassword,
+        newPassword: data.newPassword,
       });
       if (
         result &&
@@ -350,16 +355,41 @@ const ForgotPasswordForm = () => {
           Đặt lại mật khẩu
         </Text>
       </Animated.View>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập mật khẩu mới"
-        value={newPassword}
-        onChangeText={setNewPassword}
-        secureTextEntry
-      />
+      <Animated.View
+        entering={FadeInUp.delay(600).duration(1000).springify()}
+        style={{marginTop: 20, alignItems: 'center'}}>
+        <View style={{paddingHorizontal: scale(16)}}>
+          <CustomInput
+            controller={{
+              control: controlResetPassword,
+              name: 'newPassword',
+            }}
+            errorText={errorsResetPassword.newPassword?.message}
+            label="Mật khẩu"
+            labelColor={Colors.gray600}
+            secureTextEntry
+          />
+        </View>
+      </Animated.View>
+      <Animated.View
+        entering={FadeInUp.delay(600).duration(1000).springify()}
+        style={{marginTop: 20, alignItems: 'center'}}>
+        <View style={{paddingHorizontal: scale(16)}}>
+          <CustomInput
+            controller={{
+              control: controlResetPassword,
+              name: 'confirmPassword',
+            }}
+            errorText={errorsResetPassword.confirmPassword?.message}
+            label="Nhập lại mật khẩu"
+            labelColor={Colors.gray600}
+            secureTextEntry
+          />
+        </View>
+      </Animated.View>
       <TouchableOpacity
         style={styles.button}
-        onPress={handleResetPassword}
+        onPress={handleSubmitResetPassword(handleResetPassword)}
         disabled={isResetPasswordPending}>
         <Text style={styles.buttonText}>
           {isResetPasswordPending ? 'Đang đặt lại...' : 'Đặt lại mật khẩu'}
