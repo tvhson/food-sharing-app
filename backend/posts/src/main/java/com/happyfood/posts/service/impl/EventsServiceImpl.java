@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 
 @Service
@@ -154,26 +151,26 @@ public class EventsServiceImpl implements IEventsService {
                     all.add(event);
                 }
             } else {
-                if (event.getRepeatDays().stream().anyMatch(day -> day == currentDayOfWeek)) {
+//                if (event.getRepeatDays().stream().anyMatch(day -> day == currentDayOfWeek)) {
                     // nếu ngày bắt đầu sự kiện là ngày hôm nay, không phải là ngày mai
-                    Calendar start = Calendar.getInstance();
-                    start.setTime(event.getStartTime());
-                    Calendar end = Calendar.getInstance();
-                    end.setTime(event.getEndTime());
+                    // start và end là giờ Việt Nam
+                    ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+                    LocalTime start = event.getStartTime().toInstant().atZone(zone).toLocalTime();
+                    LocalTime end = event.getEndTime().toInstant().atZone(zone).toLocalTime();
+                    LocalTime now = currentDate.toInstant().atZone(zone).toLocalTime();
 
-                    Calendar now = Calendar.getInstance();
-                    if (now.after(start) && now.before(end)) {
+                    if (now.isAfter(start) && now.isBefore(end)) {
                         event.setStatus("ONGOING");
                         all.add(event);
                         continue;
                     }
-                    if (now.before(start)) {
+//                    if (now.isBefore(start)) {
                         // nếu sự kiện chưa bắt đầu
                         event.setStatus("UPCOMING");
                         all.add(event);
-                    }
+//                    }
 
-                }
+//                }
             }
         }
 
@@ -216,6 +213,8 @@ public class EventsServiceImpl implements IEventsService {
         Date currentDate = new Date();
         int currentDayOfWeek = getVietnameseDayOfWeek(currentDate);
 
+        System.out.println("ccccccccccccccccccccccccccc");
+
         for (EventsDto event : processedEvents) {
             if (event.getStartDate() != null) {
 
@@ -230,26 +229,29 @@ public class EventsServiceImpl implements IEventsService {
                     continue;
                 }
                 // nếu ngày bắt đầu sự kiện là ngày hôm nay, không phải là ngày mai
-                if (event.getStartDate().after(currentDate) && event.getStartDate().before(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000))) {
+                if (event.getStartDate().after(currentDate)) {
                     event.setStatus("UPCOMING");
                     upcoming.add(event);
                 }
             } else {
-                if (event.getRepeatDays().stream().anyMatch(day -> day == currentDayOfWeek)) {
+//                if (event.getRepeatDays().stream().anyMatch(day -> day == currentDayOfWeek)) {
                     // nếu ngày bắt đầu sự kiện là ngày hôm nay, không phải là ngày mai
-                    int x = compareCurrentTimeToRange(event.getStartTime(), event.getEndTime());
-                    if (x == 0) {
+                    ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+                    LocalTime start = event.getStartTime().toInstant().atZone(zone).toLocalTime();
+                    LocalTime end = event.getEndTime().toInstant().atZone(zone).toLocalTime();
+                    LocalTime now = currentDate.toInstant().atZone(zone).toLocalTime();
+                    if (now.isAfter(start) && now.isBefore(end)) {
                         event.setStatus("ONGOING");
                         ongoing.add(event);
                         continue;
                     }
-                    if (x < 0) {
+//                    if (now.isBefore(start)) {
                         // nếu sự kiện chưa bắt đầu
                         event.setStatus("UPCOMING");
                         upcoming.add(event);
-                    }
+//                    }
 
-                }
+//                }
             }
         }
         return RecommendEventsDto.builder()
@@ -304,7 +306,8 @@ public class EventsServiceImpl implements IEventsService {
 
     public static DayOfWeek getDayOfWeek(Date date) {
         LocalDate localDate = Instant.ofEpochMilli(date.getTime())
-                                     .atZone(ZoneId.systemDefault())
+                                     // hard code the timezone is vietnam timezone
+                                     .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
                                      .toLocalDate();
         return localDate.getDayOfWeek(); // Trả về kiểu DayOfWeek: MONDAY, TUESDAY,...
     }
