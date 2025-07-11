@@ -182,6 +182,7 @@ const ExchangeGiftScreen = ({navigation}: any) => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          showsVerticalScrollIndicator={false}
           renderItem={({item}) => (
             <RewardItem
               imageUrl={item.imageUrl}

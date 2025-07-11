@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Use '10.0.2.2 for Android emulator
-// const baseUrl = 'http://34.9.124.10:8072/';
-const baseUrl = 'http://10.0.2.2:8072/';
+const baseUrl = 'http://34.60.149.45:8072/';
+// const baseUrl = 'http://10.0.2.2:8072/';
 // const baseUrl = 'http://192.168.1.101:8072/';
 
 const ApiManager = axios.create({

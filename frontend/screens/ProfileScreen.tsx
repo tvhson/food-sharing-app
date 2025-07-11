@@ -367,24 +367,6 @@ const ProfileScreen = ({navigation, route}: any) => {
                 Lịch sử đổi quà
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('StatisticScreen')}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                padding: scale(10),
-              }}>
-              <Icon name="bar-chart" type="feather" color="black" />
-              <Text
-                style={{
-                  paddingLeft: scale(10),
-                  fontSize: 16,
-                  fontFamily: getFontFamily('bold'),
-                  color: Colors.black,
-                }}>
-                Thống kê
-              </Text>
-            </TouchableOpacity>
           </>
         </View>
       ) : null}

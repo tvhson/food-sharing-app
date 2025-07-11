@@ -1,3 +1,5 @@
+import {Icon, SearchBar} from '@rneui/themed';
+import React, {useEffect, useState} from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -6,26 +8,22 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {IGetGroupResponse, getGroup} from '../api/GroupApi';
-import {Icon, SearchBar} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {IGetGroupResponse, getGroup} from '../api/GroupApi';
 
-import Colors from '../global/Color';
-import HeaderHome from '../components/ui/HeaderHome';
-import {Menu} from 'react-native-paper';
-import OrganizationPost2 from '../components/ui/OrganizationPost2';
-import {RootState} from '../redux/Store';
-import {Route} from '../constants/route';
-import getDistance from 'geolib/es/getDistance';
-import {getFontFamily} from '../utils/fonts';
+import {useFocusEffect} from '@react-navigation/native';
+import {useNotifications} from 'react-native-notificated';
 import {moderateScale} from 'react-native-size-matters';
-import {scale} from '../utils/scale';
+import HeaderHome from '../components/ui/HeaderHome';
+import OrganizationPost2 from '../components/ui/OrganizationPost2';
+import {Route} from '../constants/route';
+import Colors from '../global/Color';
 import screenWidth from '../global/Constant';
 import {setGroup} from '../redux/GroupReducer';
-import {useFocusEffect} from '@react-navigation/native';
+import {RootState} from '../redux/Store';
+import {getFontFamily} from '../utils/fonts';
 import {useLoading} from '../utils/LoadingContext';
-import {useNotifications} from 'react-native-notificated';
+import {scale} from '../utils/scale';
 
 export const FundingScreen = ({navigation}: any) => {
   const {notify} = useNotifications();
@@ -38,8 +36,6 @@ export const FundingScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<IGetGroupResponse[]>([]);
-  const [visible, setVisible] = useState(false);
-  const [sortingMethod, setSortingMethod] = useState('');
 
   const getFundingGroup = async () => {
     showLoading();
@@ -85,25 +81,6 @@ export const FundingScreen = ({navigation}: any) => {
               post.description?.toLowerCase().includes(search.toLowerCase()),
           );
         }
-        if (sortingMethod === 'distance') {
-          filtered = filtered.sort((a, b) => {
-            const distanceA = getDistance(
-              {
-                latitude: a.latitude,
-                longitude: a.longitude,
-              },
-              location,
-            );
-            const distanceB = getDistance(
-              {
-                latitude: b.latitude,
-                longitude: b.longitude,
-              },
-              location,
-            );
-            return distanceA - distanceB;
-          });
-        }
 
         setFilterPosts(filtered);
       } catch (error) {
@@ -113,10 +90,7 @@ export const FundingScreen = ({navigation}: any) => {
     if (groups) {
       applyFilter();
     }
-  }, [search, sortingMethod, groups, location]);
-
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
+  }, [search, groups, location]);
 
   return (
     <View style={styles.container}>
@@ -141,32 +115,6 @@ export const FundingScreen = ({navigation}: any) => {
             value={search}
           />
         </View>
-        <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          contentStyle={{backgroundColor: 'white'}}
-          anchor={
-            <TouchableOpacity style={{padding: 10}} onPress={openMenu}>
-              <Icon name="filter" type="ionicon" size={24} color={'black'} />
-            </TouchableOpacity>
-          }>
-          <Menu.Item
-            onPress={() => {
-              setSortingMethod('date');
-              setVisible(false);
-            }}
-            title="Xếp theo thời gian"
-            leadingIcon={'sort-calendar-ascending'}
-          />
-          <Menu.Item
-            onPress={() => {
-              setSortingMethod('distance');
-              setVisible(false);
-            }}
-            title="Xếp theo khoảng cách"
-            leadingIcon={'map-marker-distance'}
-          />
-        </Menu>
       </View>
 
       <FlatList

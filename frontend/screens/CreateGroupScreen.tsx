@@ -161,7 +161,6 @@ const CreateGroupScreen = ({route, navigation}: any) => {
           navigation.goBack();
         })
         .catch(error => {
-          console.log('Im here 4');
           console.log(error);
           notify('error', {
             params: {

@@ -85,11 +85,12 @@ export const disconnectMessage = () => {
   }
 };
 
-export const sendMessage = (message: any) => {
+export const sendMessage = async (message: any) => {
   if (stompClient && stompClient.connected) {
-    stompClient.send('/app/message', {}, JSON.stringify(message));
+    await stompClient.send('/app/message', {}, JSON.stringify(message));
   } else {
     console.error('Cannot send message, chat client is not connected');
+    throw Error;
   }
 };
 

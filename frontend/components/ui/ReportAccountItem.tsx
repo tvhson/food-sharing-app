@@ -146,9 +146,9 @@ const ReportAccountItem = ({item, isReport}: any) => {
                   <Button
                     onPress={() => setVisibleDialogRole(false)}
                     textColor="red">
-                    Cancel
+                    Hủy
                   </Button>
-                  <Button onPress={() => handleChangeRole()}>Save</Button>
+                  <Button onPress={() => handleChangeRole()}>Lưu</Button>
                 </Dialog.Actions>
               </Dialog>
             </Portal>
@@ -301,8 +301,7 @@ const ReportAccountItem = ({item, isReport}: any) => {
                 <Text style={{fontWeight: '500', color: 'black'}}>
                   {'\u2022'} Vai trò:{' '}
                 </Text>
-                {item.role.charAt(0).toUpperCase() +
-                  item.role.slice(1).toLowerCase()}
+                {item.role === 'USER' ? 'Người dùng' : 'Tổ chức'}
               </Text>
               {item.birthDate ? (
                 <Text style={{fontSize: 16, color: Colors.grayText}}>

@@ -9,6 +9,7 @@ import {useSelector} from 'react-redux';
 import {Switch} from 'react-native-paper';
 import {updateStatusRedemption} from '../../../api/LoyaltyApi';
 import screenWidth from '../../../global/Constant';
+import {scale} from '../../../utils/scale';
 
 const HistoryRenderItem = ({item}: any) => {
   const userInfo = useSelector((state: RootState) => state.userInfo);
@@ -16,6 +17,7 @@ const HistoryRenderItem = ({item}: any) => {
   const [status, setStatus] = React.useState(item.status);
 
   const handleUpdateStatus = async (updatedStatus: string) => {
+    setStatus(updatedStatus);
     const response: any = await updateStatusRedemption(
       {
         status: updatedStatus,
@@ -23,8 +25,8 @@ const HistoryRenderItem = ({item}: any) => {
       item.id,
       accessToken,
     );
-    if (response.status === 200) {
-      setStatus(updatedStatus);
+    if (response.status !== 200) {
+      setStatus(updatedStatus === 'DONE' ? 'PENDING' : 'DONE');
     }
   };
 
@@ -51,9 +53,9 @@ const HistoryRenderItem = ({item}: any) => {
             style={{
               fontSize: 14,
               fontFamily: getFontFamily('regular'),
-              color: Colors.gray,
+              color: Colors.red,
             }}>
-            -{item.pointsUsed} Star Point
+            {item.pointsUsed} Star Point
           </Text>
           {userInfo.role === 'ADMIN' ? (
             <View style={{flexDirection: 'row', gap: 10}}>
@@ -99,6 +101,7 @@ const HistoryRenderItem = ({item}: any) => {
                     fontSize: 14,
                     fontFamily: getFontFamily('regular'),
                     color: Colors.black,
+                    marginRight: scale(20),
                   }}>
                   Địa chỉ: {item.location}
                 </Text>
@@ -109,6 +112,7 @@ const HistoryRenderItem = ({item}: any) => {
                   fontSize: 14,
                   fontFamily: getFontFamily('regular'),
                   color: Colors.black,
+                  marginRight: scale(20),
                 }}>
                 Số điện thoại: {item.phone}
               </Text>

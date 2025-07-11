@@ -3,7 +3,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, Icon} from '@rneui/themed';
 import axios from 'axios';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useForm} from 'react-hook-form';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
@@ -58,17 +58,26 @@ function EditProfileScreen(props: EditProfileScreenProps) {
 
   const autocompleteRef = useRef<any | null>(null);
 
+  useEffect(() => {
+    if (userInfo.locationName && autocompleteRef.current) {
+      autocompleteRef.current.setAddressText(userInfo.locationName);
+    }
+  }, [userInfo.locationName, autocompleteRef.current]);
+
   const toggleModal = () => {
     props.setVisible(!props.isVisible);
   };
 
   const saveProfile = async (data: EditProfileValidateSchema) => {
+    const [day, month, year] = data.birthDate.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+
     updateUser(
       {
         name: data.name,
         locationName: data.location,
         phone: data.phone,
-        birthDate: formatDate(data.birthDate),
+        birthDate: date,
         email: userInfo.email,
         imageUrl: userInfo.imageUrl,
         latitude: data.latitude,

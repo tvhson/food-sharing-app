@@ -59,8 +59,6 @@ const HomeScreen = ({navigation}: any) => {
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [filterPosts, setFilterPosts] = useState<any>(null);
-  const [sortingMethod, setSortingMethod] = useState('');
-  const [visible, setVisible] = useState(false);
   const [showComment, setShowComment] = useState(false);
   const [showDetailImage, setShowDetailImage] = useState<boolean | number>(
     false,
@@ -69,8 +67,6 @@ const HomeScreen = ({navigation}: any) => {
   const [commentPostId, setCommentPostId] = useState(0);
   const [foodType, setFoodType] = useState<FoodType | null>(null);
   const [isTagVisible, setIsTagVisible] = useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
 
   const location = useSelector((state: RootState) => state.location);
 
@@ -170,7 +166,6 @@ const HomeScreen = ({navigation}: any) => {
     // Apply sorting if not searching
     if (
       !debouncedSearch.trim() &&
-      sortingMethod === 'distance' &&
       location &&
       location.latitude &&
       location.longitude
@@ -188,7 +183,7 @@ const HomeScreen = ({navigation}: any) => {
       });
     }
     return filtered;
-  }, [debouncedSearch, searchData, sortingMethod, recommendPost, location]);
+  }, [debouncedSearch, searchData, recommendPost, location]);
 
   // Update filterPosts state when filteredData changes
   useEffect(() => {
@@ -228,70 +223,47 @@ const HomeScreen = ({navigation}: any) => {
             showLoading={isLoading}
           />
         </View>
-
-        <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          contentStyle={{backgroundColor: 'white'}}
-          anchor={
-            <TouchableOpacity style={{padding: 10}} onPress={openMenu}>
-              <Icon name="filter" type="ionicon" size={24} color={'black'} />
-            </TouchableOpacity>
-          }>
-          <Menu.Item
-            onPress={() => {
-              setSortingMethod('date');
-              setVisible(false);
-            }}
-            title="Xếp theo thời gian"
-            leadingIcon={'sort-calendar-ascending'}
-          />
-          <Menu.Item
-            onPress={() => {
-              setSortingMethod('distance');
-              setVisible(false);
-            }}
-            title="Xếp theo khoảng cách"
-            leadingIcon={'map-marker-distance'}
-          />
-        </Menu>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: scale(6),
-          justifyContent: 'flex-end',
-        }}>
-        <TouchableOpacity
-          onPress={() => setIsTagVisible(true)}
+        <View
           style={{
-            padding: scale(4),
-            backgroundColor: Colors.white,
-            borderRadius: scale(8),
-            marginHorizontal: scale(18),
-            paddingHorizontal: scale(50),
             flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            position: 'relative',
+            marginVertical: scale(6),
+            justifyContent: 'flex-end',
           }}>
-          <Text
+          <TouchableOpacity
+            onPress={() => setIsTagVisible(true)}
             style={{
-              fontSize: 16,
-              color: foodType === null ? '#706d6d' : 'black',
-              fontFamily: getFontFamily('regular'),
+              padding: scale(4),
+              backgroundColor: Colors.white,
+              borderRadius: scale(8),
+              marginHorizontal: scale(18),
+              marginLeft: scale(10),
+              paddingRight: scale(26),
+              paddingLeft: scale(6),
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              position: 'relative',
             }}>
-            {foodType === null ? 'Tất cả' : foodType}
-          </Text>
-          <View style={{position: 'absolute', right: scale(6)}}>
-            <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
-          </View>
-        </TouchableOpacity>
+            <Text
+              style={{
+                fontSize: 16,
+                color: foodType === null ? '#706d6d' : 'black',
+                fontFamily: getFontFamily('regular'),
+              }}>
+              {foodType === null ? 'Tất cả' : foodType}
+            </Text>
+            <View style={{position: 'absolute', right: scale(2)}}>
+              <Icon name="chevron-down" type="ionicon" size={20} color="#333" />
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
+
       <FlatList
         style={{marginHorizontal: 8}}
         data={displayData}
         keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

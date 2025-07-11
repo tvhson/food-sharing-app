@@ -92,6 +92,7 @@
     "@types/react-test-renderer": "^18.0.0",
     "@types/sockjs-client": "^1.5.4",
     "@types/text-encoding": "^0.0.39",
+    "@types/uuid": "^10.0.0",
     "babel-jest": "^29.6.3",
     "eslint": "^8.19.0",
     "jest": "^29.6.3",

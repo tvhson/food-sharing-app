@@ -9,6 +9,7 @@ import {
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  connectChat,
   connectMessage,
   disconnectMessage,
   getMessages,
@@ -30,7 +31,11 @@ import {createNotification} from '../api/NotificationApi';
 import dayjs from 'dayjs';
 import dayvi from 'dayjs/locale/vi';
 import {getFontFamily} from '../utils/fonts';
-import {readAllMessageOfRoomChatId} from '../redux/ChatRoomReducer';
+import {
+  pushChatRoom,
+  calculateUnreadMessages,
+  readAllMessageOfRoomChatId,
+} from '../redux/ChatRoomReducer';
 import {scale} from '../utils/scale';
 import {uploadPhoto} from '../api/UploadPhotoApi';
 import {useFocusEffect} from '@react-navigation/native';
@@ -88,6 +93,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     const connectToMessage = async () => {
+      showLoading();
       const saveMessage = (message: any) => {
         if (message.senderId === userInfo.id) {
           return;
@@ -96,7 +102,8 @@ const ChatRoomScreen = ({navigation, route}: any) => {
 
         setMessages((prevMessages: any) => [convertedMessage, ...prevMessages]);
       };
-      connectMessage(roomId, saveMessage);
+      await connectMessage(roomId, saveMessage);
+      hideLoading();
     };
     if (roomId) {
       connectToMessage();
@@ -127,7 +134,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
   useEffect(() => {
     const loadMessages = async () => {
       showLoading();
-      getMessages(roomId, accessToken).then((response: any) => {
+      await getMessages(roomId, accessToken).then((response: any) => {
         if (response.status === 200) {
           const convertedMessages = response.data
             .map((message: any) => convertMessage(message))
@@ -181,7 +188,16 @@ const ChatRoomScreen = ({navigation, route}: any) => {
         content: newMessage[0].text,
         imageUrl: imageUrl,
       };
-      sendMessage(message);
+      try {
+        await sendMessage(message);
+      } catch (error) {
+        const saveChatRoomHandler = (body: any) => {
+          dispatch(pushChatRoom(body));
+          dispatch(calculateUnreadMessages(userInfo.id));
+        };
+        await connectChat(userInfo.id, saveChatRoomHandler);
+        await sendMessage(message);
+      }
 
       setMessages((previousMessages: IMessage[]) => {
         const updatedNewMessages = newMessage.map(msg => ({
@@ -198,8 +214,10 @@ const ChatRoomScreen = ({navigation, route}: any) => {
               const roomChats = response2.data;
               const roomChat = roomChats.find(
                 (room: any) =>
-                  room.senderId === item.senderId &&
-                  room.recipientId === item.recipientId,
+                  (room.senderId === item.senderId &&
+                    room.recipientId === item.recipientId) ||
+                  (room.senderId === item.recipientId &&
+                    room.recipientId === item.senderId),
               );
               analytics().logEvent('chat', {
                 roomChatId: roomChat.id,
@@ -249,7 +267,7 @@ const ChatRoomScreen = ({navigation, route}: any) => {
     useCallback(() => {
       const readAllMessages = async () => {
         if (accessToken) {
-          readAllMessagesOfRoom(roomId, accessToken)
+          await readAllMessagesOfRoom(roomId, accessToken)
             .then((response: any) => {
               if (response.status === 200) {
                 console.log(response.data);

@@ -69,10 +69,11 @@ const PostDetail2 = ({route, navigation}: any) => {
 
   useEffect(() => {
     const getInfoUserCreatePost = async () => {
-      if (accessToken && item.author.id !== userInfo.id) {
-        getRoomChats(accessToken.toString()).then((response2: any) => {
+      if (accessToken && item.author.id !== userInfo.id && !roomChat) {
+        await getRoomChats(accessToken.toString()).then((response2: any) => {
           if (response2.status === 200) {
             const roomChats = response2.data;
+
             const roomChatFind = roomChats.find(
               (room: any) =>
                 (room.senderId === userInfo.id &&
@@ -92,7 +93,7 @@ const PostDetail2 = ({route, navigation}: any) => {
       // get comment list
       if (accessToken) {
         // get comment list
-        getCommentByPostId(item.id, accessToken)
+        await getCommentByPostId(item.id, accessToken)
           .then((response: any) => {
             setCommentList(response);
           })
@@ -133,7 +134,7 @@ const PostDetail2 = ({route, navigation}: any) => {
     // get comment list
     if (accessToken) {
       // get comment list
-      getCommentByPostId(item.id, accessToken)
+      await getCommentByPostId(item.id, accessToken)
         .then((response: any) => {
           setCommentList(response);
         })
@@ -247,7 +248,7 @@ const PostDetail2 = ({route, navigation}: any) => {
     if (response.status === 200) {
       setComment('');
       setImageUpload(null);
-      getCommentByPostId(item.id, accessToken)
+      await getCommentByPostId(item.id, accessToken)
         .then((response: any) => {
           setCommentList(response);
         })

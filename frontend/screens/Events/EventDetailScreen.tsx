@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
+  Linking,
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import {useEventById, IGetEventResponse} from '../../api/EventsApi';
@@ -24,6 +25,7 @@ const EventDetailScreen = ({route, navigation}: any) => {
   const eventId = route.params?.eventId;
   const token = useSelector((state: RootState) => state.token.key);
   const [refreshing, setRefreshing] = useState(false);
+  const locationStart = useSelector((state: RootState) => state.location);
 
   const {
     data: event,
@@ -32,6 +34,14 @@ const EventDetailScreen = ({route, navigation}: any) => {
     refetch,
     isFetching,
   } = useEventById(token, eventId);
+
+  const handleDirection = () => {
+    if (!event?.latitude || !event?.longitude) {
+      return;
+    }
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${locationStart.latitude},${locationStart.longitude}&destination=${event?.latitude},${event?.longitude}`;
+    Linking.openURL(url);
+  };
 
   if (isLoading || !event) {
     return (
@@ -73,7 +83,11 @@ const EventDetailScreen = ({route, navigation}: any) => {
             source={require('../../assets/images/location_color.png')}
             style={styles.icon}
           />
-          <Text style={styles.infoText}>{event?.locationName}</Text>
+          <TouchableOpacity onPress={handleDirection}>
+            <Text style={[styles.infoText, {marginRight: scale(30)}]}>
+              {event?.locationName}
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.infoRow}>
           <Image

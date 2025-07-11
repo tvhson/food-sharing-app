@@ -180,9 +180,11 @@ const VerifyScreen = ({navigation}: any) => {
         buttons={[
           {
             value: 'User',
-            label: 'Người',
+            label: 'User',
             checkedColor: 'white',
             style: {
+              paddingHorizontal: 0,
+              padding: 0,
               backgroundColor:
                 valueOfSegmentButton === 'User' ? Colors.button : 'transparent',
             },

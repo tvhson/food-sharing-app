@@ -12,6 +12,7 @@ import {updateNotificationAfter} from '../../redux/NotificationReducer';
 import {RootState} from '../../redux/Store';
 import {getFontFamily} from '../../utils/fonts';
 import {Rating} from '@rneui/themed';
+import {RatingStars} from './stars/RatingStars';
 
 const DialogRating = (props: {
   visible: boolean;
@@ -25,21 +26,6 @@ const DialogRating = (props: {
   const dispatch = useDispatch();
 
   const [rating, setRating] = useState(5);
-  const stars = useMemo(() => {
-    const arr = [];
-    for (let i = 1; i <= 5; i++) {
-      arr.push(
-        <TouchableOpacity key={i} onPress={() => setRating(i)}>
-          <IconButton
-            icon={i <= rating ? 'star' : 'star-outline'}
-            size={30}
-            iconColor={Colors.yellow}
-          />
-        </TouchableOpacity>,
-      );
-    }
-    return arr;
-  }, [rating]);
 
   if (!item) {
     return null;
@@ -156,12 +142,14 @@ const DialogRating = (props: {
               Bạn vừa nhận được đồ ăn từ {getName(item.description)}. Hãy đánh
               giá chất lượng món ăn của họ nhé!
             </Text>
-            <Rating
-              showRating
-              imageSize={40}
-              onFinishRating={setRating}
-              style={{paddingVertical: 10}}
-            />
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <RatingStars
+                onRatingChange={setRating}
+                maxStars={5}
+                initialRating={5}
+              />
+            </View>
+
             <Button
               loading={isLoading}
               disabled={isLoading}

@@ -364,73 +364,72 @@ const PostRenderItem2 = (props: any) => {
           leadingIcon="alert-octagon"
         />
       </Menu>
-      <TouchableOpacity
-        style={{flexDirection: 'row'}}
-        onPress={handleGoToDetail}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('PersonalPageOfOther', {id: item.author.id})
-          }>
-          <Image
-            source={{
-              uri:
-                item.author.imageUrl ||
-                userInfo.imageUrl ||
-                'https://randomuser.me/api/portraits/men/36.jpg',
-            }}
-            style={{
-              width: scale(50),
-              height: scale(50),
-              borderRadius: scale(25),
-            }}
-          />
-        </TouchableOpacity>
-        <View style={{alignSelf: 'center', marginLeft: scale(16)}}>
-          <Text
-            style={{
-              fontSize: moderateScale(18),
-              fontFamily: getFontFamily('semibold'),
-              color: Colors.text,
-            }}>
-            {item.author.name || userInfo.name}
-          </Text>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <TouchableOpacity onPress={handleGoToDetail}>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('PersonalPageOfOther', {id: item.author.id})
+            }>
             <Image
-              source={require('../../assets/images/ion_earth.png')}
-              style={{width: scale(20), height: scale(20)}}
+              source={{
+                uri:
+                  item.author.imageUrl ||
+                  userInfo.imageUrl ||
+                  'https://randomuser.me/api/portraits/men/36.jpg',
+              }}
+              style={{
+                width: scale(50),
+                height: scale(50),
+                borderRadius: scale(25),
+              }}
             />
+          </TouchableOpacity>
+          <View style={{alignSelf: 'center', marginLeft: scale(16)}}>
             <Text
               style={{
-                fontSize: moderateScale(12),
-                fontFamily: getFontFamily('regular'),
-                color: Colors.grayText,
-                marginLeft: scale(4),
+                fontSize: moderateScale(18),
+                fontFamily: getFontFamily('semibold'),
+                color: Colors.text,
               }}>
-              {createdDate}
+              {item.author.name || userInfo.name}
             </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Image
+                source={require('../../assets/images/ion_earth.png')}
+                style={{width: scale(20), height: scale(20)}}
+              />
+              <Text
+                style={{
+                  fontSize: moderateScale(12),
+                  fontFamily: getFontFamily('regular'),
+                  color: Colors.grayText,
+                  marginLeft: scale(4),
+                }}>
+                {createdDate}
+              </Text>
+            </View>
           </View>
+          <TouchableOpacity
+            onPress={event => handleOnLongPress(event)}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: Colors.background,
+              borderRadius: scale(20),
+              width: scale(40),
+              height: scale(40),
+              alignSelf: 'center',
+              position: 'absolute',
+              right: 0,
+            }}>
+            <Icon
+              source={'dots-horizontal'}
+              size={30}
+              color={Colors.grayPrimary}
+            />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={event => handleOnLongPress(event)}
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: Colors.background,
-            borderRadius: scale(20),
-            width: scale(40),
-            height: scale(40),
-            alignSelf: 'center',
-            position: 'absolute',
-            right: 0,
-          }}>
-          <Icon
-            source={'dots-horizontal'}
-            size={30}
-            color={Colors.grayPrimary}
-          />
-        </TouchableOpacity>
-      </TouchableOpacity>
-      <View>
+
         <View
           style={{
             flexDirection: 'row',
@@ -573,70 +572,70 @@ const PostRenderItem2 = (props: any) => {
             </Text>
           </View>
         </View>
-        <View
-          style={{
-            width: screenWidth * 0.85,
-            height: screenWidth,
-            borderRadius: scale(20),
-            marginTop: scale(10),
-            overflow: 'hidden',
-            alignSelf: 'center',
-            pointerEvents: 'box-none',
-          }}>
-          <ImageSwiper
-            images={item.images}
-            onPressImage={() => {
-              const detailPost = {
-                item,
-                user: item.author.id !== userInfo.id ? item.author : userInfo,
-                distance: item.distance,
-              };
+      </TouchableOpacity>
+      <View
+        style={{
+          width: screenWidth * 0.85,
+          height: screenWidth,
+          borderRadius: scale(20),
+          marginTop: scale(10),
+          overflow: 'hidden',
+          alignSelf: 'center',
+          pointerEvents: 'box-none',
+        }}>
+        <ImageSwiper
+          images={item.images}
+          onPressImage={() => {
+            const detailPost = {
+              item,
+              user: item.author.id !== userInfo.id ? item.author : userInfo,
+              distance: item.distance,
+            };
 
-              setDetailPost(detailPost);
-            }}
+            setDetailPost(detailPost);
+          }}
+        />
+      </View>
+      {renderAiComment()}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: scale(15),
+        }}>
+        <TouchableOpacity onPress={handleLiked}>
+          <Image
+            source={
+              liked
+                ? require('../../assets/images/liked.png')
+                : require('../../assets/images/like.png')
+            }
+            style={{width: scale(50), height: scale(50)}}
           />
-        </View>
-        {renderAiComment()}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: scale(15),
-          }}>
-          <TouchableOpacity onPress={handleLiked}>
-            <Image
-              source={
-                liked
-                  ? require('../../assets/images/liked.png')
-                  : require('../../assets/images/like.png')
-              }
-              style={{width: scale(50), height: scale(50)}}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{marginLeft: scale(10)}}
-            onPress={handleShowComment}>
-            <Image
-              source={require('../../assets/images/comment.png')}
-              style={{width: scale(50), height: scale(50)}}
-            />
-          </TouchableOpacity>
-          {/* <TouchableOpacity style={{marginLeft: 10}}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{marginLeft: scale(10)}}
+          onPress={handleShowComment}>
+          <Image
+            source={require('../../assets/images/comment.png')}
+            style={{width: scale(50), height: scale(50)}}
+          />
+        </TouchableOpacity>
+        {/* <TouchableOpacity style={{marginLeft: 10}}>
             <Image
               source={require('../../assets/images/share.png')}
               style={{width: 50, height: 50}}
             />
           </TouchableOpacity> */}
-          <Text
-            style={{
-              marginLeft: scale(10),
-              fontFamily: getFontFamily('regular'),
-              color: Colors.black,
-              fontSize: moderateScale(14),
-            }}>
-            {likeCount && `${likeCount} người thích`}
-          </Text>
-        </View>
+        <Text
+          style={{
+            marginLeft: scale(10),
+            fontFamily: getFontFamily('regular'),
+            color: Colors.black,
+            fontSize: moderateScale(14),
+          }}>
+          {likeCount && `${likeCount} người thích`}
+        </Text>
       </View>
     </View>
   );

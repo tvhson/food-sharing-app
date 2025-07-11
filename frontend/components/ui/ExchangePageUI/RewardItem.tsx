@@ -658,37 +658,60 @@ const RewardItem = (props: {
           }}>
           {props.pointsRequired} Star Point
         </Text>
-        <Button
-          mode="contained"
-          buttonColor={Colors.greenPrimary}
+        <Text
           style={{
-            borderRadius: scale(8),
-            justifyContent: 'center',
+            fontSize: moderateScale(15),
+            color:
+              props.stockQuantity === 0
+                ? Colors.gray
+                : props.myPoint === undefined
+                ? Colors.greenPrimary
+                : props.myPoint >= props.pointsRequired
+                ? Colors.greenPrimary
+                : Colors.red,
+            fontFamily: getFontFamily('regular'),
             alignSelf: 'center',
-            marginTop: scale(10),
-            gap: scale(10),
-          }}
-          disabled={
-            props.myPoint === undefined ||
-            props.myPoint < props.pointsRequired ||
-            props.stockQuantity === 0
-          }
-          onPress={() => {
-            setDialogRedeemVisible(true);
-            setQuantity(1);
-            setPoint(props.pointsRequired);
+            marginTop: scale(4),
           }}>
-          <Icon source={'gift-outline'} size={scale(20)} color={Colors.white} />
-          <Text
+          Còn lại: {props.stockQuantity} phần
+        </Text>
+        {userInfo.role === 'ADMIN' ? null : (
+          <Button
+            mode="contained"
+            buttonColor={Colors.greenPrimary}
             style={{
-              color: Colors.white,
-              fontSize: moderateScale(14),
-              fontFamily: getFontFamily('bold'),
-              marginLeft: scale(5),
+              borderRadius: scale(8),
+              justifyContent: 'center',
+              alignSelf: 'center',
+              marginTop: scale(10),
+              gap: scale(10),
+            }}
+            disabled={
+              props.myPoint === undefined ||
+              props.myPoint < props.pointsRequired ||
+              props.stockQuantity === 0
+            }
+            onPress={() => {
+              setDialogRedeemVisible(true);
+              setQuantity(1);
+              setPoint(props.pointsRequired);
             }}>
-            Đổi quà
-          </Text>
-        </Button>
+            <Icon
+              source={'gift-outline'}
+              size={scale(20)}
+              color={Colors.white}
+            />
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: moderateScale(14),
+                fontFamily: getFontFamily('bold'),
+                marginLeft: scale(5),
+              }}>
+              Đổi quà
+            </Text>
+          </Button>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );

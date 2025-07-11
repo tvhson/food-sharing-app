@@ -82,6 +82,7 @@ const ManageReward = ({navigation}: any) => {
         </Text>
         <FlatList
           data={data}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }

@@ -243,7 +243,7 @@ const LoadingScreen = ({navigation, route}: any) => {
           onUserLogin(userInfo);
           dispatch(saveUser(userInfo));
           connectNotification(userInfo.id, saveNotificationHandler);
-          connectChat(userInfo.id, saveChatRoomHandler);
+          await connectChat(userInfo.id, saveChatRoomHandler);
           saveAllChatRoom();
 
           if (userInfo.role === 'ADMIN') {

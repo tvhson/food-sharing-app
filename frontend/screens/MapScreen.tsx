@@ -15,6 +15,7 @@ import {createNotifications} from 'react-native-notificated';
 import {getFontFamily} from '../utils/fonts';
 import {getPosts} from '../api/PostApi';
 import {useSelector} from 'react-redux';
+import {calculateExpiredDate, timeAgo} from '../utils/helper';
 
 const listFilter = [
   {id: 1, title: 'Trong vòng 2km', value: 2},
@@ -251,6 +252,10 @@ const MapScreen = ({navigation}: any) => {
                     latitude: location.latitude,
                     longitude: location.longitude,
                   },
+                  createdDate: timeAgo(selectedMarker.createdDate),
+                  expiredString: calculateExpiredDate(
+                    new Date(selectedMarker.expiredDate),
+                  ),
                 });
               }}>
               <Text style={styles.btnText}>Xem chi tiết</Text>
